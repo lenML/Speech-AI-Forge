@@ -88,13 +88,15 @@ def text_normalize(text, is_end=False):
     return result
 
 
-# print(
-#     text_normalize(
-#         "ChatTTS是专门为对话场景设计的文本转语音模型，例如LLM助手对话任务。它支持英文和中文两种语言。最大的模型使用了10万小时以上的中英文数据进行训练。在HuggingFace中开源的版本为4万小时训练且未SFT的版本."
-#     )
-# )
-# print(
-#     text_normalize(
-#         " [oral_9] [laugh_0] [break_0] 电 [speed_0] 影 [speed_0] 中 梁朝伟 [speed_9] 扮演的陈永仁的编号27149"
-#     )
-# )
+if __name__ == "__main__":
+    print(
+        text_normalize(
+            "ChatTTS是专门为对话场景设计的文本转语音模型，例如LLM助手对话任务。它支持英文和中文两种语言。最大的模型使用了10万小时以上的中英文数据进行训练。在HuggingFace中开源的版本为4万小时训练且未SFT的版本."
+        )
+    )
+    print(
+        text_normalize(
+            " [oral_9] [laugh_0] [break_0] 电 [speed_0] 影 [speed_0] 中 梁朝伟 [speed_9] 扮演的陈永仁的编号27149"
+        )
+    )
+    print(text_normalize(" 明天有62％的概率降雨"))
