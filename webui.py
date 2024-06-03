@@ -37,6 +37,8 @@ def synthesize_ssml(ssml: str):
     buffer = io.BytesIO()
     combined_audio.export(buffer, format="wav")
 
+    buffer.seek(0)
+
     return buffer.read()
 
 
@@ -294,11 +296,17 @@ def create_interface():
                         prompt2_input = gr.Textbox(label="Prompt 2")
                         prefix_input = gr.Textbox(label="Prefix")
                     with gr.Column(scale=3):
-                        text_input = gr.Textbox(
-                            label="Text to Speech",
-                            lines=10,
-                            placeholder="输入文本或选择示例",
-                        )
+                        with gr.Row():
+                            with gr.Column(scale=4):
+                                text_input = gr.Textbox(
+                                    label="Text to Speech",
+                                    lines=10,
+                                    placeholder="输入文本或选择示例",
+                                )
+                            with gr.Column(scale=1):
+                                refine_button = gr.Button("✍️Refine Text")
+                                tts_button = gr.Button("🔊Generate Audio")
+
                         sample_dropdown = gr.Dropdown(
                             choices=[sample["text"] for sample in sample_texts],
                             label="选择示例",
@@ -310,9 +318,6 @@ def create_interface():
                             inputs=[sample_dropdown],
                             outputs=[text_input],
                         )
-                        with gr.Row():
-                            refine_button = gr.Button("✍️Refine Text")
-                            tts_button = gr.Button("🔊Generate Audio")
 
                         tts_output = gr.Audio(label="Generated Audio")
 
