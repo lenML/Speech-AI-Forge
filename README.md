@@ -30,8 +30,9 @@ https://huggingface.co/spaces/lenML/ChatTTS-Forge
 
      ![model_dir](./docs/model_dir.png)
 
-3. python: `python -m pip -r requirements.txt`
-4. ffmpeg: 加速减速变声依赖于 ffmpeg，部署环境中需要安装 ffmpeg
+3. ffmpeg: 加速减速变声依赖于 ffmpeg，部署环境中需要安装 ffmpeg
+4. rubberband: 需要安装 rubberband `apt-get insatll rubberband-cli`
+5. python: `python -m pip -r requirements.txt`
 
 > 显存消耗估计在 3.7gb 左右
 
