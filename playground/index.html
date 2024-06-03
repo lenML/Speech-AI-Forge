@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗣️</text></svg>">
+  <title>ChatTTS Forge Playground</title>
+  <script type="importmap">
+      {
+        "imports": {
+          "preact": "https://cdn.jsdelivr.net/npm/preact@10.22.0/+esm",
+          "htm": "https://cdn.jsdelivr.net/npm/htm@3.1.1/+esm",
+          "preact/hooks": "https://cdn.jsdelivr.net/npm/preact@10.22.0/hooks/dist/hooks.module.js",
+          "axios": "https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm",
+          "@quik-fe/stand": "https://cdn.jsdelivr.net/npm/@quik-fe/stand@1.1.2/+esm",
+          "goober": "https://cdn.jsdelivr.net/npm/goober@2.1.14/+esm"
+        }
+      }
+    </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    html {
+      background-color: #1f1f1f;
+      color: white;
+    }
+
+    body {
+      font-family: sans-serif;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+    }
+
+    .scrollable {
+      overflow: auto;
+    }
+
+    .pg-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .pg-scrollbar::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    .pg-scrollbar::-webkit-scrollbar-thumb {
+      background-color: rgb(177, 177, 177);
+      border-radius: 4px;
+    }
+
+    .pg-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(220, 220, 220);
+    }
+
+    .pg-scrollbar::-webkit-scrollbar-thumb:active {
+      background-color: rgb(160, 160, 160);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script type="module" src="./index.mjs">
+  </script>
+</body>
+
+</html>
