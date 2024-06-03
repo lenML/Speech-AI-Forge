@@ -38,10 +38,10 @@ def generate_audio(
     if isinstance(spk, int):
         with SeedContext(spk):
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
-        logger.debug("spk", spk)
+        logger.debug(("spk", spk))
     elif isinstance(spk, Speaker):
         params_infer_code["spk_emb"] = spk.emb
-        logger.debug("spk", spk.name)
+        logger.debug(("spk", spk.name))
 
     logger.debug(
         {

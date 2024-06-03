@@ -81,9 +81,10 @@ def text_normalize(text, is_end=False):
 
     result = pattern.sub(replace, text)
 
-    if is_end:
-        # 加这个是为了防止吞字
-        result = ensure_suffix(result, "[v_break]", "。。。[v_break]。。。")
+    # NOTE: 加了会有杂音...
+    # if is_end:
+    # 加这个是为了防止吞字
+    # result = ensure_suffix(result, "[uv_break]", "。。。[uv_break]。。。")
 
     return result
 

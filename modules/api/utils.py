@@ -74,7 +74,7 @@ def calc_spk_style(spk: str | int, style: str | int):
 
     if type(style) == int or type(style) == float:
         raise ParamsTypeError("The style parameter cannot be a number.")
-    elif type(style) == str:
+    elif type(style) == str and style != "":
         if style.isdigit():
             raise ParamsTypeError("The style parameter cannot be a number.")
         else:
