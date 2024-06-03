@@ -1,6 +1,7 @@
+import os
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "DEBUG"))
 
 
 import gradio as gr
@@ -422,5 +423,36 @@ def create_interface():
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Gradio App")
+    parser.add_argument(
+        "--server_name", type=str, default="0.0.0.0", help="server name"
+    )
+    parser.add_argument("--server_port", type=int, default=7860, help="server port")
+    parser.add_argument(
+        "--share", action="store_true", help="share the gradio interface"
+    )
+    parser.add_argument("--debug", action="store_true", help="enable debug mode")
+    parser.add_argument("--auth", type=str, help="username:password for authentication")
+
+    args = parser.parse_args()
+
+    server_name = os.getenv("GRADIO_SERVER_NAME", args.server_name)
+    server_port = int(os.getenv("GRADIO_SERVER_PORT", args.server_port))
+    share = bool(os.getenv("GRADIO_SHARE", args.share))
+    debug = bool(os.getenv("GRADIO_DEBUG", args.debug))
+    auth = os.getenv("GRADIO_AUTH", args.auth)
+
     demo = create_interface()
-    demo.queue().launch(share=False)
+
+    if auth:
+        auth = tuple(auth.split(":"))
+
+    demo.queue().launch(
+        server_name=server_name,
+        server_port=server_port,
+        share=share,
+        debug=debug,
+        auth=auth,
+    )

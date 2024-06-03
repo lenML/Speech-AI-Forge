@@ -1,3 +1,8 @@
+import os
+import logging
+
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+
 import torch
 from modules import config
 from modules import generate_audio as generate

@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  chat-tts-forge-api:
+    build: .
+    container_name: chat-tts-forge-api
+    restart: always
+    volumes:
+      - "./:/app"
+    ports:
+      - "8000:8000"
+    environment:
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-8000}
+      RELOAD: ${RELOAD:-false}
+      COMPILE: ${COMPILE:-false}
+      LRU_SIZE: ${LRU_SIZE:-64}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    command: >
+      python3 main.py
+      --host ${HOST:-0.0.0.0}
+      --port ${PORT:-8000}
+      ${RELOAD:+--reload}
+      ${COMPILE:+--compile}
+      --lru_size ${LRU_SIZE:-64}
+      --cors_origin ${CORS_ORIGIN:-*}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
