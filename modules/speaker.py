@@ -42,10 +42,13 @@ class SpeakerManager:
         self.refresh_speakers()
 
     def refresh_speakers(self):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.speakers = []
         for speaker in os.listdir(self.speaker_dir):
             if speaker.endswith(".pt"):
-                self.speakers.append(torch.load(self.speaker_dir + speaker))
+                self.speakers.append(
+                    torch.load(self.speaker_dir + speaker, map_location=device)
+                )
 
     def list_speakers(self):
         return self.speakers
