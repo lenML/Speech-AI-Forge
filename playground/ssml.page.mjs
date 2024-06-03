@@ -4,7 +4,7 @@ import { html, create, styled } from "./misc.mjs";
 const default_ssml = `
 <speak version="0.1">
   <voice spk="Bob" seed="-1" style="narration-relaxed">
-    这里是一个简单的 SSML 示例。 
+    这里是一个简单的 SSML 示例。 [lbreak]
   </voice>
 </speak>
 `.trim();
