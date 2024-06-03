@@ -161,4 +161,7 @@ class APIClient {
   }
 }
 
-export const client = new APIClient("http://localhost:8000");
+export const client = new APIClient(
+  localStorage.getItem("__chattts_playground_api_base__") ||
+    `${window.location.origin}`
+);
