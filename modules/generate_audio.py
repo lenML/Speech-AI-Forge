@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 from modules.speaker import Speaker
 from modules.utils.SeedContext import SeedContext
@@ -6,6 +7,7 @@ from modules.utils.SeedContext import SeedContext
 from modules import models
 
 
+@torch.inference_mode()
 def generate_audio(
     text: str,
     temperature: float = 0.3,

@@ -24,6 +24,7 @@ def get_styles():
     return styles_mgr.list_items()
 
 
+@torch.inference_mode()
 async def synthesize_ssml(ssml: str):
     segments = parse_ssml(ssml)
 
@@ -36,6 +37,7 @@ async def synthesize_ssml(ssml: str):
     return buffer.read()
 
 
+@torch.inference_mode()
 def tts_generate(
     text,
     temperature,
@@ -125,11 +127,14 @@ def create_interface():
                         top_k_input = gr.Slider(1, 50, value=20, label="Top K")
 
                         with gr.Row():
-                            spk_input_text = gr.Textbox(label="Speaker (Text or Seed)")
+                            spk_input_text = gr.Textbox(
+                                label="Speaker (Text or Seed)", value="-1"
+                            )
                             spk_input_dropdown = gr.Dropdown(
                                 choices=speaker_names,
                                 label="Choose Speaker",
                                 interactive=True,
+                                value="-1",
                             )
                             spk_input_dropdown.change(
                                 fn=lambda x: x,
@@ -138,7 +143,9 @@ def create_interface():
                             )
 
                         with gr.Row():
-                            style_input_text = gr.Textbox(label="Style (Text or Seed)")
+                            style_input_text = gr.Textbox(
+                                label="Style (Text or Seed)", value="-1"
+                            )
                             style_input_dropdown = gr.Dropdown(
                                 choices=styles, label="Choose Style", interactive=True
                             )
