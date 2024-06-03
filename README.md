@@ -2,6 +2,9 @@
 
 ChatTTS 锻造厂提供强大的 ChatTTS API，支持类 SSML 语法生成长文本，并能高效管理和复用说话人和风格。
 
+在线试用：
+https://huggingface.co/spaces/lenML/ChatTTS-Forge
+
 # Features
 
 - **风格提示词注入**: 灵活调整输出风格，通过注入提示词实现个性化。
@@ -106,8 +109,8 @@ ChatTTS-SSML 是类似 微软 tts 的那种格式，结合本系统中的 speake
     </voice>
 </speak>
 ```
-[ssml_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
 
+[ssml_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
 
 ## prosody
 
@@ -139,8 +142,8 @@ prosody 和 voice 一样接收所有语音控制参数，除此之外还可以�
     </voice>
 </speak>
 ```
-[prosody_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b5ad4c8d-f519-4b9a-bacf-290e4cc7d6df)
 
+[prosody_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b5ad4c8d-f519-4b9a-bacf-290e4cc7d6df)
 
 ## break
 
@@ -157,8 +160,8 @@ prosody 和 voice 一样接收所有语音控制参数，除此之外还可以�
     </voice>
 </speak>
 ```
-[break_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/e1c682b8-fce1-40fa-a4bf-7465a266798a)
 
+[break_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/e1c682b8-fce1-40fa-a4bf-7465a266798a)
 
 # styles list
 
