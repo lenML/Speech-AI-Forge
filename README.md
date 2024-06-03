@@ -20,9 +20,17 @@ ChatTTS 锻造厂提供强大的 ChatTTS API，支持类 SSML 语法生成长文
 
 ## 环境准备
 
-- python
-- ffmpeg
-- 显存 4gb 以上 (运行占用 3.7gb 左右)
+1. clone: `git clone https://github.com/lenML/ChatTTS-Forge.git`
+2. model: 请在此地址下载手动下载模型，并放置到 models/ChatTTS 目录下
+
+   - HuggingFace: https://huggingface.co/2Noise/ChatTTS
+
+     ![model_dir](./docs/model_dir.png)
+
+3. python: `python -m pip -r requirements.txt`
+4. ffmpeg: 加速减速变声依赖于 ffmpeg，部署环境中需要安装 ffmpeg
+
+> 显存消耗估计在 3.7gb 左右
 
 ## 启动项目
 
@@ -40,10 +48,6 @@ python launch.py
 | `--compile`     | `bool` | `False`     | Enable model compile                                                    |
 | `--lru_size`    | `int`  | `64`        | Set the size of the request cache pool; set to 0 to disable `lru_cache` |
 | `--cors_origin` | `str`  | `"*"`       | Allowed CORS origins. Use `*` to allow all origins                      |
-
-# Docker
-
-WIP 开发中
 
 # API
 
@@ -178,6 +182,10 @@ prosody 和 voice 一样接收所有语音控制参数，除此之外还可以�
 | whispering                | 表达一种柔和的语气，试图发出安静而柔和的声音。                                                     |
 | terrified                 | 表达一种害怕的语气，语速快且声音颤抖。听起来说话人处于不稳定的疯狂状态。                           |
 | unfriendly                | 表达一种冷淡无情的语气。                                                                           |
+
+# Docker
+
+WIP 开发中
 
 # References
 
