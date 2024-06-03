@@ -11,6 +11,8 @@ from modules.data import styles_mgr
 
 from modules.api.utils import calc_spk_style
 
+from modules.utils.normalization import text_normalize
+
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
@@ -61,7 +63,7 @@ def tts_generate(
     prompt2 = prompt2 or params.get("prompt2", "")
 
     sample_rate, audio_data = generate_audio(
-        text=text,
+        text=text_normalize(text),
         temperature=temperature,
         top_P=top_p,
         top_K=top_k,
@@ -98,6 +100,45 @@ sample_texts = [
     {
         "text": "图书馆新到了一批书籍，涵盖了文学、科学和历史等多个领域，欢迎大家前来借阅。",
     },
+    {
+        "text": "电影中梁朝伟扮演的陈永仁的编号27149",
+    },
+    {
+        "text": "这块黄金重达324.75克",
+    },
+    {
+        "text": "我们班的最高总分为583分",
+    },
+    {
+        "text": "12~23",
+    },
+    {
+        "text": "-1.5~2",
+    },
+    {
+        "text": "她出生于86年8月18日，她弟弟出生于1995年3月1日",
+    },
+    {
+        "text": "等会请在12:05请通知我",
+    },
+    {
+        "text": "今天的最低气温达到-10°C",
+    },
+    {
+        "text": "现场有7/12的观众投出了赞成票",
+    },
+    {
+        "text": "明天有62％的概率降雨",
+    },
+    {
+        "text": "随便来几个价格12块5，34.5元，20.1万",
+    },
+    {
+        "text": "这是固话0421-33441122",
+    },
+    {
+        "text": "这是手机+86 18544139121",
+    },
 ]
 
 default_ssml = """
@@ -111,9 +152,9 @@ default_ssml = """
 
 def create_interface():
     speakers = get_speakers()
-    speaker_names = [speaker.name for speaker in speakers]
+    speaker_names = ["*random"] + [speaker.name for speaker in speakers]
 
-    styles = [s.get("name") for s in get_styles()]
+    styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
     with gr.Blocks() as demo:
         with gr.Tabs():
@@ -134,10 +175,10 @@ def create_interface():
                                 choices=speaker_names,
                                 label="Choose Speaker",
                                 interactive=True,
-                                value="-1",
+                                value="*random",
                             )
                             spk_input_dropdown.change(
-                                fn=lambda x: x,
+                                fn=lambda x: x.startswith("*") and "-1" or x,
                                 inputs=[spk_input_dropdown],
                                 outputs=[spk_input_text],
                             )
@@ -147,10 +188,13 @@ def create_interface():
                                 label="Style (Text or Seed)", value="-1"
                             )
                             style_input_dropdown = gr.Dropdown(
-                                choices=styles, label="Choose Style", interactive=True
+                                choices=styles,
+                                label="Choose Style",
+                                interactive=True,
+                                value="*auto",
                             )
                             style_input_dropdown.change(
-                                fn=lambda x: x,
+                                fn=lambda x: x.startswith("*") and "-1" or x,
                                 inputs=[style_input_dropdown],
                                 outputs=[style_input_text],
                             )
