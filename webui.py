@@ -9,6 +9,8 @@ from modules.generate_audio import generate_audio
 from modules.speaker import speaker_mgr
 from modules.data import styles_mgr
 
+from modules.api.utils import calc_spk_style
+
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
@@ -32,6 +34,44 @@ async def synthesize_ssml(ssml: str):
     buffer.seek(0)
 
     return buffer.read()
+
+
+def tts_generate(
+    text,
+    temperature,
+    top_p,
+    top_k,
+    spk,
+    infer_seed,
+    use_decoder,
+    prompt1,
+    prompt2,
+    prefix,
+    style,
+):
+    params = calc_spk_style(spk=spk, style=style)
+
+    spk = params.get("spk", spk)
+    infer_seed = infer_seed or params.get("seed", infer_seed)
+    temperature = temperature or params.get("temperature", temperature)
+    prefix = prefix or params.get("prefix", prefix)
+    prompt1 = prompt1 or params.get("prompt1", "")
+    prompt2 = prompt2 or params.get("prompt2", "")
+
+    sample_rate, audio_data = generate_audio(
+        text=text,
+        temperature=temperature,
+        top_P=top_p,
+        top_K=top_k,
+        spk=spk,
+        infer_seed=infer_seed,
+        use_decoder=use_decoder,
+        prompt1=prompt1,
+        prompt2=prompt2,
+        prefix=prefix,
+    )
+
+    return sample_rate, audio_data
 
 
 def read_local_readme():
@@ -132,36 +172,6 @@ def create_interface():
                         tts_button = gr.Button("Generate Audio")
                         tts_output = gr.Audio(label="Generated Audio")
 
-                def tts_generate(
-                    text,
-                    temperature,
-                    top_p,
-                    top_k,
-                    spk,
-                    infer_seed,
-                    use_decoder,
-                    prompt1,
-                    prompt2,
-                    prefix,
-                    style,
-                ):
-                    try:
-                        spk = int(spk)
-                    except ValueError:
-                        pass  # 保持原文本
-                    return generate_audio(
-                        text,
-                        temperature,
-                        top_p,
-                        top_k,
-                        spk,
-                        infer_seed,
-                        use_decoder,
-                        prompt1,
-                        prompt2,
-                        prefix,
-                    )
-
                 tts_button.click(
                     tts_generate,
                     inputs=[
@@ -208,4 +218,4 @@ def create_interface():
 
 if __name__ == "__main__":
     demo = create_interface()
-    demo.launch()
+    demo.queue().launch(share=False)

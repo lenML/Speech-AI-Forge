@@ -1,14 +1,37 @@
 import torch
 from modules import config
 from modules import generate_audio as generate
-from modules.api import api
 
 from functools import lru_cache
 from typing import Callable
 
+from modules.api.Api import APIManager
+
+from modules.api.impl import (
+    base_api,
+    tts_api,
+    ssml_api,
+    google_api,
+    openai_api,
+    refiner_api,
+)
+
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
+
+
+def create_api():
+    api = APIManager()
+
+    base_api.setup(api)
+    tts_api.setup(api)
+    ssml_api.setup(api)
+    google_api.setup(api)
+    openai_api.setup(api)
+    refiner_api.setup(api)
+
+    return api
 
 
 def conditional_cache(condition: Callable):
@@ -77,6 +100,10 @@ if __name__ == "__main__":
             generate.generate_audio
         )
 
-    api.set_cors()
+    api = create_api()
+    config.api = api
+
+    if args.cors_origin:
+        api.set_cors(allow_origins=[args.cors_origin])
 
     uvicorn.run(api.app, host=args.host, port=args.port, reload=args.reload)

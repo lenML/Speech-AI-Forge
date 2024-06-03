@@ -8,7 +8,7 @@ from modules.data import styles_mgr
 
 
 from modules.api import utils as api_utils
-from modules.api import APIManager
+from modules.api.Api import APIManager
 
 
 async def list_styles():

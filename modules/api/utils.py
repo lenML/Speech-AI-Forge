@@ -16,6 +16,10 @@ from modules.ssml import merge_prompt
 from enum import Enum
 
 
+class ParamsTypeError(Exception):
+    pass
+
+
 class AudioFormat(str, Enum):
     mp3 = "mp3"
     wav = "wav"
