@@ -55,9 +55,21 @@ python launch.py
 
 ![api](./docs/api.png)
 
+# WebUI
+
+> 某些情况可能需要 webui（比如白嫖 huggingface） ，这里实现了一个最简单的版本
+
+```
+python webui.py
+```
+
+![webui](./docs/webui.png)
+
 # Playground
 
 实现了一套用于调试 api 的 playground 前端页面，独立于 python 代码非 gradio
+
+部署后打开 `http://localhost:8000/playground/index.html` 即可使用
 
 ![playgorund](./docs/playground.png)
 

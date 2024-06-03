@@ -37,17 +37,17 @@ def generate_audio(
         params_infer_code["spk_emb"] = spk.emb
         print("spk", spk.name)
 
-    print(
-        {
-            "infer_seed": infer_seed,
-            "temperature": temperature,
-            "top_P": top_P,
-            "top_K": top_K,
-            "prompt1": prompt1 if prompt1 else "",
-            "prompt2": prompt2 if prompt2 else "",
-            "prefix": prefix if prefix else "",
-        }
-    )
+    # print(
+    #     {
+    #         "infer_seed": infer_seed,
+    #         "temperature": temperature,
+    #         "top_P": top_P,
+    #         "top_K": top_K,
+    #         "prompt1": prompt1 if prompt1 else "",
+    #         "prompt2": prompt2 if prompt2 else "",
+    #         "prefix": prefix if prefix else "",
+    #     }
+    # )
 
     with SeedContext(infer_seed):
         wav = chat_tts.generate_audio(text, params_infer_code, use_decoder=use_decoder)
