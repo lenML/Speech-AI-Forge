@@ -12,6 +12,7 @@ from modules.data import styles_mgr
 from modules.api.utils import calc_spk_style
 
 from modules.utils.normalization import text_normalize
+from modules import refiner
 
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
@@ -27,7 +28,7 @@ def get_styles():
 
 
 @torch.inference_mode()
-async def synthesize_ssml(ssml: str):
+def synthesize_ssml(ssml: str):
     segments = parse_ssml(ssml)
 
     buffer = io.BytesIO()
@@ -76,6 +77,11 @@ def tts_generate(
     )
 
     return sample_rate, audio_data
+
+
+@torch.inference_mode()
+def refine_text(text: str):
+    return refiner.refine_text(text)
 
 
 def read_local_readme():
@@ -156,7 +162,18 @@ def create_interface():
 
     styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
-    with gr.Blocks() as demo:
+    js_func = """
+    function refresh() {
+        const url = new URL(window.location);
+
+        if (url.searchParams.get('__theme') !== 'dark') {
+            url.searchParams.set('__theme', 'dark');
+            window.location.href = url.href;
+        }
+    }
+    """
+
+    with gr.Blocks(js=js_func) as demo:
         with gr.Tabs():
             with gr.TabItem("TTS"):
                 with gr.Row():
@@ -169,13 +186,13 @@ def create_interface():
 
                         with gr.Row():
                             spk_input_text = gr.Textbox(
-                                label="Speaker (Text or Seed)", value="-1"
+                                label="Speaker (Text or Seed)", value="female2"
                             )
                             spk_input_dropdown = gr.Dropdown(
                                 choices=speaker_names,
                                 label="Choose Speaker",
                                 interactive=True,
-                                value="*random",
+                                value="female2",
                             )
                             spk_input_dropdown.change(
                                 fn=lambda x: x.startswith("*") and "-1" or x,
@@ -220,8 +237,17 @@ def create_interface():
                             inputs=[sample_dropdown],
                             outputs=[text_input],
                         )
-                        tts_button = gr.Button("Generate Audio")
+                        with gr.Row():
+                            refine_button = gr.Button("✍️Refine Text")
+                            tts_button = gr.Button("🔊Generate Audio")
+
                         tts_output = gr.Audio(label="Generated Audio")
+
+                refine_button.click(
+                    refine_text,
+                    inputs=[text_input],
+                    outputs=[text_input],
+                )
 
                 tts_button.click(
                     tts_generate,
@@ -247,7 +273,7 @@ def create_interface():
                     lines=10,
                     value=default_ssml,
                 )
-                ssml_button = gr.Button("Synthesize SSML")
+                ssml_button = gr.Button("🔊Synthesize SSML")
                 ssml_output = gr.Audio(label="Generated Audio")
 
                 ssml_button.click(

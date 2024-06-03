@@ -1,10 +1,12 @@
 import numpy as np
+import torch
 
 from modules.utils.SeedContext import SeedContext
 
 from modules import models
 
 
+@torch.inference_mode()
 def refine_text(
     text: str,
     prompt="[oral_2][laugh_0][break_6]",
