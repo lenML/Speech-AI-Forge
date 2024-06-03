@@ -1,13 +1,17 @@
 import gradio as gr
 import io
 
+import torch
+
 from modules.ssml import parse_ssml, synthesize_segment
 from modules.generate_audio import generate_audio
 
 from modules.speaker import speaker_mgr
 from modules.data import styles_mgr
 
-import requests
+torch._dynamo.config.cache_size_limit = 64
+torch._dynamo.config.suppress_errors = True
+torch.set_float32_matmul_precision("high")
 
 
 def get_speakers():

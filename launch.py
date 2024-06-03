@@ -1,9 +1,14 @@
+import torch
 from modules import config
 from modules import generate_audio as generate
 from modules.api import api
 
 from functools import lru_cache
 from typing import Callable
+
+torch._dynamo.config.cache_size_limit = 64
+torch._dynamo.config.suppress_errors = True
+torch.set_float32_matmul_precision("high")
 
 
 def conditional_cache(condition: Callable):
