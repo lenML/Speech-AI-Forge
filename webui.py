@@ -88,7 +88,9 @@ def refine_text(text: str):
 
 def read_local_readme():
     with open("README.md", "r", encoding="utf-8") as file:
-        return file.read()
+        content = file.read()
+        content = content[content.index("# 🗣️ ChatTTS-Forge") :]
+        return content
 
 
 # 演示示例文本
