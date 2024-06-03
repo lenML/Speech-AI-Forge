@@ -6,6 +6,10 @@ from modules.utils.SeedContext import SeedContext
 
 from modules import models
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 @torch.inference_mode()
 def generate_audio(
@@ -34,23 +38,23 @@ def generate_audio(
     if isinstance(spk, int):
         with SeedContext(spk):
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
-        print("spk", spk)
+        logger.debug("spk", spk)
     elif isinstance(spk, Speaker):
         params_infer_code["spk_emb"] = spk.emb
-        print("spk", spk.name)
+        logger.debug("spk", spk.name)
 
-    # print(
-    #     {
-    #         "text": text,
-    #         "infer_seed": infer_seed,
-    #         "temperature": temperature,
-    #         "top_P": top_P,
-    #         "top_K": top_K,
-    #         "prompt1": prompt1 or "",
-    #         "prompt2": prompt2 or "",
-    #         "prefix": prefix or "",
-    #     }
-    # )
+    logger.debug(
+        {
+            "text": text,
+            "infer_seed": infer_seed,
+            "temperature": temperature,
+            "top_P": top_P,
+            "top_K": top_K,
+            "prompt1": prompt1 or "",
+            "prompt2": prompt2 or "",
+            "prefix": prefix or "",
+        }
+    )
 
     with SeedContext(infer_seed):
         wav = chat_tts.generate_audio(text, params_infer_code, use_decoder=use_decoder)

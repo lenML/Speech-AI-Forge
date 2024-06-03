@@ -66,7 +66,7 @@ def generate_audio_segment(
     if enable_normalize:
         text = text_normalize(text, is_end=is_end)
 
-    logger.info(f"generate segment: {text}")
+    logger.debug(f"generate segment: {text}")
 
     sample_rate, audio_data = generate_audio.generate_audio(
         text=text,
@@ -88,12 +88,17 @@ def generate_audio_segment(
 
 
 def expand_spk(attrs: dict):
-    if attrs.get("spk", "") != "" and not str(attrs["spk"]).isdigit():
-        try:
-            params = speaker_mgr.get_speaker(str(attrs["spk"]))
-            attrs.update(params)
-        except Exception as e:
-            logger.error(f"apply style failed, {e}")
+    input_spk = attrs.get("spk", "")
+    if isinstance(input_spk, int):
+        return
+    if isinstance(input_spk, str) and input_spk.isdigit():
+        attrs.update({"spk": int(input_spk)})
+        return
+    try:
+        speaker = speaker_mgr.get_speaker(input_spk)
+        attrs.update({"spk": speaker})
+    except Exception as e:
+        logger.error(f"apply style failed, {e}")
 
 
 def expand_style(attrs: dict):
@@ -261,7 +266,9 @@ def synthesize_segment(segment: Dict[str, Any]) -> AudioSegment | None:
     if text == "":
         return None
 
-    spk = to_number(attrs.get("spk", ""), int, -1)
+    spk = attrs.get("spk", "")
+    if isinstance(spk, str):
+        spk = int(spk)
     seed = to_number(attrs.get("seed", ""), int, -1)
     top_k = to_number(attrs.get("top_k", ""), int, None)
     top_p = to_number(attrs.get("top_p", ""), float, None)

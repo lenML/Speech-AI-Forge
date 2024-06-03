@@ -3,7 +3,7 @@ import io
 
 import torch
 
-from modules.ssml import parse_ssml, synthesize_segment
+from modules.ssml import parse_ssml, synthesize_segments, combine_audio_segments
 from modules.generate_audio import generate_audio
 
 from modules.speaker import speaker_mgr
@@ -31,11 +31,11 @@ def get_styles():
 def synthesize_ssml(ssml: str):
     segments = parse_ssml(ssml)
 
+    audio_segments = synthesize_segments(segments)
+    combined_audio = combine_audio_segments(audio_segments)
+
     buffer = io.BytesIO()
-    for segment in segments:
-        audio_segment = synthesize_segment(segment=segment)
-        audio_segment.export(buffer, format="wav")
-    buffer.seek(0)
+    combined_audio.export(buffer, format="wav")
 
     return buffer.read()
 
@@ -146,6 +146,79 @@ sample_texts = [
         "text": "这是手机+86 18544139121",
     },
 ]
+
+ssml_example1 = """
+<speak version="0.1">
+    <voice spk="Bob" style="narration-relaxed">
+        下面是一个 ChatTTS 用于合成多角色多情感的有声书示例
+    </voice>
+    <voice spk="Bob" style="narration-relaxed">
+        黛玉冷笑道：
+    </voice>
+    <voice spk="female2" style="angry">
+        我说呢 [uv_break] ，亏了绊住，不然，早就飞起来了。
+    </voice>
+    <voice spk="Bob" style="narration-relaxed">
+        宝玉道：
+    </voice>
+    <voice spk="Alice" style="unfriendly">
+        “只许和你玩 [uv_break] ，替你解闷。不过偶然到他那里，就说这些闲话。”
+    </voice>
+    <voice spk="female2" style="angry">
+        “好没意思的话！[uv_break] 去不去，关我什么事儿？ 又没叫你替我解闷儿 [uv_break]，还许你不理我呢”
+    </voice>
+    <voice spk="Bob" style="narration-relaxed">
+        说着，便赌气回房去了。
+    </voice>
+</speak>
+"""
+ssml_example2 = """
+<speak version="0.1">
+    <voice spk="Bob" style="narration-relaxed">
+        使用 prosody 控制生成文本的语速语调和音量，示例如下
+
+        <prosody>
+            无任何限制将会继承父级voice配置进行生成
+        </prosody>
+        <prosody rate="1.5">
+            设置 rate 大于1表示加速，小于1为减速
+        </prosody>
+        <prosody pitch="6">
+            设置 pitch 调整音调，设置为6表示提高6个半音
+        </prosody>
+        <prosody volume="2">
+            设置 volume 调整音量，设置为2表示提高2个分贝
+        </prosody>
+
+        在 voice 中无prosody包裹的文本即为默认生成状态下的语音
+    </voice>
+</speak>
+"""
+ssml_example3 = """
+<speak version="0.1">
+    <voice spk="Bob" style="narration-relaxed">
+        使用 break 标签将会简单的
+        
+        <break time="500" />
+
+        插入一段空白到生成结果中 
+    </voice>
+</speak>
+"""
+
+ssml_example4 = """
+<speak version="0.1">
+    <voice spk="Bob" style="excited">
+        temperature for sampling (may be overridden by style or speaker)
+        <break time="500" />
+        温度值用于采样，这个值有可能被 style 或者 speaker 覆盖 
+        <break time="500" />
+        temperature for sampling ，这个值有可能被 style 或者 speaker 覆盖 
+        <break time="500" />
+        温度值用于采样，(may be overridden by style or speaker)
+    </voice>
+</speak>
+"""
 
 default_ssml = """
 <speak version="0.1">
@@ -280,6 +353,18 @@ def create_interface():
                     synthesize_ssml,
                     inputs=[ssml_input],
                     outputs=ssml_output,
+                )
+
+                examples = [
+                    ssml_example1,
+                    ssml_example2,
+                    ssml_example3,
+                    ssml_example4,
+                ]
+
+                gr.Examples(
+                    examples=examples,
+                    inputs=[ssml_input],
                 )
 
             with gr.TabItem("README"):
