@@ -85,6 +85,7 @@ def tts_generate(
     prompt2 = prompt2 or params.get("prompt2", "")
 
     infer_seed = clip(infer_seed, -1, 2**32 - 1)
+    infer_seed = int(infer_seed)
 
     if not disable_normalize:
         text = text_normalize(text)
