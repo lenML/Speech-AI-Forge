@@ -17,3 +17,5 @@ tqdm
 # torch
 # torchvision
 # torchaudio
+gradio
+emojiswitch

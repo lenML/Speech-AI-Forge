@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from fastapi.responses import FileResponse
 
 
-from modules.utils.normalization import text_normalize
+from modules.normalization import text_normalize
 
 from modules import generate_audio as generate
 

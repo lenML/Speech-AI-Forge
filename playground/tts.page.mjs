@@ -3,6 +3,9 @@ import { html, create, styled } from "./misc.mjs";
 
 const sample_texts = [
   {
+    text: "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
+  },
+  {
     text: "天气预报显示，今天会有小雨，请大家出门时记得带伞。降温的天气也提醒我们要适时添衣保暖。 [lbreak]",
   },
   {

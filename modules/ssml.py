@@ -10,7 +10,7 @@ import numpy as np
 from modules.utils.audio import time_stretch, pitch_shift
 
 from modules import generate_audio
-from modules.utils.normalization import text_normalize
+from modules.normalization import text_normalize
 
 import logging
 

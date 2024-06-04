@@ -20,7 +20,7 @@ from modules.data import styles_mgr
 
 from modules.api.utils import calc_spk_style
 
-from modules.utils.normalization import text_normalize
+from modules.normalization import text_normalize
 from modules import refiner
 
 
@@ -115,6 +115,9 @@ def read_local_readme():
 
 # 演示示例文本
 sample_texts = [
+    {
+        "text": "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
+    },
     {
         "text": "天气预报显示，今天会有小雨，请大家出门时记得带伞。降温的天气也提醒我们要适时添衣保暖 [lbreak]",
     },

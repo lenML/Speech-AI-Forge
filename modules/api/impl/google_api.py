@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from modules.api.Api import APIManager
 from modules.utils.audio import apply_prosody_to_audio_data
-from modules.utils.normalization import text_normalize
+from modules.normalization import text_normalize
 
 from modules import generate_audio as generate
 

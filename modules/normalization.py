@@ -1,4 +1,5 @@
 from modules.utils.zh_normalization.text_normlization import *
+import emojiswitch
 
 character_map = {
     "：": "，",
@@ -45,6 +46,10 @@ def apply_character_to_word(text):
 def apply_character_map(text):
     translation_table = str.maketrans(character_map)
     return text.translate(translation_table)
+
+
+def apply_emoji_map(text):
+    return emojiswitch.demojize(text, delimiters=("", ""), lang="zh")
 
 
 def insert_spaces_between_uppercase(s):
@@ -99,6 +104,7 @@ def post_normalize(text):
     text = insert_spaces_between_uppercase(text)
     text = apply_character_map(text)
     text = apply_character_to_word(text)
+    text = apply_emoji_map(text)
     return text
 
 
