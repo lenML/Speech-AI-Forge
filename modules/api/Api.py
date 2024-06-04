@@ -7,12 +7,16 @@ from fastapi.staticfiles import StaticFiles
 
 
 class APIManager:
-    def __init__(self):
-        self.app = FastAPI()
+    def __init__(self, no_docs=False):
+        self.app = FastAPI(
+            title="ChatTTS Forge API",
+            description="ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过类 SSML 语法生成丰富的音频长文本，并提供全面的 API 服务，适用于各种场景。\n\nChatTTS-Forge is a powerful text-to-speech generation tool that supports generating rich audio long texts through class SSML syntax\n\n https://github.com/lenML/ChatTTS-Forge",
+            version="0.1.0",
+            redoc_url=None if no_docs else "/redoc",
+            docs_url=None if no_docs else "/docs",
+        )
         self.registered_apis = {}
         self.logger = logging.getLogger(__name__)
-
-        self.setup_static()
 
     def set_cors(
         self,
@@ -29,9 +33,13 @@ class APIManager:
             allow_headers=allow_headers,
         )
 
-    def setup_static(self):
+    def setup_playground(self):
         app = self.app
-        app.mount("/playground", StaticFiles(directory="playground"), name="playground")
+        app.mount(
+            "/playground",
+            StaticFiles(directory="playground", html=True),
+            name="playground",
+        )
 
     def get(self, path: str, **kwargs):
         def decorator(func):

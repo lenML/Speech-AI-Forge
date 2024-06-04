@@ -26,8 +26,8 @@ torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
 
 
-def create_api():
-    api = APIManager()
+def create_api(no_docs=False):
+    api = APIManager(no_docs=no_docs)
 
     base_api.setup(api)
     tts_api.setup(api)
@@ -85,6 +85,16 @@ if __name__ == "__main__":
         default="*",
         help="Allowed CORS origins. Use '*' to allow all origins.",
     )
+    parser.add_argument(
+        "--no_playground",
+        action="store_true",
+        help="Disable the playground entry",
+    )
+    parser.add_argument(
+        "--no_docs",
+        action="store_true",
+        help="Disable the documentation entry",
+    )
 
     args = parser.parse_args()
 
@@ -105,10 +115,13 @@ if __name__ == "__main__":
             generate.generate_audio
         )
 
-    api = create_api()
+    api = create_api(no_docs=args.no_docs)
     config.api = api
 
     if args.cors_origin:
         api.set_cors(allow_origins=[args.cors_origin])
+
+    if not args.no_playground:
+        api.setup_playground()
 
     uvicorn.run(api.app, host=args.host, port=args.port, reload=args.reload)
