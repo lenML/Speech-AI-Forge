@@ -13,6 +13,7 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 
 ## Features
 
+- **支持 batch 生成**: SSML TTS 接口 / WebUI 支持自动分桶并批量生成
 - **风格提示词注入**: 灵活调整输出风格，通过注入提示词实现个性化。
 - **全面的 API 服务**: 所有功能均通过 API 访问，集成方便。
 - **友好的调试 GUI**: 独立于 Gradio 的 playground，简化调试流程。
@@ -35,7 +36,7 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
   </tr>
   <tr>
     <td rowspan="2">API</td>
-    <td>部署后打开 <code>http://localhost:8000/docs</code> 可查看详细信息。</td>
+    <td>实现了各种形式的tts接口。部署后打开 <code>http://localhost:8000/docs</code> 可查看详细信息。</td>
     <td>运行 <code>python launch.py</code></td>
     <td rowspan="2"><img src="./docs/api.png" alt="api"><br><img src="./docs/playground.png" alt="playground"></td>
   </tr>

@@ -1,16 +1,9 @@
 from lxml import etree
 
-from pydub import AudioSegment
 
-from typing import Any, Tuple, List, Dict
-from scipy.io.wavfile import write
-import io
+from typing import Any, List, Dict
 import numpy as np
 
-from modules.utils.audio import time_stretch, pitch_shift
-
-from modules import generate_audio
-from modules.normalization import text_normalize
 
 import logging
 
@@ -19,72 +12,8 @@ from modules.speaker import speaker_mgr
 
 import random
 
-import json
 
 logger = logging.getLogger(__name__)
-
-
-def bytes_to_array(bytes_data, sample_width):
-    """
-    将bytes类型的原始音频数据转换为numpy数组。
-
-    参数:
-    - bytes_data: bytes类型，原始音频数据。
-    - sample_width: int类型，音频的采样宽度（比特数/8）。
-
-    返回:
-    - numpy数组，表示音频数据。
-    """
-    # 根据采样宽度选择正确的数据类型
-    if sample_width == 1:
-        # 8-bit音频
-        dtype = np.int8
-    elif sample_width == 2:
-        # 16-bit音频
-        dtype = np.int16
-    else:
-        # 采样宽度为3或4（24-bit或32-bit音频）
-        dtype = np.int32
-
-    # 使用numpy.frombuffer将bytes数据转换为数组
-    return np.frombuffer(bytes_data, dtype=dtype)
-
-
-def generate_audio_segment(
-    text: str,
-    spk: int = -1,
-    seed: int = -1,
-    top_p: float = 0.5,
-    top_k: int = 20,
-    temp: float = 0.3,
-    prompt1: str = "",
-    prompt2: str = "",
-    prefix: str = "",
-    enable_normalize=True,
-    is_end: bool = False,
-) -> AudioSegment:
-    if enable_normalize:
-        text = text_normalize(text, is_end=is_end)
-
-    logger.debug(f"generate segment: {text}")
-
-    sample_rate, audio_data = generate_audio.generate_audio(
-        text=text,
-        temperature=temp if temp is not None else 0.3,
-        top_P=top_p if top_p is not None else 0.5,
-        top_K=top_k if top_k is not None else 20,
-        spk=spk if spk else -1,
-        infer_seed=seed if seed else -1,
-        prompt1=prompt1 if prompt1 else "",
-        prompt2=prompt2 if prompt2 else "",
-        prefix=prefix if prefix else "",
-    )
-
-    byte_io = io.BytesIO()
-    write(byte_io, sample_rate, audio_data)
-    byte_io.seek(0)
-
-    return AudioSegment.from_file(byte_io, format="wav")
 
 
 def expand_spk(attrs: dict):
@@ -227,95 +156,6 @@ def parse_ssml(ssml: str) -> List[Dict[str, Any]]:
     # logger.info(f"segments: {json.dumps(segments, ensure_ascii=False)}")
 
     return segments
-
-
-def apply_prosody(
-    audio_segment: AudioSegment, rate: float, volume: float, pitch: float
-) -> AudioSegment:
-    if rate != 1:
-        audio_segment = time_stretch(audio_segment, rate)
-
-    if volume != 0:
-        audio_segment += volume
-
-    if pitch != 0:
-        audio_segment = pitch_shift(audio_segment, pitch)
-
-    return audio_segment
-
-
-def to_number(value, t, default=0):
-    try:
-        number = t(value)
-        return number
-    except (ValueError, TypeError) as e:
-        return default
-
-
-def synthesize_segment(segment: Dict[str, Any]) -> AudioSegment | None:
-    if "break" in segment:
-        pause_segment = AudioSegment.silent(duration=segment["break"])
-        return pause_segment
-
-    attrs = segment.get("attrs", {})
-    text = segment.get("text", "")
-    is_end = segment.get("is_end", False)
-
-    text = str(text).strip()
-
-    if text == "":
-        return None
-
-    spk = attrs.get("spk", "")
-    if isinstance(spk, str):
-        spk = int(spk)
-    seed = to_number(attrs.get("seed", ""), int, -1)
-    top_k = to_number(attrs.get("top_k", ""), int, None)
-    top_p = to_number(attrs.get("top_p", ""), float, None)
-    temp = to_number(attrs.get("temp", ""), float, None)
-
-    prompt1 = attrs.get("prompt1", "")
-    prompt2 = attrs.get("prompt2", "")
-    prefix = attrs.get("prefix", "")
-    disable_normalize = attrs.get("normalize", "") == "False"
-
-    audio_segment = generate_audio_segment(
-        text,
-        enable_normalize=not disable_normalize,
-        spk=spk,
-        seed=seed,
-        top_k=top_k,
-        top_p=top_p,
-        temp=temp,
-        prompt1=prompt1,
-        prompt2=prompt2,
-        prefix=prefix,
-        is_end=is_end,
-    )
-
-    rate = float(attrs.get("rate", "1.0"))
-    volume = float(attrs.get("volume", "0"))
-    pitch = float(attrs.get("pitch", "0"))
-
-    audio_segment = apply_prosody(audio_segment, rate, volume, pitch)
-
-    return audio_segment
-
-
-def synthesize_segments(segments: List[Dict[str, Any]]) -> List[AudioSegment]:
-    audio_segments = []
-    for segment in segments:
-        audio_segment = synthesize_segment(segment=segment)
-        audio_segments.append(audio_segment)
-
-    return audio_segments
-
-
-def combine_audio_segments(audio_segments: list) -> AudioSegment:
-    combined_audio = AudioSegment.empty()
-    for segment in audio_segments:
-        combined_audio += segment
-    return combined_audio
 
 
 if __name__ == "__main__":
@@ -464,7 +304,7 @@ if __name__ == "__main__":
 
     print(segments)
 
-    audio_segments = synthesize_segments(segments)
-    combined_audio = combine_audio_segments(audio_segments)
+    # audio_segments = synthesize_segments(segments)
+    # combined_audio = combine_audio_segments(audio_segments)
 
-    combined_audio.export("output.wav", format="wav")
+    # combined_audio.export("output.wav", format="wav")

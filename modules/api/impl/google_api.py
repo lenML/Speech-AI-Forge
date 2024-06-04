@@ -13,7 +13,8 @@ from modules.normalization import text_normalize
 from modules import generate_audio as generate
 
 
-from modules.ssml import parse_ssml, synthesize_segment
+from modules.ssml import parse_ssml
+from modules.SynthesizeSegments import synthesize_segment
 
 from modules.api import utils as api_utils
 
