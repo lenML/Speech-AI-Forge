@@ -355,7 +355,7 @@ def create_tts_interface():
                 prefix_input = gr.Textbox(label="Prefix")
 
             infer_seed_rand_button.click(
-                lambda x: str(torch.randint(0, 2**32 - 1, (1,)).item()),
+                lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
                 inputs=[infer_seed_input],
                 outputs=[infer_seed_input],
             )
