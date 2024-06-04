@@ -7,7 +7,9 @@ ChatTTS-SSML 是类似 微软 tts 的那种格式，结合本系统中的 speake
 
 ## What is SSML ?
 
-如果你不清楚什么是 SSML，可以参考下面这两个文档，大概理解 SSML 如何在 TTS 系统中如何使用
+SSML（Speech Synthesis Markup Language）是一种基于 XML 的标记语言，用于控制文本到语音合成（TTS）系统的转换过程。通过 SSML，用户可以指定语音的各种属性，如语速、音量、音调、停顿时间等，以生成更加自然和个性化的语音输出。
+
+如果你想更深入了解 SSML，可以参考下面这两个文档，深入理解其如何在 TTS 系统中使用
 
 - 微软 TTS 文档：https://learn.microsoft.com/zh-cn/azure/ai-services/speech-service/speech-synthesis-markup-structure
 - 谷歌 TTS 文档：https://cloud.google.com/text-to-speech/docs/ssml?hl=zh-cn
@@ -50,7 +52,37 @@ ChatTTS-SSML 是类似 微软 tts 的那种格式，结合本系统中的 speake
 
 [ssml_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
 
+## voice
+
+| 属性      | 描述                                                              |
+| --------- | ----------------------------------------------------------------- |
+| spk       | 指定语音角色的 ID 或名称                                          |
+| style     | 指定语音的风格，例如 "narration-relaxed"                          |
+| seed      | 指定随机种子，用于生成不同的语音变体                              |
+| top_p     | 控制生成文本的多样性，值越高多样性越强                            |
+| top_k     | 限制生成时考虑的最高概率词数                                      |
+| temp      | 控制生成的随机性，值越高随机性越强                                |
+| prompt1   | 自定义提示 1，用于引导语音生成                                    |
+| prompt2   | 自定义提示 2，用于引导语音生成                                    |
+| prefix    | 在生成的文本前添加的前缀                                          |
+| normalize | 是否对文本进行标准化处理，"True" 表示标准化，"False" 表示不标准化 |
+
+```xml
+<speak version="0.1">
+    <voice spk="Bob" seed="42" temp="0.7">
+        temperature for sampling ，这个值有可能被 style 或者 speaker 覆盖
+    </voice>
+</speak>
+```
+
 ## prosody
+
+| 属性   | 描述                                                     |
+| ------ | -------------------------------------------------------- |
+| rate   | 语速，1.0 表示正常语速，大于 1 表示加速，小于 1 表示减速 |
+| volume | 音量，以分贝为单位，可以是正数或负数                     |
+| pitch  | 音调，以半音为单位，可以是正数或负数                     |
+| ...    | 并支持所有 voice 属性                                    |
 
 > 受限于模型能力，暂时无法做到对单个字控制。尽量在一个 prosody 中用长文本效果更好。
 
@@ -84,6 +116,10 @@ prosody 和 voice 一样接收所有语音控制参数，除此之外还可以�
 [prosody_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b5ad4c8d-f519-4b9a-bacf-290e4cc7d6df)
 
 ## break
+
+| 属性 | 描述                                 |
+| ---- | ------------------------------------ |
+| time | 停顿的时间，单位为毫秒，例如 "500ms" |
 
 空白，用于在文本中插入固定时长的空白停顿
 
