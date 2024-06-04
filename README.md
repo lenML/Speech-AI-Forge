@@ -84,92 +84,9 @@ python webui.py
 
 ![playgorund](./docs/playground.png)
 
-# ChatTTS-SSML v0.1
+# SSML
 
-> 这是一个实验性质的尝试，现在并没用完整的 SSML 语法和功能。
-
-ChatTTS-SSML 是类似 微软 tts 的那种格式，结合本系统中的 speaker 和 style 会很好用
-
-下面是一个简单的例子
-
-```xml
-<speak version="0.1">
-    <voice spk="Bob" style="narration-relaxed">
-        ChatTTS 用于合成多角色多情感的有声书示例
-    </voice>
-    <voice spk="Bob" style="narration-relaxed">
-        黛玉冷笑道：
-    </voice>
-    <voice spk="female2" style="angry">
-        我说呢 [uv_break] ，亏了绊住，不然，早就飞起来了。
-    </voice>
-    <voice spk="Bob" style="narration-relaxed">
-        宝玉道：
-    </voice>
-    <voice spk="Alice" style="unfriendly">
-        “只许和你玩 [uv_break] ，替你解闷。不过偶然到他那里，就说这些闲话。”
-    </voice>
-    <voice spk="female2" style="angry">
-        “好没意思的话！[uv_break] 去不去，关我什么事儿？ 又没叫你替我解闷儿 [uv_break]，还许你不理我呢”
-    </voice>
-    <voice spk="Bob" style="narration-relaxed">
-        说着，便赌气回房去了。
-    </voice>
-</speak>
-```
-
-[ssml_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
-
-## prosody
-
-> 受限于模型能力，暂时无法做到对单个字控制。尽量在一个 prosody 中用长文本效果更好。
-
-prosody 和 voice 一样接收所有语音控制参数，除此之外还可以控制 rate volume pitch 以对生成语音进行细致的后处理。
-
-一个例子如下
-
-```xml
-<speak version="0.1">
-    <voice spk="Bob" style="narration-relaxed">
-        使用 prosody 控制生成文本的语速语调和音量，示例如下
-
-        <prosody>
-            无任何限制将会继承父级voice配置进行生成
-        </prosody>
-        <prosody rate="1.5">
-            设置 rate 大于1表示加速，小于1为减速
-        </prosody>
-        <prosody pitch="6">
-            设置 pitch 调整音调，设置为6表示提高6个半音
-        </prosody>
-        <prosody volume="2">
-            设置 volume 调整音量，设置为2表示提高2个分贝
-        </prosody>
-
-        在 voice 中无prosody包裹的文本即为默认生成状态下的语音
-    </voice>
-</speak>
-```
-
-[prosody_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b5ad4c8d-f519-4b9a-bacf-290e4cc7d6df)
-
-## break
-
-空白，用于在文本中插入固定时长的空白停顿
-
-```xml
-<speak version="0.1">
-    <voice spk="Bob" style="narration-relaxed">
-        使用 break 标签将会简单的
-
-        <break time="500" />
-
-        插入一段空白到生成结果中
-    </voice>
-</speak>
-```
-
-[break_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/e1c682b8-fce1-40fa-a4bf-7465a266798a)
+[SSML readme](./SSML.md)
 
 # styles (Experimental)
 
