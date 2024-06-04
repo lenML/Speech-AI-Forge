@@ -478,6 +478,9 @@ def create_tts_interface():
                         gr.Markdown("- 开启batch请配合设置Inference Seed")
                         gr.Markdown("- 字数限制1,000字，超过部分截断")
                         gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`")
+                        gr.Markdown(
+                            "- If the input text is all in English, it is recommended to check disable_normalize"
+                        )
                         text_input = gr.Textbox(
                             show_label=False,
                             label="Text to Speech",
@@ -612,7 +615,7 @@ def create_ssml_interface():
                 # 参数
                 gr.Markdown("🎛️Parameters")
                 # batch size
-                batch_size_input = gr.Number(
+                batch_size_input = gr.Slider(
                     label="Batch Size",
                     value=8,
                     minimum=1,
@@ -688,6 +691,49 @@ def create_long_content_tab(ssml_input, tabs):
     styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
     with gr.Row():
+        with gr.Column(scale=1):
+            # 选择说话人 选择风格 选择seed
+            with gr.Group():
+                gr.Markdown("🗣️Speaker")
+                spk_input_text = gr.Textbox(
+                    label="Speaker (Text or Seed)",
+                    value="female2",
+                    show_label=False,
+                )
+                spk_input_dropdown = gr.Dropdown(
+                    choices=speaker_names,
+                    interactive=True,
+                    value="female2",
+                    show_label=False,
+                )
+                spk_rand_button = gr.Button(
+                    value="🎲",
+                    variant="secondary",
+                )
+            with gr.Group():
+                gr.Markdown("🎭Style")
+                style_input_dropdown = gr.Dropdown(
+                    choices=styles,
+                    interactive=True,
+                    show_label=False,
+                    value="*auto",
+                )
+            with gr.Group():
+                gr.Markdown("🗣️Seed")
+                infer_seed_input = gr.Number(
+                    value=42,
+                    label="Inference Seed",
+                    show_label=False,
+                    minimum=-1,
+                    maximum=2**32 - 1,
+                )
+                infer_seed_rand_button = gr.Button(
+                    value="🎲",
+                    variant="secondary",
+                )
+
+            send_btn = gr.Button("📩Send to SSML", variant="primary")
+
         with gr.Column(scale=3):
             with gr.Group():
                 gr.Markdown("📝Long Text Input")
@@ -714,85 +760,49 @@ def create_long_content_tab(ssml_input, tabs):
                     wrap=True,
                     value=[],
                 )
-        with gr.Column(scale=1):
-            # 选择说话人 选择风格 选择seed
-            with gr.Group():
-                gr.Markdown("🗣️Speaker")
-                spk_input_text = gr.Textbox(
-                    label="Speaker (Text or Seed)",
-                    value="female2",
-                    show_label=False,
-                )
-                spk_input_dropdown = gr.Dropdown(
-                    choices=speaker_names,
-                    interactive=True,
-                    value="female2",
-                    show_label=False,
-                )
-                spk_rand_button = gr.Button(
-                    value="🎲",
-                    variant="secondary",
-                )
-                spk_input_dropdown.change(
-                    fn=lambda x: x.startswith("*") and "-1" or x.split(":")[-1].strip(),
-                    inputs=[spk_input_dropdown],
-                    outputs=[spk_input_text],
-                )
-                spk_rand_button.click(
-                    lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
-                    inputs=[spk_input_text],
-                    outputs=[spk_input_text],
-                )
-            with gr.Group():
-                gr.Markdown("🎭Style")
-                style_input_dropdown = gr.Dropdown(
-                    choices=styles,
-                    interactive=True,
-                    show_label=False,
-                    value="*auto",
-                )
-            with gr.Group():
-                gr.Markdown("🗣️Seed")
-                infer_seed_input = gr.Number(
-                    value=42,
-                    label="Inference Seed",
-                    show_label=False,
-                    minimum=-1,
-                    maximum=2**32 - 1,
-                )
-                infer_seed_rand_button = gr.Button(
-                    value="🎲",
-                    variant="secondary",
-                )
-                infer_seed_rand_button.click(
-                    lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
-                    inputs=[infer_seed_input],
-                    outputs=[infer_seed_input],
-                )
 
-            send_btn = gr.Button("📩Send to SSML", variant="primary")
+    spk_input_dropdown.change(
+        fn=lambda x: x.startswith("*") and "-1" or x.split(":")[-1].strip(),
+        inputs=[spk_input_dropdown],
+        outputs=[spk_input_text],
+    )
+    spk_rand_button.click(
+        lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
+        inputs=[spk_input_text],
+        outputs=[spk_input_text],
+    )
+    infer_seed_rand_button.click(
+        lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
+        inputs=[infer_seed_input],
+        outputs=[infer_seed_input],
+    )
+    long_text_split_button.click(
+        split_long_text,
+        inputs=[long_text_input],
+        outputs=[long_text_output],
+    )
 
-            send_btn.click(
-                merge_dataframe_to_ssml,
-                inputs=[
-                    long_text_output,
-                    spk_input_text,
-                    style_input_dropdown,
-                    infer_seed_input,
-                ],
-                outputs=[ssml_input],
-            )
+    infer_seed_rand_button.click(
+        lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
+        inputs=[infer_seed_input],
+        outputs=[infer_seed_input],
+    )
 
-            def change_tab():
-                return gr.Tabs(selected="ssml")
+    send_btn.click(
+        merge_dataframe_to_ssml,
+        inputs=[
+            long_text_output,
+            spk_input_text,
+            style_input_dropdown,
+            infer_seed_input,
+        ],
+        outputs=[ssml_input],
+    )
 
-            send_btn.click(change_tab, inputs=[], outputs=[tabs])
+    def change_tab():
+        return gr.Tabs(selected="ssml")
 
-        long_text_split_button.click(
-            split_long_text,
-            inputs=[long_text_input],
-            outputs=[long_text_output],
-        )
+    send_btn.click(change_tab, inputs=[], outputs=[tabs])
 
 
 def create_readme_tab():
