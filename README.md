@@ -2,8 +2,14 @@
 
 ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过类 SSML 语法生成丰富的音频长文本，并提供全面的 API 服务，适用于各种场景。无论是个性化的语音生成，还是高效的说话人和风格管理，ChatTTS-Forge 都能满足你的需求。
 
-在线体验：
-[ChatTTS-Forge 在线体验](https://huggingface.co/spaces/lenML/ChatTTS-Forge)
+你可以通过以下几种方式体验和部署 ChatTTS-Forge：
+
+| 名称                     | 描述                     | 链接                                                                                                                                                             |
+| ------------------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Huggingface 在线体验** | ChatTTS-Forge 在线体验   | [ChatTTS-Forge 在线体验](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                      |
+| **Colab 一键启动**       | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.ipynb) |
+| **Docker 部署**          | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                |
+| **本地部署**             | 查看环境准备部分         | [本地部署](#本地部署)                                                                                                                                            |
 
 ## Features
 
@@ -19,7 +25,17 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 - **独立 refine API**: 提供单独的 refine 调试接口，提升调试效率。
 - **高效缓存机制**: 生成接口采用 LRU 缓存，提升响应速度。
 
-## 环境准备
+## Interface
+
+| 项目       | 描述                                                                         | 部署或使用方式                                           | 图片                                 |
+| ---------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------ |
+| API        | 部署后打开 `http://localhost:8000/docs` 可查看详细信息                       | 运行`python launch.py`                                   | ![api](./docs/api.png)               |
+| WebUI      | 某些情况可能需要 WebUI（比如 HuggingFace/Colab），这里实现了一个最简单的版本 | 运行 `python webui.py`                                   | ![webui](./docs/webui.png)           |
+| Playground | 实现了一套用于调试 API 的 Playground 前端页面，独立于 Python 代码非 Gradio   | 部署后打开 `http://localhost:8000/playground/index.html` | ![playground](./docs/playground.png) |
+
+## 本地部署
+
+> 预估显存消耗 3.7gb 左右
 
 1. 克隆项目: `git clone https://github.com/lenML/ChatTTS-Forge.git`
 2. 准备模型，放到如下目录
@@ -38,16 +54,13 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 3. 安装 ffmpeg: `apt-get install ffmpeg`
 4. 安装 rubberband: `apt-get install rubberband-cli`
 5. 安装 Python 依赖: `python -m pip install -r requirements.txt`
+6. 根据你的需求启动需要的服务，具体启动参数如下。
 
-> 显存消耗估计在 3.7GB 左右
+### launch.py
 
-## Startup
+Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务器。
 
-```bash
-python launch.py
-```
-
-## CLI args
+所有参数：
 
 | 参数            | 类型   | 默认值      | 描述                                            |
 | --------------- | ------ | ----------- | ----------------------------------------------- |
@@ -58,13 +71,19 @@ python launch.py
 | `--lru_size`    | `int`  | `64`        | 设置请求缓存池的大小；设置为 0 禁用 `lru_cache` |
 | `--cors_origin` | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
 
-## Interface
+### webui.py
 
-| 项目       | 描述                                                                           | 部署或使用方式                                           | 图片                                 |
-| ---------- | ------------------------------------------------------------------------------ | -------------------------------------------------------- | ------------------------------------ |
-| API        | 部署后打开 `http://localhost:8000/docs` 可查看详细信息                         | 运行`python launch.py`                                   | ![api](./docs/api.png)               |
-| WebUI      | 某些情况可能需要 WebUI（比如免费使用 HuggingFace），这里实现了一个最简单的版本 | 运行 `python webui.py`                                   | ![webui](./docs/webui.png)           |
-| Playground | 实现了一套用于调试 API 的 Playground 前端页面，独立于 Python 代码非 Gradio     | 部署后打开 `http://localhost:8000/playground/index.html` | ![playground](./docs/playground.png) |
+WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
+
+所有参数：
+
+| 参数            | 类型   | 默认值      | 描述                                               |
+| --------------- | ------ | ----------- | -------------------------------------------------- |
+| `--server_name` | `str`  | `"0.0.0.0"` | 服务器主机地址                                     |
+| `--server_port` | `int`  | `7860`      | 服务器端口                                         |
+| `--share`       | `bool` | `False`     | 启用共享模式，允许外部访问                         |
+| `--debug`       | `bool` | `False`     | 启用调试模式                                       |
+| `--auth`        | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
 
 ## SSML
 
