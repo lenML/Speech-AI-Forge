@@ -364,8 +364,8 @@ def create_tts_interface():
                 with gr.Column(scale=4):
                     with gr.Group():
                         gr.Markdown("📝Text Input")
-                        gr.Markdown("- 一次只能生成30s长度的音频")
-                        gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 [lbreak]")
+                        gr.Markdown("- 无字数限制，但模型最长只能生成30s音频")
+                        gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`")
                         text_input = gr.Textbox(
                             show_label=False,
                             label="Text to Speech",
