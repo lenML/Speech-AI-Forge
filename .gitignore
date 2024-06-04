@@ -164,3 +164,4 @@ cython_debug/
 /models/ChatTTS
 *.wav
 *.mp3
+*.webm
