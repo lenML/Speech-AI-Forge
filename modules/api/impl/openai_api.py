@@ -62,7 +62,7 @@ async def openai_speech_api(
             temperature=temperature,
             top_P=0.7,
             top_K=20,
-            spk_seed=spk,
+            spk=spk,
             infer_seed=seed,
         )
 
