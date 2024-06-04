@@ -4,12 +4,12 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 
 你可以通过以下几种方式体验和部署 ChatTTS-Forge：
 
-| 名称                     | 描述                     | 链接                                                                                                                                                             |
-| ------------------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Huggingface 在线体验** | ChatTTS-Forge 在线体验   | [ChatTTS-Forge 在线体验](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                      |
-| **Colab 一键启动**       | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.ipynb) |
-| **Docker 部署**          | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                |
-| **本地部署**             | 查看环境准备部分         | [本地部署](#本地部署)                                                                                                                                            |
+| -            | 描述                     | 链接                                                                                                                                                             |
+| ------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **在线体验** | 部署于 HuggingFace 中    | [HuggingFace Spaces](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                          |
+| **一键启动** | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.ipynb) |
+| **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                |
+| **本地部署** | 查看环境准备部分         | [本地部署](#本地部署)                                                                                                                                            |
 
 ## Features
 
@@ -113,7 +113,20 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 ## FAQ
 
-noop
+### 什么是 Prompt1 和 Prompt2？
+
+Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
+
+- Prompt1 插入到第一个 [Stts] 之前
+- Prompt2 插入到第一个 [Stts] 之后
+
+### 什么是 Prefix？
+
+Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
+
+### Style 中 `_p` 的区别是什么？
+
+Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
 
 # Docker
 
