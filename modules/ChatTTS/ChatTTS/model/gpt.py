@@ -171,7 +171,9 @@ class GPT_warpper(nn.Module):
     ):
         if disable_tqdm:
             tqdm = lambda x: x
-        
+        else:
+            from tqdm import tqdm
+            
         with torch.no_grad():   
         
             attentions = []
