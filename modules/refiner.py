@@ -3,7 +3,7 @@ import torch
 
 from modules.utils.SeedContext import SeedContext
 
-from modules import models
+from modules import models, config
 
 
 @torch.inference_mode()
@@ -29,6 +29,7 @@ def refine_text(
                 "temperature": temperature,
                 "repetition_penalty": repetition_penalty,
                 "max_new_token": max_new_token,
+                "disable_tqdm": config.disable_tqdm,
             },
             do_text_normalization=False,
         )

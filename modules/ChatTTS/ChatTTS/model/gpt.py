@@ -167,7 +167,10 @@ class GPT_warpper(nn.Module):
         infer_text=False,
         return_attn=False,
         return_hidden=False,
+        disable_tqdm=False
     ):
+        if disable_tqdm:
+            tqdm = lambda x: x
         
         with torch.no_grad():   
         

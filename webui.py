@@ -23,7 +23,7 @@ from modules.data import styles_mgr
 from modules.api.utils import calc_spk_style
 
 from modules.normalization import text_normalize
-from modules import refiner
+from modules import refiner, config
 
 
 torch._dynamo.config.cache_size_limit = 64
@@ -550,6 +550,16 @@ if __name__ == "__main__":
     )
     parser.add_argument("--debug", action="store_true", help="enable debug mode")
     parser.add_argument("--auth", type=str, help="username:password for authentication")
+    parser.add_argument(
+        "--half",
+        action="store_true",
+        help="Enable half precision for model inference",
+    )
+    parser.add_argument(
+        "--off_tqdm",
+        action="store_true",
+        help="Disable tqdm progress bar",
+    )
 
     args = parser.parse_args()
 
@@ -558,11 +568,19 @@ if __name__ == "__main__":
     share = bool(os.getenv("GRADIO_SHARE", args.share))
     debug = bool(os.getenv("GRADIO_DEBUG", args.debug))
     auth = os.getenv("GRADIO_AUTH", args.auth)
+    half = bool(os.getenv("MODEL_HALF", args.half))
+    off_tqdm = bool(os.getenv("DISABLE_TQDM", args.off_tqdm))
 
     demo = create_interface()
 
     if auth:
         auth = tuple(auth.split(":"))
+
+    if half:
+        config.model_config["half"] = True
+
+    if off_tqdm:
+        config.disable_tqdm = True
 
     demo.queue().launch(
         server_name=server_name,

@@ -95,6 +95,16 @@ if __name__ == "__main__":
         action="store_true",
         help="Disable the documentation entry",
     )
+    parser.add_argument(
+        "--half",
+        action="store_true",
+        help="Enable half precision for model inference",
+    )
+    parser.add_argument(
+        "--off_tqdm",
+        action="store_true",
+        help="Disable tqdm progress bar",
+    )
 
     args = parser.parse_args()
 
@@ -123,5 +133,11 @@ if __name__ == "__main__":
 
     if not args.no_playground:
         api.setup_playground()
+
+    if args.half:
+        config.model_config["half"] = True
+
+    if args.off_tqdm:
+        config.disable_tqdm = True
 
     uvicorn.run(api.app, host=args.host, port=args.port, reload=args.reload)

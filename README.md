@@ -53,7 +53,9 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 
 ## 本地部署
 
-> 预估显存消耗 3.7gb 左右
+> f32 模型显存需要 2gb 左右
+
+> f16 仅需 1gb 显存即可运行
 
 1. 克隆项目: `git clone https://github.com/lenML/ChatTTS-Forge.git`
 2. 准备模型，放到如下目录
@@ -90,6 +92,10 @@ Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务�
 | `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
 | `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
 | `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
+| `--half`          | `bool` | `False`     | 开启 f16 半精度推理                             |
+| `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
+
+> 开启 `--half` 可以大幅减少显存占用
 
 ### webui.py
 
@@ -104,6 +110,10 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--share`       | `bool` | `False`     | 启用共享模式，允许外部访问                         |
 | `--debug`       | `bool` | `False`     | 启用调试模式                                       |
 | `--auth`        | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
+| `--half`        | `bool` | `False`     | 开启 f16 半精度推理                                |
+| `--off_tqdm`    | `bool` | `False`     | 关闭 tqdm 进度条                                   |
+
+> 开启 `--half` 可以大幅减少显存占用
 
 ## SSML
 

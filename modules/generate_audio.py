@@ -4,7 +4,7 @@ import torch
 from modules.speaker import Speaker
 from modules.utils.SeedContext import SeedContext
 
-from modules import models
+from modules import models, config
 
 import logging
 
@@ -34,6 +34,7 @@ def generate_audio(
         "prompt2": prompt2 or "",
         "prefix": prefix or "",
         "repetition_penalty": 1.0,
+        "disable_tqdm": config.disable_tqdm,
     }
 
     if isinstance(spk, int):
@@ -44,7 +45,7 @@ def generate_audio(
         params_infer_code["spk_emb"] = spk.emb
         logger.debug(("spk", spk.name))
 
-    logger.info(
+    logger.debug(
         {
             "text": text,
             "infer_seed": infer_seed,
@@ -60,7 +61,7 @@ def generate_audio(
     with SeedContext(infer_seed):
         wav = chat_tts.generate_audio(text, params_infer_code, use_decoder=use_decoder)
 
-    audio_data = np.array(wav[0]).flatten()
+    audio_data = np.array(wav[0]).flatten().astype(np.float32)
     sample_rate = 24000
 
     return sample_rate, audio_data
