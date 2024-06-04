@@ -81,6 +81,8 @@ const SpeakerList = () => {
           <tr>
             <th>id</th>
             <th>name</th>
+            <th>gender</th>
+            <th>describe</th>
           </tr>
         </thead>
         <tbody>
@@ -89,6 +91,8 @@ const SpeakerList = () => {
               <tr>
                 <td>${speaker.id}</td>
                 <td>${speaker.name}</td>
+                <td>${speaker.gender}</td>
+                <td>${speaker.describe}</td>
               </tr>
             `
           )}
@@ -195,9 +199,8 @@ const SpeakerPageContainer = styled.div`
     color: white;
   }
 
-  th:nth-child(2),
-  td:nth-child(2) {
-    width: 60%;
+  tbody tr:nth-child(odd) {
+    background-color: #111;
   }
 
   .speaker-factory {
@@ -205,7 +208,7 @@ const SpeakerPageContainer = styled.div`
   }
 
   .spekaer-list {
-    width: 256px;
+    flex: 3;
   }
 `;
 

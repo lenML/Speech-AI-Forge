@@ -15,12 +15,18 @@ def deterministic(seed=0):
 
 class SeedContext:
     def __init__(self, seed):
-        assert isinstance(seed, int) or isinstance(
-            seed, float
+        assert (
+            isinstance(seed, int)
+            or isinstance(seed, float)
+            or (isinstance(seed, str) and seed.isdigit())
         ), "Seed must be an integer or a float."
 
         self.seed = seed
         self.state = None
+
+        if isinstance(seed, str) and seed.isdigit():
+            self.seed = int(seed)
+
         if isinstance(self.seed, float):
             self.seed = int(self.seed)
 

@@ -33,6 +33,7 @@ def generate_audio(
         "prompt1": prompt1 or "",
         "prompt2": prompt2 or "",
         "prefix": prefix or "",
+        "repetition_penalty": 1.0,
     }
 
     if isinstance(spk, int):
@@ -43,7 +44,7 @@ def generate_audio(
         params_infer_code["spk_emb"] = spk.emb
         logger.debug(("spk", spk.name))
 
-    logger.debug(
+    logger.info(
         {
             "text": text,
             "infer_seed": infer_seed,

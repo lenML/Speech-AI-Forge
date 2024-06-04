@@ -1,7 +1,10 @@
 import os
 import logging
 
-logging.basicConfig(level=os.getenv("LOG_LEVEL", "DEBUG"))
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 
 import gradio as gr
@@ -62,9 +65,13 @@ def tts_generate(
     prompt2,
     prefix,
     style,
+    disable_normalize=False,
 ):
     if style == "*auto":
         style = None
+
+    if isinstance(top_k, float):
+        top_k = int(top_k)
 
     params = calc_spk_style(spk=spk, style=style)
 
@@ -75,8 +82,11 @@ def tts_generate(
     prompt1 = prompt1 or params.get("prompt1", "")
     prompt2 = prompt2 or params.get("prompt2", "")
 
+    if not disable_normalize:
+        text = text_normalize(text)
+
     sample_rate, audio_data = generate_audio(
-        text=text_normalize(text),
+        text=text,
         temperature=temperature,
         top_P=top_p,
         top_K=top_k,
@@ -243,11 +253,231 @@ default_ssml = """
 """
 
 
-def create_interface():
+def create_tts_interface():
     speakers = get_speakers()
-    speaker_names = ["*random"] + [speaker.name for speaker in speakers]
+
+    def get_speaker_show_name(spk):
+        if spk.gender == "*" or spk.gender == "":
+            return spk.name
+        return f"{spk.gender} : {spk.name}"
+
+    speaker_names = ["*random"] + [
+        get_speaker_show_name(speaker) for speaker in speakers
+    ]
 
     styles = ["*auto"] + [s.get("name") for s in get_styles()]
+
+    history = []
+
+    with gr.Row():
+        with gr.Column(scale=1):
+            with gr.Group():
+                gr.Markdown("🎛️Sampling")
+                temperature_input = gr.Slider(
+                    0.01, 2.0, value=0.3, step=0.01, label="Temperature"
+                )
+                top_p_input = gr.Slider(0.1, 1.0, value=0.7, step=0.1, label="Top P")
+                top_k_input = gr.Slider(1, 50, value=20, step=1, label="Top K")
+
+            with gr.Row():
+                with gr.Group():
+                    gr.Markdown("🎭Style")
+                    style_input_dropdown = gr.Dropdown(
+                        choices=styles,
+                        # label="Choose Style",
+                        interactive=True,
+                        show_label=False,
+                        value="*auto",
+                    )
+            with gr.Row():
+                with gr.Group():
+                    gr.Markdown("🗣️Speaker (Name or Seed)")
+                    spk_input_text = gr.Textbox(
+                        label="Speaker (Text or Seed)",
+                        value="female2",
+                        show_label=False,
+                    )
+                    spk_input_dropdown = gr.Dropdown(
+                        choices=speaker_names,
+                        # label="Choose Speaker",
+                        interactive=True,
+                        value="female2",
+                        show_label=False,
+                    )
+                    spk_rand_button = gr.Button(
+                        value="🎲",
+                        # tooltip="Random Seed",
+                        variant="secondary",
+                    )
+                    spk_input_dropdown.change(
+                        fn=lambda x: x.startswith("*")
+                        and "-1"
+                        or x.split(":")[-1].strip(),
+                        inputs=[spk_input_dropdown],
+                        outputs=[spk_input_text],
+                    )
+                    spk_rand_button.click(
+                        lambda x: str(torch.randint(0, 2**32 - 1, (1,)).item()),
+                        inputs=[spk_input_text],
+                        outputs=[spk_input_text],
+                    )
+            with gr.Group():
+                gr.Markdown("💃Inference Seed")
+                infer_seed_input = gr.Number(
+                    value=-1, label="Inference Seed", show_label=False
+                )
+                infer_seed_rand_button = gr.Button(
+                    value="🎲",
+                    # tooltip="Random Seed",
+                    variant="secondary",
+                )
+            use_decoder_input = gr.Checkbox(
+                value=True, label="Use Decoder", visible=False
+            )
+            with gr.Group():
+                gr.Markdown("🔧Prompt engineering")
+                prompt1_input = gr.Textbox(label="Prompt 1")
+                prompt2_input = gr.Textbox(label="Prompt 2")
+                prefix_input = gr.Textbox(label="Prefix")
+
+            infer_seed_rand_button.click(
+                lambda x: str(torch.randint(0, 2**32 - 1, (1,)).item()),
+                inputs=[infer_seed_input],
+                outputs=[infer_seed_input],
+            )
+        with gr.Column(scale=3):
+            with gr.Row():
+                with gr.Column(scale=4):
+                    with gr.Group():
+                        gr.Markdown("📝Text Input")
+                        text_input = gr.Textbox(
+                            show_label=False,
+                            label="Text to Speech",
+                            lines=10,
+                            placeholder="输入文本或选择示例",
+                            elem_id="text-input",
+                        )
+                        with gr.Row():
+                            contorl_tokens = [
+                                "[laugh]",
+                                "[uv_break]",
+                                "[v_break]",
+                                "[lbreak]",
+                            ]
+
+                            for tk in contorl_tokens:
+                                t_btn = gr.Button(tk)
+                                t_btn.click(
+                                    lambda text, tk=tk: text + " " + tk,
+                                    inputs=[text_input],
+                                    outputs=[text_input],
+                                )
+                with gr.Column(scale=1):
+                    with gr.Group():
+                        gr.Markdown("🎶Refiner")
+                        refine_prompt_input = gr.Textbox(
+                            label="Refine Prompt",
+                            value="[oral_2][laugh_0][break_6]",
+                        )
+                        refine_button = gr.Button("✍️Refine Text")
+                        # TODO 分割句子，使用当前配置拼接为SSML，然后发送到SSML tab
+                        # send_button = gr.Button("📩Split and send to SSML")
+
+                    with gr.Group():
+                        gr.Markdown("🔊Generate")
+                        disable_normalize_input = gr.Checkbox(
+                            value=False, label="Disable Normalize"
+                        )
+                        tts_button = gr.Button(
+                            "🔊Generate Audio",
+                            variant="primary",
+                            elem_classes="big-button",
+                        )
+
+            with gr.Group():
+                gr.Markdown("🎄Examples")
+                sample_dropdown = gr.Dropdown(
+                    choices=[sample["text"] for sample in sample_texts],
+                    show_label=False,
+                    value=None,
+                    interactive=True,
+                )
+                sample_dropdown.change(
+                    fn=lambda x: x,
+                    inputs=[sample_dropdown],
+                    outputs=[text_input],
+                )
+
+            with gr.Group():
+                gr.Markdown("🎨Output")
+                tts_output = gr.Audio(label="Generated Audio")
+
+    refine_button.click(
+        refine_text,
+        inputs=[text_input, refine_prompt_input],
+        outputs=[text_input],
+    )
+
+    tts_button.click(
+        tts_generate,
+        inputs=[
+            text_input,
+            temperature_input,
+            top_p_input,
+            top_k_input,
+            spk_input_text,
+            infer_seed_input,
+            use_decoder_input,
+            prompt1_input,
+            prompt2_input,
+            prefix_input,
+            style_input_dropdown,
+            disable_normalize_input,
+        ],
+        outputs=tts_output,
+    )
+
+
+def create_ssml_interface():
+    examples = [
+        ssml_example1,
+        ssml_example2,
+        ssml_example3,
+        ssml_example4,
+    ]
+
+    with gr.Row():
+        with gr.Column(scale=3):
+            with gr.Group():
+                ssml_input = gr.Textbox(
+                    label="SSML Input",
+                    lines=10,
+                    value=default_ssml,
+                    placeholder="输入 SSML 或选择示例",
+                    elem_id="ssml_input",
+                )
+                ssml_button = gr.Button("🔊Synthesize SSML", variant="primary")
+        with gr.Column(scale=1):
+            gr.Examples(
+                examples=examples,
+                inputs=[ssml_input],
+            )
+
+    ssml_output = gr.Audio(label="Generated Audio")
+
+    ssml_button.click(
+        synthesize_ssml,
+        inputs=[ssml_input],
+        outputs=ssml_output,
+    )
+
+
+def create_readme_tab():
+    readme_content = read_local_readme()
+    gr.Markdown(readme_content)
+
+
+def create_interface():
 
     js_func = """
     function refresh() {
@@ -260,7 +490,12 @@ def create_interface():
     }
     """
 
-    with gr.Blocks(js=js_func) as demo:
+    head_js = """
+    <script>
+    </script>
+    """
+
+    with gr.Blocks(js=js_func, head=head_js, title="ChatTTS Forge WebUI") as demo:
         css = """
         <style>
         .big-button {
@@ -272,153 +507,17 @@ def create_interface():
         gr.HTML(css)
         with gr.Tabs():
             with gr.TabItem("TTS"):
-                with gr.Row():
-                    with gr.Column(scale=1):
-                        temperature_input = gr.Slider(
-                            0.0, 1.0, value=0.3, label="Temperature"
-                        )
-                        top_p_input = gr.Slider(0.0, 1.0, value=0.7, label="Top P")
-                        top_k_input = gr.Slider(1, 50, value=20, label="Top K")
-
-                        with gr.Row():
-                            spk_input_text = gr.Textbox(
-                                label="Speaker (Text or Seed)", value="female2"
-                            )
-                            spk_input_dropdown = gr.Dropdown(
-                                choices=speaker_names,
-                                label="Choose Speaker",
-                                interactive=True,
-                                value="female2",
-                            )
-                            spk_input_dropdown.change(
-                                fn=lambda x: x.startswith("*") and "-1" or x,
-                                inputs=[spk_input_dropdown],
-                                outputs=[spk_input_text],
-                            )
-
-                        with gr.Row():
-                            style_input_dropdown = gr.Dropdown(
-                                choices=styles,
-                                label="Choose Style",
-                                interactive=True,
-                                value="*auto",
-                            )
-                        infer_seed_input = gr.Number(value=-1, label="Inference Seed")
-                        use_decoder_input = gr.Checkbox(value=True, label="Use Decoder")
-                        prompt1_input = gr.Textbox(label="Prompt 1")
-                        prompt2_input = gr.Textbox(label="Prompt 2")
-                        prefix_input = gr.Textbox(label="Prefix")
-                    with gr.Column(scale=3):
-                        with gr.Row():
-                            with gr.Column(scale=4):
-                                text_input = gr.Textbox(
-                                    label="Text to Speech",
-                                    lines=10,
-                                    placeholder="输入文本或选择示例",
-                                )
-                                with gr.Row():
-                                    contorl_tokens = [
-                                        "[laugh]",
-                                        "[uv_break]",
-                                        "[v_break]",
-                                        "[lbreak]",
-                                    ]
-
-                                    for tk in contorl_tokens:
-                                        t_btn = gr.Button(tk)
-                                        t_btn.click(
-                                            lambda text, tk=tk: text + " " + tk,
-                                            inputs=[text_input],
-                                            outputs=[text_input],
-                                        )
-                            with gr.Column(scale=1):
-                                refine_prompt_input = gr.Textbox(
-                                    label="Refine Prompt",
-                                    value="[oral_2][laugh_0][break_6]",
-                                )
-                                refine_button = gr.Button("✍️Refine Text")
-                                # TODO 分割句子，使用当前配置拼接为SSML，然后发送到SSML tab
-                                # send_button = gr.Button("📩Split and send to SSML")
-
-                                tts_button = gr.Button(
-                                    "🔊Generate Audio",
-                                    variant="primary",
-                                    elem_classes="big-button",
-                                )
-
-                        sample_dropdown = gr.Dropdown(
-                            choices=[sample["text"] for sample in sample_texts],
-                            label="选择示例",
-                            value=None,
-                            interactive=True,
-                        )
-                        sample_dropdown.change(
-                            fn=lambda x: x,
-                            inputs=[sample_dropdown],
-                            outputs=[text_input],
-                        )
-
-                        tts_output = gr.Audio(label="Generated Audio")
-
-                refine_button.click(
-                    refine_text,
-                    inputs=[text_input, refine_prompt_input],
-                    outputs=[text_input],
-                )
-
-                tts_button.click(
-                    tts_generate,
-                    inputs=[
-                        text_input,
-                        temperature_input,
-                        top_p_input,
-                        top_k_input,
-                        spk_input_text,
-                        infer_seed_input,
-                        use_decoder_input,
-                        prompt1_input,
-                        prompt2_input,
-                        prefix_input,
-                        style_input_dropdown,
-                    ],
-                    outputs=tts_output,
-                )
+                create_tts_interface()
 
             with gr.TabItem("SSML"):
-                ssml_input = gr.Textbox(
-                    label="SSML Input",
-                    lines=10,
-                    value=default_ssml,
-                )
-                ssml_button = gr.Button("🔊Synthesize SSML", variant="primary")
-                ssml_output = gr.Audio(label="Generated Audio")
-
-                ssml_button.click(
-                    synthesize_ssml,
-                    inputs=[ssml_input],
-                    outputs=ssml_output,
-                )
-
-                examples = [
-                    ssml_example1,
-                    ssml_example2,
-                    ssml_example3,
-                    ssml_example4,
-                ]
-
-                gr.Examples(
-                    examples=examples,
-                    inputs=[ssml_input],
-                )
+                create_ssml_interface()
 
             with gr.TabItem("README"):
-                readme_content = read_local_readme()
-                gr.Markdown(readme_content)
+                create_readme_tab()
 
         gr.Markdown(
             "此项目基于 [ChatTTS-Forge](https://github.com/lenML/ChatTTS-Forge) "
         )
-
     return demo
 
 
