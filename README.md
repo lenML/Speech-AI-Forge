@@ -2,7 +2,7 @@
 
 ChatTTS 锻造厂提供强大的 ChatTTS API，支持类 SSML 语法生成长文本，并能高效管理和复用说话人和风格。
 
-在线试用：
+在线体验：
 https://huggingface.co/spaces/lenML/ChatTTS-Forge
 
 # Features
@@ -24,11 +24,18 @@ https://huggingface.co/spaces/lenML/ChatTTS-Forge
 ## 环境准备
 
 1. clone: `git clone https://github.com/lenML/ChatTTS-Forge.git`
-2. model: 请在此地址下载手动下载模型，并放置到 models/ChatTTS 目录下
+2. model: 准备模型，放到如下目录
 
-   - HuggingFace: https://huggingface.co/2Noise/ChatTTS
+![model_dir](./docs/model_dir.png)
 
-     ![model_dir](./docs/model_dir.png)
+- 2.1 自行下载 （任选其一）
+
+  - HuggingFace: https://huggingface.co/2Noise/ChatTTS
+  - ModelScope: https://modelscope.cn/models/pzc163/chatTTS/
+
+- 2.2 使用脚本下载 （任选其一）
+  - HuggingFace: 执行 `python ./download_models.py --source huggingface`
+  - ModelScope: 执行 `python ./download_models.py --source modelscope`
 
 3. ffmpeg: 加速减速变声依赖于 ffmpeg，部署环境中需要安装 ffmpeg
 4. rubberband: 需要安装 rubberband `apt-get insatll rubberband-cli`
