@@ -154,8 +154,9 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 <details open>
 <summary>output</summary>
+  
+[多角色.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/82d91409-ad71-42ac-a4cd-d9c9340e3a07)
 
-[ssml_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
 
 </details>
 
@@ -171,6 +172,14 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 中华美食不仅仅是食物，更是一种文化的传承。每一道菜背后都有着深厚的历史背景和文化故事。比如，北京的烤鸭，代表着皇家气派；而西安的羊肉泡馍，则体现了浓郁的地方风情。中华美食的精髓在于它追求的“天人合一”，讲究食材的自然性和烹饪过程中的和谐。
 
 总之，中华美食博大精深，其丰富的口感和多样的烹饪技艺，构成了一个充满魅力和无限可能的美食世界。无论你来自哪里，都会被这独特的美食文化所吸引和感动。
+
+</details>
+
+<details open>
+<summary>output</summary>
+
+[long_text_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/fe18b0f1-a85f-4255-8e25-3c953480b881)
+
 
 </details>
 
