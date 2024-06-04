@@ -23,15 +23,33 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 - **风格管理**: 通过名称或 ID 复用说话风格，内置 32 种不同风格。
 - **文本标准化**: 针对 ChatTTS 优化的文本标准化，解决大部分不支持的 token。
 - **独立 refine API**: 提供单独的 refine 调试接口，提升调试效率。
-- **高效缓存机制**: 生成接口采用 LRU 缓存，提升响应速度。
 
 ## Interface
 
-| 项目       | 描述                                                                         | 部署或使用方式                                           | 图片                                 |
-| ---------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------ |
-| API        | 部署后打开 `http://localhost:8000/docs` 可查看详细信息                       | 运行`python launch.py`                                   | ![api](./docs/api.png)               |
-| WebUI      | 某些情况可能需要 WebUI（比如 HuggingFace/Colab），这里实现了一个最简单的版本 | 运行 `python webui.py`                                   | ![webui](./docs/webui.png)           |
-| Playground | 实现了一套用于调试 API 的 Playground 前端页面，独立于 Python 代码非 Gradio   | 部署后打开 `http://localhost:8000/playground/index.html` | ![playground](./docs/playground.png) |
+<table>
+  <tr>
+    <th>项目</th>
+    <th>描述</th>
+    <th>部署或使用方式</th>
+    <th>图片</th>
+  </tr>
+  <tr>
+    <td rowspan="2">API</td>
+    <td>部署后打开 <code>http://localhost:8000/docs</code> 可查看详细信息。</td>
+    <td>运行 <code>python launch.py</code></td>
+    <td rowspan="2"><img src="./docs/api.png" alt="api"><br><img src="./docs/playground.png" alt="playground"></td>
+  </tr>
+  <tr>
+    <td>实现了一套用于调试 API 的 Playground 前端页面，独立于 Python 代码非 Gradio。</td>
+    <td>部署后打开 <code>http://localhost:8000/playground/index.html</code></td>
+  </tr>
+  <tr>
+    <td>WebUI</td>
+    <td>某些情况可能需要 WebUI（比如 HuggingFace/Colab），这里是一个简单实现。（WebUI中将不会支持对任何本地文件写操作。）</td>
+    <td>运行 <code>python webui.py</code></td>
+    <td><img src="./docs/webui.png" alt="webui"></td>
+  </tr>
+</table>
 
 ## 本地部署
 
