@@ -1,6 +1,8 @@
 import os
 import logging
 
+from numpy import clip
+
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -82,6 +84,8 @@ def tts_generate(
     prompt1 = prompt1 or params.get("prompt1", "")
     prompt2 = prompt2 or params.get("prompt2", "")
 
+    infer_seed = clip(infer_seed, -1, 2**32 - 1)
+
     if not disable_normalize:
         text = text_normalize(text)
 
@@ -103,6 +107,7 @@ def tts_generate(
 
 @torch.inference_mode()
 def refine_text(text: str, prompt: str):
+    text = text_normalize(text)
     return refiner.refine_text(text, prompt=prompt)
 
 
@@ -285,6 +290,7 @@ def create_tts_interface():
             with gr.Row():
                 with gr.Group():
                     gr.Markdown("🎭Style")
+                    gr.Markdown("- 后缀为 `_p` 表示带prompt，效果更强但是影响质量")
                     style_input_dropdown = gr.Dropdown(
                         choices=styles,
                         # label="Choose Style",
@@ -327,7 +333,11 @@ def create_tts_interface():
             with gr.Group():
                 gr.Markdown("💃Inference Seed")
                 infer_seed_input = gr.Number(
-                    value=-1, label="Inference Seed", show_label=False
+                    value=-1,
+                    label="Inference Seed",
+                    show_label=False,
+                    minimum=-1,
+                    maximum=2**32 - 1,
                 )
                 infer_seed_rand_button = gr.Button(
                     value="🎲",
@@ -353,6 +363,8 @@ def create_tts_interface():
                 with gr.Column(scale=4):
                     with gr.Group():
                         gr.Markdown("📝Text Input")
+                        gr.Markdown("- 一次只能生成30s长度的音频")
+                        gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 [lbreak]")
                         text_input = gr.Textbox(
                             show_label=False,
                             label="Text to Speech",
