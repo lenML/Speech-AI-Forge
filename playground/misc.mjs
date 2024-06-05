@@ -1,13 +1,13 @@
-import { h } from "preact";
-import * as React from "preact/hooks";
+// import { h } from "preact";
+import * as React from "react";
 import htm from "htm";
 import { bindReact } from "@quik-fe/stand";
 
 import * as goober from "goober";
 
-goober.setup(h);
+goober.setup(React.createElement);
 
-export const html = htm.bind(h);
+export const html = htm.bind(React.createElement);
 export const create = bindReact(React);
 
 /**

@@ -1,4 +1,4 @@
-import { render } from "preact";
+import { createRoot } from "react-dom";
 import { html, create, styled } from "./misc.mjs";
 
 import { pages } from "./pages.mjs";
@@ -113,4 +113,5 @@ const App = () => {
   `;
 };
 
-render(html`<${App} />`, document.getElementById("app"));
+const root = createRoot(document.getElementById("app"));
+root.render(html`<${App} />`);
