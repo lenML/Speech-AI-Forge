@@ -75,13 +75,15 @@ character_map = {
     "“": " ",
     "’": " ",
     "”": " ",
+    '"': " ",
+    "'": " ",
     ":": ",",
     ";": ",",
     "!": ".",
     "(": ",",
     ")": ",",
-    # '[': ',',
-    # ']': ',',
+    "[": ",",
+    "]": ",",
     ">": ",",
     "<": ",",
     "-": ",",
@@ -110,13 +112,6 @@ def apply_emoji_map(text):
     return emojiswitch.demojize(text, delimiters=("", ""), lang="zh")
 
 
-@pre_normalize()
-def apply_markdown_to_text(text):
-    if is_markdown(text):
-        text = markdown_to_text(text)
-    return text
-
-
 @post_normalize()
 def insert_spaces_between_uppercase(s):
     # 使用正则表达式在每个相邻的大写字母之间插入空格
@@ -125,6 +120,29 @@ def insert_spaces_between_uppercase(s):
         " ",
         s,
     )
+
+
+@pre_normalize()
+def apply_markdown_to_text(text):
+    if is_markdown(text):
+        text = markdown_to_text(text)
+    return text
+
+
+# 将 "xxx" => \nxxx\n
+# 将 'xxx' => \nxxx\n
+@pre_normalize()
+def replace_quotes(text):
+    repl = r"\n\1\n"
+    patterns = [
+        ['"', '"'],
+        ["'", "'"],
+        ["“", "”"],
+        ["‘", "’"],
+    ]
+    for p in patterns:
+        text = re.sub(rf"({p[0]}[^{p[0]}{p[1]}]+?{p[1]})", repl, text)
+    return text
 
 
 def ensure_suffix(a: str, b: str, c: str):
@@ -171,6 +189,7 @@ def sentence_normalize(sentence_text: str):
         sentences = tx.normalize(part)
         dest_text = ""
         for sentence in sentences:
+            sentence = apply_post_normalize(sentence)
             dest_text += sentence
         return dest_text
 
@@ -197,7 +216,6 @@ def text_normalize(text, is_end=False):
     lines = [line for line in lines if line]
     lines = [sentence_normalize(line) for line in lines]
     content = "\n".join(lines)
-    content = apply_post_normalize(content)
     return content
 
 
@@ -215,6 +233,16 @@ console.log('1')
 **加粗**
 
 *一条文本*
+        """,
+        """
+在沙漠、岩石、雪地上行走了很长的时间以后，小王子终于发现了一条大路。所有的大路都是通往人住的地方的。
+“你们好。”小王子说。
+这是一个玫瑰盛开的花园。
+“你好。”玫瑰花说道。
+小王子瞅着这些花，它们全都和他的那朵花一样。
+“你们是什么花？”小王子惊奇地问。
+“我们是玫瑰花。”花儿们说道。
+“啊！”小王子说……。
         """,
     ]
 
