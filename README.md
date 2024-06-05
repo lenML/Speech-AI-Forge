@@ -118,7 +118,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--off_tqdm`       | `bool` | `False`     | 关闭 tqdm 进度条                                   |
 | `--tts_max_len`    | `int`  | `1000`      | TTS（文本到语音）的最大文本长度                    |
 | `--ssml_max_len`   | `int`  | `2000`      | SSML（语音合成标记语言）的最大文本长度             |
-| `--max_batch_size` | `int`  | `12`        | TTS 的最大批处理大小                               |
+| `--max_batch_size` | `int`  | `8`         | TTS 的最大批处理大小                               |
 
 ### demo
 

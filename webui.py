@@ -39,7 +39,7 @@ webui_config = {
     "tts_max": 1000,
     "ssml_max": 5000,
     "spliter_threshold": 100,
-    "max_batch_size": 12,
+    "max_batch_size": 8,
 }
 
 
@@ -63,7 +63,7 @@ def segments_length_limit(segments, total_max: int):
 
 
 @torch.inference_mode()
-def synthesize_ssml(ssml: str, batch_size=8):
+def synthesize_ssml(ssml: str, batch_size=4):
     try:
         batch_size = int(batch_size)
     except Exception:
@@ -107,12 +107,12 @@ def tts_generate(
     prefix,
     style,
     disable_normalize=False,
-    batch_size=8,
+    batch_size=4,
 ):
     try:
         batch_size = int(batch_size)
     except Exception:
-        batch_size = 8
+        batch_size = 4
 
     max_len = webui_config["tts_max"]
     text = text.strip()[0:max_len]
@@ -362,7 +362,7 @@ def create_tts_interface():
                 batch_size_input = gr.Slider(
                     1,
                     webui_config["max_batch_size"],
-                    value=8,
+                    value=4,
                     step=1,
                     label="Batch Size",
                 )
@@ -446,9 +446,6 @@ def create_tts_interface():
                             "📝Text Input",
                             elem_id="input-title",
                         )
-                        gr.Markdown("- 每个batch最长30s")
-                        gr.Markdown("- batch size设置为1，即不使用批处理")
-                        gr.Markdown("- 开启batch请配合设置Inference Seed")
                         gr.Markdown(
                             f"- 字数限制{webui_config['tts_max']:,}字，超过部分截断"
                         )
@@ -592,7 +589,7 @@ def create_ssml_interface():
                 # batch size
                 batch_size_input = gr.Slider(
                     label="Batch Size",
-                    value=8,
+                    value=4,
                     minimum=1,
                     maximum=webui_config["max_batch_size"],
                     step=1,
@@ -891,7 +888,7 @@ if __name__ == "__main__":
 
     webui_config["tts_max"] = env.get_env_or_arg(args, "tts_max_len", 1000, int)
     webui_config["ssml_max"] = env.get_env_or_arg(args, "ssml_max_len", 5000, int)
-    webui_config["max_batch_size"] = env.get_env_or_arg(args, "max_batch_size", 12, int)
+    webui_config["max_batch_size"] = env.get_env_or_arg(args, "max_batch_size", 8, int)
 
     demo = create_interface()
 

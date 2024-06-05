@@ -8,6 +8,8 @@ from modules import models, config
 
 import logging
 
+from modules import devices
+
 logger = logging.getLogger(__name__)
 
 
@@ -69,14 +71,14 @@ def generate_audio_batch(
     if isinstance(spk, int):
         with SeedContext(spk):
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
-        logger.debug(("spk", spk))
+        logger.info(("spk", spk))
     elif isinstance(spk, Speaker):
         params_infer_code["spk_emb"] = spk.emb
-        logger.debug(("spk", spk.name))
+        logger.info(("spk", spk.name))
     else:
         raise ValueError("spk must be int or Speaker")
 
-    logger.debug(
+    logger.info(
         {
             "text": texts,
             "infer_seed": infer_seed,
@@ -95,6 +97,8 @@ def generate_audio_batch(
         )
 
     sample_rate = 24000
+
+    devices.torch_gc()
 
     return [(sample_rate, np.array(wav).flatten().astype(np.float32)) for wav in wavs]
 
