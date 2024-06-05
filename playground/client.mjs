@@ -147,15 +147,30 @@ class APIClient {
     }
   }
 
-  async createSpeaker({ name, seed }) {
+  async createSpeaker({ name, seed, describe, gender, tensor }) {
     try {
       const response = await this.client.post("/v1/speaker/create", {
         name,
         seed,
+        gender,
+        describe,
+        tensor,
       });
       return response.data;
     } catch (error) {
       console.error("Error creating speaker:", error);
+      throw error;
+    }
+  }
+
+  async updateSpeakers({ speakers }) {
+    try {
+      const response = await this.client.post("/v1/speakers/update", {
+        speakers,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating speakers:", error);
       throw error;
     }
   }

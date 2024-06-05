@@ -1,6 +1,18 @@
 import { client } from "./client.mjs";
 import { html, create, styled } from "./misc.mjs";
 
+import {
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  flexRender,
+  createColumnHelper,
+} from "@tanstack/react-table";
+
+import * as React from "react";
+import { deepEqual } from "fast-equals";
+
 /**
  * 管理 speaker
  *
@@ -14,7 +26,11 @@ const useStore = create((set, get) => ({
    */
   speakers: [],
 
-  setSpeakers: (speakers) => set({ speakers }),
+  setSpeakers: (speakers) => set({ speakers, temp_speakers: [...speakers] }),
+
+  // 编辑时的 speaker
+  temp_speakers: [],
+  setTempSpeakers: (speakers) => set({ temp_speakers: speakers }),
 
   formData: {
     seed: 42,
@@ -28,76 +44,335 @@ window.addEventListener("load", async () => {
   useStore.get().setSpeakers(speakers.data);
 });
 
-const SpeakerFactory = () => {
-  // 调用接口创建 speaker
-  // 创建speaker需要设定seed和name
+const CreateForm = () => {
   const { setSpeakers, formData, setFormData } = useStore();
+  // 还可以设置 gender describe
   return html`
-    <feildset class="speaker-factory">
-      <div>
-        <label
-          >seed
+    <div>
+      <label
+        >seed
+        <input
+          type="number"
+          value=${formData.seed}
+          oninput=${(e) => setFormData({ ...formData, seed: e.target.value })}
+        />
+      </label>
+      <label
+        >name
+        <input
+          type="text"
+          value=${formData.name}
+          oninput=${(e) => setFormData({ ...formData, name: e.target.value })}
+        />
+      </label>
+      <label>
+        gender
+        <select onChnage=${(e) => {
+          setFormData({ ...formData, gender: e.target.value });
+        }}>
+        <option value="*">*</opetion>
+        <option value="female">female</opetion>
+          <option value="male">male</opetion>
+        </select>
+      </label>
+      <label>
+        describe
+        <textarea></textarea>
+      </label>
 
-          <input
-            type="number"
-            value=${formData.seed}
-            oninput=${(e) => setFormData({ ...formData, seed: e.target.value })}
-          />
-        </label>
-        <label
-          >name
-          <input
-            type="text"
-            value=${formData.name}
-            oninput=${(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-        </label>
-
-        <button
-          onclick=${async () => {
-            const speaker = await client.createSpeaker(formData);
-            setSpeakers([...useStore.get().speakers, speaker]);
-            setFormData({ seed: 0, name: "" });
-          }}
-        >
-          创建
-        </button>
-      </div>
-    </feildset>
+      <button
+        onclick=${async () => {
+          const speaker = await client.createSpeaker(formData);
+          setSpeakers([...useStore.get().speakers, speaker]);
+          setFormData({ seed: 0, name: "" });
+        }}
+      >
+        创建
+      </button>
+    </div>
   `;
 };
 
-const SpeakerList = () => {
+const SpeakerFactory = () => {
+  return html`
+    <fieldset class="speaker-factory">
+      <legend>Speaker Factory</legend>
+      <${CreateForm} />
+    </fieldset>
+  `;
+};
+
+// Give our default column cell renderer editing superpowers!
+const defaultColumn = {
+  cell: ({ getValue, row: { index }, column: { id }, table }) => {
+    const initialValue = getValue();
+    // We need to keep and update the state of the cell normally
+    const [value, setValue] = React.useState(initialValue);
+
+    // When the input is blurred, we'll call our table meta's updateData function
+    const onBlur = () => {
+      table.options.meta?.updateData(index, id, value);
+    };
+
+    // If the initialValue is changed external, sync it up with our state
+    React.useEffect(() => {
+      setValue(initialValue);
+    }, [initialValue]);
+
+    return html`<input
+      value=${value}
+      onChange=${(e) => setValue(e.target.value)}
+      onBlur=${onBlur}
+    />`;
+  },
+};
+
+const columnHelper = createColumnHelper();
+const columns = [
+  columnHelper.accessor("id", {
+    cell: (info) => html`<div className="td-id">${info.getValue()}</div>`,
+  }),
+  columnHelper.accessor("name", {}),
+  columnHelper.accessor("gender", {}),
+  columnHelper.accessor("describe", {}),
+];
+
+function Filter({ column, table }) {
+  const firstValue = table
+    .getPreFilteredRowModel()
+    .flatRows[0]?.getValue(column.id);
+
+  const columnFilterValue = column.getFilterValue();
+
+  return typeof firstValue === "number"
+    ? html`<div className="flex space-x-2">
+        <input
+          type="number"
+          value=${columnFilterValue?.[0] ?? ""}
+          onChange=${(e) =>
+            column.setFilterValue((old) => [e.target.value, old?.[1]])}
+          placeholder=${`Min`}
+        />
+        <input
+          type="number"
+          value=${columnFilterValue?.[1] ?? ""}
+          onChange=${(e) =>
+            column.setFilterValue((old) => [old?.[0], e.target.value])}
+          placeholder=${`Max`}
+        />
+      </div>`
+    : html`<input
+        type="text"
+        value=${columnFilterValue ?? ""}
+        onChange=${(e) => column.setFilterValue(e.target.value)}
+        placeholder=${`Search...`}
+      />`;
+}
+function useSkipper() {
+  const shouldSkipRef = React.useRef(true);
+  const shouldSkip = shouldSkipRef.current;
+
+  // Wrap a function with this to skip a pagination reset temporarily
+  const skip = React.useCallback(() => {
+    shouldSkipRef.current = false;
+  }, []);
+
+  React.useEffect(() => {
+    shouldSkipRef.current = true;
+  });
+
+  return [shouldSkip, skip];
+}
+
+const PaginationContainer = styled.div`
+  display: flex;
+  padding: 8px;
+  gap: 8px;
+  height: 56px;
+
+  .divider {
+    flex: 1;
+  }
+
+  input {
+    width: auto;
+    display: inline-block;
+  }
+  select {
+    width: auto;
+    display: inline-block;
+  }
+
+  & > div {
+    display: inline-flex;
+    white-space: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const SpeakerTable = () => {
   // 显示 speaker 列表
   // 只是可以列出来，没有其他操作
-  const { speakers } = useStore();
-  // 以table
+  const { speakers, temp_speakers, setSpeakers, setTempSpeakers } = useStore();
+
+  const dataChanged = React.useMemo(() => {
+    return !deepEqual(speakers, temp_speakers);
+  });
+
+  const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
+
+  const table = useReactTable({
+    data: temp_speakers,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex,
+    defaultColumn: defaultColumn,
+    meta: {
+      updateData: (rowIndex, columnId, value) => {
+        // Skip page index reset until after next rerender
+        skipAutoResetPageIndex();
+        const old = useStore.get().temp_speakers;
+        setTempSpeakers(
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...row,
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+    },
+  });
+
+  const handleReset = React.useCallback(() => {
+    setTempSpeakers(speakers);
+  }, [speakers]);
+  const handleSave = React.useCallback(() => {
+    setSpeakers(temp_speakers);
+
+    client.updateSpeakers({
+      speakers: temp_speakers,
+    });
+  }, [temp_speakers]);
+
   return html`
     <fieldset class="spekaer-list">
       <legend>Speakers</legend>
-
-      <table class="speaker-list">
+      <table class="speaker-table">
         <thead>
-          <tr>
-            <th>id</th>
-            <th>name</th>
-            <th>gender</th>
-            <th>describe</th>
-          </tr>
+          ${table.getHeaderGroups().map(
+            (headerGroup) =>
+              html`<tr key="${headerGroup.id}">
+                ${headerGroup.headers.map(
+                  (header) =>
+                    html`<th key=${header.id} colspan=${header.colSpan}>
+                      ${header.isPlaceholder
+                        ? null
+                        : html`<div>
+                            ${flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                            ${header.column.getCanFilter()
+                              ? html`<div>
+                                  <${Filter}
+                                    column=${header.column}
+                                    table=${table}
+                                  />
+                                </div>`
+                              : null}
+                          </div>`}
+                    </th>`
+                )}
+              </tr>`
+          )}
         </thead>
         <tbody>
-          ${speakers.map(
-            (speaker) => html`
-              <tr>
-                <td>${speaker.id}</td>
-                <td>${speaker.name}</td>
-                <td>${speaker.gender}</td>
-                <td>${speaker.describe}</td>
-              </tr>
-            `
+          ${table.getRowModel().rows.map(
+            (row) =>
+              html`<tr key="${row.id}">
+                ${row
+                  .getVisibleCells()
+                  .map(
+                    (cell) =>
+                      html`<td key="${cell.id}">
+                        ${flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>`
+                  )}
+              </tr>`
           )}
         </tbody>
       </table>
+      <${PaginationContainer}>
+        <button
+          onClick=${() => table.setPageIndex(0)}
+          disabled=${!table.getCanPreviousPage()}
+        >
+          ${"<<"}
+        </button>
+        <button
+          onClick=${() => table.previousPage()}
+          disabled=${!table.getCanPreviousPage()}
+        >
+          ${"<"}
+        </button>
+        <button
+          onClick=${() => table.nextPage()}
+          disabled=${!table.getCanNextPage()}
+        >
+          ${">"}
+        </button>
+        <button
+          onClick=${() => table.setPageIndex(table.getPageCount() - 1)}
+          disabled=${!table.getCanNextPage()}
+        >
+          ${">>"}
+        </button>
+        <div className="divider"></div>
+        <div>
+          <span>Page</span>
+          <strong>
+            ${table.getState().pagination.pageIndex + 1} of ${" "}
+            ${table.getPageCount()}
+          </strong>
+        </div>
+        <select
+          value=${table.getState().pagination.pageSize}
+          onChange=${(e) => {
+            table.setPageSize(Number(e.target.value));
+          }}
+        >
+          ${[10, 20, 30, 40, 50].map(
+            (pageSize) =>
+              html`<option key=${pageSize} value=${pageSize}>
+                Show ${pageSize}
+              </option>`
+          )}
+        </select>
+      <//>
+      <button
+        className="btn-save"
+        disabled=${!dataChanged}
+        onClick=${handleSave}
+      >
+        save
+      </button>
+      <button
+        className="btn-reset"
+        disabled=${!dataChanged}
+        onClick=${handleReset}
+      >
+        reset
+      </button>
     </fieldset>
   `;
 };
@@ -160,7 +435,7 @@ const SpeakerPageContainer = styled.div`
   }
 
   input[type="number"] {
-    width: calc(100% - 2rem);
+    width: 100%;
     padding: 0.5rem;
   }
 
@@ -210,13 +485,57 @@ const SpeakerPageContainer = styled.div`
   .spekaer-list {
     flex: 3;
   }
+
+  .speaker-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td,
+    th {
+      padding: 8px;
+      text-align: left;
+    }
+
+    th:first-child,
+    td:first-child {
+      & > * {
+        width: 5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    th:not(:first-child),
+    td:not(:first-child) {
+      width: 30%;
+    }
+
+    input {
+      width: 100%;
+      background-color: transparent;
+      border-color: transparent;
+
+      &:focus {
+        background-color: #333;
+        border-color: #333;
+      }
+    }
+  }
+
+  .btn-save:not(:disabled) {
+    background-color: #28a745;
+  }
+  .btn-save:not(:disabled):hover {
+    background-color: #218838;
+  }
 `;
 
 export const SpeakerPage = () => {
   return html`
     <${SpeakerPageContainer}>
-      <${SpeakerList} />
       <${SpeakerFactory} />
+      <${SpeakerTable} />
     <//>
   `;
 };

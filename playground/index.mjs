@@ -2,6 +2,7 @@ import { createRoot } from "react-dom";
 import { html, create, styled } from "./misc.mjs";
 
 import { pages } from "./pages.mjs";
+import { ErrorBoundary } from "react-error-boundary";
 
 const useStore = create((set, get) => ({
   page: Object.keys(pages).includes(location.hash.slice(1))
@@ -103,12 +104,21 @@ const AppContent = styled.div`
   overflow: auto;
 `;
 
+function fallbackRender({ error, resetErrorBoundary }) {
+  return html`<div role="alert">
+    <p>Something went wrong:</p>
+    <pre style=${{ color: "red" }}>${error.message}</pre>
+    <button onClick=${resetErrorBoundary}>reset</button>
+  </div>`;
+}
+
 const App = () => {
-  const { page } = useStore();
   return html`
     <${PageNav} />
     <${AppContent} className="pg-scrollbar">
-      <${Content} />
+      <${ErrorBoundary} fallbackRender=${fallbackRender}>
+        <${Content} />
+      <//>
     <//>
   `;
 };

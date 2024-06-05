@@ -142,7 +142,7 @@ const SSMLFormContainer = styled.div`
 const SSMLOptions = () => {
   const { params, setParams } = useStore();
   return html`
-    <fieldset style="flex: 2">
+    <fieldset style=${{ flex: 5 }}>
       <legend>Options</legend>
       <label>
         Format
@@ -161,7 +161,7 @@ const SSMLOptions = () => {
 const SSMLHistory = () => {
   const { history } = useStore();
   return html`
-    <fieldset style="flex: 5">
+    <fieldset style=${{ flex: 5 }}>
       <legend>History</legend>
 
       <table>
