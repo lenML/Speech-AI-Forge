@@ -101,15 +101,7 @@ def synthesize_ssml(ssml: str, batch_size=4):
     audio_segments = synthesize.synthesize_segments(segments)
     combined_audio = combine_audio_segments(audio_segments)
 
-    buffer = io.BytesIO()
-    combined_audio.export(buffer, format="wav")
-
-    buffer.seek(0)
-
-    audio_data = buffer.read()
-    audio_data = audio.audio_to_int16(audio_data)
-
-    return audio_data
+    return audio.pydub_to_np(combined_audio)
 
 
 @torch.inference_mode()
