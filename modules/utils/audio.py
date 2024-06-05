@@ -5,6 +5,16 @@ import pyrubberband as pyrb
 import numpy as np
 from io import BytesIO
 
+INT16_MAX = np.iinfo(np.int16).max
+
+
+def audio_to_int16(audio_data):
+    if audio_data.dtype == np.float32:
+        audio_data = (audio_data * INT16_MAX).astype(np.int16)
+    if audio_data.dtype == np.float16:
+        audio_data = (audio_data * INT16_MAX).astype(np.int16)
+    return audio_data
+
 
 def audiosegment_to_librosawav(audiosegment):
     channel_sounds = audiosegment.split_to_mono()

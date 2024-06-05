@@ -1,3 +1,16 @@
+try:
+    import spaces
+except:
+
+    class NoneSpaces:
+        def __init__(self):
+            pass
+
+        def GPU(self, fn):
+            return fn
+
+    spaces = NoneSpaces()
+
 import os
 import logging
 
@@ -28,7 +41,7 @@ from modules.api.utils import calc_spk_style
 from modules.normalization import text_normalize
 from modules import refiner, config
 
-from modules.utils import env
+from modules.utils import env, audio
 from modules.SentenceSplitter import SentenceSplitter
 
 torch._dynamo.config.cache_size_limit = 64
@@ -63,6 +76,7 @@ def segments_length_limit(segments, total_max: int):
 
 
 @torch.inference_mode()
+@spaces.GPU
 def synthesize_ssml(ssml: str, batch_size=4):
     try:
         batch_size = int(batch_size)
@@ -90,10 +104,14 @@ def synthesize_ssml(ssml: str, batch_size=4):
 
     buffer.seek(0)
 
-    return buffer.read()
+    audio_data = buffer.read()
+    audio_data = audio.audio_to_int16(audio_data)
+
+    return audio_data
 
 
 @torch.inference_mode()
+@spaces.GPU
 def tts_generate(
     text,
     temperature,
@@ -154,8 +172,6 @@ def tts_generate(
             prompt2=prompt2,
             prefix=prefix,
         )
-
-        return sample_rate, audio_data
     else:
         spliter = SentenceSplitter(webui_config["spliter_threshold"])
         sentences = spliter.parse(text)
@@ -175,10 +191,12 @@ def tts_generate(
         sample_rate = audio_data_batch[0][0]
         audio_data = np.concatenate([data for _, data in audio_data_batch])
 
-        return sample_rate, audio_data
+    audio_data = audio.audio_to_int16(audio_data)
+    return sample_rate, audio_data
 
 
 @torch.inference_mode()
+@spaces.GPU
 def refine_text(text: str, prompt: str):
     text = text_normalize(text)
     return refiner.refine_text(text, prompt=prompt)
