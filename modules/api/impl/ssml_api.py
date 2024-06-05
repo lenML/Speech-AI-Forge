@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from fastapi.responses import FileResponse
 
 
+from modules.normalization import text_normalize
 from modules.ssml import parse_ssml
 from modules.SynthesizeSegments import (
     SynthesizeSegments,
@@ -39,6 +40,8 @@ async def synthesize_ssml(
             raise HTTPException(status_code=400, detail="SSML content is required.")
 
         segments = parse_ssml(ssml)
+        for seg in segments:
+            seg["text"] = text_normalize(seg["text"], is_end=True)
 
         if batch:
             synthesize = SynthesizeSegments(16)

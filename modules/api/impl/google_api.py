@@ -14,7 +14,11 @@ from modules import generate_audio as generate
 
 
 from modules.ssml import parse_ssml
-from modules.SynthesizeSegments import synthesize_segment
+from modules.SynthesizeSegments import (
+    SynthesizeSegments,
+    combine_audio_segments,
+    synthesize_segment,
+)
 
 from modules.api import utils as api_utils
 
@@ -31,6 +35,7 @@ class VoiceSelectionParams(BaseModel):
     temperature: float = 0.3
     topP: float = 0.7
     topK: int = 20
+    seed: int = 42
 
 
 class AudioConfig(BaseModel):
@@ -39,6 +44,8 @@ class AudioConfig(BaseModel):
     pitch: float = 0
     volumeGainDb: float = 0
     sampleRateHertz: int
+    batchSize: int = 1
+    spliterThreshold: int = 100
 
 
 class GoogleTextSynthesizeRequest(BaseModel):
@@ -59,10 +66,15 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     # 提取参数
     language_code = voice.languageCode
     voice_name = voice.name
+    infer_seed = voice.seed or 42
     audio_format = audioConfig.get("audioEncoding", "mp3")
     speaking_rate = audioConfig.get("speakingRate", 1)
     pitch = audioConfig.get("pitch", 0)
     volume_gain_db = audioConfig.get("volumeGainDb", 0)
+
+    batch_size = audioConfig.get("batchSize", 1)
+    spliter_threshold = audioConfig.get("spliterThreshold", 100)
+
     # TODO sample_rate
     sample_rate_hertz = audioConfig.get("sampleRateHertz", 24000)
 
@@ -85,7 +97,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
                 top_P=voice.topP if voice.topP else params.get("top_p", 0.7),
                 top_K=voice.topK if voice.topK else params.get("top_k", 20),
                 spk=params.get("spk", -1),
-                infer_seed=-1,
+                infer_seed=infer_seed,
                 prompt1=params.get("prompt1", ""),
                 prompt2=params.get("prompt2", ""),
                 prefix=params.get("prefix", ""),
@@ -94,10 +106,24 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
         elif input.ssml:
             # 处理SSML合成逻辑
             segments = parse_ssml(input.ssml)
-            audio_data = b""
-            for segment in segments:
-                segment_audio = synthesize_segment(segment=segment)
-                audio_data += segment_audio
+            for seg in segments:
+                seg["text"] = text_normalize(seg["text"], is_end=True)
+
+            if len(segments) == 0:
+                raise HTTPException(
+                    status_code=400, detail="The SSML text is empty or parsing failed."
+                )
+
+            synthesize = SynthesizeSegments(batch_size=batch_size)
+            audio_segments = synthesize.synthesize_segments(segments)
+            combined_audio = combine_audio_segments(audio_segments)
+
+            buffer = io.BytesIO()
+            combined_audio.export(buffer, format="wav")
+
+            buffer.seek(0)
+
+            audio_data = buffer.read()
 
         else:
             raise HTTPException(

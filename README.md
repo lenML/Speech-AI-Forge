@@ -99,6 +99,7 @@ Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务�
 | `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
 | `--half`          | `bool` | `False`     | 开启 f16 半精度推理                             |
 | `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
+| `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
 
 ### webui.py
 

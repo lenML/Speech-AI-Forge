@@ -14,12 +14,13 @@ from typing import Callable
 from modules.api.Api import APIManager
 
 from modules.api.impl import (
-    base_api,
+    style_api,
     tts_api,
     ssml_api,
     google_api,
     openai_api,
     refiner_api,
+    speaker_api,
 )
 
 logger = logging.getLogger(__name__)
@@ -29,15 +30,16 @@ torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
 
 
-def create_api(no_docs=False):
-    api = APIManager(no_docs=no_docs)
+def create_api(no_docs=False, exclude=[]):
+    api = APIManager(no_docs=no_docs, exclude_patterns=exclude)
 
-    base_api.setup(api)
+    style_api.setup(api)
     tts_api.setup(api)
     ssml_api.setup(api)
     google_api.setup(api)
     openai_api.setup(api)
     refiner_api.setup(api)
+    speaker_api.setup(api)
 
     return api
 
@@ -65,7 +67,7 @@ if __name__ == "__main__":
     import dotenv
 
     dotenv.load_dotenv(
-        dotenv_path=os.getenv("ENV_FILE", ".webui.env"),
+        dotenv_path=os.getenv("ENV_FILE", ".env.api"),
     )
 
     parser = argparse.ArgumentParser(
@@ -108,6 +110,12 @@ if __name__ == "__main__":
         action="store_true",
         help="Disable tqdm progress bar",
     )
+    # 配置哪些api要跳过 比如 exclude="/v1/speakers/*,/v1/tts/*"
+    parser.add_argument(
+        "--exclude",
+        type=str,
+        help="Exclude the specified API from the server",
+    )
 
     args = parser.parse_args()
 
@@ -123,6 +131,7 @@ if __name__ == "__main__":
     no_docs = env.get_env_or_arg(args, "no_docs", False, bool)
     half = env.get_env_or_arg(args, "half", False, bool)
     off_tqdm = env.get_env_or_arg(args, "off_tqdm", False, bool)
+    exclude = env.get_env_or_arg(args, "exclude", "", str)
 
     if compile:
         print("Model compile is enabled")
@@ -139,7 +148,7 @@ if __name__ == "__main__":
             generate.generate_audio
         )
 
-    api = create_api(no_docs=no_docs)
+    api = create_api(no_docs=no_docs, exclude=exclude.split(","))
     config.api = api
 
     if cors_origin:
@@ -154,7 +163,7 @@ if __name__ == "__main__":
     if off_tqdm:
         config.disable_tqdm = True
 
-    if args.compile:
+    if compile:
         logger.info("Model compile is enabled")
         config.enable_model_compile = True
 
@@ -163,25 +172,10 @@ if __name__ == "__main__":
         infer_seed = kwargs.get("infer_seed", -1)
         return spk_seed != -1 and infer_seed != -1
 
-    if args.lru_size > 0:
-        config.lru_size = args.lru_size
+    if lru_size > 0:
+        config.lru_size = lru_size
         generate.generate_audio = conditional_cache(should_cache)(
             generate.generate_audio
         )
 
-    api = create_api(no_docs=args.no_docs)
-    config.api = api
-
-    if args.cors_origin:
-        api.set_cors(allow_origins=[args.cors_origin])
-
-    if not args.no_playground:
-        api.setup_playground()
-
-    if args.half:
-        config.model_config["half"] = True
-
-    if args.off_tqdm:
-        config.disable_tqdm = True
-
-    uvicorn.run(api.app, host=args.host, port=args.port, reload=args.reload)
+    uvicorn.run(api.app, host=host, port=port, reload=reload)

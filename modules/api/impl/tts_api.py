@@ -13,6 +13,7 @@ from modules import generate_audio as generate
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
+from modules.synthesize_audio import synthesize_audio
 
 
 class TTSParams(BaseModel):
@@ -31,12 +32,14 @@ class TTSParams(BaseModel):
         20, description="Top K for sampling (may be overridden by style or spk)"
     )
     seed: int = Query(
-        -1, description="Seed for generate (may be overridden by style or spk)"
+        42, description="Seed for generate (may be overridden by style or spk)"
     )
     format: str = Query("mp3", description="Response audio format: [mp3,wav]")
     prompt1: str = Query("", description="Text prompt for inference")
     prompt2: str = Query("", description="Text prompt for inference")
     prefix: str = Query("", description="Text prefix for inference")
+    bs: str = Query("8", description="Batch size for inference")
+    thr: str = Query("100", description="Threshold for sentence spliter")
 
 
 async def synthesize_tts(params: TTSParams = Depends()):
@@ -51,17 +54,24 @@ async def synthesize_tts(params: TTSParams = Depends()):
             "temperature", params.temperature
         )
         prefix = params.prefix or calc_params.get("prefix", params.prefix)
+        prompt1 = params.prompt1 or calc_params.get("prompt1", params.prompt1)
+        prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
 
-        sample_rate, audio_data = generate.generate_audio(
+        batch_size = int(params.bs)
+        threshold = int(params.thr)
+
+        sample_rate, audio_data = synthesize_audio(
             text,
             temperature=temperature,
             top_P=params.top_P,
             top_K=params.top_K,
             spk=spk,
             infer_seed=seed,
-            prompt1=params.prompt1 or calc_params.get("prompt1", ""),
-            prompt2=params.prompt2 or calc_params.get("prompt2", ""),
+            prompt1=prompt1,
+            prompt2=prompt2,
             prefix=prefix,
+            batch_size=batch_size,
+            spliter_threshold=threshold,
         )
 
         buffer = io.BytesIO()

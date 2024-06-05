@@ -94,59 +94,6 @@ def synthesize_ssml(ssml: str, batch_size=8):
 
 
 @torch.inference_mode()
-def tts_generate_batch_1(
-    text,
-    temperature,
-    top_p,
-    top_k,
-    spk,
-    infer_seed,
-    use_decoder,
-    prompt1,
-    prompt2,
-    prefix,
-    style,
-    disable_normalize=False,
-    batch_size=8,
-):
-    if style == "*auto":
-        style = None
-
-    if isinstance(top_k, float):
-        top_k = int(top_k)
-
-    params = calc_spk_style(spk=spk, style=style)
-
-    spk = params.get("spk", spk)
-    infer_seed = infer_seed or params.get("seed", infer_seed)
-    temperature = temperature or params.get("temperature", temperature)
-    prefix = prefix or params.get("prefix", prefix)
-    prompt1 = prompt1 or params.get("prompt1", "")
-    prompt2 = prompt2 or params.get("prompt2", "")
-
-    infer_seed = clip(infer_seed, -1, 2**32 - 1)
-    infer_seed = int(infer_seed)
-
-    if not disable_normalize:
-        text = text_normalize(text)
-
-    sample_rate, audio_data = generate_audio(
-        text=text,
-        temperature=temperature,
-        top_P=top_p,
-        top_K=top_k,
-        spk=spk,
-        infer_seed=infer_seed,
-        use_decoder=use_decoder,
-        prompt1=prompt1,
-        prompt2=prompt2,
-        prefix=prefix,
-    )
-
-    return sample_rate, audio_data
-
-
-@torch.inference_mode()
 def tts_generate(
     text,
     temperature,

@@ -4,10 +4,11 @@ from fastapi.responses import StreamingResponse
 import io
 from numpy import clip
 import soundfile as sf
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi.responses import FileResponse
 
 
+from modules.synthesize_audio import synthesize_audio
 from modules.normalization import text_normalize
 
 from modules import generate_audio as generate
@@ -19,14 +20,22 @@ import pyrubberband as pyrb
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 
+import numpy as np
+
 
 class AudioSpeechRequest(BaseModel):
     input: str  # 需要合成的文本
     model: str = "chattts-4w"
     voice: str = "female2"
     response_format: Literal["mp3", "wav"] = "mp3"
-    speed: int = 1
+    speed: int = Field(1, ge=1, le=10, description="Speed of the audio")
     style: str = ""
+    # 是否开启batch合成，小于等于1表示不适用batch
+    # 开启batch合成会自动分割句子
+    batch_size: int = Field(1, ge=1, le=10, description="Batch size")
+    spliter_threshold: float = Field(
+        100, ge=10, le=1024, description="Threshold for sentence spliter"
+    )
 
 
 async def openai_speech_api(
@@ -40,6 +49,8 @@ async def openai_speech_api(
         voice = request.voice
         style = request.style
         response_format = request.response_format
+        batch_size = request.batch_size
+        spliter_threshold = request.spliter_threshold
         speed = request.speed
         speed = clip(speed, 0.1, 10)
 
@@ -53,17 +64,25 @@ async def openai_speech_api(
         params = api_utils.calc_spk_style(spk=voice, style=style)
 
         spk = params.get("spk", -1)
-        seed = params.get("seed", 34060637)
+        seed = params.get("seed", 42)
         temperature = params.get("temperature", 0.3)
+        prompt1 = params.get("prompt1", "")
+        prompt2 = params.get("prompt2", "")
+        prefix = params.get("prefix", "")
 
         # Generate audio
-        sample_rate, audio_data = generate.generate_audio(
+        sample_rate, audio_data = synthesize_audio(
             text,
             temperature=temperature,
             top_P=0.7,
             top_K=20,
             spk=spk,
             infer_seed=seed,
+            batch_size=batch_size,
+            spliter_threshold=spliter_threshold,
+            prompt1=prompt1,
+            prompt2=prompt2,
+            prefix=prefix,
         )
 
         if speed != 1:

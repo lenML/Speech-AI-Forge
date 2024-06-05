@@ -1,3 +1,4 @@
+import numpy as np
 from pydub import AudioSegment
 from typing import Any, List, Dict
 from scipy.io.wavfile import write
@@ -53,6 +54,9 @@ def to_number(value, t, default=0):
 
 
 class SynthesizeSegments:
+    batch_default_spk_seed = int(np.random.randint(0, 2**32 - 1))
+    batch_default_infer_seed = int(np.random.randint(0, 2**32 - 1))
+
     def __init__(self, batch_size: int = 8):
         self.batch_size = batch_size
 
@@ -90,6 +94,12 @@ class SynthesizeSegments:
 
         if not disable_normalize:
             params["text"] = text_normalize(text, is_end=is_end)
+
+        # Set default values for spk and infer_seed
+        if params["spk"] == -1:
+            params["spk"] = self.batch_default_spk_seed
+        if params["infer_seed"] == -1:
+            params["infer_seed"] = self.batch_default_infer_seed
 
         return params
 
