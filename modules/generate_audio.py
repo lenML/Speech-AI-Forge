@@ -73,6 +73,8 @@ def generate_audio_batch(
     elif isinstance(spk, Speaker):
         params_infer_code["spk_emb"] = spk.emb
         logger.debug(("spk", spk.name))
+    else:
+        raise ValueError("spk must be int or Speaker")
 
     logger.debug(
         {

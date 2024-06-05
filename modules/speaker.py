@@ -106,8 +106,10 @@ class SpeakerManager:
         return speaker
 
     def get_speaker(self, name) -> Speaker | None:
-        filename = name + ".pt"
-        return self.speakers.get(filename, None)
+        for speaker in self.speakers.values():
+            if speaker.name == name:
+                return speaker
+        return None
 
     def get_speaker_by_id(self, id) -> Speaker | None:
         for speaker in self.speakers.values():
