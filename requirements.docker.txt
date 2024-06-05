@@ -22,4 +22,4 @@ gradio
 emojiswitch
 python-dotenv
 zhon
-mistune
+mistune==3.0.2
