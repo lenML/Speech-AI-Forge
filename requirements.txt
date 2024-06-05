@@ -19,3 +19,6 @@ tqdm
 # torchaudio
 gradio
 emojiswitch
+python-dotenv
+zhon
+mistune

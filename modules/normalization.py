@@ -1,5 +1,60 @@
 from modules.utils.zh_normalization.text_normlization import *
 import emojiswitch
+from modules.utils.markdown import markdown_to_text
+
+post_normalize_pipeline = []
+pre_normalize_pipeline = []
+
+
+def post_normalize():
+    def decorator(func):
+        post_normalize_pipeline.append(func)
+        return func
+
+    return decorator
+
+
+def pre_normalize():
+    def decorator(func):
+        pre_normalize_pipeline.append(func)
+        return func
+
+    return decorator
+
+
+def apply_pre_normalize(text):
+    for func in pre_normalize_pipeline:
+        text = func(text)
+    return text
+
+
+def apply_post_normalize(text):
+    for func in post_normalize_pipeline:
+        text = func(text)
+    return text
+
+
+def is_markdown(text):
+    markdown_patterns = [
+        r"(^|\s)#[^#]",  # 标题
+        r"\*\*.*?\*\*",  # 加粗
+        r"\*.*?\*",  # 斜体
+        r"!\[.*?\]\(.*?\)",  # 图片
+        r"\[.*?\]\(.*?\)",  # 链接
+        r"`[^`]+`",  # 行内代码
+        r"```[\s\S]*?```",  # 代码块
+        r"(^|\s)\* ",  # 无序列表
+        r"(^|\s)\d+\. ",  # 有序列表
+        r"(^|\s)> ",  # 引用
+        r"(^|\s)---",  # 分隔线
+    ]
+
+    for pattern in markdown_patterns:
+        if re.search(pattern, text, re.MULTILINE):
+            return True
+
+    return False
+
 
 character_map = {
     "：": "，",
@@ -37,21 +92,32 @@ character_to_word = {
 }
 
 
+@post_normalize()
 def apply_character_to_word(text):
     for k, v in character_to_word.items():
         text = text.replace(k, v)
     return text
 
 
+@post_normalize()
 def apply_character_map(text):
     translation_table = str.maketrans(character_map)
     return text.translate(translation_table)
 
 
+@post_normalize()
 def apply_emoji_map(text):
     return emojiswitch.demojize(text, delimiters=("", ""), lang="zh")
 
 
+@pre_normalize()
+def apply_markdown_to_text(text):
+    if is_markdown(text):
+        text = markdown_to_text(text)
+    return text
+
+
+@post_normalize()
 def insert_spaces_between_uppercase(s):
     # 使用正则表达式在每个相邻的大写字母之间插入空格
     return re.sub(
@@ -94,21 +160,7 @@ def email_detect(text):
     return email_pattern.sub(replace, text)
 
 
-def pre_normalize(text):
-    # NOTE: 效果一般...
-    # text = email_detect(text)
-    return text
-
-
-def post_normalize(text):
-    text = insert_spaces_between_uppercase(text)
-    text = apply_character_map(text)
-    text = apply_character_to_word(text)
-    text = apply_emoji_map(text)
-    return text
-
-
-def text_normalize(text, is_end=False):
+def sentence_normalize(sentence_text: str):
     # https://github.com/PaddlePaddle/PaddleSpeech/tree/develop/paddlespeech/t2s/frontend/zh_normalization
     tx = TextNormalizer()
 
@@ -116,11 +168,10 @@ def text_normalize(text, is_end=False):
     pattern = re.compile(r"(\[.+?\])|([^[]+)")
 
     def normalize_part(part):
-        part = pre_normalize(part)
         sentences = tx.normalize(part)
         dest_text = ""
         for sentence in sentences:
-            dest_text += post_normalize(sentence)
+            dest_text += sentence
         return dest_text
 
     def replace(match):
@@ -129,7 +180,7 @@ def text_normalize(text, is_end=False):
         else:
             return normalize_part(match.group(2))
 
-    result = pattern.sub(replace, text)
+    result = pattern.sub(replace, sentence_text)
 
     # NOTE: 加了会有杂音...
     # if is_end:
@@ -139,15 +190,33 @@ def text_normalize(text, is_end=False):
     return result
 
 
+def text_normalize(text, is_end=False):
+    text = apply_pre_normalize(text)
+    lines = text.split("\n")
+    lines = [line.strip() for line in lines]
+    lines = [line for line in lines if line]
+    lines = [sentence_normalize(line) for line in lines]
+    content = "\n".join(lines)
+    content = apply_post_normalize(content)
+    return content
+
+
 if __name__ == "__main__":
-    print(
-        text_normalize(
-            "ChatTTS是专门为对话场景设计的文本转语音模型，例如LLM助手对话任务。它支持英文和中文两种语言。最大的模型使用了10万小时以上的中英文数据进行训练。在HuggingFace中开源的版本为4万小时训练且未SFT的版本."
-        )
-    )
-    print(
-        text_normalize(
-            " [oral_9] [laugh_0] [break_0] 电 [speed_0] 影 [speed_0] 中 梁朝伟 [speed_9] 扮演的陈永仁的编号27149"
-        )
-    )
-    print(text_normalize(" 明天有62％的概率降雨"))
+    test_cases = [
+        "ChatTTS是专门为对话场景设计的文本转语音模型，例如LLM助手对话任务。它支持英文和中文两种语言。最大的模型使用了10万小时以上的中英文数据进行训练。在HuggingFace中开源的版本为4万小时训练且未SFT的版本.",
+        " [oral_9] [laugh_0] [break_0] 电 [speed_0] 影 [speed_0] 中 梁朝伟 [speed_9] 扮演的陈永仁的编号27149",
+        " 明天有62％的概率降雨",
+        "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
+        """
+# 你好，世界
+```js
+console.log('1')
+```
+**加粗**
+
+*一条文本*
+        """,
+    ]
+
+    for i, test_case in enumerate(test_cases):
+        print(f"case {i}:\n", {"x": text_normalize(test_case, is_end=True)})
