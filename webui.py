@@ -390,7 +390,7 @@ def create_tts_interface():
                         choices=speaker_names,
                         # label="Choose Speaker",
                         interactive=True,
-                        value="female2",
+                        value="female : female2",
                         show_label=False,
                     )
                     spk_rand_button = gr.Button(
@@ -680,7 +680,7 @@ def create_long_content_tab(ssml_input, tabs):
                 spk_input_dropdown = gr.Dropdown(
                     choices=speaker_names,
                     interactive=True,
-                    value="female2",
+                    value="female : female2",
                     show_label=False,
                 )
                 spk_rand_button = gr.Button(
