@@ -23,14 +23,14 @@ class Speaker:
         self.describe = describe
         self.emb = None
 
-    def to_json(self):
+    def to_json(self, with_emb=False):
         return {
             "id": str(self.id),
             "seed": self.seed,
             "name": self.name,
             "gender": self.gender,
             "describe": self.describe,
-            # "emb": self.emb.tolist(),
+            "emb": self.emb.tolist() if with_emb else None,
         }
 
     def fix(self):
@@ -61,32 +61,33 @@ class Speaker:
 # 可以列出所有 speaker
 class SpeakerManager:
     def __init__(self):
-        self.speakers = []
+        self.speakers = {}
         self.speaker_dir = "./data/speakers/"
         self.refresh_speakers()
 
     def refresh_speakers(self):
-        self.speakers = []
-        for speaker in os.listdir(self.speaker_dir):
-            if speaker.endswith(".pt"):
+        self.speakers = {}
+        for speaker_file in os.listdir(self.speaker_dir):
+            if speaker_file.endswith(".pt"):
                 speaker = torch.load(
-                    self.speaker_dir + speaker, map_location=torch.device("cpu")
+                    self.speaker_dir + speaker_file, map_location=torch.device("cpu")
                 )
-                self.speakers.append(speaker)
+                self.speakers[speaker_file] = speaker
 
                 is_update = speaker.fix()
                 if is_update:
-                    torch.save(speaker, self.speaker_dir + speaker.name + ".pt")
+                    torch.save(speaker, self.speaker_dir + speaker_file)
 
     def list_speakers(self):
-        return self.speakers
+        return list(self.speakers.values())
 
-    def create_speaker(self, seed, name="", gender=""):
+    def create_speaker_from_seed(self, seed, name="", gender="", describe=""):
         if name == "":
             name = seed
-        speaker = Speaker(seed, name=name, gender=gender)
+        filename = name + ".pt"
+        speaker = Speaker(seed, name=name, gender=gender, describe=describe)
         speaker.emb = create_speaker_from_seed(seed)
-        torch.save(speaker, self.speaker_dir + name + ".pt")
+        torch.save(speaker, self.speaker_dir + filename)
         self.refresh_speakers()
         return speaker
 
@@ -105,10 +106,42 @@ class SpeakerManager:
         return speaker
 
     def get_speaker(self, name) -> Speaker | None:
-        try:
-            return torch.load(self.speaker_dir + name + ".pt")
-        except FileNotFoundError:
-            return None
+        filename = name + ".pt"
+        return self.speakers.get(filename, None)
+
+    def get_speaker_by_id(self, id) -> Speaker | None:
+        for speaker in self.speakers.values():
+            if str(speaker.id) == str(id):
+                return speaker
+        return None
+
+    def get_speaker_filename(self, id: str):
+        filename = None
+        for fname, spk in self.speakers.items():
+            if str(spk.id) == str(id):
+                filename = fname
+                break
+        return filename
+
+    def update_speaker(self, speaker: Speaker):
+        filename = None
+        for fname, spk in self.speakers.items():
+            if str(spk.id) == str(speaker.id):
+                filename = fname
+                break
+
+        if filename:
+            torch.save(speaker, self.speaker_dir + filename)
+            self.refresh_speakers()
+            return speaker
+        else:
+            raise ValueError("Speaker not found for update")
+
+    def save_all(self):
+        for speaker in self.speakers.values():
+            filename = self.get_speaker_filename(speaker.id)
+            torch.save(speaker, self.speaker_dir + filename)
+        # self.refresh_speakers()
 
     def __len__(self):
         return len(self.speakers)

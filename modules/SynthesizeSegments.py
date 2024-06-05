@@ -134,6 +134,8 @@ class SynthesizeSegments:
             segments
         )  # Create a list with the same length as segments
         buckets = self.bucket_segments(segments)
+        logger.debug(f"segments len: {len(segments)}")
+        logger.debug(f"bucket pool size: {len(buckets)}")
         for bucket in buckets:
             for i in range(0, len(bucket), self.batch_size):
                 batch = bucket[i : i + self.batch_size]
