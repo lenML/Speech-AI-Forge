@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Any
+from typing import Any, Union
 
 import torch
 
@@ -51,7 +51,7 @@ def to_number(value, t, default=0):
         return default
 
 
-def calc_spk_style(spk: str | int, style: str | int):
+def calc_spk_style(spk: Union[str, int], style: Union[str, int]):
     voice_attrs = {
         "spk": None,
         "seed": None,

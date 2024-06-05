@@ -1,6 +1,6 @@
 import numpy as np
 from pydub import AudioSegment
-from typing import Any, List, Dict
+from typing import Any, List, Dict, Union
 from scipy.io.wavfile import write
 import io
 from modules.utils.audio import time_stretch, pitch_shift
@@ -211,7 +211,7 @@ def generate_audio_segment(
     return AudioSegment.from_file(byte_io, format="wav")
 
 
-def synthesize_segment(segment: Dict[str, Any]) -> AudioSegment | None:
+def synthesize_segment(segment: Dict[str, Any]) -> Union[AudioSegment, None]:
     if "break" in segment:
         pause_segment = AudioSegment.silent(duration=segment["break"])
         return pause_segment

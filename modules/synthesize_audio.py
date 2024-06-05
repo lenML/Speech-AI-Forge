@@ -1,4 +1,5 @@
 import io
+from typing import Union
 from modules.SentenceSplitter import SentenceSplitter
 from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 
@@ -14,7 +15,7 @@ def synthesize_audio(
     temperature: float = 0.3,
     top_P: float = 0.7,
     top_K: float = 20,
-    spk: int | Speaker = -1,
+    spk: Union[int, Speaker] = -1,
     infer_seed: int = -1,
     use_decoder: bool = True,
     prompt1: str = "",

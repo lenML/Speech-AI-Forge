@@ -1,4 +1,5 @@
 import os
+from typing import Union
 import torch
 
 from modules import models
@@ -105,13 +106,13 @@ class SpeakerManager:
         self.refresh_speakers()
         return speaker
 
-    def get_speaker(self, name) -> Speaker | None:
+    def get_speaker(self, name) -> Union[Speaker, None]:
         for speaker in self.speakers.values():
             if speaker.name == name:
                 return speaker
         return None
 
-    def get_speaker_by_id(self, id) -> Speaker | None:
+    def get_speaker_by_id(self, id) -> Union[Speaker, None]:
         for speaker in self.speakers.values():
             if str(speaker.id) == str(id):
                 return speaker

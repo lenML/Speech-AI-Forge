@@ -9,6 +9,7 @@ from modules import models, config
 import logging
 
 from modules import devices
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ def generate_audio(
     temperature: float = 0.3,
     top_P: float = 0.7,
     top_K: float = 20,
-    spk: int | Speaker = -1,
+    spk: Union[int, Speaker] = -1,
     infer_seed: int = -1,
     use_decoder: bool = True,
     prompt1: str = "",
@@ -48,7 +49,7 @@ def generate_audio_batch(
     temperature: float = 0.3,
     top_P: float = 0.7,
     top_K: float = 20,
-    spk: int | Speaker = -1,
+    spk: Union[int, Speaker] = -1,
     infer_seed: int = -1,
     use_decoder: bool = True,
     prompt1: str = "",
