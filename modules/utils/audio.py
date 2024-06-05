@@ -9,9 +9,12 @@ INT16_MAX = np.iinfo(np.int16).max
 
 
 def audio_to_int16(audio_data):
-    if audio_data.dtype == np.float32:
-        audio_data = (audio_data * INT16_MAX).astype(np.int16)
-    if audio_data.dtype == np.float16:
+    if (
+        audio_data.dtype == np.float32
+        or audio_data.dtype == np.float64
+        or audio_data.dtype == np.float128
+        or audio_data.dtype == np.float16
+    ):
         audio_data = (audio_data * INT16_MAX).astype(np.int16)
     return audio_data
 
@@ -25,6 +28,21 @@ def audiosegment_to_librosawav(audiosegment):
     fp_arr = fp_arr.reshape(-1)
 
     return fp_arr
+
+
+def pydub_to_np(audio: AudioSegment) -> tuple[int, np.ndarray]:
+    """
+    Converts pydub audio segment into np.float32 of shape [duration_in_seconds*sample_rate, channels],
+    where each value is in range [-1.0, 1.0].
+    Returns tuple (audio_np_array, sample_rate).
+    """
+    return (
+        audio.frame_rate,
+        np.array(audio.get_array_of_samples(), dtype=np.float32).reshape(
+            (-1, audio.channels)
+        )
+        / (1 << (8 * audio.sample_width - 1)),
+    )
 
 
 def ndarray_to_segment(ndarray, frame_rate):

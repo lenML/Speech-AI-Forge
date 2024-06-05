@@ -1,12 +1,12 @@
+import io
 from modules.SentenceSplitter import SentenceSplitter
-from modules.normalization import text_normalize
+from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 
 from modules import generate_audio as generate
 
 
-import numpy as np
-
 from modules.speaker import Speaker
+from modules.utils import audio
 
 
 def synthesize_audio(
@@ -39,20 +39,28 @@ def synthesize_audio(
     else:
         spliter = SentenceSplitter(spliter_threshold)
         sentences = spliter.parse(text)
-        sentences = [text_normalize(s) for s in sentences]
-        audio_data_batch = generate.generate_audio_batch(
-            texts=sentences,
-            temperature=temperature,
-            top_P=top_P,
-            top_K=top_K,
-            spk=spk,
-            infer_seed=infer_seed,
-            use_decoder=use_decoder,
-            prompt1=prompt1,
-            prompt2=prompt2,
-            prefix=prefix,
-        )
-        sample_rate = audio_data_batch[0][0]
-        audio_data = np.concatenate([data for _, data in audio_data_batch])
 
-        return sample_rate, audio_data
+        text_segments = [
+            {
+                "text": s,
+                "params": {
+                    "text": s,
+                    "temperature": temperature,
+                    "top_P": top_P,
+                    "top_K": top_K,
+                    "spk": spk,
+                    "infer_seed": infer_seed,
+                    "use_decoder": use_decoder,
+                    "prompt1": prompt1,
+                    "prompt2": prompt2,
+                    "prefix": prefix,
+                },
+            }
+            for s in sentences
+        ]
+        synthesizer = SynthesizeSegments(batch_size)
+        audio_segments = synthesizer.synthesize_segments(text_segments)
+
+        combined_audio = combine_audio_segments(audio_segments)
+
+        return audio.pydub_to_np(combined_audio)

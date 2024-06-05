@@ -16,6 +16,8 @@ import logging
 
 from numpy import clip
 
+from modules.synthesize_audio import synthesize_audio
+
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -145,8 +147,8 @@ def tts_generate(
         top_k = int(top_k)
 
     params = calc_spk_style(spk=spk, style=style)
-
     spk = params.get("spk", spk)
+
     infer_seed = infer_seed or params.get("seed", infer_seed)
     temperature = temperature or params.get("temperature", temperature)
     prefix = prefix or params.get("prefix", prefix)
@@ -159,37 +161,19 @@ def tts_generate(
     if not disable_normalize:
         text = text_normalize(text)
 
-    if batch_size == 1:
-        sample_rate, audio_data = generate_audio(
-            text=text,
-            temperature=temperature,
-            top_P=top_p,
-            top_K=top_k,
-            spk=spk,
-            infer_seed=infer_seed,
-            use_decoder=use_decoder,
-            prompt1=prompt1,
-            prompt2=prompt2,
-            prefix=prefix,
-        )
-    else:
-        spliter = SentenceSplitter(webui_config["spliter_threshold"])
-        sentences = spliter.parse(text)
-        sentences = [text_normalize(s) for s in sentences]
-        audio_data_batch = generate_audio_batch(
-            texts=sentences,
-            temperature=temperature,
-            top_P=top_p,
-            top_K=top_k,
-            spk=spk,
-            infer_seed=infer_seed,
-            use_decoder=use_decoder,
-            prompt1=prompt1,
-            prompt2=prompt2,
-            prefix=prefix,
-        )
-        sample_rate = audio_data_batch[0][0]
-        audio_data = np.concatenate([data for _, data in audio_data_batch])
+    sample_rate, audio_data = synthesize_audio(
+        text=text,
+        temperature=temperature,
+        top_P=top_p,
+        top_K=top_k,
+        spk=spk,
+        infer_seed=infer_seed,
+        use_decoder=use_decoder,
+        prompt1=prompt1,
+        prompt2=prompt2,
+        prefix=prefix,
+        batch_size=batch_size,
+    )
 
     audio_data = audio.audio_to_int16(audio_data)
     return sample_rate, audio_data

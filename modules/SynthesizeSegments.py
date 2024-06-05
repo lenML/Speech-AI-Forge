@@ -9,6 +9,7 @@ from modules.normalization import text_normalize
 import logging
 import json
 import random
+import copy
 
 from modules.speaker import Speaker
 
@@ -61,6 +62,9 @@ class SynthesizeSegments:
         self.batch_size = batch_size
 
     def segment_to_generate_params(self, segment: Dict[str, Any]) -> Dict[str, Any]:
+        if segment.get("params", None) is not None:
+            return segment["params"]
+
         text = segment.get("text", "")
         is_end = segment.get("is_end", False)
 
@@ -111,19 +115,15 @@ class SynthesizeSegments:
         for segment in segments:
             params = self.segment_to_generate_params(segment)
 
-            key_params = params
+            key_params = copy.copy(params)
             if isinstance(key_params.get("spk"), Speaker):
                 key_params["spk"] = str(key_params["spk"].id)
             key = json.dumps(
                 {k: v for k, v in key_params.items() if k != "text"}, sort_keys=True
             )
-            if params["spk"] == -1 or params["infer_seed"] == -1:
-                key = random.random()
-                buckets[key] = [segment]
-            else:
-                if key not in buckets:
-                    buckets[key] = []
-                buckets[key].append(segment)
+            if key not in buckets:
+                buckets[key] = []
+            buckets[key].append(segment)
 
         # Convert dictionary to list of buckets
         bucket_list = list(buckets.values())

@@ -23,7 +23,7 @@ from modules.api.Api import APIManager
 class SSMLRequest(BaseModel):
     ssml: str
     format: str = "mp3"
-    batch: bool = False
+    batch_size: int = 4
 
 
 async def synthesize_ssml(
@@ -34,7 +34,12 @@ async def synthesize_ssml(
     try:
         ssml = request.ssml
         format = request.format
-        batch = request.batch
+        batch_size = request.batch_size
+
+        if batch_size < 1:
+            raise HTTPException(
+                status_code=400, detail="Batch size must be greater than 0."
+            )
 
         if not ssml:
             raise HTTPException(status_code=400, detail="SSML content is required.")
@@ -43,8 +48,8 @@ async def synthesize_ssml(
         for seg in segments:
             seg["text"] = text_normalize(seg["text"], is_end=True)
 
-        if batch:
-            synthesize = SynthesizeSegments(16)
+        if batch_size != 1:
+            synthesize = SynthesizeSegments(batch_size)
             audio_segments = synthesize.synthesize_segments(segments)
             combined_audio = combine_audio_segments(audio_segments)
             buffer = io.BytesIO()
