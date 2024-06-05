@@ -5,6 +5,7 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
 import torch
 from modules import config
+from modules.utils import env
 from modules import generate_audio as generate
 
 from functools import lru_cache
@@ -20,6 +21,8 @@ from modules.api.impl import (
     openai_api,
     refiner_api,
 )
+
+logger = logging.getLogger(__name__)
 
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
@@ -59,6 +62,11 @@ def conditional_cache(condition: Callable):
 if __name__ == "__main__":
     import argparse
     import uvicorn
+    import dotenv
+
+    dotenv.load_dotenv(
+        dotenv_path=os.getenv("ENV_FILE", ".webui.env"),
+    )
 
     parser = argparse.ArgumentParser(
         description="Start the FastAPI server with command line arguments"
@@ -110,8 +118,49 @@ if __name__ == "__main__":
 
     config.args = args
 
-    if args.compile:
+    host = env.get_env_or_arg(args, "host", "0.0.0.0", str)
+    port = env.get_env_or_arg(args, "port", 8000, int)
+    reload = env.get_env_or_arg(args, "reload", False, bool)
+    compile = env.get_env_or_arg(args, "compile", False, bool)
+    lru_size = env.get_env_or_arg(args, "lru_size", 64, int)
+    cors_origin = env.get_env_or_arg(args, "cors_origin", "*", str)
+    no_playground = env.get_env_or_arg(args, "no_playground", False, bool)
+    no_docs = env.get_env_or_arg(args, "no_docs", False, bool)
+    half = env.get_env_or_arg(args, "half", False, bool)
+    off_tqdm = env.get_env_or_arg(args, "off_tqdm", False, bool)
+
+    if compile:
         print("Model compile is enabled")
+        config.enable_model_compile = True
+
+    def should_cache(*args, **kwargs):
+        spk_seed = kwargs.get("spk_seed", -1)
+        infer_seed = kwargs.get("infer_seed", -1)
+        return spk_seed != -1 and infer_seed != -1
+
+    if lru_size > 0:
+        config.lru_size = lru_size
+        generate.generate_audio = conditional_cache(should_cache)(
+            generate.generate_audio
+        )
+
+    api = create_api(no_docs=no_docs)
+    config.api = api
+
+    if cors_origin:
+        api.set_cors(allow_origins=[cors_origin])
+
+    if not no_playground:
+        api.setup_playground()
+
+    if half:
+        config.model_config["half"] = True
+
+    if off_tqdm:
+        config.disable_tqdm = True
+
+    if args.compile:
+        logger.info("Model compile is enabled")
         config.enable_model_compile = True
 
     def should_cache(*args, **kwargs):

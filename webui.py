@@ -28,10 +28,19 @@ from modules.api.utils import calc_spk_style
 from modules.normalization import text_normalize
 from modules import refiner, config
 
+from modules.utils import env
+from modules.SentenceSplitter import SentenceSplitter
 
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
+
+webui_config = {
+    "tts_max": 1000,
+    "ssml_max": 5000,
+    "spliter_threshold": 100,
+    "max_batch_size": 12,
+}
 
 
 def get_speakers():
@@ -42,6 +51,17 @@ def get_styles():
     return styles_mgr.list_items()
 
 
+def segments_length_limit(segments, total_max: int):
+    ret_segments = []
+    total_len = 0
+    for seg in segments:
+        total_len += len(seg["text"])
+        if total_len > total_max:
+            break
+        ret_segments.append(seg)
+    return ret_segments
+
+
 @torch.inference_mode()
 def synthesize_ssml(ssml: str, batch_size=8):
     try:
@@ -49,10 +69,9 @@ def synthesize_ssml(ssml: str, batch_size=8):
     except Exception:
         batch_size = 8
 
-    # 只支持单个2000字以内的文本
-    ssml = ssml.strip()[0:2000]
-
     segments = parse_ssml(ssml)
+    max_len = webui_config["ssml_max"]
+    segments = segments_length_limit(segments, max_len)
 
     synthesize = SynthesizeSegments(batch_size=batch_size)
     audio_segments = synthesize.synthesize_segments(segments)
@@ -119,18 +138,6 @@ def tts_generate_batch_1(
     return sample_rate, audio_data
 
 
-# 根据换行分割，再根据中文句号分割
-def simple_split_text(text: str) -> list[str]:
-    text = text.strip()
-    text = text.replace("。", "。\n")
-    text = text.split("\n")
-    text = [t.strip() for t in text]
-    text = [t for t in text if t]
-    # 过滤掉只包含符号的段落
-    text = [t for t in text if t and not re.fullmatch(r"\W+", t)]
-    return text
-
-
 @torch.inference_mode()
 def tts_generate(
     text,
@@ -152,8 +159,8 @@ def tts_generate(
     except Exception:
         batch_size = 8
 
-    # 只支持单个1000字以内的文本
-    text = text.strip()[0:1000]
+    max_len = webui_config["tts_max"]
+    text = text.strip()[0:max_len]
 
     if style == "*auto":
         style = None
@@ -192,9 +199,11 @@ def tts_generate(
 
         return sample_rate, audio_data
     else:
-        texts = simple_split_text(text)
+        spliter = SentenceSplitter(webui_config["spliter_threshold"])
+        sentences = spliter.parse(text)
+        sentences = [text_normalize(s) for s in sentences]
         audio_data_batch = generate_audio_batch(
-            texts=texts,
+            texts=sentences,
             temperature=temperature,
             top_P=top_p,
             top_K=top_k,
@@ -392,7 +401,13 @@ def create_tts_interface():
                 )
                 top_p_input = gr.Slider(0.1, 1.0, value=0.7, step=0.1, label="Top P")
                 top_k_input = gr.Slider(1, 50, value=20, step=1, label="Top K")
-                batch_size_input = gr.Slider(1, 32, value=8, step=1, label="Batch Size")
+                batch_size_input = gr.Slider(
+                    1,
+                    webui_config["max_batch_size"],
+                    value=8,
+                    step=1,
+                    label="Batch Size",
+                )
 
             with gr.Row():
                 with gr.Group():
@@ -476,7 +491,9 @@ def create_tts_interface():
                         gr.Markdown("- 每个batch最长30s")
                         gr.Markdown("- batch size设置为1，即不使用批处理")
                         gr.Markdown("- 开启batch请配合设置Inference Seed")
-                        gr.Markdown("- 字数限制1,000字，超过部分截断")
+                        gr.Markdown(
+                            f"- 字数限制{webui_config['tts_max']:,}字，超过部分截断"
+                        )
                         gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`")
                         gr.Markdown(
                             "- If the input text is all in English, it is recommended to check disable_normalize"
@@ -596,7 +613,7 @@ def create_ssml_interface():
         with gr.Column(scale=3):
             with gr.Group():
                 gr.Markdown("📝SSML Input")
-                gr.Markdown("- 最长2000字符，超过会被截断")
+                gr.Markdown(f"- 最长{webui_config['tts_max']:,}字符，超过会被截断")
                 gr.Markdown("- 尽量保证使用相同的 seed")
                 gr.Markdown(
                     "- 关于SSML可以看这个 [文档](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
@@ -619,7 +636,7 @@ def create_ssml_interface():
                     label="Batch Size",
                     value=8,
                     minimum=1,
-                    maximum=32,
+                    maximum=webui_config["max_batch_size"],
                     step=1,
                 )
             with gr.Group():
@@ -641,9 +658,11 @@ def create_ssml_interface():
 
 
 def split_long_text(long_text_input):
-    long_text = simple_split_text(long_text_input)
+    spliter = SentenceSplitter(webui_config["spliter_threshold"])
+    sentences = spliter.parse(long_text_input)
+    sentences = [text_normalize(s) for s in sentences]
     data = []
-    for i, text in enumerate(long_text):
+    for i, text in enumerate(sentences):
         data.append([i, text, len(text)])
     return data
 
@@ -668,7 +687,7 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
         if seed:
             ssml += f' seed="{seed}"'
         ssml += ">\n"
-        ssml += f"{indent}{indent}{row[1]}\n"
+        ssml += f"{indent}{indent}{text_normalize(row[1])}\n"
         ssml += f"{indent}</voice>\n"
     return f"<speak version='0.1'>\n{ssml}</speak>"
 
@@ -862,6 +881,11 @@ def create_interface():
 
 if __name__ == "__main__":
     import argparse
+    import dotenv
+
+    dotenv.load_dotenv(
+        dotenv_path=os.getenv("ENV_FILE", ".webui.env"),
+    )
 
     parser = argparse.ArgumentParser(description="Gradio App")
     parser.add_argument(
@@ -883,16 +907,38 @@ if __name__ == "__main__":
         action="store_true",
         help="Disable tqdm progress bar",
     )
+    parser.add_argument(
+        "--tts_max_len",
+        type=int,
+        default=1000,
+        help="Max length of text for TTS",
+    )
+    parser.add_argument(
+        "--ssml_max_len",
+        type=int,
+        default=2000,
+        help="Max length of text for SSML",
+    )
+    parser.add_argument(
+        "--max_batch_size",
+        type=int,
+        default=12,
+        help="Max batch size for TTS",
+    )
 
     args = parser.parse_args()
 
-    server_name = os.getenv("GRADIO_SERVER_NAME", args.server_name)
-    server_port = int(os.getenv("GRADIO_SERVER_PORT", args.server_port))
-    share = bool(os.getenv("GRADIO_SHARE", args.share))
-    debug = bool(os.getenv("GRADIO_DEBUG", args.debug))
-    auth = os.getenv("GRADIO_AUTH", args.auth)
-    half = bool(os.getenv("MODEL_HALF", args.half))
-    off_tqdm = bool(os.getenv("DISABLE_TQDM", args.off_tqdm))
+    server_name = env.get_env_or_arg(args, "server_name", "default_server", str)
+    server_port = env.get_env_or_arg(args, "server_port", 8000, int)
+    share = env.get_env_or_arg(args, "share", False, bool)
+    debug = env.get_env_or_arg(args, "debug", False, bool)
+    auth = env.get_env_or_arg(args, "auth", None, str)
+    half = env.get_env_or_arg(args, "half", False, bool)
+    off_tqdm = env.get_env_or_arg(args, "off_tqdm", False, bool)
+
+    webui_config["tts_max"] = env.get_env_or_arg(args, "tts_max_len", 1000, int)
+    webui_config["ssml_max"] = env.get_env_or_arg(args, "ssml_max_len", 5000, int)
+    webui_config["max_batch_size"] = env.get_env_or_arg(args, "max_batch_size", 12, int)
 
     demo = create_interface()
 
