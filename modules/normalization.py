@@ -1,6 +1,15 @@
 from modules.utils.zh_normalization.text_normlization import *
 import emojiswitch
 from modules.utils.markdown import markdown_to_text
+from modules import models
+import re
+
+
+def is_chinese(text):
+    # 中文字符的 Unicode 范围是 \u4e00-\u9fff
+    chinese_pattern = re.compile(r"[\u4e00-\u9fff]")
+    return bool(chinese_pattern.search(text))
+
 
 post_normalize_pipeline = []
 pre_normalize_pipeline = []
@@ -93,6 +102,8 @@ character_to_word = {
     " & ": " and ",
 }
 
+## ---------- post normalize ----------
+
 
 @post_normalize()
 def apply_character_to_word(text):
@@ -109,7 +120,8 @@ def apply_character_map(text):
 
 @post_normalize()
 def apply_emoji_map(text):
-    return emojiswitch.demojize(text, delimiters=("", ""), lang="zh")
+    lang = "zh" if is_chinese(text) else "en"
+    return emojiswitch.demojize(text, delimiters=("", ""), lang=lang)
 
 
 @post_normalize()
@@ -120,6 +132,26 @@ def insert_spaces_between_uppercase(s):
         " ",
         s,
     )
+
+
+@post_normalize()
+def replace_unk_tokens(text):
+    """
+    把不在字典里的字符替换为 " , "
+    """
+    chat_tts = models.load_chat_tts()
+    tokenizer = chat_tts.pretrain_models["tokenizer"]
+    vocab = tokenizer.get_vocab()
+    vocab_set = set(vocab.keys())
+    # 添加所有英语字符
+    vocab_set.update(set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+    vocab_set.update(set(" \n\r\t"))
+    replaced_chars = [char if char in vocab_set else " , " for char in text]
+    output_text = "".join(replaced_chars)
+    return output_text
+
+
+## ---------- pre normalize ----------
 
 
 @pre_normalize()
@@ -186,7 +218,7 @@ def sentence_normalize(sentence_text: str):
     pattern = re.compile(r"(\[.+?\])|([^[]+)")
 
     def normalize_part(part):
-        sentences = tx.normalize(part)
+        sentences = tx.normalize(part) if is_chinese(part) else [part]
         dest_text = ""
         for sentence in sentences:
             sentence = apply_post_normalize(sentence)
@@ -243,6 +275,16 @@ console.log('1')
 “你们是什么花？”小王子惊奇地问。
 “我们是玫瑰花。”花儿们说道。
 “啊！”小王子说……。
+        """,
+        """
+State-of-the-art Machine Learning for PyTorch, TensorFlow, and JAX.
+
+🤗 Transformers provides APIs and tools to easily download and train state-of-the-art pretrained models. Using pretrained models can reduce your compute costs, carbon footprint, and save you the time and resources required to train a model from scratch. These models support common tasks in different modalities, such as:
+
+📝 Natural Language Processing: text classification, named entity recognition, question answering, language modeling, summarization, translation, multiple choice, and text generation.
+🖼️ Computer Vision: image classification, object detection, and segmentation.
+🗣️ Audio: automatic speech recognition and audio classification.
+🐙 Multimodal: table question answering, optical character recognition, information extraction from scanned documents, video classification, and visual question answering.
         """,
     ]
 
