@@ -69,9 +69,17 @@ def synthesize_ssml(ssml: str, batch_size=8):
     except Exception:
         batch_size = 8
 
+    ssml = ssml.strip()
+
+    if ssml == "":
+        return None
+
     segments = parse_ssml(ssml)
     max_len = webui_config["ssml_max"]
     segments = segments_length_limit(segments, max_len)
+
+    if len(segments) == 0:
+        return None
 
     synthesize = SynthesizeSegments(batch_size=batch_size)
     audio_segments = synthesize.synthesize_segments(segments)
@@ -161,6 +169,9 @@ def tts_generate(
 
     max_len = webui_config["tts_max"]
     text = text.strip()[0:max_len]
+
+    if text == "":
+        return None
 
     if style == "*auto":
         style = None
@@ -613,7 +624,7 @@ def create_ssml_interface():
         with gr.Column(scale=3):
             with gr.Group():
                 gr.Markdown("📝SSML Input")
-                gr.Markdown(f"- 最长{webui_config['tts_max']:,}字符，超过会被截断")
+                gr.Markdown(f"- 最长{webui_config['ssml_max']:,}字符，超过会被截断")
                 gr.Markdown("- 尽量保证使用相同的 seed")
                 gr.Markdown(
                     "- 关于SSML可以看这个 [文档](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
@@ -884,14 +895,12 @@ if __name__ == "__main__":
     import dotenv
 
     dotenv.load_dotenv(
-        dotenv_path=os.getenv("ENV_FILE", ".webui.env"),
+        dotenv_path=os.getenv("ENV_FILE", ".env.webui"),
     )
 
     parser = argparse.ArgumentParser(description="Gradio App")
-    parser.add_argument(
-        "--server_name", type=str, default="0.0.0.0", help="server name"
-    )
-    parser.add_argument("--server_port", type=int, default=7860, help="server port")
+    parser.add_argument("--server_name", type=str, help="server name")
+    parser.add_argument("--server_port", type=int, help="server port")
     parser.add_argument(
         "--share", action="store_true", help="share the gradio interface"
     )
@@ -910,26 +919,23 @@ if __name__ == "__main__":
     parser.add_argument(
         "--tts_max_len",
         type=int,
-        default=1000,
         help="Max length of text for TTS",
     )
     parser.add_argument(
         "--ssml_max_len",
         type=int,
-        default=2000,
         help="Max length of text for SSML",
     )
     parser.add_argument(
         "--max_batch_size",
         type=int,
-        default=12,
         help="Max batch size for TTS",
     )
 
     args = parser.parse_args()
 
-    server_name = env.get_env_or_arg(args, "server_name", "default_server", str)
-    server_port = env.get_env_or_arg(args, "server_port", 8000, int)
+    server_name = env.get_env_or_arg(args, "server_name", "0.0.0.0", str)
+    server_port = env.get_env_or_arg(args, "server_port", 7860, int)
     share = env.get_env_or_arg(args, "share", False, bool)
     debug = env.get_env_or_arg(args, "debug", False, bool)
     auth = env.get_env_or_arg(args, "auth", None, str)

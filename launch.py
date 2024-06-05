@@ -71,12 +71,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Start the FastAPI server with command line arguments"
     )
-    parser.add_argument(
-        "--host", type=str, default="0.0.0.0", help="Host to run the server on"
-    )
-    parser.add_argument(
-        "--port", type=int, default=8000, help="Port to run the server on"
-    )
+    parser.add_argument("--host", type=str, help="Host to run the server on")
+    parser.add_argument("--port", type=int, help="Port to run the server on")
     parser.add_argument(
         "--reload", action="store_true", help="Enable auto-reload for development"
     )
@@ -90,7 +86,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cors_origin",
         type=str,
-        default="*",
         help="Allowed CORS origins. Use '*' to allow all origins.",
     )
     parser.add_argument(

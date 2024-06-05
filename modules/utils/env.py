@@ -8,7 +8,7 @@ def get_env_or_arg(args, arg_name, default, arg_type):
 
     # 如果命令行参数未显式设置，则使用环境变量中的值
     env_value = os.getenv(arg_name.upper())
-    if env_value is not None:
+    if env_value is not None and env_value != "":
         if arg_type == bool:
             return env_value.lower() in ("true", "1", "t")
         return arg_type(env_value)
