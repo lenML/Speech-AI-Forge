@@ -1,15 +1,15 @@
-import numpy as np
 from pydub import AudioSegment
 from typing import Any, List, Dict, Union
 from scipy.io.wavfile import write
 import io
+from modules.utils import rng
 from modules.utils.audio import time_stretch, pitch_shift
 from modules import generate_audio
 from modules.normalization import text_normalize
 import logging
 import json
-import random
 import copy
+import numpy as np
 
 from modules.speaker import Speaker
 
@@ -55,8 +55,8 @@ def to_number(value, t, default=0):
 
 
 class SynthesizeSegments:
-    batch_default_spk_seed = int(np.random.randint(0, 2**32 - 1))
-    batch_default_infer_seed = int(np.random.randint(0, 2**32 - 1))
+    batch_default_spk_seed = rng.np_rng()
+    batch_default_infer_seed = rng.np_rng()
 
     def __init__(self, batch_size: int = 8):
         self.batch_size = batch_size

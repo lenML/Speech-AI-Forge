@@ -1,14 +1,16 @@
 import torch
 import random
 import numpy as np
+from modules.utils import rng
 
 
 def deterministic(seed=0):
     random.seed(seed)
     np.random.seed(seed)
-    torch.manual_seed(seed)
+    torch_rn = rng.convert_np_to_torch(seed)
+    torch.manual_seed(torch_rn)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+        torch.cuda.manual_seed_all(torch_rn)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
