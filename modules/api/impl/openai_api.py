@@ -28,7 +28,7 @@ class AudioSpeechRequest(BaseModel):
     model: str = "chattts-4w"
     voice: str = "female2"
     response_format: Literal["mp3", "wav"] = "mp3"
-    speed: int = Field(1, ge=1, le=10, description="Speed of the audio")
+    speed: float = Field(1, ge=0.1, le=10, description="Speed of the audio")
     style: str = ""
     # 是否开启batch合成，小于等于1表示不适用batch
     # 开启batch合成会自动分割句子
@@ -64,8 +64,8 @@ async def openai_speech_api(
         params = api_utils.calc_spk_style(spk=voice, style=style)
 
         spk = params.get("spk", -1)
-        seed = params.get("seed", 42)
-        temperature = params.get("temperature", 0.3)
+        seed = params.get("seed", request.seed or 42)
+        temperature = params.get("temperature", request.temperature or 0.3)
         prompt1 = params.get("prompt1", "")
         prompt2 = params.get("prompt2", "")
         prefix = params.get("prefix", "")
@@ -114,9 +114,10 @@ def setup(api_manager: APIManager):
 openai api document: 
 [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
 
-两个属性为本系统自定义属性，不在openai文档中：
+以下属性为本系统自定义属性，不在openai文档中：
 - batch_size: 是否开启batch合成，小于等于1表示不使用batch （不推荐）
 - spliter_threshold: 开启batch合成时，句子分割的阈值
+- style: 风格
 
 > model 可填任意值
         """,
