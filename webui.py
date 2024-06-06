@@ -45,6 +45,9 @@ from modules import refiner, config
 from modules.utils import env, audio
 from modules.SentenceSplitter import SentenceSplitter
 
+# fix: If the system proxy is enabled in the Windows system, you need to skip these
+os.environ["NO_PROXY"] = "localhost,127.0.0.1,0.0.0.0"
+
 torch._dynamo.config.cache_size_limit = 64
 torch._dynamo.config.suppress_errors = True
 torch.set_float32_matmul_precision("high")
