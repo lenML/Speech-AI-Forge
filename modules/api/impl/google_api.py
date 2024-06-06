@@ -11,6 +11,7 @@ from modules.utils.audio import apply_prosody_to_audio_data
 from modules.normalization import text_normalize
 
 from modules import generate_audio as generate
+from modules.speaker import speaker_mgr
 
 
 from modules.ssml import parse_ssml
@@ -74,6 +75,8 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     volume_gain_db = audioConfig.get("volumeGainDb", 0)
 
     batch_size = audioConfig.get("batchSize", 1)
+
+    # TODO spliter_threshold
     spliter_threshold = audioConfig.get("spliterThreshold", 100)
 
     # TODO sample_rate
@@ -83,6 +86,18 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
     # TODO maybe need to change the sample rate
     sample_rate = 24000
+
+    # TODO 使用 speaker
+    spk = speaker_mgr.get_speaker(voice_name)
+    if spk is None:
+        raise HTTPException(
+            status_code=400, detail="The specified voice name is not supported."
+        )
+
+    if audio_format != "mp3" and audio_format != "wav":
+        raise HTTPException(
+            status_code=400, detail="Invalid audio encoding format specified."
+        )
 
     try:
         if input.text:

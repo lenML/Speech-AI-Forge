@@ -29,12 +29,6 @@ class BaseResponse(BaseModel):
     message: str
     data: Any
 
-    class Config:
-        json_encoders = {
-            torch.Tensor: lambda v: v.tolist(),
-            Speaker: lambda v: v.to_json(),
-        }
-
 
 def success_response(data: Any, message: str = "ok") -> BaseResponse:
     return BaseResponse(message=message, data=data)

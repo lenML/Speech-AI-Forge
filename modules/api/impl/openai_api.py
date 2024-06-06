@@ -20,6 +20,9 @@ import pyrubberband as pyrb
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 
+from modules.speaker import speaker_mgr
+from modules.data import styles_mgr
+
 import numpy as np
 
 
@@ -45,20 +48,27 @@ async def openai_speech_api(
         ..., description="JSON body with model, input text, and voice"
     )
 ):
+    model = request.model
+    input_text = request.input
+    voice = request.voice
+    style = request.style
+    response_format = request.response_format
+    batch_size = request.batch_size
+    spliter_threshold = request.spliter_threshold
+    speed = request.speed
+    speed = clip(speed, 0.1, 10)
+
+    if not input_text:
+        raise HTTPException(status_code=400, detail="Input text is required.")
+    if speaker_mgr.get_speaker(voice) is None:
+        raise HTTPException(status_code=400, detail="Invalid voice.")
     try:
-        model = request.model
-        input_text = request.input
-        voice = request.voice
-        style = request.style
-        response_format = request.response_format
-        batch_size = request.batch_size
-        spliter_threshold = request.spliter_threshold
-        speed = request.speed
-        speed = clip(speed, 0.1, 10)
+        if style:
+            styles_mgr.find_item_by_name(style)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid style.")
 
-        if not input_text:
-            raise HTTPException(status_code=400, detail="Input text is required.")
-
+    try:
         # Normalize the text
         text = text_normalize(input_text, is_end=True)
 
