@@ -36,6 +36,10 @@ class BaseResponse(BaseModel):
         }
 
 
+def success_response(data: Any, message: str = "Success") -> BaseResponse:
+    return BaseResponse(message=message, data=data)
+
+
 def wav_to_mp3(wav_data, bitrate="48k"):
     audio = AudioSegment.from_wav(
         wav_data,

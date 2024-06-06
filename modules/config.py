@@ -1,8 +1,10 @@
+from modules.utils.JsonObject import JsonObject
+
 enable_model_compile = False
 
 lru_size = 64
 
-args = {}
+runtime_env_vars = JsonObject({})
 
 api = None
 

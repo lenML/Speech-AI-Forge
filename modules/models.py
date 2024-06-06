@@ -1,15 +1,11 @@
-from modules.ChatTTS import ChatTTS
 import torch
-
+from modules.ChatTTS import ChatTTS
 from modules import config
+from modules.devices import devices
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-print(f"device use {device}")
-
 chat_tts = None
 
 
@@ -22,20 +18,25 @@ def load_chat_tts():
         compile=config.enable_model_compile,
         source="local",
         local_path="./models/ChatTTS",
-        device=device,
+        device=devices.device,
+        dtype=devices.dtype,
+        dtype_vocos=devices.dtype_vocos,
+        dtype_dvae=devices.dtype_dvae,
+        dtype_gpt=devices.dtype_gpt,
+        dtype_decoder=devices.dtype_decoder,
     )
 
-    if config.model_config.get("half", False):
-        logging.info("half precision enabled")
-        for model_name, model in chat_tts.pretrain_models.items():
-            if isinstance(model, torch.nn.Module):
-                model.cpu()
-                if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
-                model.half()
-                if torch.cuda.is_available():
-                    model.cuda()
-                model.eval()
-                logger.log(logging.INFO, f"{model_name} converted to half precision.")
-
     return chat_tts
+
+
+def reload_chat_tts():
+    logging.info("Reloading ChatTTS models")
+    global chat_tts
+    if chat_tts:
+        if torch.cuda.is_available():
+            for model_name, model in chat_tts.pretrain_models.items():
+                if isinstance(model, torch.nn.Module):
+                    model.cpu()
+            torch.cuda.empty_cache()
+    chat_tts = None
+    return load_chat_tts()

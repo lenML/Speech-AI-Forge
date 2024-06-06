@@ -14,9 +14,11 @@ except:
 import os
 import logging
 
-from numpy import clip
+import numpy as np
 
+from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
+from modules.utils.cache import conditional_cache
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -25,20 +27,17 @@ logging.basicConfig(
 
 
 import gradio as gr
-import io
-import re
-import numpy as np
 
 import torch
 
 from modules.ssml import parse_ssml
 from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
-from modules.generate_audio import generate_audio, generate_audio_batch
 
 from modules.speaker import speaker_mgr
 from modules.data import styles_mgr
 
 from modules.api.utils import calc_spk_style
+import modules.generate_audio as generate
 
 from modules.normalization import text_normalize
 from modules import refiner, config
@@ -147,7 +146,7 @@ def tts_generate(
     prompt1 = prompt1 or params.get("prompt1", "")
     prompt2 = prompt2 or params.get("prompt2", "")
 
-    infer_seed = clip(infer_seed, -1, 2**32 - 1)
+    infer_seed = np.clip(infer_seed, -1, 2**32 - 1)
     infer_seed = int(infer_seed)
 
     if not disable_normalize:
@@ -869,20 +868,48 @@ if __name__ == "__main__":
         type=int,
         help="Max batch size for TTS",
     )
+    parser.add_argument(
+        "--lru_size",
+        type=int,
+        default=64,
+        help="Set the size of the request cache pool, set it to 0 will disable lru_cache",
+    )
+    parser.add_argument(
+        "--device_id",
+        type=str,
+        help="Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be needed before)",
+        default=None,
+    )
+    parser.add_argument(
+        "--use_cpu",
+        nargs="+",
+        help="use CPU as torch device for specified modules",
+        default=[],
+        type=str.lower,
+    )
 
     args = parser.parse_args()
 
-    server_name = env.get_env_or_arg(args, "server_name", "0.0.0.0", str)
-    server_port = env.get_env_or_arg(args, "server_port", 7860, int)
-    share = env.get_env_or_arg(args, "share", False, bool)
-    debug = env.get_env_or_arg(args, "debug", False, bool)
-    auth = env.get_env_or_arg(args, "auth", None, str)
-    half = env.get_env_or_arg(args, "half", False, bool)
-    off_tqdm = env.get_env_or_arg(args, "off_tqdm", False, bool)
+    def get_and_update_env(*args):
+        val = env.get_env_or_arg(*args)
+        key = args[1]
+        config.runtime_env_vars[key] = val
+        return val
 
-    webui_config["tts_max"] = env.get_env_or_arg(args, "tts_max_len", 1000, int)
-    webui_config["ssml_max"] = env.get_env_or_arg(args, "ssml_max_len", 5000, int)
-    webui_config["max_batch_size"] = env.get_env_or_arg(args, "max_batch_size", 8, int)
+    server_name = get_and_update_env(args, "server_name", "0.0.0.0", str)
+    server_port = get_and_update_env(args, "server_port", 7860, int)
+    share = get_and_update_env(args, "share", False, bool)
+    debug = get_and_update_env(args, "debug", False, bool)
+    auth = get_and_update_env(args, "auth", None, str)
+    half = get_and_update_env(args, "half", False, bool)
+    off_tqdm = get_and_update_env(args, "off_tqdm", False, bool)
+    lru_size = get_and_update_env(args, "lru_size", 64, int)
+    device_id = get_and_update_env(args, "device_id", None, str)
+    use_cpu = get_and_update_env(args, "use_cpu", [], list)
+
+    webui_config["tts_max"] = get_and_update_env(args, "tts_max_len", 1000, int)
+    webui_config["ssml_max"] = get_and_update_env(args, "ssml_max_len", 5000, int)
+    webui_config["max_batch_size"] = get_and_update_env(args, "max_batch_size", 8, int)
 
     demo = create_interface()
 
@@ -894,6 +921,20 @@ if __name__ == "__main__":
 
     if off_tqdm:
         config.disable_tqdm = True
+
+    def should_cache(*args, **kwargs):
+        spk_seed = kwargs.get("spk_seed", -1)
+        infer_seed = kwargs.get("infer_seed", -1)
+        return spk_seed != -1 and infer_seed != -1
+
+    if lru_size > 0:
+        config.lru_size = lru_size
+        generate.generate_audio_batch = conditional_cache(should_cache)(
+            generate.generate_audio_batch
+        )
+
+    devices.reset_device()
+    devices.first_time_calculation()
 
     demo.queue().launch(
         server_name=server_name,

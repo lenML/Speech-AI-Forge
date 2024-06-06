@@ -8,13 +8,12 @@ from modules import models, config
 
 import logging
 
-from modules import devices
+from modules.devices import devices
 from typing import Union
 
 logger = logging.getLogger(__name__)
 
 
-@torch.inference_mode()
 def generate_audio(
     text: str,
     temperature: float = 0.3,

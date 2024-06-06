@@ -101,13 +101,27 @@ class Chat:
         tokenizer_path: str = None,
         device: str = None,
         compile: bool = True,
+        dtype: torch.dtype = torch.float32,
+        dtype_vocos: torch.dtype = None,
+        dtype_dvae: torch.dtype = None,
+        dtype_gpt: torch.dtype = None,
+        dtype_decoder: torch.dtype = None,
     ):
         if not device:
             device = select_device(4096)
             self.logger.log(logging.INFO, f"use {device}")
 
+        dtype_vocos = dtype_vocos or dtype
+        dtype_dvae = dtype_dvae or dtype
+        dtype_gpt = dtype_gpt or dtype
+        dtype_decoder = dtype_decoder or dtype
+
         if vocos_config_path:
-            vocos = Vocos.from_hparams(vocos_config_path).to(device).eval()
+            vocos = (
+                Vocos.from_hparams(vocos_config_path)
+                .to(device=device, dtype=dtype_vocos)
+                .eval()
+            )
             assert vocos_ckpt_path, "vocos_ckpt_path should not be None"
             vocos.load_state_dict(torch.load(vocos_ckpt_path))
             self.pretrain_models["vocos"] = vocos
@@ -115,7 +129,7 @@ class Chat:
 
         if dvae_config_path:
             cfg = OmegaConf.load(dvae_config_path)
-            dvae = DVAE(**cfg).to(device).eval()
+            dvae = DVAE(**cfg).to(device=device, dtype=dtype_dvae).eval()
             assert dvae_ckpt_path, "dvae_ckpt_path should not be None"
             dvae.load_state_dict(torch.load(dvae_ckpt_path, map_location=device))
             self.pretrain_models["dvae"] = dvae
@@ -123,7 +137,7 @@ class Chat:
 
         if gpt_config_path:
             cfg = OmegaConf.load(gpt_config_path)
-            gpt = GPT_warpper(**cfg).to(device).eval()
+            gpt = GPT_warpper(**cfg).to(device=device, dtype=dtype_gpt).eval()
             assert gpt_ckpt_path, "gpt_ckpt_path should not be None"
             gpt.load_state_dict(torch.load(gpt_ckpt_path, map_location=device))
             if compile and "cuda" in str(device):
@@ -136,12 +150,14 @@ class Chat:
             assert os.path.exists(
                 spk_stat_path
             ), f"Missing spk_stat.pt: {spk_stat_path}"
-            self.pretrain_models["spk_stat"] = torch.load(spk_stat_path).to(device)
+            self.pretrain_models["spk_stat"] = torch.load(spk_stat_path).to(
+                device=device, dtype=dtype
+            )
             self.logger.log(logging.INFO, "gpt loaded.")
 
         if decoder_config_path:
             cfg = OmegaConf.load(decoder_config_path)
-            decoder = DVAE(**cfg).to(device).eval()
+            decoder = DVAE(**cfg).to(device=device, dtype=dtype_decoder).eval()
             assert decoder_ckpt_path, "decoder_ckpt_path should not be None"
             decoder.load_state_dict(torch.load(decoder_ckpt_path, map_location=device))
             self.pretrain_models["decoder"] = decoder

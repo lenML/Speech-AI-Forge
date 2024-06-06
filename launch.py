@@ -1,6 +1,9 @@
 import os
 import logging
 
+from modules.devices import devices
+from modules.utils.cache import conditional_cache
+
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
 import torch
@@ -8,8 +11,6 @@ from modules import config
 from modules.utils import env
 from modules import generate_audio as generate
 
-from functools import lru_cache
-from typing import Callable
 
 from modules.api.Api import APIManager
 
@@ -22,6 +23,7 @@ from modules.api.impl import (
     refiner_api,
     speaker_api,
     ping_api,
+    models_api,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,7 @@ def create_api(no_docs=False, exclude=[]):
     app = APIManager(no_docs=no_docs, exclude_patterns=exclude)
 
     ping_api.setup(app)
+    models_api.setup(app)
     style_api.setup(app)
     speaker_api.setup(app)
     tts_api.setup(app)
@@ -44,23 +47,6 @@ def create_api(no_docs=False, exclude=[]):
     refiner_api.setup(app)
 
     return app
-
-
-def conditional_cache(condition: Callable):
-    def decorator(func):
-        @lru_cache(None)
-        def cached_func(*args, **kwargs):
-            return func(*args, **kwargs)
-
-        def wrapper(*args, **kwargs):
-            if condition(*args, **kwargs):
-                return cached_func(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 
 if __name__ == "__main__":
@@ -118,22 +104,41 @@ if __name__ == "__main__":
         type=str,
         help="Exclude the specified API from the server",
     )
+    parser.add_argument(
+        "--device_id",
+        type=str,
+        help="Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be needed before)",
+        default=None,
+    )
+    parser.add_argument(
+        "--use_cpu",
+        nargs="+",
+        help="use CPU as torch device for specified modules",
+        default=[],
+        type=str.lower,
+    )
 
     args = parser.parse_args()
 
-    config.args = args
+    def get_and_update_env(*args):
+        val = env.get_env_or_arg(*args)
+        key = args[1]
+        config.runtime_env_vars[key] = val
+        return val
 
-    host = env.get_env_or_arg(args, "host", "0.0.0.0", str)
-    port = env.get_env_or_arg(args, "port", 8000, int)
-    reload = env.get_env_or_arg(args, "reload", False, bool)
-    compile = env.get_env_or_arg(args, "compile", False, bool)
-    lru_size = env.get_env_or_arg(args, "lru_size", 64, int)
-    cors_origin = env.get_env_or_arg(args, "cors_origin", "*", str)
-    no_playground = env.get_env_or_arg(args, "no_playground", False, bool)
-    no_docs = env.get_env_or_arg(args, "no_docs", False, bool)
-    half = env.get_env_or_arg(args, "half", False, bool)
-    off_tqdm = env.get_env_or_arg(args, "off_tqdm", False, bool)
-    exclude = env.get_env_or_arg(args, "exclude", "", str)
+    host = get_and_update_env(args, "host", "0.0.0.0", str)
+    port = get_and_update_env(args, "port", 8000, int)
+    reload = get_and_update_env(args, "reload", False, bool)
+    compile = get_and_update_env(args, "compile", False, bool)
+    lru_size = get_and_update_env(args, "lru_size", 64, int)
+    cors_origin = get_and_update_env(args, "cors_origin", "*", str)
+    no_playground = get_and_update_env(args, "no_playground", False, bool)
+    no_docs = get_and_update_env(args, "no_docs", False, bool)
+    half = get_and_update_env(args, "half", False, bool)
+    off_tqdm = get_and_update_env(args, "off_tqdm", False, bool)
+    exclude = get_and_update_env(args, "exclude", "", str)
+    device_id = get_and_update_env(args, "device_id", None, str)
+    use_cpu = get_and_update_env(args, "use_cpu", [], list)
 
     if compile:
         print("Model compile is enabled")
@@ -143,12 +148,6 @@ if __name__ == "__main__":
         spk_seed = kwargs.get("spk_seed", -1)
         infer_seed = kwargs.get("infer_seed", -1)
         return spk_seed != -1 and infer_seed != -1
-
-    if lru_size > 0:
-        config.lru_size = lru_size
-        generate.generate_audio = conditional_cache(should_cache)(
-            generate.generate_audio
-        )
 
     api = create_api(no_docs=no_docs, exclude=exclude.split(","))
     config.api = api
@@ -176,8 +175,11 @@ if __name__ == "__main__":
 
     if lru_size > 0:
         config.lru_size = lru_size
-        generate.generate_audio = conditional_cache(should_cache)(
-            generate.generate_audio
+        generate.generate_audio_batch = conditional_cache(should_cache)(
+            generate.generate_audio_batch
         )
+
+    devices.reset_device()
+    devices.first_time_calculation()
 
     uvicorn.run(api.app, host=host, port=port, reload=reload)
