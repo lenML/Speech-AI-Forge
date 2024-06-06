@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Body
+from fastapi import File, Form, HTTPException, Body, UploadFile
 from fastapi.responses import StreamingResponse
 
 import io
@@ -14,7 +14,7 @@ from modules.normalization import text_normalize
 from modules import generate_audio as generate
 
 
-from typing import Literal
+from typing import List, Literal, Optional, Union
 import pyrubberband as pyrb
 
 from modules.api import utils as api_utils
@@ -29,6 +29,8 @@ class AudioSpeechRequest(BaseModel):
     voice: str = "female2"
     response_format: Literal["mp3", "wav"] = "mp3"
     speed: float = Field(1, ge=0.1, le=10, description="Speed of the audio")
+    seed: int = 42
+    temperature: float = 0.3
     style: str = ""
     # 是否开启batch合成，小于等于1表示不适用batch
     # 开启batch合成会自动分割句子
@@ -106,8 +108,29 @@ async def openai_speech_api(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def setup(api_manager: APIManager):
-    api_manager.post(
+class TranscribeSegment(BaseModel):
+    id: int
+    seek: float
+    start: float
+    end: float
+    text: str
+    tokens: list[int]
+    temperature: float
+    avg_logprob: float
+    compression_ratio: float
+    no_speech_prob: float
+
+
+class TranscriptionsVerboseResponse(BaseModel):
+    task: str
+    language: str
+    duration: float
+    text: str
+    segments: list[TranscribeSegment]
+
+
+def setup(app: APIManager):
+    app.post(
         "/v1/audio/speech",
         response_class=FileResponse,
         description="""
@@ -122,3 +145,20 @@ openai api document:
 > model 可填任意值
         """,
     )(openai_speech_api)
+
+    @app.post(
+        "/v1/audio/transcriptions",
+        response_model=TranscriptionsVerboseResponse,
+        description="Transcribes audio into the input language.",
+    )
+    async def transcribe(
+        file: UploadFile = File(...),
+        model: str = Form(...),
+        language: Optional[str] = Form(None),
+        prompt: Optional[str] = Form(None),
+        response_format: str = Form("json"),
+        temperature: float = Form(0),
+        timestamp_granularities: List[str] = Form(["segment"]),
+    ):
+        # TODO: Implement transcribe
+        return api_utils.success_response("not implemented yet")
