@@ -11,6 +11,8 @@ import logging
 from modules.devices import devices
 from typing import Union
 
+from modules.utils.cache import conditional_cache
+
 logger = logging.getLogger(__name__)
 
 
@@ -65,7 +67,7 @@ def generate_audio_batch(
         "prompt2": prompt2 or "",
         "prefix": prefix or "",
         "repetition_penalty": 1.0,
-        "disable_tqdm": config.disable_tqdm,
+        "disable_tqdm": config.runtime_env_vars.off_tqdm,
     }
 
     if isinstance(spk, int):
@@ -101,6 +103,32 @@ def generate_audio_batch(
     devices.torch_gc()
 
     return [(sample_rate, np.array(wav).flatten().astype(np.float32)) for wav in wavs]
+
+
+lru_cache_enabled = False
+
+
+def setup_lru_cache():
+    global generate_audio_batch
+    global lru_cache_enabled
+
+    if lru_cache_enabled:
+        return
+    lru_cache_enabled = True
+
+    def should_cache(*args, **kwargs):
+        spk_seed = kwargs.get("spk", -1)
+        infer_seed = kwargs.get("infer_seed", -1)
+        return spk_seed != -1 and infer_seed != -1
+
+    lru_size = config.runtime_env_vars.lru_size
+    if isinstance(lru_size, int):
+        generate_audio_batch = conditional_cache(lru_size, should_cache)(
+            generate_audio_batch
+        )
+        logger.info(f"LRU cache enabled with size {lru_size}")
+    else:
+        logger.debug(f"LRU cache failed to enable, invalid size {lru_size}")
 
 
 if __name__ == "__main__":

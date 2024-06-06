@@ -55,7 +55,7 @@ class Speaker:
         return is_update
 
     def __hash__(self):
-        return str(self.id)
+        return hash(str(self.id))
 
     def __eq__(self, other):
         if not isinstance(other, Speaker):

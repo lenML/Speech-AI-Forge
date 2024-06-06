@@ -13,9 +13,10 @@ def load_chat_tts():
     global chat_tts
     if chat_tts:
         return chat_tts
+
     chat_tts = ChatTTS.Chat()
     chat_tts.load_models(
-        compile=config.enable_model_compile,
+        compile=config.runtime_env_vars.compile,
         source="local",
         local_path="./models/ChatTTS",
         device=devices.device,
@@ -25,6 +26,8 @@ def load_chat_tts():
         dtype_gpt=devices.dtype_gpt,
         dtype_decoder=devices.dtype_decoder,
     )
+
+    devices.torch_gc()
 
     return chat_tts
 

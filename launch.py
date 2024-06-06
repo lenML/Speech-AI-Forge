@@ -140,15 +140,6 @@ if __name__ == "__main__":
     device_id = get_and_update_env(args, "device_id", None, str)
     use_cpu = get_and_update_env(args, "use_cpu", [], list)
 
-    if compile:
-        print("Model compile is enabled")
-        config.enable_model_compile = True
-
-    def should_cache(*args, **kwargs):
-        spk_seed = kwargs.get("spk_seed", -1)
-        infer_seed = kwargs.get("infer_seed", -1)
-        return spk_seed != -1 and infer_seed != -1
-
     api = create_api(no_docs=no_docs, exclude=exclude.split(","))
     config.api = api
 
@@ -158,27 +149,15 @@ if __name__ == "__main__":
     if not no_playground:
         api.setup_playground()
 
-    if half:
-        config.model_config["half"] = True
-
-    if off_tqdm:
-        config.disable_tqdm = True
-
     if compile:
         logger.info("Model compile is enabled")
-        config.enable_model_compile = True
 
     def should_cache(*args, **kwargs):
         spk_seed = kwargs.get("spk_seed", -1)
         infer_seed = kwargs.get("infer_seed", -1)
         return spk_seed != -1 and infer_seed != -1
 
-    if lru_size > 0:
-        config.lru_size = lru_size
-        generate.generate_audio_batch = conditional_cache(should_cache)(
-            generate.generate_audio_batch
-        )
-
+    generate.setup_lru_cache()
     devices.reset_device()
     devices.first_time_calculation()
 

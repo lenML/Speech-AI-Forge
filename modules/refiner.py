@@ -29,7 +29,7 @@ def refine_text(
                 "temperature": temperature,
                 "repetition_penalty": repetition_penalty,
                 "max_new_token": max_new_token,
-                "disable_tqdm": config.disable_tqdm,
+                "disable_tqdm": config.runtime_env_vars.off_tqdm,
             },
             do_text_normalization=False,
         )

@@ -887,6 +887,7 @@ if __name__ == "__main__":
         default=[],
         type=str.lower,
     )
+    parser.add_argument("--compile", action="store_true", help="Enable model compile")
 
     args = parser.parse_args()
 
@@ -906,6 +907,7 @@ if __name__ == "__main__":
     lru_size = get_and_update_env(args, "lru_size", 64, int)
     device_id = get_and_update_env(args, "device_id", None, str)
     use_cpu = get_and_update_env(args, "use_cpu", [], list)
+    compile = get_and_update_env(args, "compile", False, bool)
 
     webui_config["tts_max"] = get_and_update_env(args, "tts_max_len", 1000, int)
     webui_config["ssml_max"] = get_and_update_env(args, "ssml_max_len", 5000, int)
@@ -916,23 +918,7 @@ if __name__ == "__main__":
     if auth:
         auth = tuple(auth.split(":"))
 
-    if half:
-        config.model_config["half"] = True
-
-    if off_tqdm:
-        config.disable_tqdm = True
-
-    def should_cache(*args, **kwargs):
-        spk_seed = kwargs.get("spk_seed", -1)
-        infer_seed = kwargs.get("infer_seed", -1)
-        return spk_seed != -1 and infer_seed != -1
-
-    if lru_size > 0:
-        config.lru_size = lru_size
-        generate.generate_audio_batch = conditional_cache(should_cache)(
-            generate.generate_audio_batch
-        )
-
+    generate.setup_lru_cache()
     devices.reset_device()
     devices.first_time_calculation()
 

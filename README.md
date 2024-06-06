@@ -87,6 +87,18 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 
 > 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
 
+## 推理速度
+
+> 测试平台 `GeForce RTX 2080 Ti`
+
+| 参数组合           | 推理速度 (tk/s) | 中文速度 (char/s) |
+| ------------------ | --------------- | ----------------- |
+| `--compile`        | 54              | 5.4               |
+| `--half --compile` | 51              | 5.1               |
+| 默认无参数         | 30              | 3.0               |
+| `--half`           | 28              | 2.8               |
+| `--use_cpu=all`    | 20              | 2.0               |
+
 ### launch.py
 
 Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务器。
@@ -172,6 +184,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--server_port`    | `int`  | `7860`      | 服务器端口                                         |
 | `--share`          | `bool` | `False`     | 启用共享模式，允许外部访问                         |
 | `--debug`          | `bool` | `False`     | 启用调试模式                                       |
+| `--compile`        | `bool` | `False`     | 启用模型编译                                       |
 | `--auth`           | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
 | `--half`           | `bool` | `False`     | 开启 f16 半精度推理                                |
 | `--off_tqdm`       | `bool` | `False`     | 关闭 tqdm 进度条                                   |
