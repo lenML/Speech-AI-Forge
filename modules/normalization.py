@@ -1,3 +1,4 @@
+from functools import lru_cache
 from modules.utils.zh_normalization.text_normlization import *
 import emojiswitch
 from modules.utils.markdown import markdown_to_text
@@ -5,10 +6,26 @@ from modules import models
 import re
 
 
+@lru_cache(maxsize=64)
 def is_chinese(text):
     # 中文字符的 Unicode 范围是 \u4e00-\u9fff
     chinese_pattern = re.compile(r"[\u4e00-\u9fff]")
     return bool(chinese_pattern.search(text))
+
+
+@lru_cache(maxsize=64)
+def is_eng(text):
+    eng_pattern = re.compile(r"[a-zA-Z]")
+    return bool(eng_pattern.search(text))
+
+
+@lru_cache(maxsize=64)
+def guess_lang(text):
+    if is_chinese(text):
+        return "zh"
+    if is_eng(text):
+        return "en"
+    return "zh"
 
 
 post_normalize_pipeline = []
@@ -123,7 +140,7 @@ def apply_character_map(text):
 
 @post_normalize()
 def apply_emoji_map(text):
-    lang = "zh" if is_chinese(text) else "en"
+    lang = guess_lang(text)
     return emojiswitch.demojize(text, delimiters=("", ""), lang=lang)
 
 
@@ -144,6 +161,8 @@ def replace_unk_tokens(text):
     """
     chat_tts = models.load_chat_tts()
     if "tokenizer" not in chat_tts.pretrain_models:
+        # 这个地方只有在 huggingface spaces 中才会触发
+        # 因为 hugggingface 自动处理模型卸载加载，所以如果拿不到就算了...
         return text
     tokenizer = chat_tts.pretrain_models["tokenizer"]
     vocab = tokenizer.get_vocab()
@@ -223,7 +242,7 @@ def sentence_normalize(sentence_text: str):
     pattern = re.compile(r"(\[.+?\])|([^[]+)")
 
     def normalize_part(part):
-        sentences = tx.normalize(part) if is_chinese(part) else [part]
+        sentences = tx.normalize(part) if guess_lang(part) == "zh" else [part]
         dest_text = ""
         for sentence in sentences:
             sentence = apply_post_normalize(sentence)

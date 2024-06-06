@@ -22,3 +22,4 @@ emojiswitch
 python-dotenv
 zhon
 mistune==3.0.2
+cn2an

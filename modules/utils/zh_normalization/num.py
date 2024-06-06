@@ -144,13 +144,22 @@ def replace_number(match) -> str:
     sign = match.group(1)
     number = match.group(2)
     pure_decimal = match.group(5)
-    if pure_decimal:
-        result = num2str(pure_decimal)
-    else:
-        sign: str = "负" if sign else ""
-        number: str = num2str(number)
-        result = f"{sign}{number}"
+    
+    # TODO 也许可以把 num2str 完全替换成 cn2an
+    import cn2an
+    text = pure_decimal if pure_decimal else f"{sign}{number}"
+    try:
+        result = cn2an.an2cn(text, "low")
+    except ValueError:
+        if pure_decimal:
+            result = num2str(pure_decimal)
+        else:
+            sign: str = "负" if sign else ""
+            number: str = num2str(number)
+            result = f"{sign}{number}"
     return result
+    
+    
 
 
 # 范围表达式
