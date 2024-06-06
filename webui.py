@@ -69,6 +69,8 @@ def segments_length_limit(segments, total_max: int):
     ret_segments = []
     total_len = 0
     for seg in segments:
+        if "text" not in seg:
+            continue
         total_len += len(seg["text"])
         if total_len > total_max:
             break
