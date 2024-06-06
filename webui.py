@@ -148,7 +148,7 @@ def tts_generate(
     prompt1 = prompt1 or params.get("prompt1", "")
     prompt2 = prompt2 or params.get("prompt2", "")
 
-    infer_seed = np.clip(infer_seed, -1, 2**32 - 1)
+    infer_seed = np.clip(infer_seed, -1, 2**32 - 1, out=None, dtype=np.int64)
     infer_seed = int(infer_seed)
 
     if not disable_normalize:

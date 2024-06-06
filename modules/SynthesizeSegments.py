@@ -55,11 +55,10 @@ def to_number(value, t, default=0):
 
 
 class SynthesizeSegments:
-    batch_default_spk_seed = rng.np_rng()
-    batch_default_infer_seed = rng.np_rng()
-
     def __init__(self, batch_size: int = 8):
         self.batch_size = batch_size
+        self.batch_default_spk_seed = rng.np_rng()
+        self.batch_default_infer_seed = rng.np_rng()
 
     def segment_to_generate_params(self, segment: Dict[str, Any]) -> Dict[str, Any]:
         if segment.get("params", None) is not None:

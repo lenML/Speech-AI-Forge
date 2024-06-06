@@ -37,9 +37,9 @@ class SeedContext:
         assert is_numeric(seed), "Seed must be an number."
 
         try:
-            self.seed = int(np.clip(int(seed), -1, 2**32 - 1))
+            self.seed = int(np.clip(int(seed), -1, 2**32 - 1, out=None, dtype=np.int64))
         except Exception as e:
-            raise ValueError("Seed must be an integer.")
+            raise ValueError(f"Seed must be an integer, but: {type(seed)}")
 
         self.seed = seed
         self.state = None
