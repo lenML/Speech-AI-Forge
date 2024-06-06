@@ -268,3 +268,4 @@ WIP 开发中
 
 - ChatTTS: https://github.com/2noise/ChatTTS
 - PaddleSpeech: https://github.com/PaddlePaddle/PaddleSpeech
+- 默认说话人: https://github.com/2noise/ChatTTS/issues/238
