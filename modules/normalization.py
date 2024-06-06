@@ -143,6 +143,8 @@ def replace_unk_tokens(text):
     把不在字典里的字符替换为 " , "
     """
     chat_tts = models.load_chat_tts()
+    if "tokenizer" not in chat_tts.pretrain_models:
+        return text
     tokenizer = chat_tts.pretrain_models["tokenizer"]
     vocab = tokenizer.get_vocab()
     vocab_set = set(vocab.keys())
