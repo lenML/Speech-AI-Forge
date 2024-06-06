@@ -18,8 +18,8 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 - **风格提示词注入**: 灵活调整输出风格，通过注入提示词实现个性化。
 - **全面的 API 服务**: 所有功能均通过 API 访问，集成方便。
 - **友好的调试 GUI**: 独立于 Gradio 的 playground，简化调试流程。
-- **OpenAI 风格 API**: `/v1/openai/audio/speech` 提供类似 OpenAI 的语音生成接口。
-- **Google 风格 API**: `/v1/google/text:synthesize` 提供类似 Google 的文本合成接口。
+- **OpenAI 风格 API**: `/v1/audio/speech` 提供类似 OpenAI 的语音生成接口。
+- **Google 风格 API**: `/v1/text:synthesize` 提供类似 Google 的文本合成接口。
 - **类 SSML 支持**: 使用类 SSML 语法创建丰富的音频长文本。
 - **说话人管理**: 通过名称或 ID 高效复用说话人。
 - **风格管理**: 通过名称或 ID 复用说话风格，内置 32 种不同风格。
@@ -100,6 +100,57 @@ Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务�
 | `--half`          | `bool` | `False`     | 开启 f16 半精度推理                             |
 | `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
 | `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
+
+launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
+
+#### OpenAI API: `v1/audio/speech`
+
+openai 接口比较简单，`input` 为必填项，其余均可为空。
+
+一个简单的请求示例如下：
+
+```bash
+curl http://localhost:8000/v1/audio/speech \
+  -H "Authorization: Bearer anything_your_wanna" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "chattts-4w",
+    "input": "Today is a wonderful day to build something people love! [lbreak]",
+    "voice": "female2",
+    "style": "chat"
+  }' \
+  --output speech.mp3
+```
+
+也可以使用 openai 库调用，具体可以看 [openai 官方文档](https://platform.openai.com/docs/guides/text-to-speech)
+
+#### Google API: `/v1/text:synthesize`
+
+google 接口略复杂，但是某些时候用这个是必要的，因为这个接口将会返回 base64 格式的 audio
+
+一个简单的请求示例如下：
+
+```bash
+curl "http://localhost:8000/v1/text:synthesize" -X POST \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d '{
+  "input": {
+    "text": "Hello, ChatTTS Forage Google Endpoint Test. [lbreak]"
+  },
+  "voice": {
+    "languageCode": "zh-CN",
+    "name": "female2",
+    "temperature": 0.3,
+    "topP": 0.7,
+    "topK": 20,
+    "seed": 42
+  },
+  "audioConfig": {
+    "audioEncoding": "MP3"
+  }
+}' -o response.json
+```
 
 ### webui.py
 

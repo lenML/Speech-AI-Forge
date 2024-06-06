@@ -32,7 +32,7 @@ class AudioSpeechRequest(BaseModel):
     style: str = ""
     # 是否开启batch合成，小于等于1表示不适用batch
     # 开启batch合成会自动分割句子
-    batch_size: int = Field(1, ge=1, le=10, description="Batch size")
+    batch_size: int = Field(1, ge=1, le=20, description="Batch size")
     spliter_threshold: float = Field(
         100, ge=10, le=1024, description="Threshold for sentence spliter"
     )
@@ -107,6 +107,17 @@ async def openai_speech_api(
 
 
 def setup(api_manager: APIManager):
-    api_manager.post("/v1/openai/audio/speech", response_class=FileResponse)(
-        openai_speech_api
-    )
+    api_manager.post(
+        "/v1/audio/speech",
+        response_class=FileResponse,
+        description="""
+openai api document: 
+[https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
+
+两个属性为本系统自定义属性，不在openai文档中：
+- batch_size: 是否开启batch合成，小于等于1表示不使用batch （不推荐）
+- spliter_threshold: 开启batch合成时，句子分割的阈值
+
+> model 可填任意值
+        """,
+    )(openai_speech_api)

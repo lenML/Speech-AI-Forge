@@ -30,6 +30,7 @@ class SynthesisInput(BaseModel):
 
 class VoiceSelectionParams(BaseModel):
     languageCode: str = "ZH-CN"
+
     name: str = "female2"
     style: str = ""
     temperature: float = 0.3
@@ -160,6 +161,18 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
 
 def setup(app: APIManager):
-    app.post("/v1/google/text:synthesize", response_model=GoogleTextSynthesizeResponse)(
-        google_text_synthesize
-    )
+    app.post(
+        "/v1/text:synthesize",
+        response_model=GoogleTextSynthesizeResponse,
+        description="""
+google api document: <br/>
+[https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize](https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize)
+
+- 多个属性在本系统中无用仅仅是为了兼容google api
+- voice 中的 topP, topK, temperature 为本系统中的参数
+- voice.name 即 speaker name （或者speaker seed）
+- voice.seed 为 infer seed （可在webui中测试具体作用）
+
+- 编码格式影响的是 audioContent 的二进制格式，所以所有format都是返回带有base64数据的json
+        """,
+    )(google_text_synthesize)
