@@ -1,6 +1,8 @@
 import { client } from "./client.mjs";
 import { html, create, styled } from "./misc.mjs";
 
+import { useGlobalStore } from "./global.store.mjs";
+
 const sample_texts = [
   {
     text: "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
@@ -77,8 +79,6 @@ const useStore = create((set, get) => ({
     prompt2: "",
     prefix: "",
   },
-  styles: [],
-  speakers: [],
 
   ui: {
     loading: false,
@@ -107,12 +107,6 @@ const useStore = create((set, get) => ({
       },
     });
   },
-  setStyles(styles) {
-    set({ styles });
-  },
-  setSpeakers(speakers) {
-    set({ speakers });
-  },
   setTTS(tts) {
     set({
       tts: {
@@ -130,15 +124,6 @@ const useStore = create((set, get) => ({
     });
   },
 }));
-
-window.addEventListener("load", async () => {
-  const styles = await client.listStyles();
-  const speakers = await client.listSpeakers();
-  console.log("styles:", styles);
-  console.log("speakers:", speakers);
-  useStore.get().setStyles(styles.data);
-  useStore.get().setSpeakers(speakers.data);
-});
 
 const TTSPageContainer = styled.div`
   h1 {
@@ -329,8 +314,8 @@ const TTSPageContainer = styled.div`
 `;
 
 export const TTSPage = () => {
-  const { tts, setTTS, synthesizeTTS, ui, setUI, speakers, styles } =
-    useStore();
+  const { tts, setTTS, synthesizeTTS, ui, setUI } = useStore();
+  const { speakers, styles } = useGlobalStore();
 
   const request = async () => {
     if (ui.loading) {
