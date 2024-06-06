@@ -21,6 +21,7 @@ from modules.api.impl import (
     openai_api,
     refiner_api,
     speaker_api,
+    ping_api,
 )
 
 logger = logging.getLogger(__name__)
@@ -31,17 +32,18 @@ torch.set_float32_matmul_precision("high")
 
 
 def create_api(no_docs=False, exclude=[]):
-    api = APIManager(no_docs=no_docs, exclude_patterns=exclude)
+    app = APIManager(no_docs=no_docs, exclude_patterns=exclude)
 
-    style_api.setup(api)
-    tts_api.setup(api)
-    ssml_api.setup(api)
-    google_api.setup(api)
-    openai_api.setup(api)
-    refiner_api.setup(api)
-    speaker_api.setup(api)
+    ping_api.setup(app)
+    style_api.setup(app)
+    speaker_api.setup(app)
+    tts_api.setup(app)
+    ssml_api.setup(app)
+    google_api.setup(app)
+    openai_api.setup(app)
+    refiner_api.setup(app)
 
-    return api
+    return app
 
 
 def conditional_cache(condition: Callable):

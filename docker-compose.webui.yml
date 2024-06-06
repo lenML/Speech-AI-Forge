@@ -8,23 +8,12 @@ services:
     volumes:
       - "./:/app"
     ports:
-      - 9966:9966
+      - 7860:7860
     user: "${UID}:${GID}"
     environment:
-      LOG_LEVEL: DEBUG
       NVIDIA_VISIBLE_DEVICES: all
-      SERVER_NAME: ${SERVER_NAME:-0.0.0.0}
-      SERVER_PORT: ${SERVER_PORT:-7860}
-      SHARE: ${SHARE:-false}
-      DEBUG: ${DEBUG:-false}
-      AUTH: ${AUTH}
     command: >
       python3 webui.py
-      --server_name ${SERVER_NAME:-0.0.0.0}
-      --server_port ${SERVER_PORT:-7860}
-      ${SHARE:+--share}
-      ${DEBUG:+--debug}
-      ${AUTH:+--auth ${AUTH}}
     deploy:
       resources:
         reservations:

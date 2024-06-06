@@ -262,7 +262,23 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 
 # Docker
 
-WIP 开发中
+## webui
+
+> 下载模型可以使用 [download_models.py](./download_models.py) 脚本
+
+```bash
+docker-compose -f ./docker-cmopose.webui.yml up -d
+```
+
+运行参数配置在 `.env.webui` 中
+
+## api server
+
+```bash
+docker-compose -f ./docker-cmopose.api.yml up -d
+```
+
+运行参数配置在 `.env.api` 中
 
 # References
 
