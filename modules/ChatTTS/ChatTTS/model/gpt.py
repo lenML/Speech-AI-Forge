@@ -190,6 +190,8 @@ class GPT_warpper(nn.Module):
                 attention_mask_cache[:, :attention_mask.shape[1]] = attention_mask
             
             for i in tqdm(range(max_new_token)):
+                if finish.all():
+                    continue
         
                 model_input = self.prepare_inputs_for_generation(inputs_ids, 
                     outputs.past_key_values if i!=0 else None, 
@@ -249,9 +251,6 @@ class GPT_warpper(nn.Module):
                     inputs_ids = torch.cat([inputs_ids, idx_next.unsqueeze(-1).expand(-1, -1, self.num_vq)], 1)
 
                 end_idx = end_idx + (~finish).int()
-            
-                if finish.all():
-                    break
             
             inputs_ids = [inputs_ids[idx, start_idx: start_idx+i] for idx, i in enumerate(end_idx.int())]
             inputs_ids = [i[:, 0] for i in inputs_ids] if infer_text else inputs_ids
