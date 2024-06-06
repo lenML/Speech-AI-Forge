@@ -54,6 +54,14 @@ class Speaker:
 
         return is_update
 
+    def __hash__(self):
+        return str(self.id)
+
+    def __eq__(self, other):
+        if not isinstance(other, Speaker):
+            return False
+        return str(self.id) == str(other.id)
+
 
 # 每个speaker就是一个 emb 文件 .pt
 # 管理 speaker 就是管理 ./data/speaker/ 下的所有 speaker
