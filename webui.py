@@ -13,12 +13,12 @@ except:
 
 import os
 import logging
+import sys
 
 import numpy as np
 
 from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
-from modules.utils.cache import conditional_cache
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
@@ -182,7 +182,7 @@ def refine_text(text: str, prompt: str):
 def read_local_readme():
     with open("README.md", "r", encoding="utf-8") as file:
         content = file.read()
-        content = content[content.index("# 🗣️ ChatTTS-Forge") :]
+        content = content[content.index("# ") :]
         return content
 
 
@@ -607,6 +607,8 @@ def create_ssml_interface():
     return ssml_input
 
 
+# NOTE: 这个其实是需要GPU的...但是spaces会自动卸载，所以不太好使，具体处理在text_normalize中兼容
+# @spaces.GPU
 def split_long_text(long_text_input):
     spliter = SentenceSplitter(webui_config["spliter_threshold"])
     sentences = spliter.parse(long_text_input)
@@ -779,6 +781,24 @@ def create_readme_tab():
     gr.Markdown(readme_content)
 
 
+def create_app_footer():
+    gradio_version = gr.__version__
+    git_tag = config.versions.git_tag
+    git_commit = config.versions.git_commit
+    git_branch = config.versions.git_branch
+    python_version = config.versions.python_version
+    torch_version = config.versions.torch_version
+
+    config.versions.gradio_version = gradio_version
+
+    gr.Markdown(
+        f"""
+🍦 [ChatTTS-Forge](https://github.com/lenML/ChatTTS-Forge)
+version: [{git_tag}](https://github.com/lenML/ChatTTS-Forge/commit/{git_commit}) | branch: `{git_branch}` | python: `{python_version}` | torch: `{torch_version}`
+        """
+    )
+
+
 def create_interface():
 
     js_func = """
@@ -806,6 +826,9 @@ def create_interface():
         #input_title div.eta-bar {
             display: none !important; transform: none !important;
         }
+        footer {
+            display: none !important;
+        }
         </style>
         """
 
@@ -823,9 +846,7 @@ def create_interface():
             with gr.TabItem("README"):
                 create_readme_tab()
 
-        gr.Markdown(
-            "此项目基于 [ChatTTS-Forge](https://github.com/lenML/ChatTTS-Forge) "
-        )
+        create_app_footer()
     return demo
 
 

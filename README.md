@@ -1,4 +1,4 @@
-# 🗣️ ChatTTS-Forge
+# 🍦 ChatTTS-Forge
 
 ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过类 SSML 语法生成丰富的音频长文本，并提供全面的 API 服务，适用于各种场景。
 

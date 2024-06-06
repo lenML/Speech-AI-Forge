@@ -36,7 +36,7 @@ class BaseResponse(BaseModel):
         }
 
 
-def success_response(data: Any, message: str = "Success") -> BaseResponse:
+def success_response(data: Any, message: str = "ok") -> BaseResponse:
     return BaseResponse(message=message, data=data)
 
 
