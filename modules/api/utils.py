@@ -52,7 +52,6 @@ def to_number(value, t, default=0):
 def calc_spk_style(spk: Union[str, int], style: Union[str, int]):
     voice_attrs = {
         "spk": None,
-        "seed": None,
         "prompt1": None,
         "prompt2": None,
         "prefix": None,
@@ -85,7 +84,6 @@ def calc_spk_style(spk: Union[str, int], style: Union[str, int]):
     merge_prompt(voice_attrs, params)
 
     voice_attrs["spk"] = params.get("spk", voice_attrs.get("spk", None))
-    voice_attrs["seed"] = params.get("seed", voice_attrs.get("seed", None))
     voice_attrs["temperature"] = params.get(
         "temp", voice_attrs.get("temperature", None)
     )

@@ -18,7 +18,6 @@ from modules.ssml import parse_ssml
 from modules.SynthesizeSegments import (
     SynthesizeSegments,
     combine_audio_segments,
-    synthesize_segment,
 )
 
 from modules.api import utils as api_utils

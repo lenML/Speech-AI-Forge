@@ -10,4 +10,4 @@ DATA_DIR = os.path.join(ROOT_DIR, "data")
 
 MODELS_DIR = os.path.join(ROOT_DIR, "models")
 
-speakers_dir = os.path.join(DATA_DIR, "speakers")
+SPEAKERS_DIR = os.path.join(DATA_DIR, "speakers")

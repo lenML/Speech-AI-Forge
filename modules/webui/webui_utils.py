@@ -1,37 +1,24 @@
-import os
-import logging
-import sys
-
+from typing import Union
 import numpy as np
 
-from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
 from modules.hf import spaces
 from modules.webui import webui_config
 
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
-
-import gradio as gr
-
 import torch
 
-from modules.ssml import parse_ssml
+from modules.ssml_parser.SSMLParser import create_ssml_parser, SSMLBreak, SSMLSegment
 from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 
 from modules.speaker import speaker_mgr
 from modules.data import styles_mgr
 
 from modules.api.utils import calc_spk_style
-import modules.generate_audio as generate
 
 from modules.normalization import text_normalize
-from modules import refiner, config
+from modules import refiner
 
-from modules.utils import env, audio
+from modules.utils import audio
 from modules.SentenceSplitter import SentenceSplitter
 
 
@@ -43,11 +30,14 @@ def get_styles():
     return styles_mgr.list_items()
 
 
-def segments_length_limit(segments, total_max: int):
+def segments_length_limit(
+    segments: list[Union[SSMLBreak, SSMLSegment]], total_max: int
+) -> list[Union[SSMLBreak, SSMLSegment]]:
     ret_segments = []
     total_len = 0
     for seg in segments:
-        if "text" not in seg:
+        if isinstance(seg, SSMLBreak):
+            ret_segments.append(seg)
             continue
         total_len += len(seg["text"])
         if total_len > total_max:
@@ -69,7 +59,8 @@ def synthesize_ssml(ssml: str, batch_size=4):
     if ssml == "":
         return None
 
-    segments = parse_ssml(ssml)
+    parser = create_ssml_parser()
+    segments = parser.parse(ssml)
     max_len = webui_config.ssml_max
     segments = segments_length_limit(segments, max_len)
 

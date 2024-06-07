@@ -8,6 +8,9 @@ class JsonObject:
         # If no initial dictionary is provided, use an empty dictionary
         self._dict_obj = initial_dict if initial_dict is not None else {}
 
+        if self._dict_obj is self:
+            raise ValueError("JsonObject cannot be initialized with itself")
+
     def __getattr__(self, name):
         """
         Get an attribute value. If the attribute does not exist,
@@ -111,3 +114,19 @@ class JsonObject:
         :return: A list of values.
         """
         return self._dict_obj.values()
+
+    def clone(self):
+        """
+        Clone the JsonObject.
+
+        :return: A new JsonObject with the same internal dictionary.
+        """
+        return JsonObject(self._dict_obj.copy())
+
+    def merge(self, other):
+        """
+        Merge the internal dictionary with another dictionary.
+
+        :param other: The other dictionary to merge.
+        """
+        self._dict_obj.update(other)

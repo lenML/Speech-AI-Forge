@@ -24,6 +24,9 @@ class Speaker:
         self.describe = describe
         self.emb = None
 
+        # TODO replace emb => tokens
+        self.tokens = []
+
     def to_json(self, with_emb=False):
         return {
             "id": str(self.id),
@@ -103,8 +106,8 @@ class SpeakerManager:
     def create_speaker_from_tensor(
         self, tensor, filename="", name="", gender="", describe=""
     ):
-        if name == "":
-            name = filename
+        if filename == "":
+            filename = name
         speaker = Speaker(seed=-2, name=name, gender=gender, describe=describe)
         if isinstance(tensor, torch.Tensor):
             speaker.emb = tensor

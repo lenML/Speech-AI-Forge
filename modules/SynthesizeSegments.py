@@ -1,17 +1,18 @@
+from box import Box
 from pydub import AudioSegment
-from typing import Any, List, Dict, Union
+from typing import List, Union
 from scipy.io.wavfile import write
 import io
+from modules.api.utils import calc_spk_style
+from modules.ssml_parser.SSMLParser import SSMLSegment, SSMLBreak, SSMLContext
 from modules.utils import rng
 from modules.utils.audio import time_stretch, pitch_shift
 from modules import generate_audio
 from modules.normalization import text_normalize
 import logging
 import json
-import copy
-import numpy as np
 
-from modules.speaker import Speaker
+from modules.speaker import Speaker, speaker_mgr
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ def audio_data_to_segment(audio_data, sr):
     return AudioSegment.from_file(byte_io, format="wav")
 
 
-def combine_audio_segments(audio_segments: list) -> AudioSegment:
+def combine_audio_segments(audio_segments: list[AudioSegment]) -> AudioSegment:
     combined_audio = AudioSegment.empty()
     for segment in audio_segments:
         combined_audio += segment
@@ -54,230 +55,191 @@ def to_number(value, t, default=0):
         return default
 
 
+class TTSAudioSegment(Box):
+    text: str
+    temperature: float
+    top_P: float
+    top_K: int
+    spk: int
+    infer_seed: int
+    prompt1: str
+    prompt2: str
+    prefix: str
+
+    _type: str
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 class SynthesizeSegments:
     def __init__(self, batch_size: int = 8):
         self.batch_size = batch_size
         self.batch_default_spk_seed = rng.np_rng()
         self.batch_default_infer_seed = rng.np_rng()
 
-    def segment_to_generate_params(self, segment: Dict[str, Any]) -> Dict[str, Any]:
+    def segment_to_generate_params(
+        self, segment: Union[SSMLSegment, SSMLBreak]
+    ) -> TTSAudioSegment:
+        if isinstance(segment, SSMLBreak):
+            return TTSAudioSegment(_type="break")
+
         if segment.get("params", None) is not None:
-            return segment["params"]
+            return TTSAudioSegment(**segment.get("params"))
 
         text = segment.get("text", "")
         is_end = segment.get("is_end", False)
 
         text = str(text).strip()
 
-        attrs = segment.get("attrs", {})
-        spk = attrs.get("spk", "")
-        if isinstance(spk, str):
-            spk = int(spk)
-        seed = to_number(attrs.get("seed", ""), int, -1)
-        top_k = to_number(attrs.get("top_k", ""), int, None)
-        top_p = to_number(attrs.get("top_p", ""), float, None)
-        temp = to_number(attrs.get("temp", ""), float, None)
+        attrs = segment.attrs
+        spk = attrs.spk
+        style = attrs.style
 
-        prompt1 = attrs.get("prompt1", "")
-        prompt2 = attrs.get("prompt2", "")
-        prefix = attrs.get("prefix", "")
+        ss_params = calc_spk_style(spk, style)
+
+        if "spk" in ss_params:
+            spk = ss_params["spk"]
+
+        seed = to_number(attrs.seed, int, ss_params.get("seed") or -1)
+        top_k = to_number(attrs.top_k, int, None)
+        top_p = to_number(attrs.top_p, float, None)
+        temp = to_number(attrs.temp, float, None)
+
+        prompt1 = attrs.prompt1 or ss_params.get("prompt1")
+        prompt2 = attrs.prompt2 or ss_params.get("prompt2")
+        prefix = attrs.prefix or ss_params.get("prefix")
         disable_normalize = attrs.get("normalize", "") == "False"
 
-        params = {
-            "text": text,
-            "temperature": temp if temp is not None else 0.3,
-            "top_P": top_p if top_p is not None else 0.5,
-            "top_K": top_k if top_k is not None else 20,
-            "spk": spk if spk else -1,
-            "infer_seed": seed if seed else -1,
-            "prompt1": prompt1 if prompt1 else "",
-            "prompt2": prompt2 if prompt2 else "",
-            "prefix": prefix if prefix else "",
-        }
+        seg = TTSAudioSegment(
+            _type="voice",
+            text=text,
+            temperature=temp if temp is not None else 0.3,
+            top_P=top_p if top_p is not None else 0.5,
+            top_K=top_k if top_k is not None else 20,
+            spk=spk if spk else -1,
+            infer_seed=seed if seed else -1,
+            prompt1=prompt1 if prompt1 else "",
+            prompt2=prompt2 if prompt2 else "",
+            prefix=prefix if prefix else "",
+        )
 
         if not disable_normalize:
-            params["text"] = text_normalize(text, is_end=is_end)
+            seg.text = text_normalize(text, is_end=is_end)
 
-        # Set default values for spk and infer_seed
-        if params["spk"] == -1:
-            params["spk"] = self.batch_default_spk_seed
-        if params["infer_seed"] == -1:
-            params["infer_seed"] = self.batch_default_infer_seed
+        # NOTE 每个batch的默认seed保证前后一致即使是没设置spk的情况
+        if seg.spk == -1:
+            seg.spk = self.batch_default_spk_seed
+        if seg.infer_seed == -1:
+            seg.infer_seed = self.batch_default_infer_seed
 
-        return params
+        return seg
+
+    def process_break_segments(
+        self,
+        src_segments: List[SSMLBreak],
+        bucket_segments: List[SSMLBreak],
+        audio_segments: List[AudioSegment],
+    ):
+        for segment in bucket_segments:
+            index = src_segments.index(segment)
+            audio_segments[index] = AudioSegment.silent(
+                duration=int(segment.attrs.duration)
+            )
+
+    def process_voice_segments(
+        self,
+        src_segments: List[SSMLSegment],
+        bucket: List[SSMLSegment],
+        audio_segments: List[AudioSegment],
+    ):
+        for i in range(0, len(bucket), self.batch_size):
+            batch = bucket[i : i + self.batch_size]
+            param_arr = [self.segment_to_generate_params(segment) for segment in batch]
+            texts = [params.text for params in param_arr]
+
+            params = param_arr[0]
+            audio_datas = generate_audio.generate_audio_batch(
+                texts=texts,
+                temperature=params.temperature,
+                top_P=params.top_P,
+                top_K=params.top_K,
+                spk=params.spk,
+                infer_seed=params.infer_seed,
+                prompt1=params.prompt1,
+                prompt2=params.prompt2,
+                prefix=params.prefix,
+            )
+            for idx, segment in enumerate(batch):
+                sr, audio_data = audio_datas[idx]
+                rate = float(segment.get("rate", "1.0"))
+                volume = float(segment.get("volume", "0"))
+                pitch = float(segment.get("pitch", "0"))
+
+                audio_segment = audio_data_to_segment(audio_data, sr)
+                audio_segment = apply_prosody(audio_segment, rate, volume, pitch)
+                original_index = src_segments.index(segment)
+                audio_segments[original_index] = audio_segment
 
     def bucket_segments(
-        self, segments: List[Dict[str, Any]]
-    ) -> List[List[Dict[str, Any]]]:
-        # Create a dictionary to hold buckets
-        buckets = {}
+        self, segments: List[Union[SSMLSegment, SSMLBreak]]
+    ) -> List[List[Union[SSMLSegment, SSMLBreak]]]:
+        buckets = {"<break>": []}
         for segment in segments:
+            if isinstance(segment, SSMLBreak):
+                buckets["<break>"].append(segment)
+                continue
+
             params = self.segment_to_generate_params(segment)
 
-            key_params = copy.copy(params)
-            if isinstance(key_params.get("spk"), Speaker):
-                key_params["spk"] = str(key_params["spk"].id)
+            if isinstance(params.spk, Speaker):
+                params.spk = str(params.spk.id)
+
             key = json.dumps(
-                {k: v for k, v in key_params.items() if k != "text"}, sort_keys=True
+                {k: v for k, v in params.items() if k != "text"}, sort_keys=True
             )
             if key not in buckets:
                 buckets[key] = []
             buckets[key].append(segment)
 
-        # Convert dictionary to list of buckets
-        bucket_list = list(buckets.values())
-        return bucket_list
+        return buckets
 
-    def synthesize_segments(self, segments: List[Dict[str, Any]]) -> List[AudioSegment]:
-        audio_segments = [None] * len(
-            segments
-        )  # Create a list with the same length as segments
+    def synthesize_segments(
+        self, segments: List[Union[SSMLSegment, SSMLBreak]]
+    ) -> List[AudioSegment]:
+        audio_segments = [None] * len(segments)
         buckets = self.bucket_segments(segments)
-        logger.debug(f"segments len: {len(segments)}")
-        logger.debug(f"bucket pool size: {len(buckets)}")
+
+        break_segments = buckets.pop("<break>")
+        self.process_break_segments(segments, break_segments, audio_segments)
+
+        buckets = list(buckets.values())
+
         for bucket in buckets:
-            for i in range(0, len(bucket), self.batch_size):
-                batch = bucket[i : i + self.batch_size]
-                param_arr = [
-                    self.segment_to_generate_params(segment) for segment in batch
-                ]
-                texts = [params["text"] for params in param_arr]
-
-                params = param_arr[0]  # Use the first segment to get the parameters
-                audio_datas = generate_audio.generate_audio_batch(
-                    texts=texts,
-                    temperature=params["temperature"],
-                    top_P=params["top_P"],
-                    top_K=params["top_K"],
-                    spk=params["spk"],
-                    infer_seed=params["infer_seed"],
-                    prompt1=params["prompt1"],
-                    prompt2=params["prompt2"],
-                    prefix=params["prefix"],
-                )
-                for idx, segment in enumerate(batch):
-                    (sr, audio_data) = audio_datas[idx]
-                    rate = float(segment.get("rate", "1.0"))
-                    volume = float(segment.get("volume", "0"))
-                    pitch = float(segment.get("pitch", "0"))
-
-                    audio_segment = audio_data_to_segment(audio_data, sr)
-                    audio_segment = apply_prosody(audio_segment, rate, volume, pitch)
-                    original_index = segments.index(
-                        segment
-                    )  # Get the original index of the segment
-                    audio_segments[original_index] = (
-                        audio_segment  # Place the audio_segment in the correct position
-                    )
+            self.process_voice_segments(segments, bucket, audio_segments)
 
         return audio_segments
 
 
-def generate_audio_segment(
-    text: str,
-    spk: int = -1,
-    seed: int = -1,
-    top_p: float = 0.5,
-    top_k: int = 20,
-    temp: float = 0.3,
-    prompt1: str = "",
-    prompt2: str = "",
-    prefix: str = "",
-    enable_normalize=True,
-    is_end: bool = False,
-) -> AudioSegment:
-    if enable_normalize:
-        text = text_normalize(text, is_end=is_end)
-
-    logger.debug(f"generate segment: {text}")
-
-    sample_rate, audio_data = generate_audio.generate_audio(
-        text=text,
-        temperature=temp if temp is not None else 0.3,
-        top_P=top_p if top_p is not None else 0.5,
-        top_K=top_k if top_k is not None else 20,
-        spk=spk if spk else -1,
-        infer_seed=seed if seed else -1,
-        prompt1=prompt1 if prompt1 else "",
-        prompt2=prompt2 if prompt2 else "",
-        prefix=prefix if prefix else "",
-    )
-
-    byte_io = io.BytesIO()
-    write(byte_io, sample_rate, audio_data)
-    byte_io.seek(0)
-
-    return AudioSegment.from_file(byte_io, format="wav")
-
-
-def synthesize_segment(segment: Dict[str, Any]) -> Union[AudioSegment, None]:
-    if "break" in segment:
-        pause_segment = AudioSegment.silent(duration=segment["break"])
-        return pause_segment
-
-    attrs = segment.get("attrs", {})
-    text = segment.get("text", "")
-    is_end = segment.get("is_end", False)
-
-    text = str(text).strip()
-
-    if text == "":
-        return None
-
-    spk = attrs.get("spk", "")
-    if isinstance(spk, str):
-        spk = int(spk)
-    seed = to_number(attrs.get("seed", ""), int, -1)
-    top_k = to_number(attrs.get("top_k", ""), int, None)
-    top_p = to_number(attrs.get("top_p", ""), float, None)
-    temp = to_number(attrs.get("temp", ""), float, None)
-
-    prompt1 = attrs.get("prompt1", "")
-    prompt2 = attrs.get("prompt2", "")
-    prefix = attrs.get("prefix", "")
-    disable_normalize = attrs.get("normalize", "") == "False"
-
-    audio_segment = generate_audio_segment(
-        text,
-        enable_normalize=not disable_normalize,
-        spk=spk,
-        seed=seed,
-        top_k=top_k,
-        top_p=top_p,
-        temp=temp,
-        prompt1=prompt1,
-        prompt2=prompt2,
-        prefix=prefix,
-        is_end=is_end,
-    )
-
-    rate = float(attrs.get("rate", "1.0"))
-    volume = float(attrs.get("volume", "0"))
-    pitch = float(attrs.get("pitch", "0"))
-
-    audio_segment = apply_prosody(audio_segment, rate, volume, pitch)
-
-    return audio_segment
-
-
 # 示例使用
 if __name__ == "__main__":
+    ctx1 = SSMLContext()
+    ctx1.spk = 1
+    ctx1.seed = 42
+    ctx1.temp = 0.1
+    ctx2 = SSMLContext()
+    ctx2.spk = 2
+    ctx2.seed = 42
+    ctx2.temp = 0.1
     ssml_segments = [
-        {
-            "text": "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
-            "attrs": {"spk": 2, "temp": 0.1, "seed": 42},
-        },
-        {
-            "text": "大🍉，一个大🍉，嘿，你的感觉真的很奇妙  [lbreak]",
-            "attrs": {"spk": 2, "temp": 0.1, "seed": 42},
-        },
-        {
-            "text": "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
-            "attrs": {"spk": 2, "temp": 0.3, "seed": 42},
-        },
+        SSMLSegment(text="大🍌，一条大🍌，嘿，你的感觉真的很奇妙", attrs=ctx1.copy()),
+        SSMLBreak(duration_ms=1000),
+        SSMLSegment(text="大🍉，一个大🍉，嘿，你的感觉真的很奇妙", attrs=ctx1.copy()),
+        SSMLSegment(text="大🍊，一个大🍊，嘿，你的感觉真的很奇妙", attrs=ctx2.copy()),
     ]
 
     synthesizer = SynthesizeSegments(batch_size=2)
     audio_segments = synthesizer.synthesize_segments(ssml_segments)
+    print(audio_segments)
     combined_audio = combine_audio_segments(audio_segments)
     combined_audio.export("output.wav", format="wav")

@@ -10,7 +10,6 @@ from modules.normalization import text_normalize
 from modules.ssml import parse_ssml
 from modules.SynthesizeSegments import (
     SynthesizeSegments,
-    synthesize_segment,
     combine_audio_segments,
 )
 
@@ -23,6 +22,8 @@ from modules.api.Api import APIManager
 class SSMLRequest(BaseModel):
     ssml: str
     format: str = "mp3"
+
+    # NOTE: 🤔 也许这个值应该配置成系统变量？ 传进来有点奇怪
     batch_size: int = 4
 
 
@@ -48,29 +49,15 @@ async def synthesize_ssml(
         for seg in segments:
             seg["text"] = text_normalize(seg["text"], is_end=True)
 
-        if batch_size != 1:
-            synthesize = SynthesizeSegments(batch_size)
-            audio_segments = synthesize.synthesize_segments(segments)
-            combined_audio = combine_audio_segments(audio_segments)
-            buffer = io.BytesIO()
-            combined_audio.export(buffer, format="wav")
-            buffer.seek(0)
-            if format == "mp3":
-                buffer = api_utils.wav_to_mp3(buffer)
-            return StreamingResponse(buffer, media_type=f"audio/{format}")
-        else:
-
-            def audio_streamer():
-                for segment in segments:
-                    audio_segment = synthesize_segment(segment=segment)
-                    buffer = io.BytesIO()
-                    audio_segment.export(buffer, format="wav")
-                    buffer.seek(0)
-                    if format == "mp3":
-                        buffer = api_utils.wav_to_mp3(buffer)
-                    yield buffer.read()
-
-            return StreamingResponse(audio_streamer(), media_type=f"audio/{format}")
+        synthesize = SynthesizeSegments(batch_size)
+        audio_segments = synthesize.synthesize_segments(segments)
+        combined_audio = combine_audio_segments(audio_segments)
+        buffer = io.BytesIO()
+        combined_audio.export(buffer, format="wav")
+        buffer.seek(0)
+        if format == "mp3":
+            buffer = api_utils.wav_to_mp3(buffer)
+        return StreamingResponse(buffer, media_type=f"audio/{format}")
 
     except Exception as e:
         import logging
