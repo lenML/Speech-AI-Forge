@@ -111,7 +111,7 @@ def torch_gc():
 
 
 cpu: torch.device = torch.device("cpu")
-device: torch.device = get_optimal_device()
+device: torch.device = None
 dtype: torch.dtype = torch.float32
 dtype_dvae: torch.dtype = torch.float32
 dtype_vocos: torch.dtype = torch.float32
