@@ -6,6 +6,7 @@ from modules.api.impl.openai_api import AudioSpeechRequest
 from launch import create_api
 
 import tests.conftest
+import pytest
 
 app_instance = create_api()
 
@@ -23,6 +24,7 @@ def client():
         ("Invalid voice", "unknown_voice"),
     ],
 )
+@pytest.mark.openai_api
 def test_openai_speech_api(client, input_text, voice):
     request = AudioSpeechRequest(input=input_text, voice=voice)
     response = client.post("/v1/audio/speech", json=request.model_dump())
@@ -43,6 +45,7 @@ def test_openai_speech_api(client, input_text, voice):
             f.write(response.content)
 
 
+@pytest.mark.openai_api
 def test_openai_speech_api_with_invalid_style(client):
     request = AudioSpeechRequest(
         input="Test text", voice="female2", style="invalid_style"
@@ -53,6 +56,7 @@ def test_openai_speech_api_with_invalid_style(client):
     assert "Invalid style" in response.json().get("detail", "")
 
 
+# @pytest.mark.openai_api
 # def test_transcribe_not_implemented(client):
 #     file = {"file": ("test.wav", b"test audio data")}
 #     response = client.post("/v1/audio/transcriptions", files=file)
@@ -63,6 +67,7 @@ def test_openai_speech_api_with_invalid_style(client):
 
 # TODO
 # @mark.parametrize("file_name, file_content", [("test.wav", b"test audio data")])
+# @pytest.mark.openai_api
 # def test_transcribe_with_file(client, file_name, file_content):
 #     file = {"file": (file_name, file_content)}
 #     response = client.post("/v1/audio/transcriptions", files=file)

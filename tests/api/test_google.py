@@ -35,6 +35,7 @@ def google_text_synthesize_request():
     }
 
 
+@pytest.mark.google_api
 def test_google_text_synthesize_success(google_text_synthesize_request):
     response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
     assert response.status_code == 200
@@ -51,12 +52,14 @@ def test_google_text_synthesize_success(google_text_synthesize_request):
         f.write(base64.b64decode(b64_str))
 
 
+@pytest.mark.google_api
 def test_google_text_synthesize_missing_input():
     response = client.post("/v1/text:synthesize", json={})
     assert response.status_code == 422
     assert "Field required" == response.json()["detail"][0]["msg"]
 
 
+@pytest.mark.google_api
 def test_google_text_synthesize_invalid_voice():
     request = {
         "input": {"text": "这是一个测试文本。"},
@@ -84,6 +87,7 @@ def test_google_text_synthesize_invalid_voice():
     assert "detail" in response.json()
 
 
+@pytest.mark.google_api
 def test_google_text_synthesize_invalid_audio_encoding():
     request = {
         "input": {"text": "这是一个测试文本。"},

@@ -7,11 +7,11 @@ from modules.api.Api import APIManager
 
 
 class CreateSpeaker(BaseModel):
-    seed: int
     name: str
     gender: str
     describe: str
-    tensor: list
+    tensor: list = None
+    seed: int = None
 
 
 class UpdateSpeaker(BaseModel):
@@ -76,13 +76,17 @@ def setup(app: APIManager):
                 gender=request.gender,
                 describe=request.describe,
             )
-        else:
+        elif request.seed:
             # from seed
             speaker = speaker_mgr.create_speaker_from_seed(
                 seed=request.seed,
                 name=request.name,
                 gender=request.gender,
                 describe=request.describe,
+            )
+        else:
+            raise HTTPException(
+                status_code=400, detail="Missing tensor or seed in request"
             )
         return {"message": "ok", "data": speaker.to_json()}
 
