@@ -5,7 +5,10 @@ from modules.utils.JsonObject import JsonObject
 
 from modules.utils import git
 
+# TODO impl RuntimeEnvVars() class
 runtime_env_vars = JsonObject({})
+
+auto_gc = True
 
 api = None
 

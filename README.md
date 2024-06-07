@@ -13,23 +13,23 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 
 ## Features
 
-- **batch 生成**: SSML TTS 接口 / WebUI 支持自动分桶并批量生成。
-- **支持超长文本生成**: webui 和 ssml 接口支持超长文本生成，1000 字也可保持一致性。
-- **风格提示词注入**: 灵活调整输出风格，通过注入提示词实现个性化。
-- **全面的 API 服务**: 所有功能均通过 API 访问，集成方便。
-- **友好的调试 GUI**: 独立于 Gradio 的 playground，简化调试流程。
-- **OpenAI 风格 API**: `/v1/audio/speech` 提供类似 OpenAI 的语音生成接口。
-- **Google 风格 API**: `/v1/text:synthesize` 提供类似 Google 的文本合成接口。
-- **类 SSML 支持**: 使用类 SSML 语法创建丰富的音频长文本。
-- **说话人管理**: 通过名称或 ID 高效复用说话人。
+- **全面的 API 服务**: 提供所有功能的 API 访问，方便集成。
+- **超长文本生成**: 支持生成 1000 字以上的长文本，保持一致性。
 - **风格管理**: 通过名称或 ID 复用说话风格，内置 32 种不同风格。
+- **说话人管理**: 通过名称或 ID 高效复用说话人。
+- **风格提示词注入**: 通过注入提示词灵活调整输出风格。
+- **batch 生成**: 支持自动分桶并批量生成。
+- **类 SSML 支持**: 使用类 SSML 语法创建丰富的音频长文本。
 - **独立 refine API**: 提供单独的 refine 调试接口，提升调试效率。
-- **文本标准化**: 针对 ChatTTS 优化的文本标准化，解决大部分不支持的 token。
-  - **Markdown**: 自动检测处理 markdown 格式文本
-  - **数字转写**: 自动将数字转为模型可以识别的文本
-  - **Emoji 适配**: 自动翻译 emoji 为可读文本
-  - **基于分词器**: 基于 tokenizer 预处理文本，覆盖模型所有不支持字符范围范围
-  - **中英文识别**: 适配英文环境
+- **OpenAI 风格 API**: 提供类似 OpenAI 的 `/v1/audio/speech` 语音生成接口。
+- **Google 风格 API**: 提供类似 Google 的 `/v1/text:synthesize` 文本合成接口。
+- **友好的调试 GUI**: 独立于 Gradio 的 playground，简化调试流程。
+- **文本标准化**:
+  - **Markdown**: 自动检测处理 markdown 格式文本。
+  - **数字转写**: 自动将数字转为模型可识别的文本。
+  - **Emoji 适配**: 自动翻译 emoji 为可读文本。
+  - **基于分词器**: 基于 tokenizer 预处理文本，覆盖模型所有不支持字符范围。
+  - **中英文识别**: 适配英文环境。
 
 ## Interface
 
@@ -42,19 +42,19 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
   </tr>
   <tr>
     <td rowspan="2">API</td>
-    <td>实现了各种形式的tts接口。部署后打开 <code>http://localhost:8000/docs</code> 可查看详细信息。</td>
+    <td>提供多种形式的文本转语音接口。部署后访问 <code>http://localhost:8000/docs</code> 查看详细信息。</td>
     <td>运行 <code>python launch.py</code></td>
-    <td rowspan="2"><img src="./docs/api.png" alt="api"><br><img src="./docs/playground.png" alt="playground"></td>
+    <td rowspan="2"><img src="./docs/api.png" alt="API 文档"><br><img src="./docs/playground.png" alt="Playground"></td>
   </tr>
   <tr>
-    <td>实现了一套用于调试 API 的 Playground 前端页面，独立于 Python 代码非 Gradio。</td>
-    <td>部署后打开 <code>http://localhost:8000/playground/index.html</code></td>
+    <td>包含一个独立于 Python 代码和 Gradio 的 Playground 前端页面，方便调试 API。</td>
+    <td>部署后访问 <code>http://localhost:8000/playground/index.html</code></td>
   </tr>
   <tr>
     <td>WebUI</td>
-    <td>某些情况可能需要 WebUI（比如 HuggingFace/Colab），这里是一个简单实现。（WebUI中将不会支持对任何本地文件写操作。）</td>
+    <td>在某些场景（如 HuggingFace/Colab）中需要使用 WebUI，这里提供了一个简单实现。请注意，WebUI 不支持对任何本地文件的写操作。</td>
     <td>运行 <code>python webui.py</code></td>
-    <td><img src="./docs/webui.png" alt="webui"></td>
+    <td><img src="./docs/webui.png" alt="WebUI"></td>
   </tr>
 </table>
 
@@ -86,29 +86,6 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 > 开启 `--half` 可以大幅减少显存占用。如果 batch size 大于 8 建议开启 half。
 
 > 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
-
-## Banchmark
-
-> 测试平台 `GeForce RTX 2080 Ti`
-
-### 推理速度
-
-| 参数组合           | 推理速度 (tk/s) | 中文速度 (char/s) |
-| ------------------ | --------------- | ----------------- |
-| `--compile`        | 54              | 9                 |
-| `--half --compile` | 51              | 8.5               |
-| 默认无参数         | 30              | 5                 |
-| `--half`           | 28              | 4.6               |
-| `--use_cpu=all`    | 20              | 3.3               |
-
-> 按道理说 f16 应该要提速的，不清楚为啥变慢了...
-
-### 显存占用
-
-| dtype | batch size: 1 | 10   | 20    |
-| ----- | ------------- | ---- | ----- |
-| f32   | 2GB           | 16GB | 24GB+ |
-| f16   | 1GB           | 8GB  | 16GB+ |
 
 ### launch.py
 
@@ -205,6 +182,38 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--device_id`      | `str`  | `None`      | 指定使用 gpu device_id                             |
 | `--use_cpu`        | `str`  | `None`      | 当前可选值 `"all"`                                 |
 
+## Benchmark
+
+> 可使用 `./tests/benchmark/tts_benchmark.py` 复现
+
+测试平台
+
+- GPU: `GeForce RTX 2080 Ti`
+- CPU: `3.4hz 24core`
+
+以下为 batch size 为 8 时的结果，完整扫描看 `performance_results.csv`
+
+```markdown
+| Batch size | Use decoder | Half precision | Compile model | Use CPU | GPU Memory | Duration | RTF  |
+| ---------- | ----------- | -------------- | ------------- | ------- | ---------- | -------- | ---- |
+| 8          | ✅          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.22 |
+| 8          | ✅          | ✅             | ✅            | ❌      | 0.89       | 39.34    | 0.24 |
+| 8          | ❌          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.23 |
+| 8          | ❌          | ✅             | ✅            | ❌      | 0.90       | 39.34    | 0.24 |
+| 8          | ❌          | ❌             | ❌            | ❌      | 1.70       | 36.78    | 0.29 |
+| 8          | ✅          | ❌             | ❌            | ❌      | 1.72       | 36.78    | 0.29 |
+| 8          | ❌          | ✅             | ❌            | ❌      | 1.02       | 35.75    | 0.40 |
+| 8          | ✅          | ✅             | ❌            | ❌      | 0.95       | 35.75    | 0.40 |
+| 8          | ❌          | ❌             | ❌            | ✅      | N/A        | 49.92    | 0.58 |
+| 8          | ❌          | ❌             | ✅            | ✅      | N/A        | 49.92    | 0.58 |
+| 8          | ✅          | ❌             | ✅            | ✅      | N/A        | 49.92    | 0.58 |
+| 8          | ✅          | ❌             | ❌            | ✅      | N/A        | 49.92    | 0.60 |
+| 8          | ❌          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
+| 8          | ❌          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
+| 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
+| 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
+```
+
 ### demo
 
 #### 风格化控制
@@ -277,23 +286,6 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 [style readme](./docs/sytles.md)
 
-## FAQ
-
-### 什么是 Prompt1 和 Prompt2？
-
-Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
-
-- Prompt1 插入到第一个 [Stts] 之前
-- Prompt2 插入到第一个 [Stts] 之后
-
-### 什么是 Prefix？
-
-Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
-
-### Style 中 `_p` 的区别是什么？
-
-Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
-
 # Docker
 
 ## 镜像
@@ -311,6 +303,27 @@ WIP 开发中
 
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
+
+## Roadmap
+
+WIP
+
+## FAQ
+
+### 什么是 Prompt1 和 Prompt2？
+
+Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
+
+- Prompt1 插入到第一个 [Stts] 之前
+- Prompt2 插入到第一个 [Stts] 之后
+
+### 什么是 Prefix？
+
+Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
+
+### Style 中 `_p` 的区别是什么？
+
+Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
 
 # References
 

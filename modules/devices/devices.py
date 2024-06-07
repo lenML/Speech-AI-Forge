@@ -74,7 +74,7 @@ def get_target_device_id_or_memory_available_gpu():
 
 
 def get_optimal_device_name():
-    if config.runtime_env_vars.use_cpu:
+    if config.runtime_env_vars.use_cpu == "all":
         return "cpu"
 
     if torch.cuda.is_available():
@@ -120,12 +120,14 @@ dtype_decoder: torch.dtype = torch.float32
 
 
 def reset_device():
+    global device
+    global dtype
+    global dtype_dvae
+    global dtype_vocos
+    global dtype_gpt
+    global dtype_decoder
+
     if config.runtime_env_vars.half:
-        global dtype
-        global dtype_dvae
-        global dtype_vocos
-        global dtype_gpt
-        global dtype_decoder
         dtype = torch.float16
         dtype_dvae = torch.float16
         dtype_vocos = torch.float16
@@ -133,15 +135,21 @@ def reset_device():
         dtype_decoder = torch.float16
 
         logger.info("Using half precision: torch.float16")
+    else:
+        dtype = torch.float32
+        dtype_dvae = torch.float32
+        dtype_vocos = torch.float32
+        dtype_gpt = torch.float32
+        dtype_decoder = torch.float32
 
-    if (
-        config.runtime_env_vars.device_id is not None
-        or config.runtime_env_vars.use_cpu is not None
-    ):
-        global device
+        logger.info("Using full precision: torch.float32")
+
+    if config.runtime_env_vars.use_cpu == "all":
+        device = cpu
+    else:
         device = get_optimal_device()
 
-        logger.info(f"Using device: {device}")
+    logger.info(f"Using device: {device}")
 
 
 @lru_cache

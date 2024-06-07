@@ -2,6 +2,9 @@ import torch
 import random
 import numpy as np
 from modules.utils import rng
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def deterministic(seed=0):
@@ -56,7 +59,15 @@ class SeedContext:
     def __enter__(self):
         self.state = (torch.get_rng_state(), random.getstate(), np.random.get_state())
 
-        deterministic(self.seed)
+        try:
+            deterministic(self.seed)
+        except Exception as e:
+            # raise ValueError(
+            #     f"Seed must be an integer, but: <{type(self.seed)}> {self.seed}"
+            # )
+            logger.warning(
+                f"Deterministic field, with: <{type(self.seed)}> {self.seed}"
+            )
 
     def __exit__(self, exc_type, exc_value, traceback):
         torch.set_rng_state(self.state[0])

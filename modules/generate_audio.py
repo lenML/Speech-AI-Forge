@@ -7,6 +7,7 @@ from modules.utils.SeedContext import SeedContext
 from modules import models, config
 
 import logging
+import gc
 
 from modules.devices import devices
 from typing import Union
@@ -100,7 +101,9 @@ def generate_audio_batch(
 
     sample_rate = 24000
 
-    devices.torch_gc()
+    if config.auto_gc:
+        devices.torch_gc()
+        gc.collect()
 
     return [(sample_rate, np.array(wav).flatten().astype(np.float32)) for wav in wavs]
 
