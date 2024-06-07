@@ -193,7 +193,6 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 以下为 batch size 为 8 时的结果，完整扫描看 `performance_results.csv`
 
-```markdown
 | Batch size | Use decoder | Half precision | Compile model | Use CPU | GPU Memory | Duration | RTF  |
 | ---------- | ----------- | -------------- | ------------- | ------- | ---------- | -------- | ---- |
 | 8          | ✅          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.22 |
@@ -212,7 +211,6 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | 8          | ❌          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
-```
 
 ### demo
 
