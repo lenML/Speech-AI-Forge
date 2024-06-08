@@ -15,7 +15,8 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.tuna.tsinghua.edu.cn/@g /etc/apt/sour
 RUN apt-get update -y --allow-unauthenticated --fix-missing && \
     add-apt-repository ppa:savoury1/ffmpeg4 -y && \
     apt-get update -y && \
-    apt-get install --no-install-recommends -y ffmpeg rubberband-cli && \
+    apt-get update && 	xargs -r -a packages.txt apt-get install -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     apt-get clean 
 
 RUN pip install -r requirements.docker.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
