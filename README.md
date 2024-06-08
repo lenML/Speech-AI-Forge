@@ -388,4 +388,5 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 
 - ChatTTS: https://github.com/2noise/ChatTTS
 - PaddleSpeech: https://github.com/PaddlePaddle/PaddleSpeech
+- resemble-enhance: https://github.com/resemble-ai/resemble-enhance
 - 默认说话人: https://github.com/2noise/ChatTTS/issues/238

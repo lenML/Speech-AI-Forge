@@ -13,10 +13,7 @@ from modules import config
 
 default_text_content = """
 chat T T S 是一款强大的对话式文本转语音模型。它有中英混读和多说话人的能力。
-chat T T S 不仅能够生成自然流畅的语音，还能控制[laugh]笑声啊[laugh]，
-停顿啊[uv_break]语气词啊等副语言现象[uv_break]。这个韵律超越了许多开源模型[uv_break]。
-请注意，chat T T S 的使用应遵守法律和伦理准则，避免滥用的安全风险。[uv_break]
-"""
+""".strip()
 
 
 def create_tts_interface():

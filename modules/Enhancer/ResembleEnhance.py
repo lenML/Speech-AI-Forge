@@ -1,8 +1,8 @@
 import os
 from typing import List
-from resemble_enhance.enhancer.enhancer import Enhancer
-from resemble_enhance.enhancer.hparams import HParams
-from resemble_enhance.inference import inference
+from modules.repos_static.resemble_enhance.enhancer.enhancer import Enhancer
+from modules.repos_static.resemble_enhance.enhancer.hparams import HParams
+from modules.repos_static.resemble_enhance.inference import inference
 
 import torch
 
