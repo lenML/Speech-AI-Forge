@@ -16,11 +16,6 @@ from modules.webui.readme_tab import create_readme_tab
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-
 
 def webui_init():
     # fix: If the system proxy is enabled in the Windows system, you need to skip these

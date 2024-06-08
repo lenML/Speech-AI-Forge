@@ -23,6 +23,9 @@ from modules import refiner
 from modules.utils import audio
 from modules.SentenceSplitter import SentenceSplitter
 
+from pydub import AudioSegment
+import torch.profiler
+
 
 def get_speakers():
     return speaker_mgr.list_speakers()
@@ -48,6 +51,13 @@ def load_spk_info(file):
         return "load failed"
 
 
+def wav_to_mp3(wav_data, bitrate="48k"):
+    audio = AudioSegment.from_wav(
+        wav_data,
+    )
+    return audio.export(format="mp3", bitrate=bitrate)
+
+
 def segments_length_limit(
     segments: list[Union[SSMLBreak, SSMLSegment]], total_max: int
 ) -> list[Union[SSMLBreak, SSMLSegment]]:
@@ -67,26 +77,27 @@ def segments_length_limit(
 @torch.inference_mode()
 @spaces.GPU
 def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
-    audio_data = torch.from_numpy(audio_data).float().squeeze().cpu()
-    if enable_denoise or enable_enhance:
-        enhancer = load_enhancer(devices.device)
-        if enable_denoise:
-            audio_data, sr = enhancer.denoise(audio_data, sr, devices.device)
-        if enable_enhance:
-            audio_data, sr = enhancer.enhance(
-                audio_data,
-                sr,
-                devices.device,
-                tau=0.9,
-                nfe=64,
-                solver="euler",
-                lambd=0.5,
-            )
-    audio_data = audio_data.cpu().numpy()
+    if not enable_denoise and not enable_enhance:
+        return audio_data, sr
+
+    device = devices.device
+    # NOTE: 这里很奇怪按道理得放到 device 上，但是 enhancer 做 chunk 的时候会报错...所以得 cpu()
+    tensor = torch.from_numpy(audio_data).float().squeeze().cpu()
+    enhancer = load_enhancer(device)
+
+    if enable_enhance:
+        lambd = 0.9 if enable_denoise else 0.1
+        tensor, sr = enhancer.enhance(
+            tensor, sr, tau=0.5, nfe=64, solver="rk4", lambd=lambd, device=device
+        )
+    elif enable_denoise:
+        tensor, sr = enhancer.denoise(tensor, sr)
+
+    audio_data = tensor.cpu().numpy()
     return audio_data, int(sr)
 
 
-@torch.inference_mode()
+# @torch.inference_mode()
 @spaces.GPU
 def synthesize_ssml(ssml: str, batch_size=4):
     try:
@@ -114,7 +125,7 @@ def synthesize_ssml(ssml: str, batch_size=4):
     return audio.pydub_to_np(combined_audio)
 
 
-@torch.inference_mode()
+# @torch.inference_mode()
 @spaces.GPU
 def tts_generate(
     text,

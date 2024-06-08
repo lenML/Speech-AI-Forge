@@ -1,5 +1,6 @@
 import os
-from typing import List
+from typing import List, Literal
+from modules.devices import devices
 from modules.repos_static.resemble_enhance.enhancer.enhancer import Enhancer
 from modules.repos_static.resemble_enhance.enhancer.hparams import HParams
 from modules.repos_static.resemble_enhance.inference import inference
@@ -25,14 +26,11 @@ def load_enhancer(device: torch.device):
 
 
 class ResembleEnhance:
-    hparams: HParams
-    enhancer: Enhancer
-
     def __init__(self, device: torch.device):
         self.device = device
 
-        self.enhancer = None
-        self.hparams = None
+        self.enhancer: HParams = None
+        self.hparams: Enhancer = None
 
     def load_model(self):
         hparams = HParams.load(Path(MODELS_DIR) / "resemble-enhance")
@@ -42,9 +40,7 @@ class ResembleEnhance:
             map_location="cpu",
         )["module"]
         enhancer.load_state_dict(state_dict)
-        enhancer.eval()
-        enhancer.to(self.device)
-        enhancer.denoiser.to(self.device)
+        enhancer.to(self.device).eval()
 
         self.hparams = hparams
         self.enhancer = enhancer
@@ -63,7 +59,7 @@ class ResembleEnhance:
         sr,
         device,
         nfe=32,
-        solver="midpoint",
+        solver: Literal["midpoint", "rk4", "euler"] = "midpoint",
         lambd=0.5,
         tau=0.5,
     ) -> tuple[torch.Tensor, int]:
@@ -83,34 +79,51 @@ class ResembleEnhance:
 
 if __name__ == "__main__":
     import torchaudio
-    from modules.models import load_chat_tts
-
-    load_chat_tts()
+    import gradio as gr
 
     device = torch.device("cuda")
-    ench = ResembleEnhance(device)
-    ench.load_model()
 
-    wav, sr = torchaudio.load("test.wav")
+    # def enhance(file):
+    #     print(file)
+    #     ench = load_enhancer(device)
+    #     dwav, sr = torchaudio.load(file)
+    #     dwav = dwav.mean(dim=0).to(device)
+    #     enhanced, e_sr = ench.enhance(dwav, sr)
+    #     return e_sr, enhanced.cpu().numpy()
 
-    print(wav.shape, type(wav), sr, type(sr))
-    exit()
+    # # 随便一个示例
+    # gr.Interface(
+    #     fn=enhance, inputs=[gr.Audio(type="filepath")], outputs=[gr.Audio()]
+    # ).launch()
 
-    wav = wav.squeeze(0).cuda()
+    # load_chat_tts()
 
-    print(wav.device)
+    # ench = load_enhancer(device)
 
-    denoised, d_sr = ench.denoise(wav.cpu(), sr, device)
-    denoised = denoised.unsqueeze(0)
-    print(denoised.shape)
-    torchaudio.save("denoised.wav", denoised, d_sr)
+    # devices.torch_gc()
 
-    for solver in ("midpoint", "rk4", "euler"):
-        for lambd in (0.1, 0.5, 0.9):
-            for tau in (0.1, 0.5, 0.9):
-                enhanced, e_sr = ench.enhance(
-                    wav.cpu(), sr, device, solver=solver, lambd=lambd, tau=tau, nfe=128
-                )
-                enhanced = enhanced.unsqueeze(0)
-                print(enhanced.shape)
-                torchaudio.save(f"enhanced_{solver}_{lambd}_{tau}.wav", enhanced, e_sr)
+    # wav, sr = torchaudio.load("test.wav")
+
+    # print(wav.shape, type(wav), sr, type(sr))
+    # # exit()
+
+    # wav = wav.squeeze(0).cuda()
+
+    # print(wav.device)
+
+    # denoised, d_sr = ench.denoise(wav, sr)
+    # denoised = denoised.unsqueeze(0)
+    # print(denoised.shape)
+    # torchaudio.save("denoised.wav", denoised.cpu(), d_sr)
+
+    # for solver in ("midpoint", "rk4", "euler"):
+    #     for lambd in (0.1, 0.5, 0.9):
+    #         for tau in (0.1, 0.5, 0.9):
+    #             enhanced, e_sr = ench.enhance(
+    #                 wav, sr, solver=solver, lambd=lambd, tau=tau, nfe=128
+    #             )
+    #             enhanced = enhanced.unsqueeze(0)
+    #             print(enhanced.shape)
+    #             torchaudio.save(
+    #                 f"enhanced_{solver}_{lambd}_{tau}.wav", enhanced.cpu(), e_sr
+    #             )

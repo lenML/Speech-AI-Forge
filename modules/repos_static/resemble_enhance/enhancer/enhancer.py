@@ -73,8 +73,8 @@ class Enhancer(nn.Module):
             )
             self._load_pretrained(pretrained_path)
 
-        logger.info(f"{self.__class__.__name__} summary")
-        logger.info(f"{self.summarize()}")
+        # logger.info(f"{self.__class__.__name__} summary")
+        # logger.info(f"{self.summarize()}")
 
     def _load_pretrained(self, path):
         # Clone is necessary as otherwise it holds a reference to the original model

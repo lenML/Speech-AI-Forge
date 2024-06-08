@@ -220,10 +220,9 @@ def create_tts_interface():
                     value=False, label="Disable Normalize"
                 )
 
-                # FIXME: 不知道为啥，就是非常慢，单独调脚本是很快的
-                with gr.Group(visible=webui_config.experimental):
+                with gr.Group():
                     gr.Markdown("💪🏼Enhance")
-                    enable_enhance = gr.Checkbox(value=False, label="Enable Enhance")
+                    enable_enhance = gr.Checkbox(value=True, label="Enable Enhance")
                     enable_de_noise = gr.Checkbox(value=False, label="Enable De-noise")
                 tts_button = gr.Button(
                     "🔊Generate Audio",

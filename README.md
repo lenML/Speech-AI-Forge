@@ -67,7 +67,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   - **中英文识别**: 适配英文环境。
 - **音质增强**: 继承音质增强、降噪模型提升输出质量
 - **Speaker 导入导出**: 支持 Speaker 导入导出，方便定制
-- **Speaker 合并**: 支持 Speaker 合并，微调说话人
+- **Speaker 融合**: 支持 Speaker 融合，微调说话人
 
 ## 3. <a name='Interface'></a>Interface
 

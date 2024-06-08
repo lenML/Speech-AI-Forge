@@ -1,9 +1,12 @@
 import os
 import logging
 
-from modules.devices import devices
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
-logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+from modules.devices import devices
 
 import torch
 from modules import config

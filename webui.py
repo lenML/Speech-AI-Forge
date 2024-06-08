@@ -1,4 +1,11 @@
 import os
+import logging
+
+# logging.basicConfig(
+#     level=os.getenv("LOG_LEVEL", "INFO"),
+#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+# )
+
 from modules.devices import devices
 from modules.utils import env
 from modules.webui import webui_config
