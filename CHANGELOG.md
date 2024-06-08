@@ -1,19 +1,31 @@
 # Changelog
 
-<a name="next"></a>
-## next
+<a name="0.5.5-rc"></a>
+## 0.5.5-rc (2024-06-08)
 
 ### Added
 
+- ✨ add audio enhance/denoise [[00cbc8e](https://github.com/lenML/ChatTTS-Forge/commit/00cbc8e96833fbcaf6cc224dc330908fa647f317)]
+- ✅ add speakers api test [[fbe4304](https://github.com/lenML/ChatTTS-Forge/commit/fbe4304c6716fb182442d356dbe3976982ca9d2b)]
 - ✅ add unit test [[e7f9385](https://github.com/lenML/ChatTTS-Forge/commit/e7f938562c1173899cc4e7330d59a8e354cafea4)]
 
 ### Changed
 
+- ♻️ SSML refactor [[6666082](https://github.com/lenML/ChatTTS-Forge/commit/6666082375c43b143d242bf425053e2ae661eb09)]
+- ♻️ webui refactor [[7585282](https://github.com/lenML/ChatTTS-Forge/commit/75852822f7d9cd8b95b557e2870e5435a0932fa1)]
 - ⚡ add benchmark [[ddb7670](https://github.com/lenML/ChatTTS-Forge/commit/ddb76704e5e6847bb0eeca2c0b50764a66783686)]
 
 ### Fixed
 
+- 🐛 fix warning and hf.spaces error [[f9700bb](https://github.com/lenML/ChatTTS-Forge/commit/f9700bbb1b057b2dfe4437de7cbd41a659be76c5)]
+- 🐛 fix model thread competition [[0ade6ac](https://github.com/lenML/ChatTTS-Forge/commit/0ade6ac07a2c75eb1cdda1c3db8bdf9bc2665244)]
+- 🐛 fix hf space error &#x60;ZeroGPU has not been initialized&#x60; [[562e17c](https://github.com/lenML/ChatTTS-Forge/commit/562e17c9372278c03705ec5a3ec77750854d5c7e)]
 - 🐛 fix openai api [[49088c5](https://github.com/lenML/ChatTTS-Forge/commit/49088c5480043518bb9beda817f5e5b38d133fa8)]
+
+### Miscellaneous
+
+- 📝 update [[13eb1c5](https://github.com/lenML/ChatTTS-Forge/commit/13eb1c518d8bbc8d26b14fd0e3649ee7158b2a7f)]
+- 📝 add Changelog [[4d1aece](https://github.com/lenML/ChatTTS-Forge/commit/4d1aece3d8eb89a9b0f3cf7ba90bb76c99b640d2)]
 
 
 <a name="0.5.2"></a>
