@@ -5,7 +5,9 @@ import torch
 import gradio as gr
 
 from modules import config
+from modules.webui import webui_config
 
+from modules.webui.system_tab import create_system_tab
 from modules.webui.tts_tab import create_tts_interface
 from modules.webui.ssml_tab import create_ssml_interface
 from modules.webui.spliter_tab import create_spliter_tab
@@ -93,15 +95,17 @@ def create_interface():
             with gr.TabItem("Spilter"):
                 create_spliter_tab(ssml_input, tabs=tabs)
 
-            if config.runtime_env_vars.webui_experimental:
-                with gr.TabItem("Speaker"):
-                    create_speaker_panel()
-                with gr.TabItem("Denoise"):
-                    gr.Markdown("🚧 Under construction")
-                with gr.TabItem("Inpainting"):
-                    gr.Markdown("🚧 Under construction")
-                with gr.TabItem("ASR"):
-                    gr.Markdown("🚧 Under construction")
+            with gr.TabItem("Speaker", visible=webui_config.experimental):
+                create_speaker_panel()
+            with gr.TabItem("Denoise", visible=webui_config.experimental):
+                gr.Markdown("🚧 Under construction")
+            with gr.TabItem("Inpainting", visible=webui_config.experimental):
+                gr.Markdown("🚧 Under construction")
+            with gr.TabItem("ASR", visible=webui_config.experimental):
+                gr.Markdown("🚧 Under construction")
+
+            with gr.TabItem("System"):
+                create_system_tab()
 
             with gr.TabItem("README"):
                 create_readme_tab()

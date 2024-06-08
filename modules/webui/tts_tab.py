@@ -90,15 +90,14 @@ def create_tts_interface():
                                 outputs=[spk_input_text],
                             )
 
-                        if config.runtime_env_vars.webui_experimental:
-                            with gr.Tab(label="Upload"):
-                                spk_input_upload = gr.File(label="Speaker (Upload)")
-                                # TODO 读取 speaker
-                                # spk_input_upload.change(
-                                #     fn=lambda x: x.read().decode("utf-8"),
-                                #     inputs=[spk_input_upload],
-                                #     outputs=[spk_input_text],
-                                # )
+                        with gr.Tab(label="Upload", visible=webui_config.experimental):
+                            spk_input_upload = gr.File(label="Speaker (Upload)")
+                            # TODO 读取 speaker
+                            # spk_input_upload.change(
+                            #     fn=lambda x: x.read().decode("utf-8"),
+                            #     inputs=[spk_input_upload],
+                            #     outputs=[spk_input_text],
+                            # )
             with gr.Group():
                 gr.Markdown("💃Inference Seed")
                 infer_seed_input = gr.Number(
@@ -122,85 +121,61 @@ def create_tts_interface():
                 prompt2_input = gr.Textbox(label="Prompt 2")
                 prefix_input = gr.Textbox(label="Prefix")
 
-                if config.runtime_env_vars.webui_experimental:
-                    prompt_audio = gr.File(label="prompt_audio")
+                prompt_audio = gr.File(
+                    label="prompt_audio", visible=webui_config.experimental
+                )
 
             infer_seed_rand_button.click(
                 lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
                 inputs=[infer_seed_input],
                 outputs=[infer_seed_input],
             )
-        with gr.Column(scale=3):
-            with gr.Row():
-                with gr.Column(scale=4):
-                    with gr.Group():
-                        input_title = gr.Markdown(
-                            "📝Text Input",
-                            elem_id="input-title",
-                        )
-                        gr.Markdown(
-                            f"- 字数限制{webui_config.tts_max:,}字，超过部分截断"
-                        )
-                        gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`")
-                        gr.Markdown(
-                            "- If the input text is all in English, it is recommended to check disable_normalize"
-                        )
-                        text_input = gr.Textbox(
-                            show_label=False,
-                            label="Text to Speech",
-                            lines=10,
-                            placeholder="输入文本或选择示例",
-                            elem_id="text-input",
-                        )
-                        # TODO 字数统计，其实实现很好写，但是就是会触发loading...并且还要和后端交互...
-                        # text_input.change(
-                        #     fn=lambda x: (
-                        #         f"📝Text Input ({len(x)} char)"
-                        #         if x
-                        #         else (
-                        #             "📝Text Input (0 char)"
-                        #             if not x
-                        #             else "📝Text Input (0 char)"
-                        #         )
-                        #     ),
-                        #     inputs=[text_input],
-                        #     outputs=[input_title],
-                        # )
-                        with gr.Row():
-                            contorl_tokens = [
-                                "[laugh]",
-                                "[uv_break]",
-                                "[v_break]",
-                                "[lbreak]",
-                            ]
+        with gr.Column(scale=4):
+            with gr.Group():
+                input_title = gr.Markdown(
+                    "📝Text Input",
+                    elem_id="input-title",
+                )
+                gr.Markdown(f"- 字数限制{webui_config.tts_max:,}字，超过部分截断")
+                gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`")
+                gr.Markdown(
+                    "- If the input text is all in English, it is recommended to check disable_normalize"
+                )
+                text_input = gr.Textbox(
+                    show_label=False,
+                    label="Text to Speech",
+                    lines=10,
+                    placeholder="输入文本或选择示例",
+                    elem_id="text-input",
+                )
+                # TODO 字数统计，其实实现很好写，但是就是会触发loading...并且还要和后端交互...
+                # text_input.change(
+                #     fn=lambda x: (
+                #         f"📝Text Input ({len(x)} char)"
+                #         if x
+                #         else (
+                #             "📝Text Input (0 char)"
+                #             if not x
+                #             else "📝Text Input (0 char)"
+                #         )
+                #     ),
+                #     inputs=[text_input],
+                #     outputs=[input_title],
+                # )
+                with gr.Row():
+                    contorl_tokens = [
+                        "[laugh]",
+                        "[uv_break]",
+                        "[v_break]",
+                        "[lbreak]",
+                    ]
 
-                            for tk in contorl_tokens:
-                                t_btn = gr.Button(tk)
-                                t_btn.click(
-                                    lambda text, tk=tk: text + " " + tk,
-                                    inputs=[text_input],
-                                    outputs=[text_input],
-                                )
-                with gr.Column(scale=1):
-                    with gr.Group():
-                        gr.Markdown("🎶Refiner")
-                        refine_prompt_input = gr.Textbox(
-                            label="Refine Prompt",
-                            value="[oral_2][laugh_0][break_6]",
-                        )
-                        refine_button = gr.Button("✍️Refine Text")
-                        # TODO 分割句子，使用当前配置拼接为SSML，然后发送到SSML tab
-                        # send_button = gr.Button("📩Split and send to SSML")
-
-                    with gr.Group():
-                        gr.Markdown("🔊Generate")
-                        disable_normalize_input = gr.Checkbox(
-                            value=False, label="Disable Normalize"
-                        )
-                        tts_button = gr.Button(
-                            "🔊Generate Audio",
-                            variant="primary",
-                            elem_classes="big-button",
+                    for tk in contorl_tokens:
+                        t_btn = gr.Button(tk)
+                        t_btn.click(
+                            lambda text, tk=tk: text + " " + tk,
+                            inputs=[text_input],
+                            outputs=[text_input],
                         )
 
             with gr.Group():
@@ -220,6 +195,32 @@ def create_tts_interface():
             with gr.Group():
                 gr.Markdown("🎨Output")
                 tts_output = gr.Audio(label="Generated Audio")
+        with gr.Column(scale=1):
+            with gr.Group():
+                gr.Markdown("🎶Refiner")
+                refine_prompt_input = gr.Textbox(
+                    label="Refine Prompt",
+                    value="[oral_2][laugh_0][break_6]",
+                )
+                refine_button = gr.Button("✍️Refine Text")
+                # TODO 分割句子，使用当前配置拼接为SSML，然后发送到SSML tab
+                # send_button = gr.Button("📩Split and send to SSML")
+
+            with gr.Group():
+                gr.Markdown("🔊Generate")
+                disable_normalize_input = gr.Checkbox(
+                    value=False, label="Disable Normalize"
+                )
+
+                with gr.Group(visible=webui_config.experimental):
+                    gr.Markdown("💪🏼Enhance")
+                    enable_enhance = gr.Checkbox(value=False, label="Enable Enhance")
+                    enable_de_noise = gr.Checkbox(value=False, label="Enable De-noise")
+                tts_button = gr.Button(
+                    "🔊Generate Audio",
+                    variant="primary",
+                    elem_classes="big-button",
+                )
 
     refine_button.click(
         refine_text,
@@ -243,6 +244,8 @@ def create_tts_interface():
             style_input_dropdown,
             disable_normalize_input,
             batch_size_input,
+            enable_enhance,
+            enable_de_noise,
         ],
         outputs=tts_output,
     )

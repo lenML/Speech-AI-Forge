@@ -93,8 +93,10 @@ if __name__ == "__main__":
     device_id = get_and_update_env(args, "device_id", None, str)
     use_cpu = get_and_update_env(args, "use_cpu", [], list)
     compile = get_and_update_env(args, "compile", False, bool)
-    webui_experimental = get_and_update_env(args, "webui_experimental", False, bool)
 
+    webui_config.experimental = get_and_update_env(
+        args, "webui_experimental", False, bool
+    )
     webui_config.tts_max = get_and_update_env(args, "tts_max_len", 1000, int)
     webui_config.ssml_max = get_and_update_env(args, "ssml_max_len", 5000, int)
     webui_config.max_batch_size = get_and_update_env(args, "max_batch_size", 8, int)

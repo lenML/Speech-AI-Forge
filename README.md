@@ -166,21 +166,22 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 所有参数：
 
-| 参数               | 类型   | 默认值      | 描述                                               |
-| ------------------ | ------ | ----------- | -------------------------------------------------- |
-| `--server_name`    | `str`  | `"0.0.0.0"` | 服务器主机地址                                     |
-| `--server_port`    | `int`  | `7860`      | 服务器端口                                         |
-| `--share`          | `bool` | `False`     | 启用共享模式，允许外部访问                         |
-| `--debug`          | `bool` | `False`     | 启用调试模式                                       |
-| `--compile`        | `bool` | `False`     | 启用模型编译                                       |
-| `--auth`           | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
-| `--half`           | `bool` | `False`     | 开启 f16 半精度推理                                |
-| `--off_tqdm`       | `bool` | `False`     | 关闭 tqdm 进度条                                   |
-| `--tts_max_len`    | `int`  | `1000`      | TTS（文本到语音）的最大文本长度                    |
-| `--ssml_max_len`   | `int`  | `2000`      | SSML（语音合成标记语言）的最大文本长度             |
-| `--max_batch_size` | `int`  | `8`         | TTS 的最大批处理大小                               |
-| `--device_id`      | `str`  | `None`      | 指定使用 gpu device_id                             |
-| `--use_cpu`        | `str`  | `None`      | 当前可选值 `"all"`                                 |
+| 参数                   | 类型   | 默认值      | 描述                                               |
+| ---------------------- | ------ | ----------- | -------------------------------------------------- |
+| `--server_name`        | `str`  | `"0.0.0.0"` | 服务器主机地址                                     |
+| `--server_port`        | `int`  | `7860`      | 服务器端口                                         |
+| `--share`              | `bool` | `False`     | 启用共享模式，允许外部访问                         |
+| `--debug`              | `bool` | `False`     | 启用调试模式                                       |
+| `--compile`            | `bool` | `False`     | 启用模型编译                                       |
+| `--auth`               | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
+| `--half`               | `bool` | `False`     | 开启 f16 半精度推理                                |
+| `--off_tqdm`           | `bool` | `False`     | 关闭 tqdm 进度条                                   |
+| `--tts_max_len`        | `int`  | `1000`      | TTS（文本到语音）的最大文本长度                    |
+| `--ssml_max_len`       | `int`  | `2000`      | SSML（语音合成标记语言）的最大文本长度             |
+| `--max_batch_size`     | `int`  | `8`         | TTS 的最大批处理大小                               |
+| `--device_id`          | `str`  | `None`      | 指定使用 gpu device_id                             |
+| `--use_cpu`            | `str`  | `None`      | 当前可选值 `"all"`                                 |
+| `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
 
 ## Benchmark
 

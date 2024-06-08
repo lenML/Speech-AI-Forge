@@ -7,6 +7,7 @@ from modules.devices import devices
 import logging
 import gc
 
+
 logger = logging.getLogger(__name__)
 
 chat_tts = None
@@ -36,17 +37,10 @@ def load_chat_tts_in_thread():
     logger.info("ChatTTS models loaded")
 
 
-def initialize_chat_tts():
+def load_chat_tts():
     with lock:
         if chat_tts is None:
-            model_thread = threading.Thread(target=load_chat_tts_in_thread)
-            model_thread.start()
-            model_thread.join()
-
-
-def load_chat_tts():
-    if chat_tts is None:
-        initialize_chat_tts()
+            load_chat_tts_in_thread()
     if chat_tts is None:
         raise Exception("Failed to load ChatTTS models")
     return chat_tts

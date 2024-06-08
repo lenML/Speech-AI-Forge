@@ -167,4 +167,6 @@ cython_debug/
 *.webm
 
 # models
-/models/Denoise/audio-denoiser
+/models/**/*.pt
+/models/**/*.bin
+/models/**/*.json

@@ -1,6 +1,9 @@
 from typing import Union
 import numpy as np
 
+from modules.Enhancer.ResembleEnhance import load_enhancer
+from modules.denoise import TTSAudioDenoiser
+from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
 from modules.hf import spaces
 from modules.webui import webui_config
@@ -48,6 +51,28 @@ def segments_length_limit(
 
 @torch.inference_mode()
 @spaces.GPU
+def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
+    audio_data = torch.from_numpy(audio_data).float().squeeze().cpu()
+    if enable_denoise or enable_enhance:
+        enhancer = load_enhancer(devices.device)
+        if enable_denoise:
+            audio_data, sr = enhancer.denoise(audio_data, sr, devices.device)
+        if enable_enhance:
+            audio_data, sr = enhancer.enhance(
+                audio_data,
+                sr,
+                devices.device,
+                tau=0.9,
+                nfe=64,
+                solver="euler",
+                lambd=0.5,
+            )
+    audio_data = audio_data.cpu().numpy()
+    return audio_data, int(sr)
+
+
+@torch.inference_mode()
+@spaces.GPU
 def synthesize_ssml(ssml: str, batch_size=4):
     try:
         batch_size = int(batch_size)
@@ -90,6 +115,8 @@ def tts_generate(
     style,
     disable_normalize=False,
     batch_size=4,
+    enable_enhance=False,
+    enable_denoise=False,
 ):
     try:
         batch_size = int(batch_size)
@@ -117,7 +144,7 @@ def tts_generate(
     prompt1 = prompt1 or params.get("prompt1", "")
     prompt2 = prompt2 or params.get("prompt2", "")
 
-    infer_seed = np.clip(infer_seed, -1, 2**32 - 1, out=None, dtype=np.int64)
+    infer_seed = np.clip(infer_seed, -1, 2**32 - 1, out=None, dtype=np.float64)
     infer_seed = int(infer_seed)
 
     if not disable_normalize:
@@ -135,6 +162,10 @@ def tts_generate(
         prompt2=prompt2,
         prefix=prefix,
         batch_size=batch_size,
+    )
+
+    audio_data, sample_rate = apply_audio_enhance(
+        audio_data, sample_rate, enable_denoise, enable_enhance
     )
 
     audio_data = audio.audio_to_int16(audio_data)
