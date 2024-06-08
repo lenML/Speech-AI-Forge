@@ -99,6 +99,10 @@ class SpeakerManager:
                 self.speakers[speaker_file] = Speaker.from_file(
                     self.speaker_dir + speaker_file
                 )
+        # 检查是否有被删除的，同步到 speakers
+        for fname, spk in self.speakers.items():
+            if not os.path.exists(self.speaker_dir + fname):
+                del self.speakers[fname]
 
     def list_speakers(self):
         return list(self.speakers.values())
