@@ -61,7 +61,7 @@ def create_spk_from_seed(
     desc: str,
 ):
     chat_tts = load_chat_tts()
-    with SeedContext(seed):
+    with SeedContext(seed, True):
         emb = chat_tts.sample_random_speaker()
     spk = Speaker(seed=-2, name=name, gender=gender, describe=desc)
     spk.emb = emb

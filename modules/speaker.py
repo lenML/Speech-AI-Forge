@@ -11,7 +11,7 @@ import uuid
 
 def create_speaker_from_seed(seed):
     chat_tts = models.load_chat_tts()
-    with SeedContext(seed):
+    with SeedContext(seed, True):
         emb = chat_tts.sample_random_speaker()
     return emb
 

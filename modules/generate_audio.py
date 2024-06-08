@@ -72,7 +72,7 @@ def generate_audio_batch(
     }
 
     if isinstance(spk, int):
-        with SeedContext(spk):
+        with SeedContext(spk, True):
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
         logger.info(("spk", spk))
     elif isinstance(spk, Speaker):
@@ -94,7 +94,7 @@ def generate_audio_batch(
         }
     )
 
-    with SeedContext(infer_seed):
+    with SeedContext(infer_seed, True):
         wavs = chat_tts.generate_audio(
             texts, params_infer_code, use_decoder=use_decoder
         )
