@@ -75,8 +75,8 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
      - [ModelScope](https://modelscope.cn/models/pzc163/chatTTS/)
 
    - 使用脚本下载（任选其一）
-     - HuggingFace: 执行 `python ./download_models.py --source huggingface`
-     - ModelScope: 执行 `python ./download_models.py --source modelscope`
+     - HuggingFace: 执行 `python -m scripts/download_models --source huggingface`
+     - ModelScope: 执行 `python -m scripts/download_models --source modelscope`
 
 3. 安装 ffmpeg: `apt-get install ffmpeg`
 4. 安装 rubberband: `apt-get install rubberband-cli`
@@ -293,7 +293,7 @@ WIP 开发中
 
 ## 手动 build
 
-下载模型: `python ./download_models.py`
+下载模型: `python -m scripts/download_models --source huggingface`
 
 - webui: `docker-compose -f ./docker-cmopose.webui.yml up -d`
 - api: `docker-compose -f ./docker-cmopose.api.yml up -d`
