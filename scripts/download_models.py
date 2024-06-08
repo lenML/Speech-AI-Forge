@@ -27,9 +27,9 @@ def main():
             continue
 
         if args.source == "modelscope":
-            downloader.download_from_modelscope()
+            downloader.from_modelscope()
         elif args.source == "huggingface":
-            downloader.download_from_huggingface()
+            downloader.from_huggingface()
         else:
             raise ValueError("Invalid source")
 
