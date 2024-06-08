@@ -1,19 +1,28 @@
 # Changelog
 
-<a name="0.5.5-rc"></a>
-## 0.5.5-rc (2024-06-08)
+<a name="0.5.5"></a>
+## 0.5.5 (2024-06-08)
 
 ### Added
 
+- ✨ add webui speaker creator [[df26549](https://github.com/lenML/ChatTTS-Forge/commit/df265490f35b2b991c395455dd2f4ad563193cef)]
+- ✨ webui speaker tab and merger [[7ad71fd](https://github.com/lenML/ChatTTS-Forge/commit/7ad71fddb61f3b41b3af66d201f6105ca09539d9)]
+- ✨ add enhance download script [[37adec6](https://github.com/lenML/ChatTTS-Forge/commit/37adec6de3109b3829602c7c7be06fd7247f10eb)]
 - ✨ add audio enhance/denoise [[00cbc8e](https://github.com/lenML/ChatTTS-Forge/commit/00cbc8e96833fbcaf6cc224dc330908fa647f317)]
 - ✅ add speakers api test [[fbe4304](https://github.com/lenML/ChatTTS-Forge/commit/fbe4304c6716fb182442d356dbe3976982ca9d2b)]
 - ✅ add unit test [[e7f9385](https://github.com/lenML/ChatTTS-Forge/commit/e7f938562c1173899cc4e7330d59a8e354cafea4)]
 
 ### Changed
 
+- ♿ pin resemble-enhance [[b8f41f9](https://github.com/lenML/ChatTTS-Forge/commit/b8f41f90061c75ee3e09ddc6cae8d657bc67aad1)]
+- ⚡ 调整 speaker 合并 step [[906ecc3](https://github.com/lenML/ChatTTS-Forge/commit/906ecc3d295d90459485cd131563ffd588914d52)]
 - ♻️ SSML refactor [[6666082](https://github.com/lenML/ChatTTS-Forge/commit/6666082375c43b143d242bf425053e2ae661eb09)]
 - ♻️ webui refactor [[7585282](https://github.com/lenML/ChatTTS-Forge/commit/75852822f7d9cd8b95b557e2870e5435a0932fa1)]
 - ⚡ add benchmark [[ddb7670](https://github.com/lenML/ChatTTS-Forge/commit/ddb76704e5e6847bb0eeca2c0b50764a66783686)]
+
+### Removed
+
+- 🔥 remove trainer [[0c80c24](https://github.com/lenML/ChatTTS-Forge/commit/0c80c2437fb8e8b231ae770205089198f4ac1c13)]
 
 ### Fixed
 
@@ -24,6 +33,9 @@
 
 ### Miscellaneous
 
+- 🐳 fix pip requirements [[4256371](https://github.com/lenML/ChatTTS-Forge/commit/4256371c9d3d8d290840a98fb6ac7bc19268a1e7)]
+- 📝 update [[8bfbbc6](https://github.com/lenML/ChatTTS-Forge/commit/8bfbbc6146379cec0f468a5867707b3baf4e2b04)]
+- 📝 update [[aab41ed](https://github.com/lenML/ChatTTS-Forge/commit/aab41ed4f25a132c0e0e4e4cb0e3c851b905a30a)]
 - 📝 update [[13eb1c5](https://github.com/lenML/ChatTTS-Forge/commit/13eb1c518d8bbc8d26b14fd0e3649ee7158b2a7f)]
 - 📝 add Changelog [[4d1aece](https://github.com/lenML/ChatTTS-Forge/commit/4d1aece3d8eb89a9b0f3cf7ba90bb76c99b640d2)]
 
