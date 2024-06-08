@@ -3,12 +3,20 @@ import torch
 from modules.webui.webui_utils import (
     get_speakers,
     get_styles,
+    load_spk_info,
     refine_text,
     tts_generate,
 )
 from modules.webui import webui_config
 from modules.webui.examples import example_texts
 from modules import config
+
+default_text_content = """
+chat T T S 是一款强大的对话式文本转语音模型。它有中英混读和多说话人的能力。
+chat T T S 不仅能够生成自然流畅的语音，还能控制[laugh]笑声啊[laugh]，
+停顿啊[uv_break]语气词啊等副语言现象[uv_break]。这个韵律超越了许多开源模型[uv_break]。
+请注意，chat T T S 的使用应遵守法律和伦理准则，避免滥用的安全风险。[uv_break]
+"""
 
 
 def create_tts_interface():
@@ -90,14 +98,18 @@ def create_tts_interface():
                                 outputs=[spk_input_text],
                             )
 
-                        with gr.Tab(label="Upload", visible=webui_config.experimental):
-                            spk_input_upload = gr.File(label="Speaker (Upload)")
-                            # TODO 读取 speaker
-                            # spk_input_upload.change(
-                            #     fn=lambda x: x.read().decode("utf-8"),
-                            #     inputs=[spk_input_upload],
-                            #     outputs=[spk_input_text],
-                            # )
+                        with gr.Tab(label="Upload"):
+                            spk_file_upload = gr.File(label="Speaker (Upload)")
+
+                            gr.Markdown("📝Speaker info")
+                            infos = gr.Markdown("empty")
+
+                            spk_file_upload.change(
+                                fn=load_spk_info,
+                                inputs=[spk_file_upload],
+                                outputs=[infos],
+                            ),
+
             with gr.Group():
                 gr.Markdown("💃Inference Seed")
                 infer_seed_input = gr.Number(
@@ -147,6 +159,7 @@ def create_tts_interface():
                     lines=10,
                     placeholder="输入文本或选择示例",
                     elem_id="text-input",
+                    value=default_text_content,
                 )
                 # TODO 字数统计，其实实现很好写，但是就是会触发loading...并且还要和后端交互...
                 # text_input.change(
@@ -203,8 +216,6 @@ def create_tts_interface():
                     value="[oral_2][laugh_0][break_6]",
                 )
                 refine_button = gr.Button("✍️Refine Text")
-                # TODO 分割句子，使用当前配置拼接为SSML，然后发送到SSML tab
-                # send_button = gr.Button("📩Split and send to SSML")
 
             with gr.Group():
                 gr.Markdown("🔊Generate")
@@ -247,6 +258,7 @@ def create_tts_interface():
             batch_size_input,
             enable_enhance,
             enable_de_noise,
+            spk_file_upload,
         ],
         outputs=tts_output,
     )

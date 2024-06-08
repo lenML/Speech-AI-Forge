@@ -2,7 +2,6 @@ from typing import Union
 import numpy as np
 
 from modules.Enhancer.ResembleEnhance import load_enhancer
-from modules.denoise import TTSAudioDenoiser
 from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
 from modules.hf import spaces
@@ -13,7 +12,7 @@ import torch
 from modules.ssml_parser.SSMLParser import create_ssml_parser, SSMLBreak, SSMLSegment
 from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 
-from modules.speaker import speaker_mgr
+from modules.speaker import speaker_mgr, Speaker
 from modules.data import styles_mgr
 
 from modules.api.utils import calc_spk_style
@@ -31,6 +30,22 @@ def get_speakers():
 
 def get_styles():
     return styles_mgr.list_items()
+
+
+def load_spk_info(file):
+    if file is None:
+        return "empty"
+    try:
+
+        spk: Speaker = Speaker.from_file(file)
+        infos = spk.to_json()
+        return f"""
+- name: {infos.name}
+- gender: {infos.gender}
+- describe: {infos.describe}
+    """.strip()
+    except:
+        return "load failed"
 
 
 def segments_length_limit(
@@ -103,20 +118,21 @@ def synthesize_ssml(ssml: str, batch_size=4):
 @spaces.GPU
 def tts_generate(
     text,
-    temperature,
-    top_p,
-    top_k,
-    spk,
-    infer_seed,
-    use_decoder,
-    prompt1,
-    prompt2,
-    prefix,
-    style,
+    temperature=0.3,
+    top_p=0.7,
+    top_k=20,
+    spk=-1,
+    infer_seed=-1,
+    use_decoder=True,
+    prompt1="",
+    prompt2="",
+    prefix="",
+    style="",
     disable_normalize=False,
     batch_size=4,
     enable_enhance=False,
     enable_denoise=False,
+    spk_file=None,
 ):
     try:
         batch_size = int(batch_size)
@@ -149,6 +165,9 @@ def tts_generate(
 
     if not disable_normalize:
         text = text_normalize(text)
+
+    if spk_file:
+        spk = Speaker.from_file(spk_file)
 
     sample_rate, audio_data = synthesize_audio(
         text=text,

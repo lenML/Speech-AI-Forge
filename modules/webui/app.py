@@ -95,10 +95,8 @@ def create_interface():
             with gr.TabItem("Spilter"):
                 create_spliter_tab(ssml_input, tabs=tabs)
 
-            with gr.TabItem("Speaker", visible=webui_config.experimental):
+            with gr.TabItem("Speaker"):
                 create_speaker_panel()
-            with gr.TabItem("Denoise", visible=webui_config.experimental):
-                gr.Markdown("🚧 Under construction")
             with gr.TabItem("Inpainting", visible=webui_config.experimental):
                 gr.Markdown("🚧 Under construction")
             with gr.TabItem("ASR", visible=webui_config.experimental):

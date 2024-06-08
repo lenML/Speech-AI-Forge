@@ -1,5 +1,6 @@
 import os
 from typing import Union
+from box import Box
 import torch
 
 from modules import models
@@ -16,6 +17,18 @@ def create_speaker_from_seed(seed):
 
 
 class Speaker:
+    @staticmethod
+    def from_file(file_like):
+        speaker = torch.load(file_like, map_location=torch.device("cpu"))
+        speaker.fix()
+        return speaker
+
+    @staticmethod
+    def from_tensor(tensor):
+        speaker = Speaker(seed=-2)
+        speaker.emb = tensor
+        return speaker
+
     def __init__(self, seed, name="", gender="", describe=""):
         self.id = uuid.uuid4()
         self.seed = seed
@@ -28,14 +41,16 @@ class Speaker:
         self.tokens = []
 
     def to_json(self, with_emb=False):
-        return {
-            "id": str(self.id),
-            "seed": self.seed,
-            "name": self.name,
-            "gender": self.gender,
-            "describe": self.describe,
-            "emb": self.emb.tolist() if with_emb else None,
-        }
+        return Box(
+            **{
+                "id": str(self.id),
+                "seed": self.seed,
+                "name": self.name,
+                "gender": self.gender,
+                "describe": self.describe,
+                "emb": self.emb.tolist() if with_emb else None,
+            }
+        )
 
     def fix(self):
         is_update = False
@@ -81,14 +96,9 @@ class SpeakerManager:
         self.speakers = {}
         for speaker_file in os.listdir(self.speaker_dir):
             if speaker_file.endswith(".pt"):
-                speaker = torch.load(
-                    self.speaker_dir + speaker_file, map_location=torch.device("cpu")
+                self.speakers[speaker_file] = Speaker.from_file(
+                    self.speaker_dir + speaker_file
                 )
-                self.speakers[speaker_file] = speaker
-
-                is_update = speaker.fix()
-                if is_update:
-                    torch.save(speaker, self.speaker_dir + speaker_file)
 
     def list_speakers(self):
         return list(self.speakers.values())
