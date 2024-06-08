@@ -1,6 +1,8 @@
 # 🍦 ChatTTS-Forge
 
-ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过类 SSML 语法生成丰富的音频长文本，并提供全面的 API 服务，适用于各种场景。
+ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。
+
+![banner](./docs/banner.png)
 
 你可以通过以下几种方式体验和部署 ChatTTS-Forge：
 
@@ -11,7 +13,40 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 | **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                |
 | **本地部署** | 查看环境准备部分         | [本地部署](#本地部署)                                                                                                                                            |
 
-## Features
+## 1. <a name='INDEX'></a>INDEX
+
+<!-- vscode-markdown-toc -->
+
+- 1. [INDEX](#INDEX)
+- 2. [Features](#Features)
+- 3. [Interface](#Interface)
+- 4. [本地部署](#)
+  - 4.1. [`launch.py`: API Server](#launch.py:APIServer)
+    - 4.1.1. [OpenAI API: `v1/audio/speech`](#OpenAIAPI:v1audiospeech)
+    - 4.1.2. [Google API: `/v1/text:synthesize`](#GoogleAPI:v1text:synthesize)
+  - 4.2. [`webui.py`: WebUI](#webui.py:WebUI)
+    - 4.2.1. [webui features](#webuifeatures)
+- 5. [Benchmark](#Benchmark)
+  - 5.1. [demo](#demo)
+    - 5.1.1. [风格化控制](#-1)
+    - 5.1.2. [长文本生成](#-1)
+- 6. [SSML](#SSML)
+- 7. [Speaking style](#Speakingstyle)
+- 8. [镜像](#-1)
+- 9. [手动 build](#build)
+- 10. [Roadmap](#Roadmap)
+- 11. [FAQ](#FAQ)
+  - 11.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
+  - 11.2. [什么是 Prefix？](#Prefix)
+  - 11.3. [Style 中 `_p` 的区别是什么？](#Style_p)
+
+<!-- vscode-markdown-toc-config
+	numbering=true
+	autoSave=true
+	/vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+## 2. <a name='Features'></a>Features
 
 - **全面的 API 服务**: 提供所有功能的 API 访问，方便集成。
 - **超长文本生成**: 支持生成 1000 字以上的长文本，保持一致性。
@@ -30,8 +65,11 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
   - **Emoji 适配**: 自动翻译 emoji 为可读文本。
   - **基于分词器**: 基于 tokenizer 预处理文本，覆盖模型所有不支持字符范围。
   - **中英文识别**: 适配英文环境。
+- **音质增强**: 继承音质增强、降噪模型提升输出质量
+- **Speaker 导入导出**: 支持 Speaker 导入导出，方便定制
+- **Speaker 合并**: 支持 Speaker 合并，微调说话人
 
-## Interface
+## 3. <a name='Interface'></a>Interface
 
 <table>
   <tr>
@@ -58,7 +96,7 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
   </tr>
 </table>
 
-## 本地部署
+## 4. <a name=''></a>本地部署
 
 > f32 模型显存需要 2gb 左右
 
@@ -87,7 +125,7 @@ ChatTTS-Forge 是一个功能强大的文本转语音生成工具，支持通过
 
 > 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
 
-### launch.py
+### 4.1. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务器。
 
@@ -111,7 +149,7 @@ Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务�
 
 launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
 
-#### OpenAI API: `v1/audio/speech`
+#### 4.1.1. <a name='OpenAIAPI:v1audiospeech'></a>OpenAI API: `v1/audio/speech`
 
 openai 接口比较简单，`input` 为必填项，其余均可为空。
 
@@ -132,7 +170,7 @@ curl http://localhost:8000/v1/audio/speech \
 
 也可以使用 openai 库调用，具体可以看 [openai 官方文档](https://platform.openai.com/docs/guides/text-to-speech)
 
-#### Google API: `/v1/text:synthesize`
+#### 4.1.2. <a name='GoogleAPI:v1text:synthesize'></a>Google API: `/v1/text:synthesize`
 
 google 接口略复杂，但是某些时候用这个是必要的，因为这个接口将会返回 base64 格式的 audio
 
@@ -160,7 +198,7 @@ curl "http://localhost:8000/v1/text:synthesize" -X POST \
 }' -o response.json
 ```
 
-### webui.py
+### 4.2. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
 
 WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
@@ -183,7 +221,29 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--use_cpu`            | `str`  | `None`      | 当前可选值 `"all"`                                 |
 | `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
 
-## Benchmark
+#### 4.2.1. <a name='webuifeatures'></a>webui features
+
+[点我看详细图文介绍](./docs/webui_features.md)
+
+- ChatTTS 模型原生功能 Refiner/Generate
+- 原生 Batch 合成，高效合成超长文本
+- Style control
+- SSML
+- Spliter 超长文本预处理
+- Speaker
+  - 支持 seed 指定 speaker
+  - 内置众多 speaker 可以使用
+  - 支持 speaker embdding 上传，可以复用保存下来的 speaker
+  - Speaker merge: 支持合并说话人，微调 speaker
+- Prompt Slot
+- Text Normalize
+- Experimental 实验功能
+  - enhance: 音质增强提高输出质量
+  - denoise: 去除噪音
+  - [WIP] ASR
+  - [WIP] Inpainting
+
+## 5. <a name='Benchmark'></a>Benchmark
 
 > 可使用 `./tests/benchmark/tts_benchmark.py` 复现
 
@@ -213,9 +273,9 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 
-### demo
+### 5.1. <a name='demo'></a>demo
 
-#### 风格化控制
+#### 5.1.1. <a name='-1'></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -255,7 +315,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 </details>
 
-#### 长文本生成
+#### 5.1.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -277,21 +337,21 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 </details>
 
-## SSML
+## 6. <a name='SSML'></a>SSML
 
 [SSML readme](./docs/SSML.md)
 
-## Speaking style
+## 7. <a name='Speakingstyle'></a>Speaking style
 
 [style readme](./docs/sytles.md)
 
 # Docker
 
-## 镜像
+## 8. <a name='-1'></a>镜像
 
 WIP 开发中
 
-## 手动 build
+## 9. <a name='build'></a>手动 build
 
 下载模型: `python -m scripts/download_models --source huggingface`
 
@@ -303,24 +363,24 @@ WIP 开发中
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-## Roadmap
+## 10. <a name='Roadmap'></a>Roadmap
 
 WIP
 
-## FAQ
+## 11. <a name='FAQ'></a>FAQ
 
-### 什么是 Prompt1 和 Prompt2？
+### 11.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
 
 Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
 
 - Prompt1 插入到第一个 [Stts] 之前
 - Prompt2 插入到第一个 [Stts] 之后
 
-### 什么是 Prefix？
+### 11.2. <a name='Prefix'></a>什么是 Prefix？
 
 Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
 
-### Style 中 `_p` 的区别是什么？
+### 11.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
 
 Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
 
