@@ -5,12 +5,13 @@ from modules.webui.webui_utils import (
     get_speakers,
     get_styles,
     split_long_text,
-    synthesize_ssml,
 )
-from modules.webui import webui_config
-from modules.webui.examples import ssml_examples, default_ssml
+from modules.hf import spaces
 
 
+# NOTE: 因为 text_normalize 需要使用 tokenizer
+@torch.inference_mode()
+@spaces.GPU
 def merge_dataframe_to_ssml(dataframe, spk, style, seed):
     if style == "*auto":
         style = None
@@ -31,7 +32,7 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
         if seed:
             ssml += f' seed="{seed}"'
         ssml += ">\n"
-        ssml += f"{indent}{indent}{text_normalize(row[1])}\n"
+        ssml += f"{indent}{indent}{text_normalize(row.iloc[1])}\n"
         ssml += f"{indent}</voice>\n"
     return f"<speak version='0.1'>\n{ssml}</speak>"
 
