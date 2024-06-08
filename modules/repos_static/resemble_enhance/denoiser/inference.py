@@ -3,8 +3,10 @@ from functools import cache
 
 import torch
 
+from ..denoiser.denoiser import Denoiser
+
 from ..inference import inference
-from .train import Denoiser, HParams
+from .hparams import HParams
 
 logger = logging.getLogger(__name__)
 

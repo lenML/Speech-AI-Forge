@@ -9,8 +9,6 @@ from torch.distributions import Beta
 from ..common import Normalizer
 from ..denoiser.inference import load_denoiser
 from ..melspec import MelSpectrogram
-from ..utils.distributed import global_leader_only
-from ..utils.train_loop import TrainLoop
 from .hparams import HParams
 from .lcfm import CFM, IRMAE, LCFM
 from .univnet import UnivNet
@@ -69,7 +67,10 @@ class Enhancer(nn.Module):
         self.register_buffer("dummy", torch.zeros(1))
 
         if self.hp.enhancer_stage1_run_dir is not None:
-            pretrained_path = self.hp.enhancer_stage1_run_dir / "ds/G/default/mp_rank_00_model_states.pt"
+            pretrained_path = (
+                self.hp.enhancer_stage1_run_dir
+                / "ds/G/default/mp_rank_00_model_states.pt"
+            )
             self._load_pretrained(pretrained_path)
 
         logger.info(f"{self.__class__.__name__} summary")
@@ -78,7 +79,9 @@ class Enhancer(nn.Module):
     def _load_pretrained(self, path):
         # Clone is necessary as otherwise it holds a reference to the original model
         cfm_state_dict = {k: v.clone() for k, v in self.lcfm.cfm.state_dict().items()}
-        denoiser_state_dict = {k: v.clone() for k, v in self.denoiser.state_dict().items()}
+        denoiser_state_dict = {
+            k: v.clone() for k, v in self.denoiser.state_dict().items()
+        }
         state_dict = torch.load(path, map_location="cpu")["module"]
         self.load_state_dict(state_dict, strict=False)
         self.lcfm.cfm.load_state_dict(cfm_state_dict)  # Reset cfm
@@ -105,25 +108,6 @@ class Enhancer(nn.Module):
         if drop_last:
             return self.mel_fn(x)[..., :-1]  # (b d t)
         return self.mel_fn(x)
-
-    @global_leader_only
-    @torch.no_grad()
-    def _visualize(self, original_mel, denoised_mel):
-        loop = TrainLoop.get_running_loop()
-        if loop is None or loop.global_step % 100 != 0:
-            return
-
-        plt.figure(figsize=(6, 6))
-        plt.subplot(211)
-        plt.title("Original")
-        plt.imshow(original_mel[0].cpu().numpy(), origin="lower", interpolation="none")
-        plt.subplot(212)
-        plt.title("Denoised")
-        plt.imshow(denoised_mel[0].cpu().numpy(), origin="lower", interpolation="none")
-        plt.tight_layout()
-
-        path = loop.get_running_loop_viz_path("input", ".png")
-        plt.savefig(path, dpi=300)
 
     def _may_denoise(self, x: Tensor, y: Tensor | None = None):
         if self.hp.lcfm_training_mode == "cfm":
@@ -167,7 +151,9 @@ class Enhancer(nn.Module):
             if self.training:
                 lambd = Beta(0.2, 0.2).sample(x.shape[:1]).to(x.device)
                 lambd = lambd[:, None, None]
-                x_mel_denoised = self.normalizer(self.to_mel(self._may_denoise(x, z)), update=False)
+                x_mel_denoised = self.normalizer(
+                    self.to_mel(self._may_denoise(x, z)), update=False
+                )
                 x_mel_denoised = x_mel_denoised.detach()
                 x_mel_denoised = lambd * x_mel_denoised + (1 - lambd) * x_mel_original
                 self._visualize(x_mel_original, x_mel_denoised)
@@ -176,9 +162,13 @@ class Enhancer(nn.Module):
                 if lambd == 0:
                     x_mel_denoised = x_mel_original
                 else:
-                    x_mel_denoised = self.normalizer(self.to_mel(self._may_denoise(x, z)), update=False)
+                    x_mel_denoised = self.normalizer(
+                        self.to_mel(self._may_denoise(x, z)), update=False
+                    )
                     x_mel_denoised = x_mel_denoised.detach()
-                    x_mel_denoised = lambd * x_mel_denoised + (1 - lambd) * x_mel_original
+                    x_mel_denoised = (
+                        lambd * x_mel_denoised + (1 - lambd) * x_mel_original
+                    )
         else:
             x_mel_denoised = x_mel_original
 
