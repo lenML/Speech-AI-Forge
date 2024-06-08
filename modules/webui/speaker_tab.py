@@ -161,7 +161,11 @@ def create_speaker_panel():
                                 choices=speaker_names, value="None", label="Speaker A"
                             )
                             spk_a_w = gr.Slider(
-                                value=1, minimum=0, maximum=10, step=1, label="Weight A"
+                                value=1,
+                                minimum=0,
+                                maximum=10,
+                                step=0.1,
+                                label="Weight A",
                             )
 
                         with gr.Group():
@@ -169,7 +173,11 @@ def create_speaker_panel():
                                 choices=speaker_names, value="None", label="Speaker B"
                             )
                             spk_b_w = gr.Slider(
-                                value=1, minimum=0, maximum=10, step=1, label="Weight B"
+                                value=1,
+                                minimum=0,
+                                maximum=10,
+                                step=0.1,
+                                label="Weight B",
                             )
 
                         with gr.Group():
@@ -177,7 +185,11 @@ def create_speaker_panel():
                                 choices=speaker_names, value="None", label="Speaker C"
                             )
                             spk_c_w = gr.Slider(
-                                value=1, minimum=0, maximum=10, step=1, label="Weight C"
+                                value=1,
+                                minimum=0,
+                                maximum=10,
+                                step=0.1,
+                                label="Weight C",
                             )
 
                         with gr.Group():
@@ -185,7 +197,11 @@ def create_speaker_panel():
                                 choices=speaker_names, value="None", label="Speaker D"
                             )
                             spk_d_w = gr.Slider(
-                                value=1, minimum=0, maximum=10, step=1, label="Weight D"
+                                value=1,
+                                minimum=0,
+                                maximum=10,
+                                step=0.1,
+                                label="Weight D",
                             )
 
                     with gr.Row():
