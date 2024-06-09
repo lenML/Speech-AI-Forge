@@ -19,7 +19,11 @@ def audio_to_int16(audio_data):
     return audio_data
 
 
-def audiosegment_to_librosawav(audiosegment):
+def audiosegment_to_librosawav(audiosegment: AudioSegment) -> np.ndarray:
+    """
+    Converts pydub audio segment into np.float32 of shape [duration_in_seconds*sample_rate, channels],
+    where each value is in range [-1.0, 1.0].
+    """
     channel_sounds = audiosegment.split_to_mono()
     samples = [s.get_array_of_samples() for s in channel_sounds]
 

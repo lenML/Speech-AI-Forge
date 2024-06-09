@@ -107,7 +107,12 @@ def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
 
 @torch.inference_mode()
 @spaces.GPU
-def synthesize_ssml(ssml: str, batch_size=4):
+def synthesize_ssml(
+    ssml: str,
+    batch_size=4,
+    enable_enhance=False,
+    enable_denoise=False,
+):
     try:
         batch_size = int(batch_size)
     except Exception:
@@ -130,7 +135,14 @@ def synthesize_ssml(ssml: str, batch_size=4):
     audio_segments = synthesize.synthesize_segments(segments)
     combined_audio = combine_audio_segments(audio_segments)
 
-    sr, audio_data = audio.pydub_to_np(combined_audio)
+    sr = combined_audio.frame_rate
+    audio_data, sr = apply_audio_enhance(
+        audio.audiosegment_to_librosawav(combined_audio),
+        sr,
+        enable_denoise,
+        enable_enhance,
+    )
+
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio.audio_to_int16(audio_data)
 

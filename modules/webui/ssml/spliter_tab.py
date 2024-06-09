@@ -35,7 +35,8 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
         ssml += ">\n"
         ssml += f"{indent}{indent}{text_normalize(row.iloc[1])}\n"
         ssml += f"{indent}</voice>\n"
-    return f"<speak version='0.1'>\n{ssml}</speak>"
+    # 原封不动输出回去是为了触发 loadding 效果
+    return dataframe, spk, style, seed, f"<speak version='0.1'>\n{ssml}</speak>"
 
 
 # 长文本处理
@@ -153,7 +154,13 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
             style_input_dropdown,
             infer_seed_input,
         ],
-        outputs=[ssml_input],
+        outputs=[
+            long_text_output,
+            spk_input_text,
+            style_input_dropdown,
+            infer_seed_input,
+            ssml_input,
+        ],
     )
 
     def change_tab():

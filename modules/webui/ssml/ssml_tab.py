@@ -37,6 +37,12 @@ def create_ssml_interface():
                     maximum=webui_config.max_batch_size,
                     step=1,
                 )
+
+            with gr.Group():
+                gr.Markdown("💪🏼Enhance")
+                enable_enhance = gr.Checkbox(value=True, label="Enable Enhance")
+                enable_de_noise = gr.Checkbox(value=False, label="Enable De-noise")
+
             with gr.Group():
                 gr.Markdown("🎄Examples")
                 gr.Examples(
@@ -48,7 +54,7 @@ def create_ssml_interface():
 
     ssml_button.click(
         synthesize_ssml,
-        inputs=[ssml_input, batch_size_input],
+        inputs=[ssml_input, batch_size_input, enable_enhance, enable_de_noise],
         outputs=ssml_output,
     )
 

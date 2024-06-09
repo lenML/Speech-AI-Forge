@@ -53,7 +53,7 @@ podcast_default_case = [
 # NOTE: 因为 text_normalize 需要使用 tokenizer
 @torch.inference_mode()
 @spaces.GPU
-def merge_dataframe_to_ssml(df: pd.DataFrame):
+def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
     ssml = ""
     indent = " " * 2
 
@@ -70,7 +70,8 @@ def merge_dataframe_to_ssml(df: pd.DataFrame):
         ssml += ">\n"
         ssml += f"{indent}{indent}{text_normalize(text)}\n"
         ssml += f"{indent}</voice>\n"
-    return f"<speak version='0.1'>\n{ssml}</speak>"
+    # 原封不动输出回去是为了触发 loadding 效果
+    return msg, spk, style, f"<speak version='0.1'>\n{ssml}</speak>"
 
 
 def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Tabs):
@@ -163,11 +164,14 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
             columns=["index", "speaker", "text", "style"],
         )
 
-    def send_to_ssml(sheet: pd.DataFrame):
+    def send_to_ssml(msg, spk, style, sheet: pd.DataFrame):
         if sheet.empty:
             return gr.Error("Please add some text to the script table.")
-        ssml = merge_dataframe_to_ssml(sheet)
+        msg, spk, style, ssml = merge_dataframe_to_ssml(msg, spk, style, sheet)
         return [
+            msg,
+            spk,
+            style,
             gr.Textbox(value=ssml),
             gr.Tabs(selected="ssml"),
             gr.Tabs(selected="ssml.editor"),
@@ -194,6 +198,13 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
     )
     send_to_ssml_btn.click(
         send_to_ssml,
-        inputs=[script_table],
-        outputs=[ssml_input, tabs1, tabs2],
+        inputs=[msg, spk_input_dropdown, style_input_dropdown, script_table],
+        outputs=[
+            msg,
+            spk_input_dropdown,
+            style_input_dropdown,
+            ssml_input,
+            tabs1,
+            tabs2,
+        ],
     )
