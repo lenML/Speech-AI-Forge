@@ -127,6 +127,8 @@ def inference(
 ):
     if config.runtime_env_vars.off_tqdm:
         trange = range
+    else:
+        from tqdm import trange
 
     remove_weight_norm_recursively(model)
 
