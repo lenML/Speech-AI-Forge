@@ -1,13 +1,11 @@
 import os
 import logging
-from functools import partial
 from omegaconf import OmegaConf
 
 import torch
 from vocos import Vocos
 from .model.dvae import DVAE
 from .model.gpt import GPT_warpper
-from .utils.gpu_utils import select_device
 from .utils.infer_utils import (
     count_invalid_characters,
     detect_language,
@@ -107,9 +105,7 @@ class Chat:
         dtype_gpt: torch.dtype = None,
         dtype_decoder: torch.dtype = None,
     ):
-        if not device:
-            device = select_device(4096)
-            self.logger.log(logging.INFO, f"use {device}")
+        assert device is not None, "device should not be None"
 
         dtype_vocos = dtype_vocos or dtype
         dtype_dvae = dtype_dvae or dtype
@@ -179,22 +175,12 @@ class Chat:
         params_refine_text={},
         params_infer_code={"prompt": "[speed_5]"},
         use_decoder=True,
-        do_text_normalization=True,
-        lang=None,
     ):
 
         assert self.check_model(use_decoder=use_decoder)
 
         if not isinstance(text, list):
             text = [text]
-
-        if do_text_normalization:
-            for i, t in enumerate(text):
-                _lang = detect_language(t) if lang is None else lang
-                self.init_normalizer(_lang)
-                text[i] = self.normalizer[_lang](t)
-                if _lang == "zh":
-                    text[i] = apply_half2full_map(text[i])
 
         for i, t in enumerate(text):
             reserved_tokens = self.pretrain_models[
@@ -251,22 +237,12 @@ class Chat:
         self,
         text,
         params_refine_text={},
-        do_text_normalization=True,
-        lang=None,
     ) -> str:
 
         # assert self.check_model(use_decoder=False)
 
         if not isinstance(text, list):
             text = [text]
-
-        if do_text_normalization:
-            for i, t in enumerate(text):
-                _lang = detect_language(t) if lang is None else lang
-                self.init_normalizer(_lang)
-                text[i] = self.normalizer[_lang](t)
-                if _lang == "zh":
-                    text[i] = apply_half2full_map(text[i])
 
         for i, t in enumerate(text):
             reserved_tokens = self.pretrain_models[
@@ -305,7 +281,10 @@ class Chat:
         prompt = [params_infer_code.get("prompt", "") + i for i in prompt]
         params_infer_code.pop("prompt", "")
         result = infer_code(
-            self.pretrain_models, prompt, **params_infer_code, return_hidden=use_decoder
+            self.pretrain_models,
+            prompt,
+            return_hidden=use_decoder,
+            **params_infer_code,
         )
 
         if use_decoder:
@@ -326,37 +305,7 @@ class Chat:
     def sample_random_speaker(
         self,
     ) -> torch.Tensor:
-
+        assert self.pretrain_models["gpt"] is not None, "gpt model not loaded"
         dim = self.pretrain_models["gpt"].gpt.layers[0].mlp.gate_proj.in_features
         std, mean = self.pretrain_models["spk_stat"].chunk(2)
         return torch.randn(dim, device=std.device) * std + mean
-
-    def init_normalizer(self, lang):
-
-        if lang not in self.normalizer:
-            if lang == "zh":
-                try:
-                    from tn.chinese.normalizer import Normalizer
-                except:
-                    self.logger.log(
-                        logging.WARNING,
-                        f"Package WeTextProcessing not found! \
-                        Run: conda install -c conda-forge pynini=2.1.5 && pip install WeTextProcessing",
-                    )
-                self.normalizer[lang] = Normalizer().normalize
-            else:
-                try:
-                    from nemo_text_processing.text_normalization.normalize import (
-                        Normalizer,
-                    )
-                except:
-                    self.logger.log(
-                        logging.WARNING,
-                        f"Package nemo_text_processing not found! \
-                        Run: conda install -c conda-forge pynini=2.1.5 && pip install nemo_text_processing",
-                    )
-                self.normalizer[lang] = partial(
-                    Normalizer(input_case="cased", lang=lang).normalize,
-                    verbose=False,
-                    punct_post_process=True,
-                )
