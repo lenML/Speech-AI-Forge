@@ -31,6 +31,5 @@ def refine_text(
                 "max_new_token": max_new_token,
                 "disable_tqdm": config.runtime_env_vars.off_tqdm,
             },
-            do_text_normalization=False,
         )
         return refined_text
