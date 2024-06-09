@@ -1,12 +1,12 @@
-fg_dir: !!python/object/apply:pathlib.PosixPath
-- data
-- fg
-bg_dir: !!python/object/apply:pathlib.PosixPath
-- data
-- bg
-rir_dir: !!python/object/apply:pathlib.PosixPath
-- data
-- rir
+fg_dir: !!python/object/apply:pathlib.Path
+  - data
+  - fg
+bg_dir: !!python/object/apply:pathlib.Path
+  - data
+  - bg
+rir_dir: !!python/object/apply:pathlib.Path
+  - data
+  - rir
 load_fg_only: false
 wav_rate: 44100
 n_fft: 2048
@@ -16,8 +16,8 @@ num_mels: 128
 stft_magnitude_min: 0.0001
 preemphasis: 0.97
 mix_alpha_range:
-- 0.2
-- 0.8
+  - 0.2
+  - 0.8
 nj: 64
 training_seconds: 3.0
 batch_size_per_gpu: 32
