@@ -44,7 +44,7 @@ def create_ssml_interface():
                     inputs=[ssml_input],
                 )
 
-    ssml_output = gr.Audio(label="Generated Audio")
+    ssml_output = gr.Audio(label="Generated Audio", format="mp3")
 
     ssml_button.click(
         synthesize_ssml,

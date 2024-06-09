@@ -204,7 +204,9 @@ def create_speaker_merger():
                                     value="说话人合并测试 123456789 [uv_break] ok, test done [lbreak]",
                                 )
 
-                                output_audio = gr.Audio(label="Output Audio")
+                                output_audio = gr.Audio(
+                                    label="Output Audio", format="mp3"
+                                )
 
         with gr.Column(scale=1):
             with gr.Group():

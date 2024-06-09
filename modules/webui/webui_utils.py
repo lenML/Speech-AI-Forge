@@ -1,3 +1,4 @@
+import io
 from typing import Union
 import numpy as np
 
@@ -51,13 +52,6 @@ def load_spk_info(file):
         return "load failed"
 
 
-def wav_to_mp3(wav_data, bitrate="48k"):
-    audio = AudioSegment.from_wav(
-        wav_data,
-    )
-    return audio.export(format="mp3", bitrate=bitrate)
-
-
 def segments_length_limit(
     segments: list[Union[SSMLBreak, SSMLSegment]], total_max: int
 ) -> list[Union[SSMLBreak, SSMLSegment]]:
@@ -97,7 +91,7 @@ def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
     return audio_data, int(sr)
 
 
-# @torch.inference_mode()
+@torch.inference_mode()
 @spaces.GPU
 def synthesize_ssml(ssml: str, batch_size=4):
     try:
@@ -122,7 +116,9 @@ def synthesize_ssml(ssml: str, batch_size=4):
     audio_segments = synthesize.synthesize_segments(segments)
     combined_audio = combine_audio_segments(audio_segments)
 
-    return audio.pydub_to_np(combined_audio)
+    sr, audio_data = audio.pydub_to_np(combined_audio)
+
+    return sr, audio_data
 
 
 # @torch.inference_mode()
@@ -197,7 +193,6 @@ def tts_generate(
     audio_data, sample_rate = apply_audio_enhance(
         audio_data, sample_rate, enable_denoise, enable_enhance
     )
-
     audio_data = audio.audio_to_int16(audio_data)
     return sample_rate, audio_data
 

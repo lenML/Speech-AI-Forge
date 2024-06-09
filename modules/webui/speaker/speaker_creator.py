@@ -118,7 +118,7 @@ def speaker_creator_ui():
                     with gr.Row():
                         current_seed = gr.Label(label="Current Seed", value=-1)
                         with gr.Column(scale=4):
-                            output_audio = gr.Audio(label="Output Audio")
+                            output_audio = gr.Audio(label="Output Audio", format="mp3")
 
         test_voice_btn.click(
             fn=test_spk_voice,

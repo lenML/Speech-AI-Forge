@@ -204,7 +204,7 @@ def create_tts_interface():
 
             with gr.Group():
                 gr.Markdown("🎨Output")
-                tts_output = gr.Audio(label="Generated Audio")
+                tts_output = gr.Audio(label="Generated Audio", format="mp3")
         with gr.Column(scale=1):
             with gr.Group():
                 gr.Markdown("🎶Refiner")
