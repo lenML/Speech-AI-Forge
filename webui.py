@@ -81,6 +81,12 @@ if __name__ == "__main__":
         help="Enable webui_experimental features",
     )
 
+    parser.add_argument(
+        "--language",
+        type=str,
+        default="zh-CN",
+        help="Set the default language for the webui",
+    )
     args = parser.parse_args()
 
     def get_and_update_env(*args):
@@ -100,6 +106,7 @@ if __name__ == "__main__":
     device_id = get_and_update_env(args, "device_id", None, str)
     use_cpu = get_and_update_env(args, "use_cpu", [], list)
     compile = get_and_update_env(args, "compile", False, bool)
+    language = get_and_update_env(args, "language", False, bool)
 
     webui_config.experimental = get_and_update_env(
         args, "webui_experimental", False, bool
@@ -108,6 +115,7 @@ if __name__ == "__main__":
     webui_config.ssml_max = get_and_update_env(args, "ssml_max_len", 5000, int)
     webui_config.max_batch_size = get_and_update_env(args, "max_batch_size", 8, int)
 
+    webui_init()
     demo = create_interface()
 
     if auth:
@@ -116,8 +124,6 @@ if __name__ == "__main__":
     generate_audio.setup_lru_cache()
     devices.reset_device()
     devices.first_time_calculation()
-
-    webui_init()
 
     demo.queue().launch(
         server_name=server_name,

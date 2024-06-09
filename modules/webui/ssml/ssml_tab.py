@@ -3,7 +3,6 @@ from modules.webui.webui_utils import (
     synthesize_ssml,
 )
 from modules.webui import webui_config
-from modules.webui.examples import ssml_examples, default_ssml
 
 
 def create_ssml_interface():
@@ -11,15 +10,11 @@ def create_ssml_interface():
         with gr.Column(scale=3):
             with gr.Group():
                 gr.Markdown("📝SSML Input")
-                gr.Markdown(f"- 最长{webui_config.ssml_max:,}字符，超过会被截断")
-                gr.Markdown("- 尽量保证使用相同的 seed")
-                gr.Markdown(
-                    "- 关于SSML可以看这个 [文档](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
-                )
+                gr.Markdown("SSML_TEXT_GUIDE")
                 ssml_input = gr.Textbox(
                     label="SSML Input",
                     lines=10,
-                    value=default_ssml,
+                    value=webui_config.localization.DEFAULT_SSML_TEXT,
                     placeholder="输入 SSML 或选择示例",
                     elem_id="ssml_input",
                     show_label=False,
@@ -46,7 +41,7 @@ def create_ssml_interface():
             with gr.Group():
                 gr.Markdown("🎄Examples")
                 gr.Examples(
-                    examples=ssml_examples,
+                    examples=webui_config.localization.ssml_examples,
                     inputs=[ssml_input],
                 )
 

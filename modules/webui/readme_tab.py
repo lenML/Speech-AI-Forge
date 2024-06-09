@@ -10,4 +10,4 @@ def read_local_readme():
 
 def create_readme_tab():
     readme_content = read_local_readme()
-    gr.Markdown(readme_content)
+    gr.Markdown(readme_content, elem_classes=["no-translate"])

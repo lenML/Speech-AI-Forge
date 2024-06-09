@@ -8,12 +8,6 @@ from modules.webui.webui_utils import (
     tts_generate,
 )
 from modules.webui import webui_config
-from modules.webui.examples import example_texts
-from modules import config
-
-default_text_content = """
-chat T T S 是一款强大的对话式文本转语音模型。它有中英混读和多说话人的能力。
-""".strip()
 
 
 def create_tts_interface():
@@ -53,7 +47,7 @@ def create_tts_interface():
             with gr.Row():
                 with gr.Group():
                     gr.Markdown("🎭Style")
-                    gr.Markdown("- 后缀为 `_p` 表示带prompt，效果更强但是影响质量")
+                    gr.Markdown("TTS_STYLE_GUIDE")
                     style_input_dropdown = gr.Dropdown(
                         choices=styles,
                         # label="Choose Style",
@@ -138,18 +132,14 @@ def create_tts_interface():
                     "📝Text Input",
                     elem_id="input-title",
                 )
-                gr.Markdown(f"- 字数限制{webui_config.tts_max:,}字，超过部分截断")
-                gr.Markdown("- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`")
-                gr.Markdown(
-                    "- If the input text is all in English, it is recommended to check disable_normalize"
-                )
+                gr.Markdown(f"TTS_TEXT_GUIDE")
                 text_input = gr.Textbox(
                     show_label=False,
                     label="Text to Speech",
                     lines=10,
                     placeholder="输入文本或选择示例",
                     elem_id="text-input",
-                    value=default_text_content,
+                    value=webui_config.localization.DEFAULT_TTS_TEXT,
                 )
                 # TODO 字数统计，其实实现很好写，但是就是会触发loading...并且还要和后端交互...
                 # text_input.change(
@@ -184,7 +174,10 @@ def create_tts_interface():
             with gr.Group():
                 gr.Markdown("🎄Examples")
                 sample_dropdown = gr.Dropdown(
-                    choices=[sample["text"] for sample in example_texts],
+                    choices=[
+                        sample["text"]
+                        for sample in webui_config.localization.tts_examples
+                    ],
                     show_label=False,
                     value=None,
                     interactive=True,

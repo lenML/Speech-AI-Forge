@@ -27,13 +27,14 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   - 4.2. [`webui.py`: WebUI](#webui.py:WebUI)
     - 4.2.1. [webui features](#webuifeatures)
 - 5. [Benchmark](#Benchmark)
-  - 5.1. [demo](#demo)
-    - 5.1.1. [风格化控制](#-1)
-    - 5.1.2. [长文本生成](#-1)
-- 6. [SSML](#SSML)
-- 7. [Speaking style](#Speakingstyle)
-- 8. [镜像](#-1)
-- 9. [手动 build](#build)
+- 6. [demo](#demo)
+  - 6.1. [风格化控制](#-1)
+  - 6.2. [长文本生成](#-1)
+- 7. [SSML](#SSML)
+- 8. [Speaking style](#Speakingstyle)
+- 9. [Docker](#Docker)
+  - 9.1. [镜像](#-1)
+  - 9.2. [手动 build](#build)
 - 10. [Roadmap](#Roadmap)
 - 11. [FAQ](#FAQ)
   - 11.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
@@ -220,6 +221,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--device_id`          | `str`  | `None`      | 指定使用 gpu device_id                             |
 | `--use_cpu`            | `str`  | `None`      | 当前可选值 `"all"`                                 |
 | `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
+| `--language`           | `str`  | `zh-CN`     | 设置 webui 本地化                                  |
 
 #### 4.2.1. <a name='webuifeatures'></a>webui features
 
@@ -229,12 +231,14 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 - 原生 Batch 合成，高效合成超长文本
 - Style control
 - SSML
-- Spliter 超长文本预处理
+  - Editor: 简单的 SSML 编辑，配合其他功能使用
+  - Spliter：超长文本分割预处理
+  - Podcast: 支持创建编辑播客脚本
 - Speaker
-  - 支持 seed 指定 speaker
-  - 内置众多 speaker 可以使用
-  - 支持 speaker embdding 上传，可以复用保存下来的 speaker
-  - Speaker merge: 支持合并说话人，微调 speaker
+  - 内置音色：内置众多 speaker 可以使用
+  - speaker creator: 支持试音抽卡，创建 speaker
+  - embdding: 支持 speaker embdding 上传，可以复用保存下来的 speaker
+  - speaker merge: 支持合并说话人，微调 speaker
 - Prompt Slot
 - Text Normalize
 - Experimental 实验功能
@@ -273,9 +277,9 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 
-### 5.1. <a name='demo'></a>demo
+## 6. <a name='demo'></a>demo
 
-#### 5.1.1. <a name='-1'></a>风格化控制
+### 6.1. <a name='-1'></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -315,7 +319,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 </details>
 
-#### 5.1.2. <a name='-1'></a>长文本生成
+### 6.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -337,21 +341,21 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 </details>
 
-## 6. <a name='SSML'></a>SSML
+## 7. <a name='SSML'></a>SSML
 
 [SSML readme](./docs/SSML.md)
 
-## 7. <a name='Speakingstyle'></a>Speaking style
+## 8. <a name='Speakingstyle'></a>Speaking style
 
 [style readme](./docs/sytles.md)
 
-# Docker
+## 9. <a name='Docker'></a>Docker
 
-## 8. <a name='-1'></a>镜像
+### 9.1. <a name='-1'></a>镜像
 
 WIP 开发中
 
-## 9. <a name='build'></a>手动 build
+### 9.2. <a name='build'></a>手动 build
 
 下载模型: `python -m scripts/download_models --source huggingface`
 

@@ -95,8 +95,7 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
         with gr.Column(scale=3):
             with gr.Group():
                 gr.Markdown("📝Long Text Input")
-                gr.Markdown("- 此页面用于处理超长文本")
-                gr.Markdown("- 切割后，可以选择说话人、风格、seed，然后发送到SSML")
+                gr.Markdown("SSML_SPLITER_GUIDE")
                 long_text_input = gr.Textbox(
                     label="Long Text Input",
                     lines=10,

@@ -5,9 +5,10 @@ import torch
 import gradio as gr
 
 from modules import config
-from modules.webui import webui_config
+from modules.webui import gradio_extensions, localization, webui_config, gradio_hijack
 
 from modules.webui.changelog_tab import create_changelog_tab
+from modules.webui.localization_runtime import ENLocalizationVars, ZHLocalizationVars
 from modules.webui.ssml.podcast_tab import create_ssml_podcast_tab
 from modules.webui.system_tab import create_system_tab
 from modules.webui.tts_tab import create_tts_interface
@@ -27,6 +28,11 @@ def webui_init():
     torch._dynamo.config.suppress_errors = True
     torch.set_float32_matmul_precision("high")
 
+    if config.runtime_env_vars.language == "en":
+        webui_config.localization = ENLocalizationVars()
+    else:
+        webui_config.localization = ZHLocalizationVars()
+
     logger.info("WebUI module initialized")
 
 
@@ -44,11 +50,13 @@ def create_app_footer():
         f"""
 🍦 [ChatTTS-Forge](https://github.com/lenML/ChatTTS-Forge)
 version: [{git_tag}](https://github.com/lenML/ChatTTS-Forge/commit/{git_commit}) | branch: `{git_branch}` | python: `{python_version}` | torch: `{torch_version}`
-        """
+        """,
+        elem_classes=["no-translate"],
     )
 
 
 def create_interface():
+    gradio_extensions.reload_javascript()
 
     js_func = """
     function refresh() {
@@ -117,4 +125,8 @@ def create_interface():
                         create_changelog_tab()
 
         create_app_footer()
+
+    # Dump the English config for the localization
+    # ** JUST for developer
+    # localization.dump_english_config(gradio_hijack.all_components)
     return demo

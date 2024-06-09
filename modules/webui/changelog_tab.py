@@ -10,4 +10,4 @@ def read_local_changelog():
 
 def create_changelog_tab():
     changelog_content = read_local_changelog()
-    gr.Markdown(changelog_content)
+    gr.Markdown(changelog_content, elem_classes=["no-translate"])

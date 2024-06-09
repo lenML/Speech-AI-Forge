@@ -3,7 +3,7 @@ import gradio as gr
 import torch
 
 from modules.hf import spaces
-from modules.webui import webui_utils
+from modules.webui import webui_config, webui_utils
 from modules.webui.webui_utils import get_speakers, tts_generate
 from modules.speaker import speaker_mgr, Speaker
 
@@ -128,17 +128,6 @@ def merge_spk_to_file(
     return tmp_file_path
 
 
-merge_desc = """
-## Speaker Merger
-
-在本面板中，您可以选择多个说话人并指定他们的权重，合成新的语音并进行测试。以下是各个功能的详细说明：
-
-1. 选择说话人: 您可以从下拉菜单中选择最多四个说话人（A、B、C、D），每个说话人都有一个对应的权重滑块，范围从0到10。权重决定了每个说话人在合成语音中的影响程度。
-2. 合成语音: 在选择好说话人和设置好权重后，您可以在“Test Text”框中输入要测试的文本，然后点击“测试语音”按钮来生成并播放合成的语音。
-3. 保存说话人: 您还可以在右侧的“说话人信息”部分填写新的说话人的名称、性别和描述，并点击“Save Speaker”按钮来保存合成的说话人。保存后的说话人文件将显示在“Merged Speaker”栏中，供下载使用。
-"""
-
-
 # 显示 a b c d 四个选择框，选择一个或多个，然后可以试音，并导出
 def create_speaker_merger():
     def get_spk_choices():
@@ -146,7 +135,7 @@ def create_speaker_merger():
         speaker_names = ["None"] + speaker_names
         return speaker_names
 
-    gr.Markdown(merge_desc)
+    gr.Markdown("SPEAKER_MERGER_GUIDE")
 
     def spk_picker(label_tail: str):
         with gr.Row():
@@ -198,7 +187,7 @@ def create_speaker_merger():
                                 test_text = gr.Textbox(
                                     label="Test Text",
                                     placeholder="Please input test text",
-                                    value="说话人合并测试 123456789 [uv_break] ok, test done [lbreak]",
+                                    value=webui_config.localization.DEFAULT_SPEAKER_MERAGE_TEXT,
                                 )
 
                                 output_audio = gr.Audio(

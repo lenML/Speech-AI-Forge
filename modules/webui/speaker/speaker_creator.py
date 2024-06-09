@@ -5,6 +5,7 @@ from modules.utils.SeedContext import SeedContext
 from modules.hf import spaces
 from modules.models import load_chat_tts
 from modules.utils.rng import np_rng
+from modules.webui import webui_config
 from modules.webui.webui_utils import get_speakers, tts_generate
 
 import tempfile
@@ -88,16 +89,6 @@ def random_speaker():
     return seed, name
 
 
-creator_ui_desc = """
-## Speaker Creator
-使用本面板快捷抽卡生成 speaker.pt 文件。
-
-1. **生成说话人**：输入种子、名字、性别和描述。点击 "Generate speaker.pt" 按钮，生成的说话人配置会保存为.pt文件。
-2. **测试说话人声音**：输入测试文本。点击 "Test Voice" 按钮，生成的音频会在 "Output Audio" 中播放。
-3. **随机生成说话人**：点击 "Random Speaker" 按钮，随机生成一个种子和名字，可以进一步编辑其他信息并测试。
-"""
-
-
 def speaker_creator_ui():
     def on_generate(seed, name, gender, desc):
         file_path = create_spk_from_seed(seed, name, gender, desc)
@@ -113,7 +104,7 @@ def speaker_creator_ui():
                     test_text = gr.Textbox(
                         label="Test Text",
                         placeholder="Please input test text",
-                        value="说话人测试 123456789 [uv_break] ok, test done [lbreak]",
+                        value=webui_config.localization.DEFAULT_SPEAKER_TEST_TEXT,
                     )
                     with gr.Row():
                         current_seed = gr.Label(label="Current Seed", value=-1)
@@ -131,7 +122,7 @@ def speaker_creator_ui():
             outputs=[current_seed],
         )
 
-    gr.Markdown(creator_ui_desc)
+    gr.Markdown("SPEAKER_CREATOR_GUIDE")
 
     with gr.Row():
         with gr.Column(scale=2):
