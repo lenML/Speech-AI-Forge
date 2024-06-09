@@ -5,22 +5,36 @@
 
 ### Added
 
+- ✨ add localization [[c05035d](https://github.com/lenML/ChatTTS-Forge/commit/c05035d5cdcc5aa7efd995fe42f6a2541abe718b)]
+- ✨ SSML 支持 enhancer [[5c2788e](https://github.com/lenML/ChatTTS-Forge/commit/5c2788e04f3debfa8bafd8a2e2371dde30f38d4d)]
+- ✨ webui 增加 podcast 工具 tab [[b0b169d](https://github.com/lenML/ChatTTS-Forge/commit/b0b169d8b49c8e013209e59d1f8b637382d8b997)]
 - ✨ 完善  enhancer [[205ebeb](https://github.com/lenML/ChatTTS-Forge/commit/205ebebeb7530c81fde7ea96c7e4c6a888a29835)]
 
 ### Changed
 
+- 🍱 update banner [[dbc293e](https://github.com/lenML/ChatTTS-Forge/commit/dbc293e1a7dec35f60020dcaf783ba3b7c734bfa)]
 - ⚡ 增强 TN [[092c1b9](https://github.com/lenML/ChatTTS-Forge/commit/092c1b94147249880198fe2ad3dfe3b209099e19)]
 - ⚡ enhancer 支持 off_tqdm [[94d34d6](https://github.com/lenML/ChatTTS-Forge/commit/94d34d657fa3433dae9ff61775e0c364a6f77aff)]
 - ⚡ 增加 git env [[43d9c65](https://github.com/lenML/ChatTTS-Forge/commit/43d9c65877ff68ad94716bc2e505ccc7ae8869a8)]
 - ⚡ 修改webui保存文件格式 [[2da41c9](https://github.com/lenML/ChatTTS-Forge/commit/2da41c90aa81bf87403598aefaea3e0ae2e83d79)]
 
+### Removed
+
+- 🔥 clear code [[e8a1d7b](https://github.com/lenML/ChatTTS-Forge/commit/e8a1d7b269d259adc3082a0349c9b73fef1ec1a4)]
+
 ### Fixed
 
+- 🐛 fix hparams config [#22](https://github.com/lenML/ChatTTS-Forge/issues/22) [[61d9809](https://github.com/lenML/ChatTTS-Forge/commit/61d9809804ad8c141d36afde51a608734a105662)]
+- 🐛 fix enhance 下载脚本 [[d2e14b0](https://github.com/lenML/ChatTTS-Forge/commit/d2e14b0a4905724a55b03493fa4b94b5c4383c95)]
+- 🐛 fix &#x27;trange&#x27; referenced [[d1a8dae](https://github.com/lenML/ChatTTS-Forge/commit/d1a8daee61e62d14cf5fd7a17fab4424e24b1c41)]
+- 🐛 fix ssml to mp3 error &#x60;bad sample width&#x60; [[564b7eb](https://github.com/lenML/ChatTTS-Forge/commit/564b7ebbd55df50aac38562957eebd898945315e)]
 - 🐛 fix seed context exit behavior [[d4e33c8](https://github.com/lenML/ChatTTS-Forge/commit/d4e33c8f0aabe253ce96756f907e979578c81b17)]
 - 🐛 fix colab script [[687cc2c](https://github.com/lenML/ChatTTS-Forge/commit/687cc2cc97ff7e89328b747dbfcacbcd51bd5efc)]
 
 ### Miscellaneous
 
+- 🌐 更新翻译文案 [[f56caa7](https://github.com/lenML/ChatTTS-Forge/commit/f56caa71e9186680b93c487d9645186ae18c1dc6)]
+- 📝 update [[7cacf91](https://github.com/lenML/ChatTTS-Forge/commit/7cacf913541ee5f86eaa80d8b193b94b3db2b67c)]
 - 📝 update webui document [[7f2bb22](https://github.com/lenML/ChatTTS-Forge/commit/7f2bb227027cc0eff312c37758a20916c1ebade6)]
 
 
