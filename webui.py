@@ -84,7 +84,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--language",
         type=str,
-        default="zh-CN",
         help="Set the default language for the webui",
     )
     args = parser.parse_args()
@@ -106,7 +105,7 @@ if __name__ == "__main__":
     device_id = get_and_update_env(args, "device_id", None, str)
     use_cpu = get_and_update_env(args, "use_cpu", [], list)
     compile = get_and_update_env(args, "compile", False, bool)
-    language = get_and_update_env(args, "language", False, bool)
+    language = get_and_update_env(args, "language", "zh-CN", str)
 
     webui_config.experimental = get_and_update_env(
         args, "webui_experimental", False, bool
