@@ -1,6 +1,31 @@
 # Changelog
 
+<a name="0.5.6-rc"></a>
+## 0.5.6-rc (2024-06-09)
+
+### Added
+
+- ✨ 完善  enhancer [[205ebeb](https://github.com/lenML/ChatTTS-Forge/commit/205ebebeb7530c81fde7ea96c7e4c6a888a29835)]
+
+### Changed
+
+- ⚡ 增强 TN [[092c1b9](https://github.com/lenML/ChatTTS-Forge/commit/092c1b94147249880198fe2ad3dfe3b209099e19)]
+- ⚡ enhancer 支持 off_tqdm [[94d34d6](https://github.com/lenML/ChatTTS-Forge/commit/94d34d657fa3433dae9ff61775e0c364a6f77aff)]
+- ⚡ 增加 git env [[43d9c65](https://github.com/lenML/ChatTTS-Forge/commit/43d9c65877ff68ad94716bc2e505ccc7ae8869a8)]
+- ⚡ 修改webui保存文件格式 [[2da41c9](https://github.com/lenML/ChatTTS-Forge/commit/2da41c90aa81bf87403598aefaea3e0ae2e83d79)]
+
+### Fixed
+
+- 🐛 fix seed context exit behavior [[d4e33c8](https://github.com/lenML/ChatTTS-Forge/commit/d4e33c8f0aabe253ce96756f907e979578c81b17)]
+- 🐛 fix colab script [[687cc2c](https://github.com/lenML/ChatTTS-Forge/commit/687cc2cc97ff7e89328b747dbfcacbcd51bd5efc)]
+
+### Miscellaneous
+
+- 📝 update webui document [[7f2bb22](https://github.com/lenML/ChatTTS-Forge/commit/7f2bb227027cc0eff312c37758a20916c1ebade6)]
+
+
 <a name="0.5.5"></a>
+
 ## 0.5.5 (2024-06-08)
 
 ### Added
@@ -34,13 +59,9 @@
 ### Miscellaneous
 
 - 🐳 fix pip requirements [[4256371](https://github.com/lenML/ChatTTS-Forge/commit/4256371c9d3d8d290840a98fb6ac7bc19268a1e7)]
-- 📝 update [[8bfbbc6](https://github.com/lenML/ChatTTS-Forge/commit/8bfbbc6146379cec0f468a5867707b3baf4e2b04)]
-- 📝 update [[aab41ed](https://github.com/lenML/ChatTTS-Forge/commit/aab41ed4f25a132c0e0e4e4cb0e3c851b905a30a)]
-- 📝 update [[13eb1c5](https://github.com/lenML/ChatTTS-Forge/commit/13eb1c518d8bbc8d26b14fd0e3649ee7158b2a7f)]
-- 📝 add Changelog [[4d1aece](https://github.com/lenML/ChatTTS-Forge/commit/4d1aece3d8eb89a9b0f3cf7ba90bb76c99b640d2)]
-
 
 <a name="0.5.2"></a>
+
 ## 0.5.2 (2024-06-06)
 
 ### Changed
@@ -55,16 +76,16 @@
 
 - 📝 add banchmark [[3a72ba0](https://github.com/lenML/ChatTTS-Forge/commit/3a72ba0f97d5409502b9ff98e356f69affcce06b)]
 
-
 <a name="0.5.1"></a>
+
 ## 0.5.1 (2024-06-06)
 
 ### Fixed
 
 - 🐛 fix SynthesizeSegments seed [[83b63bd](https://github.com/lenML/ChatTTS-Forge/commit/83b63bdd0d92e115c9b6946f427343c48de1a313)]
 
-
 <a name="0.5.0"></a>
+
 ## 0.5.0 (2024-06-06)
 
 ### Added
@@ -125,7 +146,7 @@
 - 🐛 fix [#6](https://github.com/lenML/ChatTTS-Forge/issues/6) [[fc30977](https://github.com/lenML/ChatTTS-Forge/commit/fc309774a73c3c9ae4c5c527c3aa9bef4a7a3c1f)]
 - 🐛 fix seed context error [[faceb2b](https://github.com/lenML/ChatTTS-Forge/commit/faceb2b0af749a869df3656dee89b20f69b130b8)]
 - 🐛 fix infer_seed range [[2782182](https://github.com/lenML/ChatTTS-Forge/commit/2782182367faef932429e2a7a012f7d867c0cb3a)]
-- 🐛 fix [#2](https://github.com/lenML/ChatTTS-Forge/issues/2) 改用境内cdn [[6ba27c3](https://github.com/lenML/ChatTTS-Forge/commit/6ba27c3c4d1ef4175cfe95de671599f64572eaeb)]
+- 🐛 fix [#2](https://github.com/lenML/ChatTTS-Forge/issues/2) 改用境内 cdn [[6ba27c3](https://github.com/lenML/ChatTTS-Forge/commit/6ba27c3c4d1ef4175cfe95de671599f64572eaeb)]
 - 🐛 fix [#3](https://github.com/lenML/ChatTTS-Forge/issues/3) [[7ffe91f](https://github.com/lenML/ChatTTS-Forge/commit/7ffe91fa3028f88f0414786dd669b91cce409043)]
 - 🐛 fix webui [[b44156f](https://github.com/lenML/ChatTTS-Forge/commit/b44156fbac7ea59765ced4bbfd303f3095166693)]
 - 🐛 fix webui [[4ad0cee](https://github.com/lenML/ChatTTS-Forge/commit/4ad0ceef9d1251437cff57e12a0a82f1cd427e17)]
@@ -138,41 +159,14 @@
 
 ### Miscellaneous
 
-- 📝 update [[ca6e79c](https://github.com/lenML/ChatTTS-Forge/commit/ca6e79c2ee0254c0f4444a65152d9e96cc072eeb)]
-- 📝 update [[78f68e6](https://github.com/lenML/ChatTTS-Forge/commit/78f68e67bbf64ca52fcdeb6c9f466bdf75bb2846)]
-- 📝 update [[2fce75d](https://github.com/lenML/ChatTTS-Forge/commit/2fce75de0009d3e09e27c311dfc1eafde0e3665f)]
--  :zep: improve cache [[eedc558](https://github.com/lenML/ChatTTS-Forge/commit/eedc55880f4802ef9f23117d8266100be18cbe41)]
--  :zep: Improved device support [[400afe6](https://github.com/lenML/ChatTTS-Forge/commit/400afe60c9261247998617b2943fa210230b7ad3)]
--  :zep: improve TN [[c22591f](https://github.com/lenML/ChatTTS-Forge/commit/c22591ffb2c1ae9e14eef307d708925bcc7a67a7)]
-- 📝 update [[56dd837](https://github.com/lenML/ChatTTS-Forge/commit/56dd837bf181d78d4638dcff50fd803d64384a96)]
-- 📝 update [[65f2b2c](https://github.com/lenML/ChatTTS-Forge/commit/65f2b2c6b69c60ef5f7342bef953deea54a7b388)]
--  add mps support [[6983506](https://github.com/lenML/ChatTTS-Forge/commit/6983506d7237c05ea346fdbe7d042b69d3743a3b)]
--  :zep: revert infer_utils [[4a507cc](https://github.com/lenML/ChatTTS-Forge/commit/4a507cccf23b94a11f470b67d96bbad6c9efbf74)]
--  Optimize tqdm display [[516eca6](https://github.com/lenML/ChatTTS-Forge/commit/516eca6c99b7b8433d1cda8435a19214eb1cc678)]
--  Improve code [[0e278ab](https://github.com/lenML/ChatTTS-Forge/commit/0e278ab40276e3e0610515bf0e4329c95a67e00c)]
--  Add apple gpu mps backend [[9764e23](https://github.com/lenML/ChatTTS-Forge/commit/9764e233e1e82d8dbec607032744cb565b616525)]
-- 📝 update [[90a1026](https://github.com/lenML/ChatTTS-Forge/commit/90a1026533ad5900fe2373c785c6a3eeb70295b4)]
-- 📝 update [[f89bbec](https://github.com/lenML/ChatTTS-Forge/commit/f89bbec9ae921c22a7fcb073c907735436602870)]
--  Update README.md [[88fbe87](https://github.com/lenML/ChatTTS-Forge/commit/88fbe876beaa44562634de868d76d017b19de86d)]
-- 📝 layout [[3341c6f](https://github.com/lenML/ChatTTS-Forge/commit/3341c6f44975bc1614da91636a0fb9cfd52675b7)]
-- 📝 update doc [[4e68c5f](https://github.com/lenML/ChatTTS-Forge/commit/4e68c5f98f1f4d059ad65e97383c2e0332f0db9b)]
-- 📝 update doc [[bad40c6](https://github.com/lenML/ChatTTS-Forge/commit/bad40c644851b4285d1ce131b26df7d1db996e2e)]
-- 📝 update doc [[71e5249](https://github.com/lenML/ChatTTS-Forge/commit/71e52493c38c03d9bbf892992da99a1b87dba647)]
-- 📝 update doc [[353e787](https://github.com/lenML/ChatTTS-Forge/commit/353e7876007bf1560b790dd4eb0c4f33804458f6)]
-- 📝 update doc [[46010dd](https://github.com/lenML/ChatTTS-Forge/commit/46010dd95d16591c68b780f5d40df8868fa56e7f)]
-- 📝 update doc [[d673be3](https://github.com/lenML/ChatTTS-Forge/commit/d673be3e4d31e2df4cc5f612526bb9562f58dcef)]
-- 📝 update doc [[6a5e663](https://github.com/lenML/ChatTTS-Forge/commit/6a5e663e8f0f6da5436ad8b64167fbd68ccb4f46)]
-- 📝 update doc [[505635d](https://github.com/lenML/ChatTTS-Forge/commit/505635d2b5f879eaa9cbaea5fbd375a328c4d1b3)]
-- 📝 update doc [[91a221e](https://github.com/lenML/ChatTTS-Forge/commit/91a221e18f47ffeff8a8105fc1a1c0c28c2a4a2f)]
-- 📝 update [[9937d08](https://github.com/lenML/ChatTTS-Forge/commit/9937d0806d392a59803b33d32e1d79cf0f6f2dc8)]
-- 📝 update [[91fe377](https://github.com/lenML/ChatTTS-Forge/commit/91fe3773562dd36bafe7ecf0258c62768dae797a)]
-- 📝 update [[881b694](https://github.com/lenML/ChatTTS-Forge/commit/881b694d4bcd82c37eea9588b5f01ebf3ca41f7e)]
-- 📝 update [[afead31](https://github.com/lenML/ChatTTS-Forge/commit/afead31d80db1cb650e4af7927116e7ba8f7e7cb)]
--  Update README.md [[3506611](https://github.com/lenML/ChatTTS-Forge/commit/350661126a8df3a32fbd9072177414cf0cc28449)]
--  Update issue templates [[1d19417](https://github.com/lenML/ChatTTS-Forge/commit/1d194177ab6dd3b1055ca925bfd2befc6fe2f07c)]
-- 📝 update [[01bfbdc](https://github.com/lenML/ChatTTS-Forge/commit/01bfbdc786d8bbbff97d5079c594dd4978e30f56)]
--  LICENSE [[0afb189](https://github.com/lenML/ChatTTS-Forge/commit/0afb189718797e0706ba64c1e8d2188c4fa0fe4c)]
-- 📝 document update [[c3c8997](https://github.com/lenML/ChatTTS-Forge/commit/c3c8997a7ec7659cf022b8120e2c76e0764c89bd)]
--  Initial commit [[9fed2b6](https://github.com/lenML/ChatTTS-Forge/commit/9fed2b60a90547286e6c06483167c397c7bbed78)]
-
-
+- :zep: improve cache [[eedc558](https://github.com/lenML/ChatTTS-Forge/commit/eedc55880f4802ef9f23117d8266100be18cbe41)]
+- :zep: Improved device support [[400afe6](https://github.com/lenML/ChatTTS-Forge/commit/400afe60c9261247998617b2943fa210230b7ad3)]
+- :zep: improve TN [[c22591f](https://github.com/lenML/ChatTTS-Forge/commit/c22591ffb2c1ae9e14eef307d708925bcc7a67a7)]
+- add mps support [[6983506](https://github.com/lenML/ChatTTS-Forge/commit/6983506d7237c05ea346fdbe7d042b69d3743a3b)]
+- :zep: revert infer_utils [[4a507cc](https://github.com/lenML/ChatTTS-Forge/commit/4a507cccf23b94a11f470b67d96bbad6c9efbf74)]
+- Optimize tqdm display [[516eca6](https://github.com/lenML/ChatTTS-Forge/commit/516eca6c99b7b8433d1cda8435a19214eb1cc678)]
+- Improve code [[0e278ab](https://github.com/lenML/ChatTTS-Forge/commit/0e278ab40276e3e0610515bf0e4329c95a67e00c)]
+- Add apple gpu mps backend [[9764e23](https://github.com/lenML/ChatTTS-Forge/commit/9764e233e1e82d8dbec607032744cb565b616525)]
+- Update issue templates [[1d19417](https://github.com/lenML/ChatTTS-Forge/commit/1d194177ab6dd3b1055ca925bfd2befc6fe2f07c)]
+- LICENSE [[0afb189](https://github.com/lenML/ChatTTS-Forge/commit/0afb189718797e0706ba64c1e8d2188c4fa0fe4c)]
+- Initial commit [[9fed2b6](https://github.com/lenML/ChatTTS-Forge/commit/9fed2b60a90547286e6c06483167c397c7bbed78)]
