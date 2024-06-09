@@ -1,5 +1,5 @@
 import requests
-
+from tqdm import tqdm
 from scripts.ModelDownloader import ModelDownloader
 
 
@@ -31,12 +31,20 @@ class ResembleEnhanceDownloader(ModelDownloader):
     def _download_file(self, url, dest_path):
         response = requests.get(url, stream=True)
         response.raise_for_status()
-        with open(dest_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
+
+        total_size = int(response.headers.get("content-length", 0))
+        block_size = 8192  # 8 Kibibytes
+
+        with open(dest_path, "wb") as file, tqdm(
+            total=total_size, unit="iB", unit_scale=True, desc=dest_path.name
+        ) as bar:
+            for chunk in response.iter_content(chunk_size=block_size):
                 file.write(chunk)
+                bar.update(len(chunk))
 
     def check_exist(self) -> bool:
-        return self.model_dir.exists() and any(self.model_dir.iterdir())
+        model_file = self.model_dir / "mp_rank_00_model_states.pt"
+        return self.model_dir.exists() and model_file.exists()
 
     def gc(self):
         pass  # No cache to clear for direct download
