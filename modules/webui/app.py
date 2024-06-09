@@ -30,9 +30,9 @@ def webui_init():
 
 def create_app_footer():
     gradio_version = gr.__version__
-    git_tag = config.versions.git_tag
-    git_commit = config.versions.git_commit
-    git_branch = config.versions.git_branch
+    git_tag = os.environ.get("V_GIT_TAG") or config.versions.git_tag
+    git_commit = os.environ.get("V_GIT_COMMIT") or config.versions.git_commit
+    git_branch = os.environ.get("V_GIT_BRANCH") or config.versions.git_branch
     python_version = config.versions.python_version
     torch_version = config.versions.torch_version
 
