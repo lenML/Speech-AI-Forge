@@ -97,7 +97,7 @@
   ],
 
   "SSML_TEXT_GUIDE": [
-    "- Maximum {webui_config.ssml_max:,} characters. Excess will be truncated.",
+    "- Maximum 3000 characters. Excess will be truncated.",
     "- For more information about SSML, refer to this [documentation](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
   ],
 

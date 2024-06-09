@@ -12,7 +12,7 @@
   "Upload": "上传",
   "Speaker (Upload)": "音色 (上传)",
   "📝Speaker info": "📝音色信息",
-  "empty": "empty",
+  "empty": "无",
   "💃Inference Seed": "💃推理种子",
   "Inference Seed": "推理种子",
   "Use Decoder": "使用解码器",
@@ -29,7 +29,7 @@
   "🔧Prompt engineering": "🔧提示工程",
   "prompt_audio": "提示音频",
   "🔊Generate": "🔊生成",
-  "Disable Normalize": "禁用归一化",
+  "Disable Normalize": "禁用文本预处理",
   "💪🏼Enhance": "💪🏼增强",
   "Enable Enhance": "启用增强",
   "Enable De-noise": "启用降噪",
@@ -41,7 +41,7 @@
   "🎛️Parameters": "🎛️参数",
   "Spilter": "分割器",
   "🗣️Seed": "🗣️种子",
-  "📩Send to SSML": "📩发送到Editor",
+  "📩Send to SSML": "📩发送到编辑器",
   "📝Long Text Input": "📝长文本输入",
   "🔪Split Text": "🔪分割文本",
   "Podcast": "播客",
@@ -50,7 +50,7 @@
   "Clear": "清除",
   "📔Script": "📔脚本",
   "Speaker": "音色",
-  "Creator": "创建者",
+  "Creator": "抽卡",
   "ℹ️Speaker info": "ℹ️音色信息",
   "Seed": "种子",
   "Random Speaker": "随机音色",
@@ -86,7 +86,7 @@
     "- 如果文本为全英文，建议关闭文本标准化"
   ],
   "SPEAKER_CREATOR_GUIDE": [
-    "### Speaker Creator",
+    "### 音色抽卡",
     "使用本面板快捷抽卡生成 speaker.pt 文件。",
     "",
     "1. 生成说话人：输入种子、名字、性别和描述。点击 \"Generate speaker.pt\" 按钮，生成的说话人配置会保存为.pt文件。",
@@ -95,7 +95,7 @@
   ],
 
   "SSML_TEXT_GUIDE": [
-    "- 最长{webui_config.ssml_max:,}字符，超过会被截断",
+    "- 线上版本有字符限制，超过会被截断，具体限制见readme文档",
     "- 关于SSML可以看这个 [文档](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
   ],
 
@@ -106,7 +106,7 @@
   ],
 
   "SPEAKER_MERGER_GUIDE": [
-    "### Speaker Merger",
+    "### 音色融合",
     "在本面板中，您可以选择多个说话人并指定他们的权重，合成新的语音并进行测试。以下是各个功能的详细说明：",
     "",
     "1. 选择说话人: 您可以从下拉菜单中选择最多四个说话人（A、B、C、D），每个说话人都有一个对应的权重滑块，范围从0到10。权重决定了每个说话人在合成语音中的影响程度。",
