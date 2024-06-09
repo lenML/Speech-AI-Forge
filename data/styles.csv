@@ -67,3 +67,5 @@ id,name,desc,params
 65,whispering_p,builtin style whispering,"{""speed"": 2, ""oral"": 3, ""break"": 4, ""prompt2"": ""[Ptts][Ptts][Ptts] 用气声低音量语气像说悄悄话 [Stts][Ptts][Stts][Ptts][Stts]""}"
 66,terrified_p,builtin style terrified,"{""speed"": 7, ""oral"": 7, ""break"": 1, ""prompt2"": ""[Ptts][Ptts][Ptts] 用恐惧颤抖语气像遇到可怕事情 [Stts][Ptts][Stts][Ptts][Stts]""}"
 67,unfriendly_p,builtin style unfriendly,"{""speed"": 4, ""oral"": 2, ""break"": 3, ""prompt2"": ""[Ptts][Ptts][Ptts] 用冷淡无感情语气像对待陌生人 [Stts][Ptts][Stts][Ptts][Stts]""}"
+68,podcast,builtin style podcast,"{""speed"": 2, ""oral"": 8, ""break"": 2, ""laugh"": 1}"
+69,podcast_p,builtin style podcast,"{""speed"": 2, ""oral"": 8, ""break"": 2, ""laugh"": 1, ""prompt2"": ""[Ptts][Ptts][Ptts] 用轻松随意的语气像在录制播客 [Stts][Ptts][Stts][Ptts][Stts]""}"

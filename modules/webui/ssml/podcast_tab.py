@@ -7,45 +7,65 @@ from modules.webui import webui_utils
 from modules.hf import spaces
 
 podcast_default_case = [
-    [1, "female2", "你好，欢迎收听今天的播客内容。今天我们要聊的是中华料理。", "chat"],
-    [2, "Alice", "嗨，我特别期待这个话题！中华料理真的是博大精深。", "chat"],
+    [
+        1,
+        "female2",
+        "你好，欢迎收听今天的播客内容。今天我们要聊的是中华料理。 [lbreak]",
+        "podcast_p",
+    ],
+    [
+        2,
+        "Alice",
+        "嗨，我特别期待这个话题！中华料理真的是博大精深。 [lbreak]",
+        "podcast_p",
+    ],
     [
         3,
         "Bob",
-        "没错，中华料理有着几千年的历史，而且每个地区都有自己的特色菜。",
-        "chat",
+        "没错，中华料理有着几千年的历史，而且每个地区都有自己的特色菜。 [lbreak]",
+        "podcast_p",
     ],
     [
         4,
         "female2",
-        "那我们先从最有名的川菜开始吧。川菜以其麻辣著称，是很多人的最爱。",
-        "chat",
+        "那我们先从最有名的川菜开始吧。川菜以其麻辣著称，是很多人的最爱。 [lbreak]",
+        "podcast_p",
     ],
     [
         5,
         "Alice",
-        "对，我特别喜欢吃麻婆豆腐和辣子鸡。那种麻辣的感觉真是让人难以忘怀。",
-        "chat",
+        "对，我特别喜欢吃麻婆豆腐和辣子鸡。那种麻辣的感觉真是让人难以忘怀。 [lbreak]",
+        "podcast_p",
     ],
     [
         6,
         "Bob",
-        "除了川菜，粤菜也是很受欢迎的。粤菜讲究鲜美，像是白切鸡和蒸鱼都是经典。",
-        "chat",
+        "除了川菜，粤菜也是很受欢迎的。粤菜讲究鲜美，像是白切鸡和蒸鱼都是经典。 [lbreak]",
+        "podcast_p",
     ],
-    [7, "female2", "对啊，粤菜的烹饪方式比较清淡，更注重食材本身的味道。", "chat"],
-    [8, "Alice", "还有北京的京菜，像北京烤鸭，那可是来北京必吃的美食。", "chat"],
+    [
+        7,
+        "female2",
+        "对啊，粤菜的烹饪方式比较清淡，更注重食材本身的味道。 [lbreak]",
+        "podcast_p",
+    ],
+    [
+        8,
+        "Alice",
+        "还有北京的京菜，像北京烤鸭，那可是来北京必吃的美食。 [lbreak]",
+        "podcast_p",
+    ],
     [
         9,
         "Bob",
-        "不仅如此，还有淮扬菜、湘菜、鲁菜等等，每个菜系都有其独特的风味。",
-        "chat",
+        "不仅如此，还有淮扬菜、湘菜、鲁菜等等，每个菜系都有其独特的风味。 [lbreak]",
+        "podcast_p",
     ],
     [
         10,
         "female2",
-        "对对对，像淮扬菜的狮子头，湘菜的剁椒鱼头，都是让人垂涎三尺的美味。",
-        "chat",
+        "对对对，像淮扬菜的狮子头，湘菜的剁椒鱼头，都是让人垂涎三尺的美味。 [lbreak]",
+        "podcast_p",
     ],
 ]
 
@@ -111,10 +131,11 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
                 script_table = gr.DataFrame(
                     headers=["index", "speaker", "text", "style"],
                     datatype=["number", "str", "str", "str"],
-                    interactive=False,
+                    interactive=True,
                     wrap=True,
                     value=podcast_default_case,
                     row_count=(0, "dynamic"),
+                    col_count=(4, "fixed"),
                 )
 
     send_to_ssml_btn = gr.Button("📩Send to SSML", variant="primary")
