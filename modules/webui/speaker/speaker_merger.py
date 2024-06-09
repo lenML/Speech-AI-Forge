@@ -3,6 +3,7 @@ import gradio as gr
 import torch
 
 from modules.hf import spaces
+from modules.webui import webui_utils
 from modules.webui.webui_utils import get_speakers, tts_generate
 from modules.speaker import speaker_mgr, Speaker
 
@@ -138,23 +139,19 @@ merge_desc = """
 """
 
 
-def get_spk_choices():
-    speakers = get_speakers()
-
-    speaker_names = ["None"] + [get_speaker_show_name(speaker) for speaker in speakers]
-    return speaker_names
-
-
 # 显示 a b c d 四个选择框，选择一个或多个，然后可以试音，并导出
 def create_speaker_merger():
-    speaker_names = get_spk_choices()
+    def get_spk_choices():
+        speakers, speaker_names = webui_utils.get_speaker_names()
+        speaker_names = ["None"] + speaker_names
+        return speaker_names
 
     gr.Markdown(merge_desc)
 
     def spk_picker(label_tail: str):
         with gr.Row():
             spk_a = gr.Dropdown(
-                choices=speaker_names, value="None", label=f"Speaker {label_tail}"
+                choices=get_spk_choices(), value="None", label=f"Speaker {label_tail}"
             )
             refresh_a_btn = gr.Button("🔄", variant="secondary")
 

@@ -7,10 +7,12 @@ import gradio as gr
 from modules import config
 from modules.webui import webui_config
 
+from modules.webui.changelog_tab import create_changelog_tab
+from modules.webui.ssml.podcast_tab import create_ssml_podcast_tab
 from modules.webui.system_tab import create_system_tab
 from modules.webui.tts_tab import create_tts_interface
-from modules.webui.ssml_tab import create_ssml_interface
-from modules.webui.spliter_tab import create_spliter_tab
+from modules.webui.ssml.ssml_tab import create_ssml_interface
+from modules.webui.ssml.spliter_tab import create_spliter_tab
 from modules.webui.speaker_tab import create_speaker_panel
 from modules.webui.readme_tab import create_readme_tab
 
@@ -85,10 +87,17 @@ def create_interface():
                 create_tts_interface()
 
             with gr.TabItem("SSML", id="ssml"):
-                ssml_input = create_ssml_interface()
-
-            with gr.TabItem("Spilter"):
-                create_spliter_tab(ssml_input, tabs=tabs)
+                with gr.Tabs() as ssml_tabs:
+                    with gr.TabItem("Editor", id="ssml.editor"):
+                        ssml_input = create_ssml_interface()
+                    with gr.TabItem("Spilter"):
+                        create_spliter_tab(
+                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                        )
+                    with gr.TabItem("Podcast"):
+                        create_ssml_podcast_tab(
+                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                        )
 
             with gr.TabItem("Speaker"):
                 create_speaker_panel()
@@ -101,7 +110,11 @@ def create_interface():
                 create_system_tab()
 
             with gr.TabItem("README"):
-                create_readme_tab()
+                with gr.Tabs():
+                    with gr.TabItem("readme"):
+                        create_readme_tab()
+                    with gr.TabItem("changelog"):
+                        create_changelog_tab()
 
         create_app_footer()
     return demo

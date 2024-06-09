@@ -1,6 +1,7 @@
 import gradio as gr
 import torch
 from modules.normalization import text_normalize
+from modules.webui import webui_utils
 from modules.webui.webui_utils import (
     get_speakers,
     get_styles,
@@ -40,17 +41,9 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
 # 长文本处理
 # 可以输入长文本，并选择切割方法，切割之后可以将拼接的SSML发送到SSML tab
 # 根据 。 句号切割，切割之后显示到 data table
-def create_spliter_tab(ssml_input, tabs):
-    speakers = get_speakers()
-
-    def get_speaker_show_name(spk):
-        if spk.gender == "*" or spk.gender == "":
-            return spk.name
-        return f"{spk.gender} : {spk.name}"
-
-    speaker_names = ["*random"] + [
-        get_speaker_show_name(speaker) for speaker in speakers
-    ]
+def create_spliter_tab(ssml_input, tabs1, tabs2):
+    speakers, speaker_names = webui_utils.get_speaker_names()
+    speaker_names = ["*random"] + speaker_names
 
     styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
@@ -164,6 +157,6 @@ def create_spliter_tab(ssml_input, tabs):
     )
 
     def change_tab():
-        return gr.Tabs(selected="ssml")
+        return gr.Tabs(selected="ssml"), gr.Tabs(selected="ssml.editor")
 
-    send_btn.click(change_tab, inputs=[], outputs=[tabs])
+    send_btn.click(change_tab, inputs=[], outputs=[tabs1, tabs2])

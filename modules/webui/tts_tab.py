@@ -27,6 +27,7 @@ def create_tts_interface():
     speaker_names = ["*random"] + [
         get_speaker_show_name(speaker) for speaker in speakers
     ]
+    speaker_names.sort(key=lambda x: x.startswith("*") and "-1" or x)
 
     styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
@@ -121,18 +122,10 @@ def create_tts_interface():
                     # tooltip="Random Seed",
                     variant="secondary",
                 )
+            # 感觉这个没必要设置...
             use_decoder_input = gr.Checkbox(
                 value=True, label="Use Decoder", visible=False
             )
-            with gr.Group():
-                gr.Markdown("🔧Prompt engineering")
-                prompt1_input = gr.Textbox(label="Prompt 1")
-                prompt2_input = gr.Textbox(label="Prompt 2")
-                prefix_input = gr.Textbox(label="Prefix")
-
-                prompt_audio = gr.File(
-                    label="prompt_audio", visible=webui_config.experimental
-                )
 
             infer_seed_rand_button.click(
                 lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
@@ -213,6 +206,16 @@ def create_tts_interface():
                     value="[oral_2][laugh_0][break_6]",
                 )
                 refine_button = gr.Button("✍️Refine Text")
+
+            with gr.Group():
+                gr.Markdown("🔧Prompt engineering")
+                prompt1_input = gr.Textbox(label="Prompt 1")
+                prompt2_input = gr.Textbox(label="Prompt 2")
+                prefix_input = gr.Textbox(label="Prefix")
+
+                prompt_audio = gr.File(
+                    label="prompt_audio", visible=webui_config.experimental
+                )
 
             with gr.Group():
                 gr.Markdown("🔊Generate")
