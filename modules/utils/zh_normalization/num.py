@@ -46,10 +46,15 @@ def replace_frac(match) -> str:
     sign = match.group(1)
     nominator = match.group(2)
     denominator = match.group(3)
-    sign: str = "负" if sign else ""
-    nominator: str = num2str(nominator)
-    denominator: str = num2str(denominator)
-    result = f"{sign}{denominator}分之{nominator}"
+    try:
+        import cn2an
+
+        return cn2an.an2cn(f"{sign}{nominator}/{denominator}", "low")
+    except:
+        sign: str = "负" if sign else ""
+        nominator: str = num2str(nominator)
+        denominator: str = num2str(denominator)
+        result = f"{sign}{denominator}分之{nominator}"
     return result
 
 
@@ -66,9 +71,14 @@ def replace_percentage(match) -> str:
     """
     sign = match.group(1)
     percent = match.group(2)
-    sign: str = "负" if sign else ""
-    percent: str = num2str(percent)
-    result = f"{sign}百分之{percent}"
+    try:
+        import cn2an
+
+        return cn2an.an2cn(f"{sign}{percent}%", "low")
+    except:
+        sign: str = "负" if sign else ""
+        percent: str = num2str(percent)
+        result = f"{sign}百分之{percent}"
     return result
 
 
@@ -86,9 +96,14 @@ def replace_negative_num(match) -> str:
     """
     sign = match.group(1)
     number = match.group(2)
-    sign: str = "负" if sign else ""
-    number: str = num2str(number)
-    result = f"{sign}{number}"
+    try:
+        import cn2an
+
+        return cn2an.an2cn(f"{sign}{number}", "low")
+    except:
+        sign: str = "负" if sign else ""
+        number: str = num2str(number)
+        result = f"{sign}{number}"
     return result
 
 
@@ -105,7 +120,12 @@ def replace_default_num(match):
         str
     """
     number = match.group(0)
-    return verbalize_digit(number, alt_one=True)
+    try:
+        import cn2an
+
+        return cn2an.an2cn(number, "low")
+    except:
+        return verbalize_digit(number, alt_one=True)
 
 
 # 数字表达式
@@ -144,9 +164,10 @@ def replace_number(match) -> str:
     sign = match.group(1)
     number = match.group(2)
     pure_decimal = match.group(5)
-    
+
     # TODO 也许可以把 num2str 完全替换成 cn2an
     import cn2an
+
     text = pure_decimal if pure_decimal else f"{sign}{number}"
     try:
         result = cn2an.an2cn(text, "low")
@@ -158,8 +179,6 @@ def replace_number(match) -> str:
             number: str = num2str(number)
             result = f"{sign}{number}"
     return result
-    
-    
 
 
 # 范围表达式

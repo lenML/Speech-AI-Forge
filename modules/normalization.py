@@ -310,6 +310,10 @@ State-of-the-art Machine Learning for PyTorch, TensorFlow, and JAX.
 🗣️ Audio: automatic speech recognition and audio classification.
 🐙 Multimodal: table question answering, optical character recognition, information extraction from scanned documents, video classification, and visual question answering.
         """,
+        """
+120米
+有12%的概率会下雨
+""",
     ]
 
     for i, test_case in enumerate(test_cases):
