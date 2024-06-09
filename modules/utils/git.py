@@ -2,14 +2,25 @@ from functools import lru_cache
 import os
 import subprocess
 
+
 from modules.utils import constants
 
+# 用于判断是否在hf spaces
+try:
+    import spaces
+except:
+    spaces = None
+
 git = os.environ.get("GIT", "git")
+
+in_hf_spaces = spaces is not None
 
 
 @lru_cache()
 def commit_hash():
     try:
+        if in_hf_spaces:
+            return "<hf>"
         return subprocess.check_output(
             [git, "-C", constants.ROOT_DIR, "rev-parse", "HEAD"],
             shell=False,
@@ -22,6 +33,8 @@ def commit_hash():
 @lru_cache()
 def git_tag():
     try:
+        if in_hf_spaces:
+            return "<hf>"
         return subprocess.check_output(
             [git, "-C", constants.ROOT_DIR, "describe", "--tags"],
             shell=False,
@@ -44,6 +57,8 @@ def git_tag():
 @lru_cache()
 def branch_name():
     try:
+        if in_hf_spaces:
+            return "<hf>"
         return subprocess.check_output(
             [git, "-C", constants.ROOT_DIR, "rev-parse", "--abbrev-ref", "HEAD"],
             shell=False,

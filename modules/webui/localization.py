@@ -1,7 +1,9 @@
 import json
 import os
 import gradio as gr
+import logging
 
+logger = logging.getLogger(__name__)
 
 current_translation = {}
 localization_root = os.path.join(
@@ -24,9 +26,15 @@ def localization_js(filename):
                         assert isinstance(v, str) or isinstance(
                             v, list
                         ), f"Value for key {k} is not a string or list"
+
+                    logger.info(f"Loaded localization file {full_name}")
             except Exception as e:
-                print(str(e))
-                print(f"Failed to load localization file {full_name}")
+                logger.warning(str(e))
+                logger.warning(f"Failed to load localization file {full_name}")
+        else:
+            logger.warning(f"Localization file {full_name} does not exist")
+    else:
+        logger.warning(f"Localization file {filename} is not a string")
 
     # current_translation = {k: 'XXX' for k in current_translation.keys()}  # use this to see if all texts are covered
 
