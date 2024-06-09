@@ -32,6 +32,20 @@ def get_speakers():
     return speaker_mgr.list_speakers()
 
 
+def get_speaker_names() -> tuple[list[Speaker], list[str]]:
+    speakers = get_speakers()
+
+    def get_speaker_show_name(spk):
+        if spk.gender == "*" or spk.gender == "":
+            return spk.name
+        return f"{spk.gender} : {spk.name}"
+
+    speaker_names = [get_speaker_show_name(speaker) for speaker in speakers]
+    speaker_names.sort(key=lambda x: x.startswith("*") and "-1" or x)
+
+    return speakers, speaker_names
+
+
 def get_styles():
     return styles_mgr.list_items()
 
@@ -117,6 +131,8 @@ def synthesize_ssml(ssml: str, batch_size=4):
     combined_audio = combine_audio_segments(audio_segments)
 
     sr, audio_data = audio.pydub_to_np(combined_audio)
+    # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
+    audio_data = audio.audio_to_int16(audio_data)
 
     return sr, audio_data
 
@@ -193,6 +209,7 @@ def tts_generate(
     audio_data, sample_rate = apply_audio_enhance(
         audio_data, sample_rate, enable_denoise, enable_enhance
     )
+    # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio.audio_to_int16(audio_data)
     return sample_rate, audio_data
 
