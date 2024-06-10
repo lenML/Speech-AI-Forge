@@ -126,6 +126,9 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--use_cpu`            | `str`  | `None`      | 当前可选值 `"all"`                                 |
 | `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
 | `--language`           | `str`  | `zh-CN`     | 设置 webui 本地化                                  |
+| `--api`                | `bool` | `False`     | 是否开启 API                                       |
+
+> 从 webui.py 入口启动， 可与 api 同时启动，api 的配置在下方 launch.py 脚本参数中说明， 开启后可在 `http://localhost:7860/docs` 查看 api
 
 > 开启 `--half` 可以大幅减少显存占用。如果 batch size 大于 8 建议开启 half。
 
@@ -158,7 +161,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 ### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
-Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务器。
+某些情况，你并不需要 webui，那么可以使用这个脚本启动单纯的 api 服务。
 
 所有参数：
 

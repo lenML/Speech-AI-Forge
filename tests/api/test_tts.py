@@ -25,7 +25,7 @@ def test_synthesize_tts(client):
     tts_params = default_tts_params.copy()
 
     response = client.get("/v1/tts", params=tts_params)
-
+    print(response.content)
     assert response.status_code == 200
     assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
 

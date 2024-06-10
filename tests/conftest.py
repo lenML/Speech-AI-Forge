@@ -3,13 +3,13 @@ from pytest import fixture
 from fastapi.testclient import TestClient
 
 from launch import create_api
-
+import fastapi
 
 from modules.devices import devices
 
 
 devices.reset_device()
-app_instance = create_api()
+app_instance = create_api(fastapi.FastAPI())
 
 
 @fixture

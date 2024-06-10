@@ -9,8 +9,6 @@ from fastapi.responses import FileResponse
 
 from modules.normalization import text_normalize
 
-from modules import generate_audio as generate
-
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 from modules.synthesize_audio import synthesize_audio
