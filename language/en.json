@@ -83,7 +83,6 @@
     "Suffix _p indicates prompt, which has stronger effect but may impact quality."
   ],
   "SSML_SPLITER_GUIDE": [
-    "- Character limit details can be found in README. Excess will be truncated.",
     "- If the last character is swallowed and not read, try adding `[lbreak]` at the end.",
     "- If the text is all in English, it is recommended to disable text standardization."
   ],
@@ -97,12 +96,10 @@
   ],
 
   "SSML_TEXT_GUIDE": [
-    "- Maximum 3000 characters. Excess will be truncated.",
     "- For more information about SSML, refer to this [documentation](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
   ],
 
   "TTS_TEXT_GUIDE": [
-    "- Character limit. Excess will be truncated.",
     "- If the last character is swallowed and not read, try adding `[lbreak]` at the end.",
     "- If the input text is all in English, it is recommended to disable text standardization."
   ],

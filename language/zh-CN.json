@@ -82,7 +82,6 @@
   "💼Speaker file": "💼音色文件",
   "TTS_STYLE_GUIDE": ["后缀为 _p 表示带prompt，效果更强但是影响质量"],
   "SSML_SPLITER_GUIDE": [
-    "- 字数限制详见README，超过部分将截断",
     "- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`",
     "- 如果文本为全英文，建议关闭文本标准化"
   ],
@@ -96,12 +95,10 @@
   ],
 
   "SSML_TEXT_GUIDE": [
-    "- 线上版本有字符限制，超过会被截断，具体限制见readme文档",
     "- 关于SSML可以看这个 [文档](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
   ],
 
   "TTS_TEXT_GUIDE": [
-    "- 字数限制，超过部分将截断",
     "- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`",
     "- If the input text is all in English, it is recommended to check disable_normalize"
   ],
