@@ -20,12 +20,10 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 - 1. [INDEX](#INDEX)
 - 2. [Features](#Features)
 - 3. [Interface](#Interface)
-- 4. [本地部署](#)
-  - 4.1. [`launch.py`: API Server](#launch.py:APIServer)
-    - 4.1.1. [OpenAI API: `v1/audio/speech`](#OpenAIAPI:v1audiospeech)
-    - 4.1.2. [Google API: `/v1/text:synthesize`](#GoogleAPI:v1text:synthesize)
-  - 4.2. [`webui.py`: WebUI](#webui.py:WebUI)
-    - 4.2.1. [webui features](#webuifeatures)
+- 4. [安装和运行](#)
+  - 4.1. [`webui.py`: WebUI](#webui.py:WebUI)
+    - 4.1.1. [webui features](#webuifeatures)
+  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
 - 5. [Benchmark](#Benchmark)
 - 6. [demo](#demo)
   - 6.1. [风格化控制](#-1)
@@ -40,6 +38,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   - 11.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
   - 11.2. [什么是 Prefix？](#Prefix)
   - 11.3. [Style 中 `_p` 的区别是什么？](#Style_p)
+  - 11.4. [为什么开启了 `--compile` 很慢？](#--compile)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -97,109 +96,12 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   </tr>
 </table>
 
-## 4. <a name=''></a>本地部署
+## 4. <a name=''></a>安装和运行
 
-> f32 模型显存需要 2gb 左右
+1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
+2. 根据你的需求启动需要的服务，具体启动参数如下。
 
-> f16 仅需 1gb 显存即可运行
-
-1. 克隆项目: `git clone https://github.com/lenML/ChatTTS-Forge.git`
-2. 准备模型，放到如下目录
-
-   ![model_dir](./docs/model_dir.png)
-
-   - 自行下载（任选其一）
-
-     - [HuggingFace](https://huggingface.co/2Noise/ChatTTS)
-     - [ModelScope](https://modelscope.cn/models/pzc163/chatTTS/)
-
-   - 使用脚本下载（任选其一）
-     - HuggingFace: 执行 `python -m scripts/download_models --source huggingface`
-     - ModelScope: 执行 `python -m scripts/download_models --source modelscope`
-
-3. 安装 ffmpeg: `apt-get install ffmpeg`
-4. 安装 rubberband: `apt-get install rubberband-cli`
-5. 安装 Python 依赖: `python -m pip install -r requirements.txt`
-6. 根据你的需求启动需要的服务，具体启动参数如下。
-
-> 开启 `--half` 可以大幅减少显存占用。如果 batch size 大于 8 建议开启 half。
-
-> 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
-
-### 4.1. <a name='launch.py:APIServer'></a>`launch.py`: API Server
-
-Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务器。
-
-所有参数：
-
-| 参数              | 类型   | 默认值      | 描述                                            |
-| ----------------- | ------ | ----------- | ----------------------------------------------- |
-| `--host`          | `str`  | `"0.0.0.0"` | 服务器主机地址                                  |
-| `--port`          | `int`  | `8000`      | 服务器端口                                      |
-| `--reload`        | `bool` | `False`     | 启用自动重载功能（用于开发）                    |
-| `--compile`       | `bool` | `False`     | 启用模型编译                                    |
-| `--lru_size`      | `int`  | `64`        | 设置请求缓存池的大小；设置为 0 禁用 `lru_cache` |
-| `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
-| `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
-| `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
-| `--half`          | `bool` | `False`     | 开启 f16 半精度推理                             |
-| `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
-| `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
-| `--device_id`     | `str`  | `None`      | 指定使用 gpu device_id                          |
-| `--use_cpu`       | `str`  | `None`      | 当前可选值 `"all"`                              |
-
-launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
-
-#### 4.1.1. <a name='OpenAIAPI:v1audiospeech'></a>OpenAI API: `v1/audio/speech`
-
-openai 接口比较简单，`input` 为必填项，其余均可为空。
-
-一个简单的请求示例如下：
-
-```bash
-curl http://localhost:8000/v1/audio/speech \
-  -H "Authorization: Bearer anything_your_wanna" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "chattts-4w",
-    "input": "Today is a wonderful day to build something people love! [lbreak]",
-    "voice": "female2",
-    "style": "chat"
-  }' \
-  --output speech.mp3
-```
-
-也可以使用 openai 库调用，具体可以看 [openai 官方文档](https://platform.openai.com/docs/guides/text-to-speech)
-
-#### 4.1.2. <a name='GoogleAPI:v1text:synthesize'></a>Google API: `/v1/text:synthesize`
-
-google 接口略复杂，但是某些时候用这个是必要的，因为这个接口将会返回 base64 格式的 audio
-
-一个简单的请求示例如下：
-
-```bash
-curl "http://localhost:8000/v1/text:synthesize" -X POST \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json; charset=utf-8" \
-  -d '{
-  "input": {
-    "text": "Hello, ChatTTS Forage Google Endpoint Test. [lbreak]"
-  },
-  "voice": {
-    "languageCode": "zh-CN",
-    "name": "female2",
-    "temperature": 0.3,
-    "topP": 0.7,
-    "topK": 20,
-    "seed": 42
-  },
-  "audioConfig": {
-    "audioEncoding": "MP3"
-  }
-}' -o response.json
-```
-
-### 4.2. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
+### 4.1. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
 
 WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
@@ -223,7 +125,11 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
 | `--language`           | `str`  | `zh-CN`     | 设置 webui 本地化                                  |
 
-#### 4.2.1. <a name='webuifeatures'></a>webui features
+> 开启 `--half` 可以大幅减少显存占用。如果 batch size 大于 8 建议开启 half。
+
+> 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
+
+#### 4.1.1. <a name='webuifeatures'></a>webui features
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
@@ -246,6 +152,32 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
   - denoise: 去除噪音
   - [WIP] ASR
   - [WIP] Inpainting
+
+### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+
+Launch.py 是 ChatTTS-Forge 的启动脚本，用于配置和启动 API 服务器。
+
+所有参数：
+
+| 参数              | 类型   | 默认值      | 描述                                            |
+| ----------------- | ------ | ----------- | ----------------------------------------------- |
+| `--host`          | `str`  | `"0.0.0.0"` | 服务器主机地址                                  |
+| `--port`          | `int`  | `8000`      | 服务器端口                                      |
+| `--reload`        | `bool` | `False`     | 启用自动重载功能（用于开发）                    |
+| `--compile`       | `bool` | `False`     | 启用模型编译                                    |
+| `--lru_size`      | `int`  | `64`        | 设置请求缓存池的大小；设置为 0 禁用 `lru_cache` |
+| `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
+| `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
+| `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
+| `--half`          | `bool` | `False`     | 开启 f16 半精度推理                             |
+| `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
+| `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
+| `--device_id`     | `str`  | `None`      | 指定使用 gpu device_id                          |
+| `--use_cpu`       | `str`  | `None`      | 当前可选值 `"all"`                              |
+
+launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
+
+[详细 API 文档](./docs/api.md)
 
 ## 5. <a name='Benchmark'></a>Benchmark
 
@@ -387,6 +319,12 @@ Prefix 主要用于控制模型的生成能力，类似于官方示例中的 ref
 ### 11.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
 
 Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
+
+### 11.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
+
+由于还未实现推理 padding 所以如果每次推理 shape 改变都可能触发 torch 进行 compile
+
+> 暂时不建议开启
 
 # References
 
