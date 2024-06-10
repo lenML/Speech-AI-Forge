@@ -9,8 +9,8 @@ import pytest
 @mark.parametrize(
     "input_text, voice",
     [
-        ("Hello, world", "female2"),
-        ("Test text", "Alice"),
+        ("Hello, world [lbreak]", "female2"),
+        ("Test text [lbreak]", "Alice"),
         ("Invalid voice", "unknown_voice"),
     ],
 )

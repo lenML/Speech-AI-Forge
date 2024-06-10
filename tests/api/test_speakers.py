@@ -10,16 +10,16 @@ from modules.utils import constants
     "path, method, status_code",
     [
         ("/v1/speakers/list", "GET", 200),
-        # ("/v1/speakers/update", "POST", 200),
+        ("/v1/speakers/refresh", "POST", 200),
     ],
 )
-@mark.speakers
+@mark.speakers_api
 def test_api_endpoints(client, path, method, status_code):
     response = client.request(method, path)
     assert response.status_code == status_code
 
 
-@mark.speakers
+@mark.speakers_api
 def test_create_speaker(client):
     data = {
         "name": "测试发言人",

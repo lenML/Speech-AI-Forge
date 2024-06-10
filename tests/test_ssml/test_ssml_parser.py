@@ -28,12 +28,12 @@ def test_speak_tag(parser):
     assert len(segments) == 3
     assert isinstance(segments[0], SSMLSegment)
     assert segments[0].text == "你好"
-    assert segments[0].params.rate == "fast"
+    assert segments[0].attrs.rate == "fast"
     assert isinstance(segments[1], SSMLBreak)
-    assert segments[1].duration == 500
+    assert segments[1].attrs.duration == 500
     assert isinstance(segments[2], SSMLSegment)
     assert segments[2].text == "你好"
-    assert segments[2].params.rate == "slow"
+    assert segments[2].attrs.rate == "slow"
 
 
 @pytest.mark.ssml_parser
@@ -47,8 +47,8 @@ def test_voice_tag(parser):
     assert len(segments) == 1
     assert isinstance(segments[0], SSMLSegment)
     assert segments[0].text == "你好"
-    assert segments[0].params.spk == "xiaoyan"
-    assert segments[0].params.style == "news"
+    assert segments[0].attrs.spk == "xiaoyan"
+    assert segments[0].attrs.style == "news"
 
 
 @pytest.mark.ssml_parser
@@ -61,7 +61,7 @@ def test_break_tag(parser):
     segments = parser.parse(ssml)
     assert len(segments) == 1
     assert isinstance(segments[0], SSMLBreak)
-    assert segments[0].duration == 500
+    assert segments[0].attrs.duration == 500
 
 
 @pytest.mark.ssml_parser
@@ -75,7 +75,7 @@ def test_prosody_tag(parser):
     assert len(segments) == 1
     assert isinstance(segments[0], SSMLSegment)
     assert segments[0].text == "你好"
-    assert segments[0].params.rate == "fast"
+    assert segments[0].attrs.rate == "fast"
 
 
 @pytest.mark.ssml_parser

@@ -35,10 +35,14 @@ def setup(app: APIManager):
 
     @app.get("/v1/speakers/list", response_model=api_utils.BaseResponse)
     async def list_speakers():
-        return {
-            "message": "ok",
-            "data": [spk.to_json() for spk in speaker_mgr.list_speakers()],
-        }
+        return api_utils.success_response(
+            [spk.to_json() for spk in speaker_mgr.list_speakers()]
+        )
+
+    @app.post("/v1/speakers/refresh", response_model=api_utils.BaseResponse)
+    async def refresh_speakers():
+        speaker_mgr.refresh_speakers()
+        return api_utils.success_response(None)
 
     @app.post("/v1/speakers/update", response_model=api_utils.BaseResponse)
     async def update_speakers(request: SpeakersUpdate):
@@ -59,7 +63,8 @@ def setup(app: APIManager):
                 # number array => Tensor
                 speaker.emb = torch.tensor(spk["tensor"])
         speaker_mgr.save_all()
-        return {"message": "ok", "data": None}
+
+        return api_utils.success_response(None)
 
     @app.post("/v1/speaker/create", response_model=api_utils.BaseResponse)
     async def create_speaker(request: CreateSpeaker):
@@ -88,12 +93,7 @@ def setup(app: APIManager):
             raise HTTPException(
                 status_code=400, detail="Missing tensor or seed in request"
             )
-        return {"message": "ok", "data": speaker.to_json()}
-
-    @app.post("/v1/speaker/refresh", response_model=api_utils.BaseResponse)
-    async def refresh_speakers():
-        speaker_mgr.refresh_speakers()
-        return {"message": "ok"}
+        return api_utils.success_response(speaker.to_json())
 
     @app.post("/v1/speaker/update", response_model=api_utils.BaseResponse)
     async def update_speaker(request: UpdateSpeaker):
@@ -113,11 +113,11 @@ def setup(app: APIManager):
             # number array => Tensor
             speaker.emb = torch.tensor(request.tensor)
         speaker_mgr.update_speaker(speaker)
-        return {"message": "ok"}
+        return api_utils.success_response(None)
 
     @app.post("/v1/speaker/detail", response_model=api_utils.BaseResponse)
     async def speaker_detail(request: SpeakerDetail):
         speaker = speaker_mgr.get_speaker_by_id(request.id)
         if speaker is None:
             raise HTTPException(status_code=404, detail="Speaker not found")
-        return {"message": "ok", "data": speaker.to_json(with_emb=request.with_emb)}
+        return api_utils.success_response(speaker.to_json(with_emb=request.with_emb))
