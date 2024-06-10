@@ -37,7 +37,7 @@ class ResembleEnhance:
         enhancer = Enhancer(hparams)
         state_dict = torch.load(
             Path(MODELS_DIR) / "resemble-enhance" / "mp_rank_00_model_states.pt",
-            map_location="cpu",
+            map_location=self.device,
         )["module"]
         enhancer.load_state_dict(state_dict)
         enhancer.to(self.device).eval()
