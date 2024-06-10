@@ -1,19 +1,9 @@
 import os
-from pytest import fixture, mark, raises
-from fastapi.testclient import TestClient
+from pytest import mark
 from modules.api.impl.openai_api import AudioSpeechRequest
-
-from launch import create_api
 
 import tests.conftest
 import pytest
-
-app_instance = create_api()
-
-
-@fixture
-def client():
-    yield TestClient(app_instance.app)
 
 
 @mark.parametrize(

@@ -1,13 +1,8 @@
 import pytest
-from fastapi.testclient import TestClient
-from launch import create_api
 import base64
 import os
 
 import tests.conftest
-
-app_instance = create_api()
-client = TestClient(app_instance.app)
 
 
 @pytest.fixture
@@ -36,7 +31,7 @@ def google_text_synthesize_request():
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_success(google_text_synthesize_request):
+def test_google_text_synthesize_success(client, google_text_synthesize_request):
     response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
     assert response.status_code == 200
     assert "audioContent" in response.json()
@@ -53,14 +48,18 @@ def test_google_text_synthesize_success(google_text_synthesize_request):
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_missing_input():
+def test_google_text_synthesize_missing_input(
+    client,
+):
     response = client.post("/v1/text:synthesize", json={})
     assert response.status_code == 422
     assert "Field required" == response.json()["detail"][0]["msg"]
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_invalid_voice():
+def test_google_text_synthesize_invalid_voice(
+    client,
+):
     request = {
         "input": {"text": "这是一个测试文本。"},
         "voice": {
@@ -88,7 +87,9 @@ def test_google_text_synthesize_invalid_voice():
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_invalid_audio_encoding():
+def test_google_text_synthesize_invalid_audio_encoding(
+    client,
+):
     request = {
         "input": {"text": "这是一个测试文本。"},
         "voice": {

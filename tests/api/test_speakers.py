@@ -1,17 +1,8 @@
 import os
-from pytest import fixture, mark
-from fastapi.testclient import TestClient
+from pytest import mark
 
-from launch import create_api
 
 from modules.utils import constants
-
-app_instance = create_api()
-
-
-@fixture
-def client():
-    yield TestClient(app_instance.app)
 
 
 # 标记为参数化测试

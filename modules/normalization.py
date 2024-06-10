@@ -5,6 +5,10 @@ from modules.utils.markdown import markdown_to_text
 from modules import models
 import re
 
+# 是否关闭 unk token 检查
+# NOTE: 单测的时候用于跳过模型加载
+DISABLE_UNK_TOKEN_CHECK = False
+
 
 @lru_cache(maxsize=64)
 def is_chinese(text):
@@ -159,6 +163,8 @@ def replace_unk_tokens(text):
     """
     把不在字典里的字符替换为 " , "
     """
+    if DISABLE_UNK_TOKEN_CHECK:
+        return text
     chat_tts = models.load_chat_tts()
     if "tokenizer" not in chat_tts.pretrain_models:
         # 这个地方只有在 huggingface spaces 中才会触发

@@ -115,7 +115,11 @@ async def openai_speech_api(
         import logging
 
         logging.exception(e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 class TranscribeSegment(BaseModel):

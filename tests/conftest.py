@@ -1,4 +1,20 @@
 import os
+from pytest import fixture
+from fastapi.testclient import TestClient
+
+from launch import create_api
+
+
+from modules.devices import devices
+
+
+devices.reset_device()
+app_instance = create_api()
+
+
+@fixture
+def client():
+    yield TestClient(app_instance.app)
 
 
 test_inputs_dir = os.path.dirname(__file__) + "/test_inputs"

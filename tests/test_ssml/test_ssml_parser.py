@@ -98,7 +98,3 @@ def test_unsupported_tag(parser):
     """
     with pytest.raises(NotImplementedError, match=r"Tag unsupported not supported."):
         parser.parse(ssml)
-
-
-if __name__ == "__main__":
-    pytest.main()

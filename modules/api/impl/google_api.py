@@ -14,7 +14,7 @@ from modules import generate_audio as generate
 from modules.speaker import speaker_mgr
 
 
-from modules.ssml import parse_ssml
+from modules.ssml_parser.SSMLParser import create_ssml_parser
 from modules.SynthesizeSegments import (
     SynthesizeSegments,
     combine_audio_segments,
@@ -65,6 +65,8 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     audioConfig = request.audioConfig
 
     # 提取参数
+
+    # TODO 这个也许应该传给 normalizer
     language_code = voice.languageCode
     voice_name = voice.name
     infer_seed = voice.seed or 42
@@ -86,9 +88,8 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     # TODO maybe need to change the sample rate
     sample_rate = 24000
 
-    # TODO 使用 speaker
-    spk = speaker_mgr.get_speaker(voice_name)
-    if spk is None:
+    # 虽然 calc_spk_style 可以解析 seed 形式，但是这个接口只准备支持 speakers list 中存在的 speaker
+    if speaker_mgr.get_speaker(voice_name) is None:
         raise HTTPException(
             status_code=400, detail="The specified voice name is not supported."
         )
@@ -120,7 +121,8 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
         elif input.ssml:
             # 处理SSML合成逻辑
-            segments = parse_ssml(input.ssml)
+            parser = create_ssml_parser()
+            segments = parser.parse(input.ssml)
             for seg in segments:
                 seg["text"] = text_normalize(seg["text"], is_end=True)
 
@@ -171,7 +173,11 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
         import logging
 
         logging.exception(e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def setup(app: APIManager):

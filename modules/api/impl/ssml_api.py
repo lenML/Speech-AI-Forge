@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 
 
 from modules.normalization import text_normalize
-from modules.ssml import parse_ssml
+from modules.ssml_parser.SSMLParser import create_ssml_parser
 from modules.SynthesizeSegments import (
     SynthesizeSegments,
     combine_audio_segments,
@@ -34,7 +34,7 @@ async def synthesize_ssml(
 ):
     try:
         ssml = request.ssml
-        format = request.format
+        format = request.format.lower()
         batch_size = request.batch_size
 
         if batch_size < 1:
@@ -42,10 +42,16 @@ async def synthesize_ssml(
                 status_code=400, detail="Batch size must be greater than 0."
             )
 
-        if not ssml:
+        if not ssml or ssml == "":
             raise HTTPException(status_code=400, detail="SSML content is required.")
 
-        segments = parse_ssml(ssml)
+        if format not in ["mp3", "wav"]:
+            raise HTTPException(
+                status_code=400, detail="Format must be 'mp3' or 'wav'."
+            )
+
+        parser = create_ssml_parser()
+        segments = parser.parse(ssml)
         for seg in segments:
             seg["text"] = text_normalize(seg["text"], is_end=True)
 
@@ -63,7 +69,11 @@ async def synthesize_ssml(
         import logging
 
         logging.exception(e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def setup(api_manager: APIManager):

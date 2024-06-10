@@ -29,6 +29,12 @@ class SSMLContext(Box):
         self.prompt2 = None
         self.prefix = None
 
+    def clone(self):
+        ctx = SSMLContext()
+        for k, v in self.items():
+            ctx[k] = v
+        return ctx
+
 
 class SSMLSegment(Box):
     def __init__(self, text: str, attrs=SSMLContext()):
@@ -84,7 +90,7 @@ def create_ssml_parser():
 
     @parser.resolver("speak")
     def tag_speak(element, context, segments, parser):
-        ctx = copy.deepcopy(context)
+        ctx = context.clone() if context is not None else SSMLContext()
 
         version = element.get("version")
         if version != "0.1":
@@ -95,7 +101,7 @@ def create_ssml_parser():
 
     @parser.resolver("voice")
     def tag_voice(element, context, segments, parser):
-        ctx = copy.deepcopy(context)
+        ctx = context.clone() if context is not None else SSMLContext()
 
         ctx.spk = element.get("spk", ctx.spk)
         ctx.style = element.get("style", ctx.style)
@@ -131,7 +137,7 @@ def create_ssml_parser():
 
     @parser.resolver("prosody")
     def tag_prosody(element, context, segments, parser):
-        ctx = copy.deepcopy(context)
+        ctx = context.clone() if context is not None else SSMLContext()
 
         ctx.spk = element.get("spk", ctx.spk)
         ctx.style = element.get("style", ctx.style)

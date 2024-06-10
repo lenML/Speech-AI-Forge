@@ -44,6 +44,39 @@ class TTSParams(BaseModel):
 
 async def synthesize_tts(params: TTSParams = Depends()):
     try:
+        # Validate text
+        if not params.text.strip():
+            raise HTTPException(
+                status_code=422, detail="Text parameter cannot be empty"
+            )
+
+        # Validate temperature
+        if not (0 <= params.temperature <= 1):
+            raise HTTPException(
+                status_code=422, detail="Temperature must be between 0 and 1"
+            )
+
+        # Validate top_P
+        if not (0 <= params.top_P <= 1):
+            raise HTTPException(status_code=422, detail="top_P must be between 0 and 1")
+
+        # Validate top_K
+        if params.top_K <= 0:
+            raise HTTPException(
+                status_code=422, detail="top_K must be a positive integer"
+            )
+        if params.top_K > 100:
+            raise HTTPException(
+                status_code=422, detail="top_K must be less than or equal to 100"
+            )
+
+        # Validate format
+        if params.format not in ["mp3", "wav"]:
+            raise HTTPException(
+                status_code=422,
+                detail="Invalid format. Supported formats are mp3 and wav",
+            )
+
         text = text_normalize(params.text, is_end=False)
 
         calc_params = api_utils.calc_spk_style(spk=params.spk, style=params.style)
@@ -87,7 +120,11 @@ async def synthesize_tts(params: TTSParams = Depends()):
         import logging
 
         logging.exception(e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def setup(api_manager: APIManager):

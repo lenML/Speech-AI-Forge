@@ -46,6 +46,10 @@ class PlainTextRenderer(mistune.HTMLRenderer):
         # remove code
         return ""
 
+    def thematic_break(self) -> str:
+        # remove break
+        return "\n"
+
 
 def markdown_to_text(markdown_text):
     renderer = PlainTextRenderer()
@@ -68,6 +72,9 @@ console.log(1)
 - 列表项 1
 - 列表项 2
 - 列表项 3
+
+1. 第一
+2. 第二
 
 > 这是一个引用。
 

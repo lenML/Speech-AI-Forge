@@ -42,7 +42,11 @@ async def refiner_prompt_post(request: RefineTextRequest):
         import logging
 
         logging.exception(e)
-        raise HTTPException(status_code=500, detail=str(e))
+
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def setup(api_manager: APIManager):
