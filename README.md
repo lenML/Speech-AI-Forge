@@ -13,7 +13,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 | **在线体验** | 部署于 HuggingFace 中    | [HuggingFace Spaces](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                          |
 | **一键启动** | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.ipynb) |
 | **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                |
-| **本地部署** | 查看环境准备部分         | [本地部署](#本地部署)                                                                                                                                            |
+| **本地部署** | 查看环境准备部分         | [本地部署](#InstallationandRunning)                                                                                                                              |
 
 ## 1. <a name='INDEX'></a>INDEX
 
@@ -98,7 +98,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   </tr>
 </table>
 
-## 4. <a name=''></a>安装和运行
+## 4. <a name='InstallationandRunning'></a> Installation and Running
 
 1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
 2. 根据你的需求启动需要的服务，具体启动参数如下。
