@@ -93,13 +93,11 @@ def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
     tensor = torch.from_numpy(audio_data).float().squeeze().cpu()
     enhancer = load_enhancer(device)
 
-    if enable_enhance:
+    if enable_enhance or enable_denoise:
         lambd = 0.9 if enable_denoise else 0.1
         tensor, sr = enhancer.enhance(
             tensor, sr, tau=0.5, nfe=64, solver="rk4", lambd=lambd, device=device
         )
-    elif enable_denoise:
-        tensor, sr = enhancer.denoise(tensor, sr)
 
     audio_data = tensor.cpu().numpy()
     return audio_data, int(sr)
