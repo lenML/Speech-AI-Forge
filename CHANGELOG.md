@@ -1,22 +1,27 @@
 # Changelog
 
 <a name="0.5.6-rc"></a>
-## 0.5.6-rc (2024-06-09)
+
+## 0.5.6-rc (2024-06-10)
 
 ### Added
 
+- ✨ add webui 音色编辑器 [[fb4c7b3](https://github.com/lenML/ChatTTS-Forge/commit/fb4c7b3b0949ac669da0d069c739934f116b83e2)]
 - ✨ add localization [[c05035d](https://github.com/lenML/ChatTTS-Forge/commit/c05035d5cdcc5aa7efd995fe42f6a2541abe718b)]
 - ✨ SSML 支持 enhancer [[5c2788e](https://github.com/lenML/ChatTTS-Forge/commit/5c2788e04f3debfa8bafd8a2e2371dde30f38d4d)]
 - ✨ webui 增加 podcast 工具 tab [[b0b169d](https://github.com/lenML/ChatTTS-Forge/commit/b0b169d8b49c8e013209e59d1f8b637382d8b997)]
-- ✨ 完善  enhancer [[205ebeb](https://github.com/lenML/ChatTTS-Forge/commit/205ebebeb7530c81fde7ea96c7e4c6a888a29835)]
+- ✨ 完善 enhancer [[205ebeb](https://github.com/lenML/ChatTTS-Forge/commit/205ebebeb7530c81fde7ea96c7e4c6a888a29835)]
 
 ### Changed
 
+- ⚡ 增加默认说话人 [[d702ad5](https://github.com/lenML/ChatTTS-Forge/commit/d702ad5ad585978f8650284ab99238571dbd163b)]
+- 🍱 add &#x60;podcast&#x60; &#x60;podcast_p&#x60; style [[2b9e5bf](https://github.com/lenML/ChatTTS-Forge/commit/2b9e5bfd8fe4700f802097b995f5b68bf1097087)]
+- 🎨 improve code [[317951e](https://github.com/lenML/ChatTTS-Forge/commit/317951e431b16c735df31187b1af7230a1608c41)]
 - 🍱 update banner [[dbc293e](https://github.com/lenML/ChatTTS-Forge/commit/dbc293e1a7dec35f60020dcaf783ba3b7c734bfa)]
 - ⚡ 增强 TN [[092c1b9](https://github.com/lenML/ChatTTS-Forge/commit/092c1b94147249880198fe2ad3dfe3b209099e19)]
 - ⚡ enhancer 支持 off_tqdm [[94d34d6](https://github.com/lenML/ChatTTS-Forge/commit/94d34d657fa3433dae9ff61775e0c364a6f77aff)]
 - ⚡ 增加 git env [[43d9c65](https://github.com/lenML/ChatTTS-Forge/commit/43d9c65877ff68ad94716bc2e505ccc7ae8869a8)]
-- ⚡ 修改webui保存文件格式 [[2da41c9](https://github.com/lenML/ChatTTS-Forge/commit/2da41c90aa81bf87403598aefaea3e0ae2e83d79)]
+- ⚡ 修改 webui 保存文件格式 [[2da41c9](https://github.com/lenML/ChatTTS-Forge/commit/2da41c90aa81bf87403598aefaea3e0ae2e83d79)]
 
 ### Removed
 
@@ -24,6 +29,9 @@
 
 ### Fixed
 
+- 🐛 fix missing device [#25](https://github.com/lenML/ChatTTS-Forge/issues/25) [[07cf6c1](https://github.com/lenML/ChatTTS-Forge/commit/07cf6c1386900999b6c9436debbfcbe59f6b692a)]
+- 🐛 fix Chat.refiner_prompt() [[0839863](https://github.com/lenML/ChatTTS-Forge/commit/083986369d0e67fcb4bd71930ad3d2bc3fc038fb)]
+- 🐛 fix --language type check [[50d354c](https://github.com/lenML/ChatTTS-Forge/commit/50d354c91c659d9ae16c8eaa0218d9e08275fbb2)]
 - 🐛 fix hparams config [#22](https://github.com/lenML/ChatTTS-Forge/issues/22) [[61d9809](https://github.com/lenML/ChatTTS-Forge/commit/61d9809804ad8c141d36afde51a608734a105662)]
 - 🐛 fix enhance 下载脚本 [[d2e14b0](https://github.com/lenML/ChatTTS-Forge/commit/d2e14b0a4905724a55b03493fa4b94b5c4383c95)]
 - 🐛 fix &#x27;trange&#x27; referenced [[d1a8dae](https://github.com/lenML/ChatTTS-Forge/commit/d1a8daee61e62d14cf5fd7a17fab4424e24b1c41)]
@@ -33,10 +41,9 @@
 
 ### Miscellaneous
 
+- 🧪 add tests [[7a54225](https://github.com/lenML/ChatTTS-Forge/commit/7a542256a157a281a15312bbf987bc9fb16876ee)]
+- 🔨 improve model downloader [[79a0c59](https://github.com/lenML/ChatTTS-Forge/commit/79a0c599f03b4e47346315a03f1df3d92578fe5d)]
 - 🌐 更新翻译文案 [[f56caa7](https://github.com/lenML/ChatTTS-Forge/commit/f56caa71e9186680b93c487d9645186ae18c1dc6)]
-- 📝 update [[7cacf91](https://github.com/lenML/ChatTTS-Forge/commit/7cacf913541ee5f86eaa80d8b193b94b3db2b67c)]
-- 📝 update webui document [[7f2bb22](https://github.com/lenML/ChatTTS-Forge/commit/7f2bb227027cc0eff312c37758a20916c1ebade6)]
-
 
 <a name="0.5.5"></a>
 
