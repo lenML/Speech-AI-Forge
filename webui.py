@@ -17,6 +17,7 @@ from launch import (
     app_version,
 )
 from modules.webui import webui_config
+from modules import config
 from modules.webui.app import webui_init, create_interface
 import argparse
 from modules.gradio_dcls_fix import dcls_patch
@@ -72,7 +73,7 @@ def process_webui_args(args):
     debug = get_and_update_env(args, "debug", False, bool)
     auth = get_and_update_env(args, "auth", None, str)
     language = get_and_update_env(args, "language", "zh-CN", str)
-    api = get_and_update_env(args, "api", "zh-CN", str)
+    api = get_and_update_env(args, "api", False, bool)
 
     webui_config.experimental = get_and_update_env(
         args, "webui_experimental", False, bool
@@ -106,17 +107,16 @@ def process_webui_args(args):
             "title": app_title,
             "description": app_description,
             "version": app_version,
-            # "redoc_url": (
-            #     None
-            #     if api is False
-            #     else None if config.runtime_env_vars.no_docs else "/redoc"
-            # ),
-            # "docs_url": (
-            #     None
-            #     if api is False
-            #     else None if config.runtime_env_vars.no_docs else "/docs"
-            # ),
-            "docs_url": "/docs",
+            "redoc_url": (
+                None
+                if api is False
+                else None if config.runtime_env_vars.no_docs else "/redoc"
+            ),
+            "docs_url": (
+                None
+                if api is False
+                else None if config.runtime_env_vars.no_docs else "/docs"
+            ),
         },
     )
     # gradio uses a very open CORS policy via app.user_middleware, which makes it possible for

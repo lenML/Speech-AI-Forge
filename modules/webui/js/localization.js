@@ -163,6 +163,23 @@ function localizeWholePage() {
   }
 }
 
+/**
+ *
+ * @param {HTMLElement} node
+ */
+function isNeedTranslate(node) {
+  if (!node) return false;
+  if (!(node instanceof HTMLElement)) return true;
+  while (node.parentElement !== document.body) {
+    if (node.classList.contains("no-translate")) {
+      return false;
+    }
+    node = node.parentElement;
+    if (!node) break;
+  }
+  return true;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   if (!hasLocalization()) {
     return;
@@ -170,9 +187,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   onUiUpdate(function (m) {
     m.forEach(function (mutation) {
-      mutation.addedNodes.forEach(function (node) {
-        processNode(node);
-      });
+      Array.from(mutation.addedNodes)
+        .filter(isNeedTranslate)
+        .forEach(function (node) {
+          processNode(node);
+        });
     });
   });
 
