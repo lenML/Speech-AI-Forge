@@ -1,3 +1,5 @@
+[cn](./README.md) | [en](./README.en.md)
+
 # 🍦 ChatTTS-Forge
 
 ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。
@@ -147,9 +149,10 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
   - speaker merge: 支持合并说话人，微调 speaker
 - Prompt Slot
 - Text Normalize
-- Experimental 实验功能
+- 音质增强：
   - enhance: 音质增强提高输出质量
   - denoise: 去除噪音
+- Experimental 实验功能
   - [WIP] ASR
   - [WIP] Inpainting
 
