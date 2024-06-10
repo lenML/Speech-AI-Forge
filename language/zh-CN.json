@@ -57,8 +57,8 @@
   "🔊Generate speaker.pt": "🔊生成 speaker.pt",
   "Save .pt file": "保存.pt文件",
   "Save to File": "保存到文件",
-  "🎤Test voice": "🎤测试语音",
-  "Test Voice": "测试语音",
+  "🎤Test voice": "🎤试语",
+  "Test Voice": "试语",
   "Current Seed": "当前种子",
   "Output Audio": "输出音频",
   "Merger": "融合",
@@ -79,6 +79,7 @@
   "README": "README",
   "readme": "readme",
   "changelog": "changelog",
+  "💼Speaker file": "💼音色文件",
   "TTS_STYLE_GUIDE": ["后缀为 _p 表示带prompt，效果更强但是影响质量"],
   "SSML_SPLITER_GUIDE": [
     "- 字数限制详见README，超过部分将截断",
