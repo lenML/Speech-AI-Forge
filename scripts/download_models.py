@@ -1,4 +1,5 @@
 import argparse
+import time
 
 from scripts.ModelDownloader import ModelDownloader
 from scripts.dl_chattts import ChatTTSDownloader
@@ -32,6 +33,15 @@ def main():
             downloader.from_huggingface()
         else:
             raise ValueError("Invalid source")
+
+        # after check
+        times = 5
+        for i in range(times):
+            if downloader.check_exist():
+                break
+            time.sleep(5)
+            if i == times - 1:
+                raise TimeoutError("Download timeout")
 
         downloader.gc()
 

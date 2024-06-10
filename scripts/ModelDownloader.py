@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 
 MODEL_DIR = Path("models")
 
