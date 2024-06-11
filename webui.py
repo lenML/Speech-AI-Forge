@@ -130,6 +130,8 @@ def process_webui_args(args):
     if api:
         process_api_args(args, app)
 
+    demo.block_thread()
+
 
 if __name__ == "__main__":
     import dotenv
