@@ -5,7 +5,7 @@ import numpy as np
 from modules.Enhancer.ResembleEnhance import load_enhancer
 from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
-from modules.hf import spaces
+from modules.utils.hf import spaces
 from modules.webui import webui_config
 
 import torch

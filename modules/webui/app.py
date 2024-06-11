@@ -5,7 +5,7 @@ import torch
 import gradio as gr
 
 from modules import config
-from modules.webui import gradio_extensions, localization, webui_config, gradio_hijack
+from modules.webui import gradio_extensions, webui_config
 
 from modules.webui.changelog_tab import create_changelog_tab
 from modules.webui.localization_runtime import ENLocalizationVars, ZHLocalizationVars
@@ -43,6 +43,7 @@ def create_app_footer():
     git_branch = os.environ.get("V_GIT_BRANCH") or config.versions.git_branch
     python_version = config.versions.python_version
     torch_version = config.versions.torch_version
+    ffmpeg_version = config.versions.ffmpeg_version
 
     config.versions.gradio_version = gradio_version
 
@@ -53,9 +54,10 @@ def create_app_footer():
     footer_items.append(f"branch: `{git_branch}`")
     footer_items.append(f"python: `{python_version}`")
     footer_items.append(f"torch: `{torch_version}`")
+    footer_items.append(f"ffmpeg: `{ffmpeg_version}`")
 
     if config.runtime_env_vars.api and not config.runtime_env_vars.no_docs:
-        footer_items.append(f"[API](/docs)")
+        footer_items.append(f"[api](/docs)")
 
     gr.Markdown(
         " | ".join(footer_items),

@@ -2,7 +2,7 @@ import io
 import gradio as gr
 import torch
 
-from modules.hf import spaces
+from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
 from modules.webui.webui_utils import get_speakers, tts_generate
 from modules.speaker import speaker_mgr, Speaker

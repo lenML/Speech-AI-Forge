@@ -7,7 +7,7 @@ from modules.webui.webui_utils import (
     get_styles,
     split_long_text,
 )
-from modules.hf import spaces
+from modules.utils.hf import spaces
 
 
 # NOTE: 因为 text_normalize 需要使用 tokenizer

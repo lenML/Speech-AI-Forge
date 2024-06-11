@@ -4,7 +4,7 @@ import torch
 
 from modules.normalization import text_normalize
 from modules.webui import webui_utils
-from modules.hf import spaces
+from modules.utils.hf import spaces
 
 podcast_default_case = [
     [

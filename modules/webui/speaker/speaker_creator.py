@@ -2,7 +2,7 @@ import gradio as gr
 import torch
 from modules.speaker import Speaker
 from modules.utils.SeedContext import SeedContext
-from modules.hf import spaces
+from modules.utils.hf import spaces
 from modules.models import load_chat_tts
 from modules.utils.rng import np_rng
 from modules.webui import webui_config

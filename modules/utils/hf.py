@@ -2,6 +2,8 @@
 
 try:
     import spaces
+
+    is_spaces_env = True
 except:
 
     class NoneSpaces:
@@ -12,3 +14,4 @@ except:
             return fn
 
     spaces = NoneSpaces()
+    is_spaces_env = False

@@ -3,7 +3,7 @@ import sys
 import torch
 from modules.utils.JsonObject import JsonObject
 
-from modules.utils import git
+from modules.utils import git, ffmpeg
 
 # TODO impl RuntimeEnvVars() class
 runtime_env_vars = JsonObject({})
@@ -20,5 +20,6 @@ versions = JsonObject(
         "git_tag": git.git_tag(),
         "git_branch": git.branch_name(),
         "git_commit": git.commit_hash(),
+        "ffmpeg_version": ffmpeg.ffmpeg_version(),
     }
 )
