@@ -46,11 +46,11 @@ git clone https://github.com/lenML/ChatTTS-Forge.git --depth=1
 - 使用脚本下载（任选其一）：
   - 从 HuggingFace 下载：
     ```bash
-    python -m scripts/download_models --source huggingface
+    python -m scripts.download_models --source huggingface
     ```
   - 从 ModelScope 下载：
     ```bash
-    python -m scripts/download_models --source modelscope
+    python -m scripts.download_models --source modelscope
     ```
 
 安装完成之后 `models` 文件夹应该如下
