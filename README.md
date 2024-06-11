@@ -1,4 +1,4 @@
-[cn](./README.md) | [en](./README.en.md)
+[cn](./README.md) | [en](./README.en.md) | [Discord Server](https://discord.gg/9XnXUhAy3t)
 
 # 🍦 ChatTTS-Forge
 
