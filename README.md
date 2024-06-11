@@ -20,27 +20,30 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 <!-- vscode-markdown-toc -->
 
 - 1. [INDEX](#INDEX)
-- 2. [Features](#Features)
-- 3. [Interface](#Interface)
-- 4. [安装和运行](#)
-  - 4.1. [`webui.py`: WebUI](#webui.py:WebUI)
-    - 4.1.1. [webui features](#webuifeatures)
-  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
-- 5. [Benchmark](#Benchmark)
-- 6. [demo](#demo)
-  - 6.1. [风格化控制](#-1)
-  - 6.2. [长文本生成](#-1)
-- 7. [SSML](#SSML)
-- 8. [Speaking style](#Speakingstyle)
-- 9. [Docker](#Docker)
-  - 9.1. [镜像](#-1)
-  - 9.2. [手动 build](#build)
-- 10. [Roadmap](#Roadmap)
-- 11. [FAQ](#FAQ)
-  - 11.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
-  - 11.2. [什么是 Prefix？](#Prefix)
-  - 11.3. [Style 中 `_p` 的区别是什么？](#Style_p)
-  - 11.4. [为什么开启了 `--compile` 很慢？](#--compile)
+- 2. [GPU 显存要求](#GPU)
+  - 2.1. [加载模型显存要求](#)
+  - 2.2. [Batch Size 显存要求](#BatchSize)
+- 3. [Features](#Features)
+- 4. [Interface](#Interface)
+- 5. [ Installation and Running](#InstallationandRunning)
+  - 5.1. [`webui.py`: WebUI](#webui.py:WebUI)
+    - 5.1.1. [webui features](#webuifeatures)
+  - 5.2. [`launch.py`: API Server](#launch.py:APIServer)
+- 6. [Benchmark](#Benchmark)
+- 7. [demo](#demo)
+  - 7.1. [风格化控制](#-1)
+  - 7.2. [长文本生成](#-1)
+- 8. [SSML](#SSML)
+- 9. [Speaking style](#Speakingstyle)
+- 10. [Docker](#Docker)
+  - 10.1. [镜像](#-1)
+  - 10.2. [手动 build](#build)
+- 11. [Roadmap](#Roadmap)
+- 12. [FAQ](#FAQ)
+  - 12.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
+  - 12.2. [什么是 Prefix？](#Prefix)
+  - 12.3. [Style 中 `_p` 的区别是什么？](#Style_p)
+  - 12.4. [为什么开启了 `--compile` 很慢？](#--compile)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -48,7 +51,31 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-## 2. <a name='Features'></a>Features
+## 2. <a name='GPU'></a>GPU 显存要求
+
+### 2.1. <a name=''></a>加载模型显存要求
+
+| 数据类型 | 加载 ChatTTS 模型 | 加载 Enhancer 模型 |
+| -------- | ----------------- | ------------------ |
+| float32  | 2GB               | 3GB                |
+| half     | 1GB               | 1.5GB              |
+
+### 2.2. <a name='BatchSize'></a>Batch Size 显存要求
+
+| 数据类型 | Batch Size | 不开启 Enhancer | 开启 Enhancer |
+| -------- | ---------- | --------------- | ------------- |
+| float32  | ≤ 4        | 2GB             | 4GB           |
+| float32  | 8          | 8~10GB          | 8~14GB        |
+| half     | ≤ 4        | 2GB             | 4GB           |
+| half     | 8          | 2~6GB           | 4~8GB         |
+
+**注释：**
+
+- Batch Size 为 4 以内时，2GB 显存足够进行推理。
+- Batch Size 为 8 时，需 8~14GB 显存。
+- Half Batch Size 为上表中的 Batch Size 的一半，显存要求也相应减半。
+
+## 3. <a name='Features'></a>Features
 
 - **全面的 API 服务**: 提供所有功能的 API 访问，方便集成。
 - **超长文本生成**: 支持生成 1000 字以上的长文本，保持一致性。
@@ -71,7 +98,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 - **Speaker 导入导出**: 支持 Speaker 导入导出，方便定制
 - **Speaker 融合**: 支持 Speaker 融合，微调说话人
 
-## 3. <a name='Interface'></a>Interface
+## 4. <a name='Interface'></a>Interface
 
 <table>
   <tr>
@@ -98,12 +125,12 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   </tr>
 </table>
 
-## 4. <a name='InstallationandRunning'></a> Installation and Running
+## 5. <a name='InstallationandRunning'></a> Installation and Running
 
 1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
 2. 根据你的需求启动需要的服务，具体启动参数如下。
 
-### 4.1. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
+### 5.1. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
 
 WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
@@ -134,7 +161,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 > 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
 
-#### 4.1.1. <a name='webuifeatures'></a>webui features
+#### 5.1.1. <a name='webuifeatures'></a>webui features
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
@@ -159,7 +186,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
   - [WIP] ASR
   - [WIP] Inpainting
 
-### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 5.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 某些情况，你并不需要 webui，那么可以使用这个脚本启动单纯的 api 服务。
 
@@ -185,7 +212,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 [详细 API 文档](./docs/api.md)
 
-## 5. <a name='Benchmark'></a>Benchmark
+## 6. <a name='Benchmark'></a>Benchmark
 
 > 可使用 `./tests/benchmark/tts_benchmark.py` 复现
 
@@ -215,9 +242,9 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 
-## 6. <a name='demo'></a>demo
+## 7. <a name='demo'></a>demo
 
-### 6.1. <a name='-1'></a>风格化控制
+### 7.1. <a name='-1'></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -257,7 +284,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-### 6.2. <a name='-1'></a>长文本生成
+### 7.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -279,21 +306,21 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-## 7. <a name='SSML'></a>SSML
+## 8. <a name='SSML'></a>SSML
 
 [SSML readme](./docs/SSML.md)
 
-## 8. <a name='Speakingstyle'></a>Speaking style
+## 9. <a name='Speakingstyle'></a>Speaking style
 
 [style readme](./docs/sytles.md)
 
-## 9. <a name='Docker'></a>Docker
+## 10. <a name='Docker'></a>Docker
 
-### 9.1. <a name='-1'></a>镜像
+### 10.1. <a name='-1'></a>镜像
 
 WIP 开发中
 
-### 9.2. <a name='build'></a>手动 build
+### 10.2. <a name='build'></a>手动 build
 
 下载模型: `python -m scripts.download_models --source modelscope`
 
@@ -305,28 +332,28 @@ WIP 开发中
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-## 10. <a name='Roadmap'></a>Roadmap
+## 11. <a name='Roadmap'></a>Roadmap
 
 WIP
 
-## 11. <a name='FAQ'></a>FAQ
+## 12. <a name='FAQ'></a>FAQ
 
-### 11.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
+### 12.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
 
 Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
 
 - Prompt1 插入到第一个 [Stts] 之前
 - Prompt2 插入到第一个 [Stts] 之后
 
-### 11.2. <a name='Prefix'></a>什么是 Prefix？
+### 12.2. <a name='Prefix'></a>什么是 Prefix？
 
 Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
 
-### 11.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
+### 12.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
 
 Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
 
-### 11.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
+### 12.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
 
 由于还未实现推理 padding 所以如果每次推理 shape 改变都可能触发 torch 进行 compile
 

@@ -20,27 +20,30 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 <!-- vscode-markdown-toc -->
 
 - 1. [INDEX](#INDEX)
-- 2. [Features](#Features)
-- 3. [Interface](#Interface)
-- 4. [ Installation and Running](#InstallationandRunning)
-  - 4.1. [ `webui.py`: WebUI](#webui.py:WebUI)
-    - 4.1.1. [WebUI Features](#WebUIFeatures)
-  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
-- 5. [Benchmark](#Benchmark)
-- 6. [demo](#demo)
-  - 6.1. [风格化控制](#)
-  - 6.2. [长文本生成](#-1)
-- 7. [SSML](#SSML)
-- 8. [Speaking style](#Speakingstyle)
-- 9. [Docker](#Docker)
-  - 9.1. [镜像](#-1)
-  - 9.2. [手动 build](#build)
-- 10. [Roadmap](#Roadmap)
-- 11. [FAQ](#FAQ)
-  - 11.1. [What are Prompt1 and Prompt2?](#WhatarePrompt1andPrompt2)
-  - 11.2. [What is Prefix?](#WhatisPrefix)
-  - 11.3. [What is the difference in Style with `_p`?](#WhatisthedifferenceinStylewith_p)
-  - 11.4. [Why is it slow when `--compile` is enabled?](#Whyisitslowwhen--compileisenabled)
+- 2. [GPU Memory Requirements](#GPUMemoryRequirements)
+  - 2.1. [Model Loading Memory Requirements](#ModelLoadingMemoryRequirements)
+  - 2.2. [Batch Size Memory Requirements](#BatchSizeMemoryRequirements)
+- 3. [Features](#Features)
+- 4. [Interface](#Interface)
+- 5. [ Installation and Running](#InstallationandRunning)
+  - 5.1. [ `webui.py`: WebUI](#webui.py:WebUI)
+    - 5.1.1. [WebUI Features](#WebUIFeatures)
+  - 5.2. [`launch.py`: API Server](#launch.py:APIServer)
+- 6. [Benchmark](#Benchmark)
+- 7. [demo](#demo)
+  - 7.1. [风格化控制](#)
+  - 7.2. [长文本生成](#-1)
+- 8. [SSML](#SSML)
+- 9. [Speaking style](#Speakingstyle)
+- 10. [Docker](#Docker)
+  - 10.1. [Image](#Image)
+  - 10.2. [Manual build](#Manualbuild)
+- 11. [Roadmap](#Roadmap)
+- 12. [FAQ](#FAQ)
+  - 12.1. [What are Prompt1 and Prompt2?](#WhatarePrompt1andPrompt2)
+  - 12.2. [What is Prefix?](#WhatisPrefix)
+  - 12.3. [What is the difference in Style with `_p`?](#WhatisthedifferenceinStylewith_p)
+  - 12.4. [Why is it slow when `--compile` is enabled?](#Whyisitslowwhen--compileisenabled)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -48,7 +51,31 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-## 2. <a name='Features'></a>Features
+## 2. <a name='GPUMemoryRequirements'></a>GPU Memory Requirements
+
+### 2.1. <a name='ModelLoadingMemoryRequirements'></a>Model Loading Memory Requirements
+
+| Data Type | Load ChatTTS Model | Load Enhancer Model |
+| --------- | ------------------ | ------------------- |
+| float32   | 2GB                | 3GB                 |
+| half      | 1GB                | 1.5GB               |
+
+### 2.2. <a name='BatchSizeMemoryRequirements'></a>Batch Size Memory Requirements
+
+| Data Type | Batch Size | Without Enhancer | With Enhancer |
+| --------- | ---------- | ---------------- | ------------- |
+| float32   | ≤ 4        | 2GB              | 4GB           |
+| float32   | 8          | 8~10GB           | 8~14GB        |
+| half      | ≤ 4        | 2GB              | 4GB           |
+| half      | 8          | 2~6GB            | 4~8GB         |
+
+**Notes:**
+
+- For Batch Size ≤ 4, 2GB of memory is sufficient for inference.
+- For Batch Size = 8, 8~14GB of memory is required.
+- Half Batch Size means half of the above-mentioned Batch Size, and the memory requirements are also halved accordingly.
+
+## 3. <a name='Features'></a>Features
 
 - **Comprehensive API Services**: Provides API access to all functionalities for easy integration.
 - **Ultra-long Text Generation**: Supports generating texts longer than 1000 characters while maintaining consistency.
@@ -71,7 +98,7 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 - **Speaker Import and Export**: Supports importing and exporting speakers for easy customization.
 - **Speaker Merging**: Supports merging speakers and fine-tuning them.
 
-## 3. <a name='Interface'></a>Interface
+## 4. <a name='Interface'></a>Interface
 
 <table>
   <tr>
@@ -98,12 +125,12 @@ You can experience and deploy ChatTTS-Forge through the following methods:
   </tr>
 </table>
 
-## 4. <a name='InstallationandRunning'></a> Installation and Running
+## 5. <a name='InstallationandRunning'></a> Installation and Running
 
 1. Ensure that the [related dependencies](./docs/dependencies.md) are correctly installed.
 2. Start the required services according to your needs. The specific startup parameters are as follows.
 
-### 4.1. <a name='webui.py:WebUI'></a> `webui.py`: WebUI
+### 5.1. <a name='webui.py:WebUI'></a> `webui.py`: WebUI
 
 WebUI.py is a script used to configure and start the Gradio Web UI interface.
 
@@ -131,7 +158,7 @@ All parameters:
 
 > Since `MKL FFT doesn't support tensors of type: Half`, `--half` and `--use_cpu="all"` cannot be used simultaneously.
 
-#### 4.1.1. <a name='WebUIFeatures'></a>WebUI Features
+#### 5.1.1. <a name='WebUIFeatures'></a>WebUI Features
 
 [Click here for a detailed introduction with images](./docs/webui_features.md)
 
@@ -156,7 +183,7 @@ All parameters:
   - [WIP] ASR
   - [WIP] Inpainting
 
-### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 5.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 Launch.py is the startup script for ChatTTS-Forge, used to configure and launch the API server.
 
@@ -182,7 +209,7 @@ Once the `launch.py` script has started successfully, you can check if the API i
 
 [Detailed API documentation](./docs/api.md)
 
-## 5. <a name='Benchmark'></a>Benchmark
+## 6. <a name='Benchmark'></a>Benchmark
 
 > You can reproduce this using `./tests/benchmark/tts_benchmark.py`
 
@@ -212,9 +239,9 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 
-## 6. <a name='demo'></a>demo
+## 7. <a name='demo'></a>demo
 
-### 6.1. <a name=''></a>风格化控制
+### 7.1. <a name=''></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -254,7 +281,7 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 </details>
 
-### 6.2. <a name='-1'></a>长文本生成
+### 7.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -276,21 +303,21 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 </details>
 
-## 7. <a name='SSML'></a>SSML
+## 8. <a name='SSML'></a>SSML
 
 [SSML readme](./docs/SSML.md)
 
-## 8. <a name='Speakingstyle'></a>Speaking style
+## 9. <a name='Speakingstyle'></a>Speaking style
 
 [style readme](./docs/sytles.md)
 
-## 9. <a name='Docker'></a>Docker
+## 10. <a name='Docker'></a>Docker
 
-### 9.1. <a name='-1'></a>Image
+### 10.1. <a name='Image'></a>Image
 
 WIP
 
-### 9.2. <a name='build'></a>Manual build
+### 10.2. <a name='Manualbuild'></a>Manual build
 
 download models
 
@@ -306,28 +333,28 @@ Environment variable configuration
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-## 10. <a name='Roadmap'></a>Roadmap
+## 11. <a name='Roadmap'></a>Roadmap
 
 WIP
 
-## 11. <a name='FAQ'></a>FAQ
+## 12. <a name='FAQ'></a>FAQ
 
-### 11.1. <a name='WhatarePrompt1andPrompt2'></a>What are Prompt1 and Prompt2?
+### 12.1. <a name='WhatarePrompt1andPrompt2'></a>What are Prompt1 and Prompt2?
 
 Prompt1 and Prompt2 are system prompts with different insertion points. The current model is very sensitive to the first [Stts] token, hence the need for two prompts.
 
 - Prompt1 is inserted before the first [Stts].
 - Prompt2 is inserted after the first [Stts].
 
-### 11.2. <a name='WhatisPrefix'></a>What is Prefix?
+### 12.2. <a name='WhatisPrefix'></a>What is Prefix?
 
 The prefix is primarily used to control the model's generation capabilities, similar to the refine prompt in the official examples. This prefix should only contain special non-lexical tokens, such as `[laugh_0]`, `[oral_0]`, `[speed_0]`, `[break_0]`, etc.
 
-### 11.3. <a name='WhatisthedifferenceinStylewith_p'></a>What is the difference in Style with `_p`?
+### 12.3. <a name='WhatisthedifferenceinStylewith_p'></a>What is the difference in Style with `_p`?
 
 Styles with `_p` use both prompt and prefix, while those without `_p` use only the prefix.
 
-### 11.4. <a name='Whyisitslowwhen--compileisenabled'></a>Why is it slow when `--compile` is enabled?
+### 12.4. <a name='Whyisitslowwhen--compileisenabled'></a>Why is it slow when `--compile` is enabled?
 
 Due to the lack of inference padding, any change in the inference shape may trigger torch to compile.
 
