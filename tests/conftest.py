@@ -2,9 +2,9 @@ import os
 from pytest import fixture
 from fastapi.testclient import TestClient
 
-from launch import create_api
 import fastapi
 
+from modules.api.api_setup import create_api
 from modules.devices import devices
 
 

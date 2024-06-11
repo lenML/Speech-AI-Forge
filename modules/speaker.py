@@ -104,7 +104,7 @@ class SpeakerManager:
             if not os.path.exists(self.speaker_dir + fname):
                 del self.speakers[fname]
 
-    def list_speakers(self):
+    def list_speakers(self) -> list[Speaker]:
         return list(self.speakers.values())
 
     def create_speaker_from_seed(self, seed, name="", gender="", describe=""):

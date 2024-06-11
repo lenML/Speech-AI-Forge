@@ -1,7 +1,6 @@
 import logging
 import os
 
-import torch
 import gradio as gr
 
 from modules import config
@@ -23,10 +22,6 @@ logger = logging.getLogger(__name__)
 def webui_init():
     # fix: If the system proxy is enabled in the Windows system, you need to skip these
     os.environ["NO_PROXY"] = "localhost,127.0.0.1,0.0.0.0"
-
-    torch._dynamo.config.cache_size_limit = 64
-    torch._dynamo.config.suppress_errors = True
-    torch.set_float32_matmul_precision("high")
 
     if config.runtime_env_vars.language == "en":
         webui_config.localization = ENLocalizationVars()

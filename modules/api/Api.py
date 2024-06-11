@@ -24,7 +24,7 @@ def is_excluded(path, exclude_patterns):
 
 
 class APIManager:
-    def __init__(self, app: FastAPI, no_docs=False, exclude_patterns=[]):
+    def __init__(self, app: FastAPI, exclude_patterns=[]):
         self.app = app
         self.registered_apis = {}
         self.logger = logging.getLogger(__name__)

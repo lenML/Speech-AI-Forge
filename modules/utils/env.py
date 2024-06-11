@@ -1,5 +1,7 @@
 import os
 
+from modules import config
+
 
 def get_env_val(key, val_type):
     env_val = os.getenv(key.upper())
@@ -27,3 +29,10 @@ def get_env_or_arg(args, arg_name, default, arg_type):
         return env_val
 
     return default
+
+
+def get_and_update_env(*args):
+    val = get_env_or_arg(*args)
+    key = args[1]
+    config.runtime_env_vars[key] = val
+    return val

@@ -1,7 +1,16 @@
 import os
 import logging
 
+from modules.api.api_setup import (
+    process_api_args,
+    process_model_args,
+    setup_api_args,
+    setup_model_args,
+)
 from modules.ffmpeg_env import setup_ffmpeg_path
+from modules.utils.env import get_and_update_env
+from modules.api.app_config import app_description, app_title, app_version
+from modules.utils.torch_opt import configure_torch_optimizations
 
 setup_ffmpeg_path()
 logging.basicConfig(
@@ -9,16 +18,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-from launch import (
-    get_and_update_env,
-    setup_api_args,
-    setup_model_args,
-    process_api_args,
-    process_model_args,
-    app_description,
-    app_title,
-    app_version,
-)
 from modules.webui import webui_config
 from modules import config
 from modules.webui.app import webui_init, create_interface
@@ -92,6 +91,7 @@ def process_webui_args(args):
     webui_config.ssml_max = get_and_update_env(args, "ssml_max_len", 5000, int)
     webui_config.max_batch_size = get_and_update_env(args, "max_batch_size", 8, int)
 
+    configure_torch_optimizations()
     webui_init()
     demo = create_interface()
 
