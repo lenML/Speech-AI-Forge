@@ -154,10 +154,11 @@ addObserverIfDesiredNodeAvailable(".toast-wrap", function (added) {
   added.forEach(function (element) {
     if (element.innerText.includes("Connection errored out.")) {
       window.setTimeout(function () {
-        document.getElementById("reset_button").classList.remove("hidden");
-        document.getElementById("generate_button").classList.add("hidden");
-        document.getElementById("skip_button").classList.add("hidden");
-        document.getElementById("stop_button").classList.add("hidden");
+        // FIXME: 这几个button好像是没有...a1111里面的gradio版本和我们的不一样
+        document.getElementById("reset_button")?.classList.remove("hidden");
+        document.getElementById("generate_button")?.classList.add("hidden");
+        document.getElementById("skip_button")?.classList.add("hidden");
+        document.getElementById("stop_button")?.classList.add("hidden");
       });
     }
   });
