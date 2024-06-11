@@ -101,8 +101,10 @@ apt-get install rubberband-cli
 
 **Windows**:
 
+> 若你已经安装有 ffmpeg，并可以在命令行中调用，那么无需进行下面的下载和安装
+
 1. 从[此处](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z)下载并解压 ffmpeg 的 Windows 二进制文件。
-2. 将 ffmpeg 的`/bin`文件夹添加到您的环境变量`PATH`中。
+2. 将 ffmpeg 的`/bin`文件夹中的 .exe 文件解压到 `项目目录/ffmpeg` 文件夹内
 
 ## 5. 安装 python 依赖
 

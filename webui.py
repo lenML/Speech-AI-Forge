@@ -1,6 +1,9 @@
 import os
 import logging
 
+from modules.ffmpeg_env import setup_ffmpeg_path
+
+setup_ffmpeg_path()
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",

@@ -170,3 +170,10 @@ cython_debug/
 /models/**/*.pt
 /models/**/*.bin
 /models/**/*.json
+
+/ffmpeg/ffmpeg
+/ffmpeg/ffprobe
+/ffmpeg/ffplay
+/ffmpeg/ffmpeg.exe
+/ffmpeg/ffprobe.exe
+/ffmpeg/ffplay.exe
