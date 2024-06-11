@@ -79,30 +79,30 @@ git clone https://github.com/lenML/ChatTTS-Forge.git --depth=1
 
 ## 4. 后处理工具链
 
-音频后处理如加速减速提高音量等依赖以下库：
+音频后处理操作（如加速、减速、提高音量等）依赖以下库：
 
-- **ffmpeg**
-- **rubberband**
+- **ffmpeg** 或 **libav**（推荐使用 ffmpeg）
+- **rubberband-cli**（仅 Linux 环境需要）
 
-### Windows 安装
+### 安装 ffmpeg
 
-下载地址：
-
-- ffmpeg: [下载](https://ffmpeg.org/download.html)
-- rubberband: [下载](https://breakfastquay.com/rubberband/)
-
-下载后将其放置在易于访问的目录中，并配置环境变量 PATH，以确保命令行可以识别相应的可执行文件。
-
-### Linux 安装
-
-在 Ubuntu 系统上，可以通过以下命令安装 `ffmpeg` 和 `rubberband-cli`：
+**Mac（使用 [Homebrew](http://brew.sh)）**:
 
 ```bash
-sudo apt-get install ffmpeg
-sudo apt-get install rubberband-cli
+brew install ffmpeg
 ```
 
-其他系统的安装方式类似。
+**Linux（使用 aptitude）**:
+
+```bash
+apt-get install ffmpeg libavcodec-extra
+apt-get install rubberband-cli
+```
+
+**Windows**:
+
+1. 从[此处](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z)下载并解压 ffmpeg 的 Windows 二进制文件。
+2. 将 ffmpeg 的`/bin`文件夹添加到您的环境变量`PATH`中。
 
 ## 5. 安装 python 依赖
 
