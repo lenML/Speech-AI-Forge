@@ -2,10 +2,15 @@
 
 <a name="0.5.6-rc"></a>
 
-## 0.5.6-rc (2024-06-10)
+## 0.5.6-rc (2024-06-11)
 
 ### Added
 
+- ✨ add ffmpeg version to webui footer [[e9241a1](https://github.com/lenML/ChatTTS-Forge/commit/e9241a1a8d1f5840ae6259e46020684ba70a0efb)]
+- ✨ support use internal ffmpeg [[0e02ab0](https://github.com/lenML/ChatTTS-Forge/commit/0e02ab0f5d81fbfb6166793cb4f6d58c5f17f34c)]
+- ✨ 增加参数 debug_generate [[94e876a](https://github.com/lenML/ChatTTS-Forge/commit/94e876ae3819c3efbde4a239085f91342874bd5a)]
+- ✨ 支持 api 服务与 webui 并存 [[4901491](https://github.com/lenML/ChatTTS-Forge/commit/4901491eced3955c51030388d1dcebf049cd790e)]
+- ✨ refiner api support normalize [[ef665da](https://github.com/lenML/ChatTTS-Forge/commit/ef665dad5a5517c610f0b430bc52a5b0ba3c2d96)]
 - ✨ add webui 音色编辑器 [[fb4c7b3](https://github.com/lenML/ChatTTS-Forge/commit/fb4c7b3b0949ac669da0d069c739934f116b83e2)]
 - ✨ add localization [[c05035d](https://github.com/lenML/ChatTTS-Forge/commit/c05035d5cdcc5aa7efd995fe42f6a2541abe718b)]
 - ✨ SSML 支持 enhancer [[5c2788e](https://github.com/lenML/ChatTTS-Forge/commit/5c2788e04f3debfa8bafd8a2e2371dde30f38d4d)]
@@ -23,12 +28,21 @@
 - ⚡ 增加 git env [[43d9c65](https://github.com/lenML/ChatTTS-Forge/commit/43d9c65877ff68ad94716bc2e505ccc7ae8869a8)]
 - ⚡ 修改 webui 保存文件格式 [[2da41c9](https://github.com/lenML/ChatTTS-Forge/commit/2da41c90aa81bf87403598aefaea3e0ae2e83d79)]
 
+### Breaking changes
+
+- 💥 enhancer support --half [[fef2ed6](https://github.com/lenML/ChatTTS-Forge/commit/fef2ed659fd7fe5a14807d286c209904875ce594)]
+
 ### Removed
 
 - 🔥 clear code [[e8a1d7b](https://github.com/lenML/ChatTTS-Forge/commit/e8a1d7b269d259adc3082a0349c9b73fef1ec1a4)]
 
 ### Fixed
 
+- 🐛 fix [#33](https://github.com/lenML/ChatTTS-Forge/issues/33) [[76e0b58](https://github.com/lenML/ChatTTS-Forge/commit/76e0b5808ede71ebb28edbf0ce0af7d9da9bcb27)]
+- 🐛 fix localization error [[507dbe7](https://github.com/lenML/ChatTTS-Forge/commit/507dbe7a3b92d1419164d24f7804295f6686b439)]
+- 🐛 block main thread [#30](https://github.com/lenML/ChatTTS-Forge/issues/30) [[3a7cbde](https://github.com/lenML/ChatTTS-Forge/commit/3a7cbde6ccdfd20a6c53d7625d4e652007367fbf)]
+- 🐛 fix webui skip no-translate [[a8d595e](https://github.com/lenML/ChatTTS-Forge/commit/a8d595eb490f23c943d6efc35b65b33266c033b7)]
+- 🐛 fix hf.space force abort [[f564536](https://github.com/lenML/ChatTTS-Forge/commit/f5645360dd1f45a7bf112f01c85fb862ee57df3c)]
 - 🐛 fix missing device [#25](https://github.com/lenML/ChatTTS-Forge/issues/25) [[07cf6c1](https://github.com/lenML/ChatTTS-Forge/commit/07cf6c1386900999b6c9436debbfcbe59f6b692a)]
 - 🐛 fix Chat.refiner_prompt() [[0839863](https://github.com/lenML/ChatTTS-Forge/commit/083986369d0e67fcb4bd71930ad3d2bc3fc038fb)]
 - 🐛 fix --language type check [[50d354c](https://github.com/lenML/ChatTTS-Forge/commit/50d354c91c659d9ae16c8eaa0218d9e08275fbb2)]
@@ -41,6 +55,9 @@
 
 ### Miscellaneous
 
+- 🧪 add tests [[a807640](https://github.com/lenML/ChatTTS-Forge/commit/a80764030b790baee45a10cbe2d4edd7f183ef3c)]
+- 🌐 fix [[b34a0f8](https://github.com/lenML/ChatTTS-Forge/commit/b34a0f8654467f3068e43056708742ab69e3665b)]
+- 🌐 remove chat limit desc [[3f81eca](https://github.com/lenML/ChatTTS-Forge/commit/3f81ecae6e4521eeb4e867534defc36be741e1e2)]
 - 🧪 add tests [[7a54225](https://github.com/lenML/ChatTTS-Forge/commit/7a542256a157a281a15312bbf987bc9fb16876ee)]
 - 🔨 improve model downloader [[79a0c59](https://github.com/lenML/ChatTTS-Forge/commit/79a0c599f03b4e47346315a03f1df3d92578fe5d)]
 - 🌐 更新翻译文案 [[f56caa7](https://github.com/lenML/ChatTTS-Forge/commit/f56caa71e9186680b93c487d9645186ae18c1dc6)]
