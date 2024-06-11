@@ -65,14 +65,14 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 | 数据类型 | Batch Size | 不开启 Enhancer | 开启 Enhancer |
 | -------- | ---------- | --------------- | ------------- |
 | float32  | ≤ 4        | 2GB             | 4GB           |
-| float32  | 8          | 8~10GB          | 8~14GB        |
+| float32  | 8          | 4~10GB          | 6~14GB        |
 | half     | ≤ 4        | 2GB             | 4GB           |
 | half     | 8          | 2~6GB           | 4~8GB         |
 
 **注释：**
 
-- Batch Size 为 4 以内时，2GB 显存足够进行推理。
-- Batch Size 为 8 时，需 8~14GB 显存。
+- Batch Size 为 4 以内时，4GB 显存足够进行推理。
+- Batch Size 为 8 时，需 6~14GB 显存。
 - Half Batch Size 为上表中的 Batch Size 的一半，显存要求也相应减半。
 
 ## 3. <a name='Features'></a>Features
