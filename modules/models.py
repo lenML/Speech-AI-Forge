@@ -55,10 +55,9 @@ def unload_chat_tts():
             if isinstance(model, torch.nn.Module):
                 model.cpu()
                 del model
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-    gc.collect()
     chat_tts = None
+    devices.torch_gc()
+    gc.collect()
     logger.info("ChatTTS models unloaded")
 
 

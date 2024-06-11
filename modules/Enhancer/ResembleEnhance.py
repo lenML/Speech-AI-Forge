@@ -1,3 +1,4 @@
+import gc
 import os
 from typing import List, Literal
 from modules.devices import devices
@@ -12,6 +13,10 @@ from pathlib import Path
 
 from threading import Lock
 from modules import config
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 resemble_enhance = None
 lock = Lock()
@@ -80,11 +85,32 @@ def load_enhancer() -> ResembleEnhance:
     global resemble_enhance
     with lock:
         if resemble_enhance is None:
+            logger.info("Loading ResembleEnhance model")
             resemble_enhance = ResembleEnhance(
                 device=devices.device, dtype=devices.dtype
             )
             resemble_enhance.load_model()
+            logger.info("ResembleEnhance model loaded")
     return resemble_enhance
+
+
+def unload_enhancer():
+    global resemble_enhance
+    with lock:
+        if resemble_enhance is not None:
+            logger.info("Unloading ResembleEnhance model")
+            del resemble_enhance
+            resemble_enhance = None
+            devices.torch_gc()
+            gc.collect()
+            logger.info("ResembleEnhance model unloaded")
+
+
+def reload_enhancer():
+    logger.info("Reloading ResembleEnhance model")
+    unload_enhancer()
+    load_enhancer()
+    logger.info("ResembleEnhance model reloaded")
 
 
 if __name__ == "__main__":
