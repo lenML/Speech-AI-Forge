@@ -14,7 +14,7 @@ WEBUI_DIR_PATH = Path(os.path.dirname(os.path.realpath(__file__)))
 
 
 def read_file(fp):
-    with open(WEBUI_DIR_PATH / fp, "r") as f:
+    with open(WEBUI_DIR_PATH / fp, "r", encoding="utf-8") as f:
         return f.read()
 
 
