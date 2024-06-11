@@ -295,10 +295,10 @@ WIP 开发中
 
 ### 9.2. <a name='build'></a>手动 build
 
-下载模型: `python -m scripts/download_models --source huggingface`
+下载模型: `python -m scripts.download_models --source modelscope`
 
-- webui: `docker-compose -f ./docker-cmopose.webui.yml up -d`
-- api: `docker-compose -f ./docker-cmopose.api.yml up -d`
+- webui: `docker-compose -f ./docker-compose.webui.yml up -d`
+- api: `docker-compose -f ./docker-compose.api.yml up -d`
 
 环境变量配置
 

@@ -286,18 +286,22 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 ## 9. <a name='Docker'></a>Docker
 
-### 9.1. <a name='-1'></a>镜像
+### 9.1. <a name='-1'></a>Image
 
-WIP 开发中
+WIP
 
-### 9.2. <a name='build'></a>手动 build
+### 9.2. <a name='build'></a>Manual build
 
-下载模型: `python -m scripts/download_models --source huggingface`
+download models
 
-- webui: `docker-compose -f ./docker-cmopose.webui.yml up -d`
-- api: `docker-compose -f ./docker-cmopose.api.yml up -d`
+```bash
+python -m scripts.download_models --source huggingface
+```
 
-环境变量配置
+- webui: `docker-compose -f ./docker-compose.webui.yml up -d`
+- api: `docker-compose -f ./docker-compose.api.yml up -d`
+
+Environment variable configuration
 
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
