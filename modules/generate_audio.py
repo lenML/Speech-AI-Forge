@@ -74,10 +74,10 @@ def generate_audio_batch(
     if isinstance(spk, int):
         with SeedContext(spk, True):
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
-        logger.info(("spk", spk))
+        logger.debug(("spk", spk))
     elif isinstance(spk, Speaker):
         params_infer_code["spk_emb"] = spk.emb
-        logger.info(("spk", spk.name))
+        logger.debug(("spk", spk.name))
     else:
         logger.warn(
             f"spk must be int or Speaker, but: <{type(spk)}> {spk}, wiil set to default voice"
@@ -85,7 +85,7 @@ def generate_audio_batch(
         with SeedContext(2, True):
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
 
-    logger.info(
+    logger.debug(
         {
             "text": texts,
             "infer_seed": infer_seed,

@@ -13,7 +13,7 @@ import uvicorn
 import torch
 from modules import config
 from modules.utils import env
-from modules import generate_audio as generate
+from modules import generate_audio
 from modules.api.Api import APIManager
 
 from modules.api.impl import (
@@ -89,6 +89,11 @@ def setup_model_args(parser: argparse.ArgumentParser):
         default=64,
         help="Set the size of the request cache pool, set it to 0 will disable lru_cache",
     )
+    parser.add_argument(
+        "--debug_generate",
+        action="store_true",
+        help="Enable debug mode for audio generation",
+    )
 
 
 def setup_api_args(parser: argparse.ArgumentParser):
@@ -127,10 +132,14 @@ def process_model_args(args):
     use_cpu = get_and_update_env(args, "use_cpu", [], list)
     half = get_and_update_env(args, "half", False, bool)
     off_tqdm = get_and_update_env(args, "off_tqdm", False, bool)
+    debug_generate = get_and_update_env(args, "debug_generate", False, bool)
 
-    generate.setup_lru_cache()
+    generate_audio.setup_lru_cache()
     devices.reset_device()
     devices.first_time_calculation()
+
+    if debug_generate:
+        generate_audio.logger.setLevel(logging.DEBUG)
 
 
 def process_api_args(args, app):
