@@ -69,6 +69,9 @@ def compute_offset(chunk1, chunk2, sr=44100):
         f_max=sr // 2,
     )
 
+    chunk1 = chunk1.float()
+    chunk2 = chunk2.float()
+
     spec1 = mel_fn(chunk1).log1p()
     spec2 = mel_fn(chunk2).log1p()
 
