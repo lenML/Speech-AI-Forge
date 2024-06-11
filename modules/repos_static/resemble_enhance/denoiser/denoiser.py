@@ -65,7 +65,9 @@ class Denoiser(nn.Module):
             x = x.cpu()
 
         window = torch.hann_window(self.stft_cfg["win_length"], device=x.device)
-        s = torch.stft(x.float(), **self.stft_cfg, window=window, return_complex=True)  # (b f t+1)
+        s = torch.stft(
+            x.float(), **self.stft_cfg, window=window, return_complex=True
+        )  # (b f t+1)
 
         s = s[..., :-1]  # (b f t)
 
@@ -106,6 +108,7 @@ class Denoiser(nn.Module):
         if s.isnan().any():
             logger.warning("NaN detected in ISTFT input.")
 
+        s = s.to(torch.complex64)
         s = F.pad(s, (0, 1), "replicate")  # (b f t+1)
 
         window = torch.hann_window(self.stft_cfg["win_length"], device=s.device)
@@ -168,7 +171,9 @@ class Denoiser(nn.Module):
 
         mag, cos, sin = self._stft(x)  # (b 2f t)
         mag_mask, sin_res, cos_res = self._predict(mag, cos, sin)
-        sep_mag, sep_cos, sep_sin = self._separate(mag, cos, sin, mag_mask, cos_res, sin_res)
+        sep_mag, sep_cos, sep_sin = self._separate(
+            mag, cos, sin, mag_mask, cos_res, sin_res
+        )
 
         o = self._istft(sep_mag, sep_cos, sep_sin)
 

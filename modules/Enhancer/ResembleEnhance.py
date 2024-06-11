@@ -11,53 +11,50 @@ from modules.utils.constants import MODELS_DIR
 from pathlib import Path
 
 from threading import Lock
+from modules import config
 
 resemble_enhance = None
 lock = Lock()
 
 
-def load_enhancer(device: torch.device):
-    global resemble_enhance
-    with lock:
-        if resemble_enhance is None:
-            resemble_enhance = ResembleEnhance(device)
-            resemble_enhance.load_model()
-    return resemble_enhance
-
-
 class ResembleEnhance:
-    def __init__(self, device: torch.device):
+    def __init__(self, device: torch.device, dtype=torch.float32):
         self.device = device
+        self.dtype = dtype
 
         self.enhancer: HParams = None
         self.hparams: Enhancer = None
 
     def load_model(self):
         hparams = HParams.load(Path(MODELS_DIR) / "resemble-enhance")
-        enhancer = Enhancer(hparams)
+        enhancer = Enhancer(hparams).to(device=self.device, dtype=self.dtype).eval()
         state_dict = torch.load(
             Path(MODELS_DIR) / "resemble-enhance" / "mp_rank_00_model_states.pt",
             map_location=self.device,
         )["module"]
         enhancer.load_state_dict(state_dict)
-        enhancer.to(self.device).eval()
 
         self.hparams = hparams
         self.enhancer = enhancer
 
     @torch.inference_mode()
-    def denoise(self, dwav, sr, device) -> tuple[torch.Tensor, int]:
+    def denoise(self, dwav, sr) -> tuple[torch.Tensor, int]:
         assert self.enhancer is not None, "Model not loaded"
         assert self.enhancer.denoiser is not None, "Denoiser not loaded"
         enhancer = self.enhancer
-        return inference(model=enhancer.denoiser, dwav=dwav, sr=sr, device=device)
+        return inference(
+            model=enhancer.denoiser,
+            dwav=dwav,
+            sr=sr,
+            device=self.devicem,
+            dtype=self.dtype,
+        )
 
     @torch.inference_mode()
     def enhance(
         self,
         dwav,
         sr,
-        device,
         nfe=32,
         solver: Literal["midpoint", "rk4", "euler"] = "midpoint",
         lambd=0.5,
@@ -74,7 +71,20 @@ class ResembleEnhance:
         assert self.enhancer is not None, "Model not loaded"
         enhancer = self.enhancer
         enhancer.configurate_(nfe=nfe, solver=solver, lambd=lambd, tau=tau)
-        return inference(model=enhancer, dwav=dwav, sr=sr, device=device)
+        return inference(
+            model=enhancer, dwav=dwav, sr=sr, device=self.device, dtype=self.dtype
+        )
+
+
+def load_enhancer() -> ResembleEnhance:
+    global resemble_enhance
+    with lock:
+        if resemble_enhance is None:
+            resemble_enhance = ResembleEnhance(
+                device=devices.device, dtype=devices.dtype
+            )
+            resemble_enhance.load_model()
+    return resemble_enhance
 
 
 if __name__ == "__main__":

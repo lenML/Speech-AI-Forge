@@ -8,6 +8,8 @@ from torchaudio.functional import resample
 from torchaudio.transforms import MelSpectrogram
 from tqdm import trange
 
+from modules.devices import devices
+
 from .hparams import HParams
 
 from modules import config
@@ -16,7 +18,14 @@ logger = logging.getLogger(__name__)
 
 
 @torch.inference_mode()
-def inference_chunk(model, dwav, sr, device, npad=441):
+def inference_chunk(
+    model,
+    dwav: torch.Tensor,
+    sr: int,
+    device: torch.device,
+    dtype: torch.dtype,
+    npad=441,
+):
     assert model.hp.wav_rate == sr, f"Expected {model.hp.wav_rate} Hz, got {sr} Hz"
     del sr
 
@@ -24,7 +33,7 @@ def inference_chunk(model, dwav, sr, device, npad=441):
     abs_max = dwav.abs().max().clamp(min=1e-7)
 
     assert dwav.dim() == 1, f"Expected 1D waveform, got {dwav.dim()}D"
-    dwav = dwav.to(device)
+    dwav = dwav.to(device=device, dtype=dtype)
     dwav = dwav / abs_max  # Normalize
     dwav = F.pad(dwav, (0, npad))
     hwav = model(dwav[None])[0].cpu()  # (T,)
@@ -123,7 +132,13 @@ def remove_weight_norm_recursively(module):
 
 
 def inference(
-    model, dwav, sr, device, chunk_seconds: float = 30.0, overlap_seconds: float = 1.0
+    model,
+    dwav,
+    sr,
+    device,
+    dtype,
+    chunk_seconds: float = 30.0,
+    overlap_seconds: float = 1.0,
 ):
     if config.runtime_env_vars.off_tqdm:
         trange = range
@@ -160,8 +175,11 @@ def inference(
     chunks = []
     for start in trange(0, dwav.shape[-1], hop_length):
         chunks.append(
-            inference_chunk(model, dwav[start : start + chunk_length], sr, device)
+            inference_chunk(
+                model, dwav[start : start + chunk_length], sr, device, dtype
+            )
         )
+        devices.torch_gc()
 
     hwav = merge_chunks(chunks, chunk_length, hop_length, sr=sr, length=dwav.shape[-1])
 
@@ -172,5 +190,6 @@ def inference(
     logger.info(
         f"Elapsed time: {elapsed_time:.3f} s, {hwav.shape[-1] / elapsed_time / 1000:.3f} kHz"
     )
+    devices.torch_gc()
 
     return hwav, sr

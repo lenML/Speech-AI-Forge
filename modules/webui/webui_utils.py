@@ -88,15 +88,14 @@ def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
     if not enable_denoise and not enable_enhance:
         return audio_data, sr
 
-    device = devices.device
-    # NOTE: 这里很奇怪按道理得放到 device 上，但是 enhancer 做 chunk 的时候会报错...所以得 cpu()
+    # FIXME: 这里可能改成 to(device) 会优化一点？
     tensor = torch.from_numpy(audio_data).float().squeeze().cpu()
-    enhancer = load_enhancer(device)
+    enhancer = load_enhancer()
 
     if enable_enhance or enable_denoise:
         lambd = 0.9 if enable_denoise else 0.1
         tensor, sr = enhancer.enhance(
-            tensor, sr, tau=0.5, nfe=64, solver="rk4", lambd=lambd, device=device
+            tensor, sr, tau=0.5, nfe=64, solver="rk4", lambd=lambd
         )
 
     audio_data = tensor.cpu().numpy()
