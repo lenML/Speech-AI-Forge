@@ -1,11 +1,17 @@
 # Changelog
 
-<a name="0.5.6-rc"></a>
+<a name="0.6.0"></a>
 
-## 0.5.6-rc (2024-06-11)
+## 0.6.0 (2024-06-12)
 
 ### Added
 
+- ✨ add XTTSv2 api [#42](https://github.com/lenML/ChatTTS-Forge/issues/42) [[d1fc63c](https://github.com/lenML/ChatTTS-Forge/commit/d1fc63cd1e847d622135c96371bbfe2868a80c19)]
+- ✨ google api 支持 enhancer [[14fecdb](https://github.com/lenML/ChatTTS-Forge/commit/14fecdb8ea0f9a5d872a4c7ca862e901990076c0)]
+- ✨ 修改 podcast 脚本默认 style [[98186c2](https://github.com/lenML/ChatTTS-Forge/commit/98186c25743cbfa24ca7d41336d4ec84aa34aacf)]
+- ✨ playground google api [[4109adb](https://github.com/lenML/ChatTTS-Forge/commit/4109adb317be215970d756b4ba7064c9dc4d6fdc)]
+- ✨ 添加 unload api [[ed9d61a](https://github.com/lenML/ChatTTS-Forge/commit/ed9d61a2fe4ba1d902d91517148f8f7dea47b51b)]
+- ✨ support api workers [[babdada](https://github.com/lenML/ChatTTS-Forge/commit/babdada50e79e425bac4d3074f8e42dfb4c4c33a)]
 - ✨ add ffmpeg version to webui footer [[e9241a1](https://github.com/lenML/ChatTTS-Forge/commit/e9241a1a8d1f5840ae6259e46020684ba70a0efb)]
 - ✨ support use internal ffmpeg [[0e02ab0](https://github.com/lenML/ChatTTS-Forge/commit/0e02ab0f5d81fbfb6166793cb4f6d58c5f17f34c)]
 - ✨ 增加参数 debug_generate [[94e876a](https://github.com/lenML/ChatTTS-Forge/commit/94e876ae3819c3efbde4a239085f91342874bd5a)]
@@ -19,6 +25,8 @@
 
 ### Changed
 
+- ⚡ improve synthesize_audio [[759adc2](https://github.com/lenML/ChatTTS-Forge/commit/759adc2ead1da8395df62ea1724456dad6894eb1)]
+- ⚡ reduce enhancer chunk vram usage [[3464b42](https://github.com/lenML/ChatTTS-Forge/commit/3464b427b14878ee11e03ebdfb91efee1550de59)]
 - ⚡ 增加默认说话人 [[d702ad5](https://github.com/lenML/ChatTTS-Forge/commit/d702ad5ad585978f8650284ab99238571dbd163b)]
 - 🍱 add &#x60;podcast&#x60; &#x60;podcast_p&#x60; style [[2b9e5bf](https://github.com/lenML/ChatTTS-Forge/commit/2b9e5bfd8fe4700f802097b995f5b68bf1097087)]
 - 🎨 improve code [[317951e](https://github.com/lenML/ChatTTS-Forge/commit/317951e431b16c735df31187b1af7230a1608c41)]
@@ -38,6 +46,9 @@
 
 ### Fixed
 
+- 🐛 fix worker env loader [[5b0bf4e](https://github.com/lenML/ChatTTS-Forge/commit/5b0bf4e93738bcd115f006376691c4eaa89b66de)]
+- 🐛 fix colab default lang missing [[d4e5190](https://github.com/lenML/ChatTTS-Forge/commit/d4e51901856305fc039d886a92e38eea2a2cd24d)]
+- 🐛 fix &quot;reflection_pad1d&quot; not implemented for &#x27;Half&#x27; [[536c19b](https://github.com/lenML/ChatTTS-Forge/commit/536c19b7f6dc3f1702fcc2a90daa3277040e70f0)]
 - 🐛 fix [#33](https://github.com/lenML/ChatTTS-Forge/issues/33) [[76e0b58](https://github.com/lenML/ChatTTS-Forge/commit/76e0b5808ede71ebb28edbf0ce0af7d9da9bcb27)]
 - 🐛 fix localization error [[507dbe7](https://github.com/lenML/ChatTTS-Forge/commit/507dbe7a3b92d1419164d24f7804295f6686b439)]
 - 🐛 block main thread [#30](https://github.com/lenML/ChatTTS-Forge/issues/30) [[3a7cbde](https://github.com/lenML/ChatTTS-Forge/commit/3a7cbde6ccdfd20a6c53d7625d4e652007367fbf)]
@@ -55,6 +66,8 @@
 
 ### Miscellaneous
 
+- 🐳 fix docker / 兼容 py 3.9 [[ebb096f](https://github.com/lenML/ChatTTS-Forge/commit/ebb096f9b1b843b65d150fb34da7d3b5acb13011)]
+- 🐳 add .dockerignore [[57262b8](https://github.com/lenML/ChatTTS-Forge/commit/57262b81a8df3ed26ca5da5e264d5dca7b022471)]
 - 🧪 add tests [[a807640](https://github.com/lenML/ChatTTS-Forge/commit/a80764030b790baee45a10cbe2d4edd7f183ef3c)]
 - 🌐 fix [[b34a0f8](https://github.com/lenML/ChatTTS-Forge/commit/b34a0f8654467f3068e43056708742ab69e3665b)]
 - 🌐 remove chat limit desc [[3f81eca](https://github.com/lenML/ChatTTS-Forge/commit/3f81ecae6e4521eeb4e867534defc36be741e1e2)]
