@@ -1,7 +1,16 @@
 import argparse
+import logging
 import os
 import dotenv
 from fastapi import FastAPI
+
+from modules.ffmpeg_env import setup_ffmpeg_path
+
+setup_ffmpeg_path()
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 
 from modules.api.api_setup import (
     process_api_args,

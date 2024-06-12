@@ -40,8 +40,8 @@ if __name__ == "__main__":
     reload = env.get_and_update_env(args, "reload", False, bool)
     workers = env.get_and_update_env(args, "workers", 1, int)
     log_level = env.get_and_update_env(args, "log_level", "info", str)
-    access_log = env.get_and_update_env(args, "access_log", "true", bool)
-    proxy_headers = env.get_and_update_env(args, "proxy_headers", "true", bool)
+    access_log = env.get_and_update_env(args, "access_log", True, bool)
+    proxy_headers = env.get_and_update_env(args, "proxy_headers", True, bool)
     timeout_keep_alive = env.get_and_update_env(args, "timeout_keep_alive", 5, int)
     timeout_graceful_shutdown = env.get_and_update_env(
         args, "timeout_graceful_shutdown", 0, int
