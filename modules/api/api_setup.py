@@ -18,6 +18,7 @@ from modules.api.impl import (
     speaker_api,
     ping_api,
     models_api,
+    xtts_v2_api,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ def create_api(app, exclude=[]):
     google_api.setup(app_mgr)
     openai_api.setup(app_mgr)
     refiner_api.setup(app_mgr)
+    xtts_v2_api.setup(app_mgr)
 
     return app_mgr
 

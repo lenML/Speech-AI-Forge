@@ -6,8 +6,10 @@ import fastapi
 
 from modules.api.api_setup import create_api
 from modules.devices import devices
+from modules import config
 
 
+config.runtime_env_vars.off_tqdm = True
 devices.reset_device()
 app_instance = create_api(fastapi.FastAPI())
 

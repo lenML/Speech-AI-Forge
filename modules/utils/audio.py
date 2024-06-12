@@ -95,7 +95,11 @@ def pitch_shift(
 
 
 def apply_prosody_to_audio_data(
-    audio_data: np.ndarray, rate: float, volume: float, pitch: float, sr: int
+    audio_data: np.ndarray,
+    rate: float = 1,
+    volume: float = 0,
+    pitch: float = 0,
+    sr: int = 24000,
 ) -> np.ndarray:
     if rate != 1:
         audio_data = pyrb.time_stretch(audio_data, sr=sr, rate=rate)
