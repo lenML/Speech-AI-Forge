@@ -25,7 +25,7 @@ def inference_chunk(
     device: torch.device,
     dtype: torch.dtype,
     npad=441,
-):
+) -> torch.Tensor:
     assert model.hp.wav_rate == sr, f"Expected {model.hp.wav_rate} Hz, got {sr} Hz"
     del sr
 
@@ -36,7 +36,7 @@ def inference_chunk(
     dwav = dwav.to(device=device, dtype=dtype)
     dwav = dwav / abs_max  # Normalize
     dwav = F.pad(dwav, (0, npad))
-    hwav = model(dwav[None])[0].cpu()  # (T,)
+    hwav: torch.Tensor = model(dwav[None])[0].cpu()  # (T,)
     hwav = hwav[:length]  # Trim padding
     hwav = hwav * abs_max  # Unnormalize
 
@@ -177,11 +177,10 @@ def inference(
 
     chunks = []
     for start in trange(0, dwav.shape[-1], hop_length):
-        chunks.append(
-            inference_chunk(
-                model, dwav[start : start + chunk_length], sr, device, dtype
-            )
+        chunk_dwav = inference_chunk(
+            model, dwav[start : start + chunk_length], sr, device, dtype
         )
+        chunks.append(chunk_dwav.cpu())
         devices.torch_gc()
 
     hwav = merge_chunks(chunks, chunk_length, hop_length, sr=sr, length=dwav.shape[-1])
