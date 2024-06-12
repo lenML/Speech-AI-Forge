@@ -23,45 +23,31 @@ def synthesize_audio(
     prefix: str = "",
     batch_size: int = 1,
     spliter_threshold: int = 100,
+    end_of_sentence="",
 ):
-    if batch_size == 1:
-        return generate.generate_audio(
-            text,
-            temperature=temperature,
-            top_P=top_P,
-            top_K=top_K,
-            spk=spk,
-            infer_seed=infer_seed,
-            use_decoder=use_decoder,
-            prompt1=prompt1,
-            prompt2=prompt2,
-            prefix=prefix,
-        )
-    else:
-        spliter = SentenceSplitter(spliter_threshold)
-        sentences = spliter.parse(text)
+    spliter = SentenceSplitter(spliter_threshold)
+    sentences = spliter.parse(text)
 
-        text_segments = [
-            {
-                "text": s,
-                "params": {
-                    "text": s,
-                    "temperature": temperature,
-                    "top_P": top_P,
-                    "top_K": top_K,
-                    "spk": spk,
-                    "infer_seed": infer_seed,
-                    "use_decoder": use_decoder,
-                    "prompt1": prompt1,
-                    "prompt2": prompt2,
-                    "prefix": prefix,
-                },
-            }
-            for s in sentences
-        ]
-        synthesizer = SynthesizeSegments(batch_size)
-        audio_segments = synthesizer.synthesize_segments(text_segments)
+    text_segments = [
+        {
+            "text": s + end_of_sentence,
+            "params": {
+                "temperature": temperature,
+                "top_P": top_P,
+                "top_K": top_K,
+                "spk": spk,
+                "infer_seed": infer_seed,
+                "use_decoder": use_decoder,
+                "prompt1": prompt1,
+                "prompt2": prompt2,
+                "prefix": prefix,
+            },
+        }
+        for s in sentences
+    ]
+    synthesizer = SynthesizeSegments(batch_size)
+    audio_segments = synthesizer.synthesize_segments(text_segments)
 
-        combined_audio = combine_audio_segments(audio_segments)
+    combined_audio = combine_audio_segments(audio_segments)
 
-        return audio.pydub_to_np(combined_audio)
+    return audio.pydub_to_np(combined_audio)

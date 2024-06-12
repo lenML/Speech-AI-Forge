@@ -56,20 +56,18 @@ def to_number(value, t, default=0):
 
 
 class TTSAudioSegment(Box):
-    text: str
-    temperature: float
-    top_P: float
-    top_K: int
-    spk: int
-    infer_seed: int
-    prompt1: str
-    prompt2: str
-    prefix: str
-
-    _type: str
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._type = kwargs.get("_type", "voice")
+        self.text = kwargs.get("text", "")
+        self.temperature = kwargs.get("temperature", 0.3)
+        self.top_P = kwargs.get("top_P", 0.5)
+        self.top_K = kwargs.get("top_K", 20)
+        self.spk = kwargs.get("spk", -1)
+        self.infer_seed = kwargs.get("infer_seed", -1)
+        self.prompt1 = kwargs.get("prompt1", "")
+        self.prompt2 = kwargs.get("prompt2", "")
+        self.prefix = kwargs.get("prefix", "")
 
 
 class SynthesizeSegments:
@@ -85,9 +83,11 @@ class SynthesizeSegments:
             return TTSAudioSegment(_type="break")
 
         if segment.get("params", None) is not None:
-            return TTSAudioSegment(**segment.get("params"))
+            params = segment.get("params")
+            text = segment.get("text", None) or segment.text or ""
+            return TTSAudioSegment(**params, text=text)
 
-        text = segment.get("text", "")
+        text = segment.get("text", None) or segment.text or ""
         is_end = segment.get("is_end", False)
 
         text = str(text).strip()
