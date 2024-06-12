@@ -349,6 +349,10 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 
 > 暂时不建议开启
 
+# Contributing
+
+To contribute, clone the repository, make your changes, commit and push to your clone, and submit a pull request.
+
 # References
 
 - ChatTTS: https://github.com/2noise/ChatTTS

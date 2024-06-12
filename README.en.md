@@ -350,6 +350,10 @@ Due to the lack of inference padding, any change in the inference shape may trig
 
 > It is currently not recommended to enable this.
 
+# Contributing
+
+To contribute, clone the repository, make your changes, commit and push to your clone, and submit a pull request.
+
 # References
 
 - ChatTTS: https://github.com/2noise/ChatTTS
