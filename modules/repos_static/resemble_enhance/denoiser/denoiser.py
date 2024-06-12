@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 import torch
 import torch.nn.functional as F
@@ -154,7 +155,7 @@ class Denoiser(nn.Module):
         sep_sin = sin * cos_res + cos * sin_res
         return sep_mag, sep_cos, sep_sin
 
-    def forward(self, x: Tensor, y: Tensor | None = None):
+    def forward(self, x: Tensor, y: Union[Tensor, None] = None):
         """
         Args:
             x: (b t), a mixed audio

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Union
 
 from torch import Tensor
 
@@ -16,7 +16,9 @@ def rglob_audio_files(path: Path):
     return list(walk_paths(path, ".wav")) + list(walk_paths(path, ".flac"))
 
 
-def mix_fg_bg(fg: Tensor, bg: Tensor, alpha: float | Callable[..., float] = 0.5, eps=1e-7):
+def mix_fg_bg(
+    fg: Tensor, bg: Tensor, alpha: Union[float, Callable[..., float]] = 0.5, eps=1e-7
+):
     """
     Args:
         fg: (b, t)

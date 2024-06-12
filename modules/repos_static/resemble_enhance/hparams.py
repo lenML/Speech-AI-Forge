@@ -1,6 +1,7 @@
 import logging
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Union
 
 from omegaconf import OmegaConf
 from rich.console import Console
@@ -102,7 +103,7 @@ class HParams:
         OmegaConf.save(asdict(self), str(path))
 
     @classmethod
-    def load(cls, run_dir, yaml: Path | None = None):
+    def load(cls, run_dir, yaml: Union[Path, None] = None):
         hps = []
 
         if (run_dir / "hparams.yaml").exists():
@@ -120,7 +121,9 @@ class HParams:
                 for k, v in asdict(hp).items():
                     if getattr(hps[0], k) != v:
                         errors[k] = f"{getattr(hps[0], k)} != {v}"
-                raise ValueError(f"Found inconsistent hparams: {errors}, consider deleting {run_dir}")
+                raise ValueError(
+                    f"Found inconsistent hparams: {errors}, consider deleting {run_dir}"
+                )
 
         return hps[0]
 

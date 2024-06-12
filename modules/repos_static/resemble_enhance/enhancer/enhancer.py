@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -109,7 +110,7 @@ class Enhancer(nn.Module):
             return self.mel_fn(x)[..., :-1]  # (b d t)
         return self.mel_fn(x)
 
-    def _may_denoise(self, x: Tensor, y: Tensor | None = None):
+    def _may_denoise(self, x: Tensor, y: Union[Tensor, None] = None):
         if self.hp.lcfm_training_mode == "cfm":
             return self.denoiser(x, y)
         return x
@@ -126,7 +127,9 @@ class Enhancer(nn.Module):
         self.lcfm.eval_tau_(tau)
         self._eval_lambd = lambd
 
-    def forward(self, x: Tensor, y: Tensor | None = None, z: Tensor | None = None):
+    def forward(
+        self, x: Tensor, y: Union[Tensor, None] = None, z: Union[Tensor, None] = None
+    ):
         """
         Args:
             x: (b t), mix wavs (fg + bg)

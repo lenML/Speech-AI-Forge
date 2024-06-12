@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+from typing import Union
 import warnings
 from functools import partial
 
@@ -29,7 +30,9 @@ class AttachableEffect(Effect):
         chain = augment.EffectChain()
         chain = self.attach(chain)
         tensor = torch.from_numpy(wav)[None].float()  # (1, T)
-        tensor = chain.apply(tensor, src_info={"rate": sr}, target_info={"channels": 1, "rate": sr})
+        tensor = chain.apply(
+            tensor, src_info={"rate": sr}, target_info={"channels": 1, "rate": sr}
+        )
         wav = tensor.numpy()[0]  # (T,)
         return wav
 
@@ -41,7 +44,9 @@ class SoxEffect(AttachableEffect):
         self.kwargs = kwargs
 
     def attach(self, chain: augment.EffectChain) -> augment.EffectChain:
-        _logger.debug(f"Attaching {self.effect_name} with {self.args} and {self.kwargs}")
+        _logger.debug(
+            f"Attaching {self.effect_name} with {self.args} and {self.kwargs}"
+        )
         if not hasattr(chain, self.effect_name):
             raise ValueError(f"EffectChain has no attribute {self.effect_name}")
         return getattr(chain, self.effect_name)(*self.args, **self.kwargs)
@@ -115,21 +120,30 @@ class Randint(Generator):
 
 
 class Concat(Generator):
-    def __init__(self, *parts: Generator | str):
+    def __init__(self, *parts: Union[Generator, str]):
         self.parts = parts
 
     def __call__(self):
-        return "".join([part if isinstance(part, str) else part() for part in self.parts])
+        return "".join(
+            [part if isinstance(part, str) else part() for part in self.parts]
+        )
 
 
 class RandomLowpassDistorter(SoxEffect):
     def __init__(self, low=2000, high=16000):
-        super().__init__("sinc", "-n", Randint(50, 200), Concat("-", Uniform(low, high)))
+        super().__init__(
+            "sinc", "-n", Randint(50, 200), Concat("-", Uniform(low, high))
+        )
 
 
 class RandomBandpassDistorter(SoxEffect):
     def __init__(self, low=100, high=1000, min_width=2000, max_width=4000):
-        super().__init__("sinc", "-n", Randint(50, 200), partial(self._fn, low, high, min_width, max_width))
+        super().__init__(
+            "sinc",
+            "-n",
+            Randint(50, 200),
+            partial(self._fn, low, high, min_width, max_width),
+        )
 
     @staticmethod
     def _fn(low, high, min_width, max_width):
@@ -139,7 +153,15 @@ class RandomBandpassDistorter(SoxEffect):
 
 
 class RandomEqualizer(SoxEffect):
-    def __init__(self, low=100, high=4000, q_low=1, q_high=5, db_low: int = -30, db_high: int = 30):
+    def __init__(
+        self,
+        low=100,
+        high=4000,
+        q_low=1,
+        q_high=5,
+        db_low: int = -30,
+        db_high: int = 30,
+    ):
         super().__init__(
             "equalizer",
             Uniform(low, high),
@@ -150,7 +172,9 @@ class RandomEqualizer(SoxEffect):
 
 class RandomOverdrive(SoxEffect):
     def __init__(self, gain_low=5, gain_high=40, colour_low=20, colour_high=80):
-        super().__init__("overdrive", Uniform(gain_low, gain_high), Uniform(colour_low, colour_high))
+        super().__init__(
+            "overdrive", Uniform(gain_low, gain_high), Uniform(colour_low, colour_high)
+        )
 
 
 class RandomReverb(Chain):

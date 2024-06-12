@@ -1,6 +1,7 @@
 import logging
 from functools import cache
 from pathlib import Path
+from typing import Union
 
 import torch
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @cache
-def load_enhancer(run_dir: str | Path | None, device):
+def load_enhancer(run_dir: Union[str, Path, None], device):
     run_dir = download(run_dir)
     hp = HParams.load(run_dir)
     enhancer = Enhancer(hp)

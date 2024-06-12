@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from typing import Union
 
 import torch.nn as nn
 import torch.nn.functional as F
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class IRMAEOutput:
     latent: Tensor  # latent vector
-    decoded: Tensor | None  # decoder output, include extra dim
+    decoded: Union[Tensor, None]  # decoder output, include extra dim
 
 
 class ResBlock(nn.Sequential):

@@ -3,6 +3,7 @@ import random
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
+from typing import Union
 
 import librosa
 import numpy as np
@@ -16,7 +17,7 @@ _logger = logging.getLogger(__name__)
 
 @dataclass
 class RandomRIR(Effect):
-    rir_dir: Path | None
+    rir_dir: Union[Path, None]
     rir_rate: int = 44_000
     rir_suffix: str = ".npy"
     deterministic: bool = False
@@ -49,7 +50,9 @@ class RandomRIR(Effect):
 
         length = len(wav)
 
-        wav = librosa.resample(wav, orig_sr=sr, target_sr=self.rir_rate, res_type="kaiser_fast")
+        wav = librosa.resample(
+            wav, orig_sr=sr, target_sr=self.rir_rate, res_type="kaiser_fast"
+        )
         rir = self._sample_rir()
 
         wav = signal.convolve(wav, rir, mode="same")
@@ -58,7 +61,9 @@ class RandomRIR(Effect):
         if actlev > 0.99:
             wav = (wav / actlev) * 0.98
 
-        wav = librosa.resample(wav, orig_sr=self.rir_rate, target_sr=sr, res_type="kaiser_fast")
+        wav = librosa.resample(
+            wav, orig_sr=self.rir_rate, target_sr=sr, res_type="kaiser_fast"
+        )
 
         if abs(length - len(wav)) > 10:
             _logger.warning(f"length mismatch: {length} vs {len(wav)}")

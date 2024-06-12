@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -50,7 +51,9 @@ class UnivNet(nn.Module):
             ]
         )
 
-        self.conv_pre = weight_norm(nn.Conv1d(self.d_noise, self.nc, 7, padding=3, padding_mode="reflect"))
+        self.conv_pre = weight_norm(
+            nn.Conv1d(self.d_noise, self.nc, 7, padding=3, padding_mode="reflect")
+        )
 
         self.conv_post = nn.Sequential(
             nn.LeakyReLU(0.2),
@@ -64,7 +67,7 @@ class UnivNet(nn.Module):
     def eps(self):
         return 1e-5
 
-    def forward(self, x: Tensor, y: Tensor | None = None, npad=10):
+    def forward(self, x: Tensor, y: Union[Tensor, None] = None, npad=10):
         """
         Args:
             x: (b c t), acoustic features
@@ -74,7 +77,9 @@ class UnivNet(nn.Module):
         """
         assert x.ndim == 3, "x must be 3D tensor"
         assert y is None or y.ndim == 2, "y must be 2D tensor"
-        assert x.shape[1] == self.d_input, f"x.shape[1] must be {self.d_input}, but got {x.shape}"
+        assert (
+            x.shape[1] == self.d_input
+        ), f"x.shape[1] must be {self.d_input}, but got {x.shape}"
         assert npad >= 0, "npad must be positive or zero"
 
         x = F.pad(x, (0, npad), "constant", 0)

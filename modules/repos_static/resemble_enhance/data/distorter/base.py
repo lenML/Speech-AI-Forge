@@ -2,6 +2,7 @@ import itertools
 import os
 import random
 import time
+from typing import Union
 import warnings
 
 import numpy as np
@@ -87,7 +88,7 @@ class Choice(Effect):
 
 
 class Permutation(Effect):
-    def __init__(self, *effects, n: int | None = None):
+    def __init__(self, *effects, n: Union[int, None] = None):
         super().__init__()
         self.effects = effects
         self.n = n
