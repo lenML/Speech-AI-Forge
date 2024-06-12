@@ -28,6 +28,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   - 4.1. [`webui.py`: WebUI](#webui.py:WebUI)
     - 4.1.1. [webui features](#webuifeatures)
   - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
+    - 4.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
 - 5. [Benchmark](#Benchmark)
 - 6. [demo](#demo)
   - 6.1. [风格化控制](#-1)
@@ -184,6 +185,21 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
 
 [详细 API 文档](./docs/api.md)
+
+#### 4.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
+
+通过 `/v1/xtts_v2` 系列 api，你可以方便的将 ChatTTS-Forge 连接到你的 SillyTavern 中。
+
+下面是一个简单的配置指南:
+
+1. 点开 插件拓展
+2. 点开 `TTS` 插件配置部分
+3. 切换 `TTS Provider` 为 `XTTSv2`
+4. 勾选 `Enabled`
+5. 选择/配置 `Voice`
+6. **[关键]** 设置 `Provider Endpoint` 到 `http://localhost:7870/v1/xtts_v2`
+
+![sillytavern_tts](./docs/sillytavern_tts.png)
 
 ## 5. <a name='Benchmark'></a>Benchmark
 

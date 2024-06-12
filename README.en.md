@@ -28,6 +28,7 @@ You can experience and deploy ChatTTS-Forge through the following methods:
   - 4.1. [ `webui.py`: WebUI](#webui.py:WebUI)
     - 4.1.1. [WebUI Features](#WebUIFeatures)
   - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
+    - 4.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
 - 5. [Benchmark](#Benchmark)
 - 6. [demo](#demo)
   - 6.1. [风格化控制](#)
@@ -181,6 +182,21 @@ All parameters:
 Once the `launch.py` script has started successfully, you can check if the API is enabled at `/docs`.
 
 [Detailed API documentation](./docs/api.md)
+
+#### 4.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
+
+Through the `/v1/xtts_v2` series API, you can easily connect ChatTTS-Forge to your SillyTavern.
+
+Here's a simple configuration guide:
+
+1. Open the plugin extension.
+2. Open the `TTS` plugin configuration section.
+3. Switch `TTS Provider` to `XTTSv2`.
+4. Check `Enabled`.
+5. Select/configure `Voice`.
+6. **[Key Step]** Set the `Provider Endpoint` to `http://localhost:7870/v1/xtts_v2`.
+
+![sillytavern_tts](./docs/sillytavern_tts.png)
 
 ## 5. <a name='Benchmark'></a>Benchmark
 
