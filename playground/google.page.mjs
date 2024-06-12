@@ -21,6 +21,7 @@ const useStore = create((set, get) => ({
       seed: 42,
     },
     audioConfig: {},
+    enhancerConfig: {},
   },
 
   setPayload: (payload) => {
@@ -37,6 +38,7 @@ const useStore = create((set, get) => ({
         ...get().payload.audioConfig,
         ...payload.audioConfig,
       },
+      enhancerConfig: {},
     });
   },
 

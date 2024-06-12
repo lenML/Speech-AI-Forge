@@ -27,6 +27,7 @@ def google_text_synthesize_request():
             "batchSize": 1,
             "spliterThreshold": 100,
         },
+        "enhancerConfig": {},
     }
 
 
@@ -57,60 +58,42 @@ def test_google_text_synthesize_missing_input(
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_invalid_voice(
-    client,
-):
-    request = {
-        "input": {"text": "这是一个测试文本。"},
-        "voice": {
-            "languageCode": "EN-US",
-            "name": "invalid_voice",
-            "style": "",
-            "temperature": 0.5,
-            "topP": 0.8,
-            "topK": 50,
-            "seed": 42,
-        },
-        "audioConfig": {
-            "audioEncoding": "mp3",
-            "speakingRate": 1.0,
-            "pitch": 0.0,
-            "volumeGainDb": 0.0,
-            "sampleRateHertz": 24000,
-            "batchSize": 1,
-            "spliterThreshold": 100,
-        },
-    }
-    response = client.post("/v1/text:synthesize", json=request)
-    assert response.status_code == 400
+def test_google_text_synthesize_invalid_voice(client, google_text_synthesize_request):
+    google_text_synthesize_request.update(
+        {
+            "voice": {
+                "languageCode": "EN-US",
+                "name": "invalid_voice",
+                "style": "",
+                "temperature": 0.5,
+                "topP": 0.8,
+                "topK": 50,
+                "seed": 42,
+            }
+        }
+    )
+    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+    assert response.status_code == 422
     assert "detail" in response.json()
 
 
 @pytest.mark.google_api
 def test_google_text_synthesize_invalid_audio_encoding(
-    client,
+    client, google_text_synthesize_request
 ):
-    request = {
-        "input": {"text": "这是一个测试文本。"},
-        "voice": {
-            "languageCode": "ZH-CN",
-            "name": "female2",
-            "style": "",
-            "temperature": 0.5,
-            "topP": 0.8,
-            "topK": 50,
-            "seed": 42,
-        },
-        "audioConfig": {
-            "audioEncoding": "invalid_format",
-            "speakingRate": 1.0,
-            "pitch": 0.0,
-            "volumeGainDb": 0.0,
-            "sampleRateHertz": 24000,
-            "batchSize": 1,
-            "spliterThreshold": 100,
-        },
-    }
-    response = client.post("/v1/text:synthesize", json=request)
-    assert response.status_code == 400
+    google_text_synthesize_request.update(
+        {
+            "audioConfig": {
+                "audioEncoding": "invalid_format",
+                "speakingRate": 1.0,
+                "pitch": 0.0,
+                "volumeGainDb": 0.0,
+                "sampleRateHertz": 24000,
+                "batchSize": 1,
+                "spliterThreshold": 100,
+            },
+        }
+    )
+    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+    assert response.status_code == 422
     assert "detail" in response.json()

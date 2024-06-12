@@ -1,4 +1,5 @@
 import base64
+from typing import Literal
 from fastapi import HTTPException
 
 import io
@@ -6,7 +7,12 @@ import soundfile as sf
 from pydantic import BaseModel
 
 
+from modules.Enhancer.ResembleEnhance import (
+    apply_audio_enhance,
+    apply_audio_enhance_full,
+)
 from modules.api.Api import APIManager
+from modules.synthesize_audio import synthesize_audio
 from modules.utils.audio import apply_prosody_to_audio_data
 from modules.normalization import text_normalize
 
@@ -44,15 +50,25 @@ class AudioConfig(BaseModel):
     speakingRate: float = 1
     pitch: float = 0
     volumeGainDb: float = 0
-    sampleRateHertz: int
+    sampleRateHertz: int = 24000
     batchSize: int = 1
     spliterThreshold: int = 100
+
+
+class EnhancerConfig(BaseModel):
+    enabled: bool = False
+    model: str = "resemble-enhance"
+    nfe: int = 32
+    solver: Literal["midpoint", "rk4", "euler"] = "midpoint"
+    lambd: float = 0.5
+    tau: float = 0.5
 
 
 class GoogleTextSynthesizeRequest(BaseModel):
     input: SynthesisInput
     voice: VoiceSelectionParams
-    audioConfig: dict
+    audioConfig: AudioConfig
+    enhancerConfig: EnhancerConfig = None
 
 
 class GoogleTextSynthesizeResponse(BaseModel):
@@ -63,6 +79,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     input = request.input
     voice = request.voice
     audioConfig = request.audioConfig
+    enhancerConfig = request.enhancerConfig
 
     # 提取参数
 
@@ -70,40 +87,41 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     language_code = voice.languageCode
     voice_name = voice.name
     infer_seed = voice.seed or 42
-    audio_format = audioConfig.get("audioEncoding", "mp3")
-    speaking_rate = audioConfig.get("speakingRate", 1)
-    pitch = audioConfig.get("pitch", 0)
-    volume_gain_db = audioConfig.get("volumeGainDb", 0)
+    audio_format = audioConfig.audioEncoding or "mp3"
+    speaking_rate = audioConfig.speakingRate or 1
+    pitch = audioConfig.pitch or 0
+    volume_gain_db = audioConfig.volumeGainDb or 0
 
-    batch_size = audioConfig.get("batchSize", 1)
+    batch_size = audioConfig.batchSize or 1
 
     # TODO spliter_threshold
-    spliter_threshold = audioConfig.get("spliterThreshold", 100)
+    spliter_threshold = audioConfig.spliterThreshold or 100
 
     # TODO sample_rate
-    sample_rate_hertz = audioConfig.get("sampleRateHertz", 24000)
+    sample_rate_hertz = audioConfig.sampleRateHertz or 24000
 
     params = api_utils.calc_spk_style(spk=voice.name, style=voice.style)
-
-    # TODO maybe need to change the sample rate
-    sample_rate = 24000
 
     # 虽然 calc_spk_style 可以解析 seed 形式，但是这个接口只准备支持 speakers list 中存在的 speaker
     if speaker_mgr.get_speaker(voice_name) is None:
         raise HTTPException(
-            status_code=400, detail="The specified voice name is not supported."
+            status_code=422, detail="The specified voice name is not supported."
         )
 
     if audio_format != "mp3" and audio_format != "wav":
         raise HTTPException(
-            status_code=400, detail="Invalid audio encoding format specified."
+            status_code=422, detail="Invalid audio encoding format specified."
         )
+
+    if enhancerConfig.enabled:
+        # TODO enhancer params checker
+        pass
 
     try:
         if input.text:
             # 处理文本合成逻辑
             text = text_normalize(input.text, is_end=True)
-            sample_rate, audio_data = generate.generate_audio(
+            sample_rate, audio_data = synthesize_audio(
                 text,
                 temperature=(
                     voice.temperature
@@ -117,6 +135,8 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
                 prompt1=params.get("prompt1", ""),
                 prompt2=params.get("prompt2", ""),
                 prefix=params.get("prefix", ""),
+                batch_size=batch_size,
+                spliter_threshold=spliter_threshold,
             )
 
         elif input.ssml:
@@ -128,7 +148,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
             if len(segments) == 0:
                 raise HTTPException(
-                    status_code=400, detail="The SSML text is empty or parsing failed."
+                    status_code=422, detail="The SSML text is empty or parsing failed."
                 )
 
             synthesize = SynthesizeSegments(batch_size=batch_size)
@@ -144,7 +164,17 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
         else:
             raise HTTPException(
-                status_code=400, detail="Either text or SSML input must be provided."
+                status_code=422, detail="Either text or SSML input must be provided."
+            )
+
+        if enhancerConfig.enabled:
+            audio_data, sample_rate = apply_audio_enhance_full(
+                audio_data=audio_data,
+                sr=sample_rate,
+                nfe=enhancerConfig.nfe,
+                solver=enhancerConfig.solver,
+                lambd=enhancerConfig.lambd,
+                tau=enhancerConfig.tau,
             )
 
         audio_data = apply_prosody_to_audio_data(

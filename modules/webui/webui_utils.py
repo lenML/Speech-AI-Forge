@@ -2,7 +2,7 @@ import io
 from typing import Union
 import numpy as np
 
-from modules.Enhancer.ResembleEnhance import load_enhancer
+from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
 from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
 from modules.utils.hf import spaces
@@ -85,21 +85,7 @@ def segments_length_limit(
 @torch.inference_mode()
 @spaces.GPU
 def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
-    if not enable_denoise and not enable_enhance:
-        return audio_data, sr
-
-    # FIXME: 这里可能改成 to(device) 会优化一点？
-    tensor = torch.from_numpy(audio_data).float().squeeze().cpu()
-    enhancer = load_enhancer()
-
-    if enable_enhance or enable_denoise:
-        lambd = 0.9 if enable_denoise else 0.1
-        tensor, sr = enhancer.enhance(
-            tensor, sr, tau=0.5, nfe=64, solver="rk4", lambd=lambd
-        )
-
-    audio_data = tensor.cpu().numpy()
-    return audio_data, int(sr)
+    return _apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance)
 
 
 @torch.inference_mode()

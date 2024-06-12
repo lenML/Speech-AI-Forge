@@ -1,6 +1,6 @@
 # API
 
-使用 `launch.py` 脚本启动 `api` 服务之后，你可以在 `http://localhost:8000/docs` 下查看和简单测试 `api`
+使用 `launch.py` 脚本启动 `api` 服务之后，你可以在 `http://localhost:7870/docs` 下查看和简单测试 `api`
 
 下面特殊接口的介绍
 
@@ -11,7 +11,7 @@ openai 接口比较简单，`input` 为必填项，其余均可为空。
 一个简单的请求示例如下：
 
 ```bash
-curl http://localhost:8000/v1/audio/speech \
+curl http://localhost:7870/v1/audio/speech \
   -H "Authorization: Bearer anything_your_wanna" \
   -H "Content-Type: application/json" \
   -d '{
@@ -32,7 +32,7 @@ google 接口略复杂，但是某些时候用这个是必要的，因为这个�
 一个简单的请求示例如下：
 
 ```bash
-curl "http://localhost:8000/v1/text:synthesize" -X POST \
+curl "http://localhost:7870/v1/text:synthesize" -X POST \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{
@@ -48,7 +48,10 @@ curl "http://localhost:8000/v1/text:synthesize" -X POST \
     "seed": 42
   },
   "audioConfig": {
-    "audioEncoding": "MP3"
+    "audioEncoding": "mp3"
+  },
+  "enhancerConfig": {
+    "enabled": true
   }
 }' -o response.json
 ```
