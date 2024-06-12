@@ -1,6 +1,9 @@
 import { client } from "./client.mjs";
 import { create } from "./misc.mjs";
 
+/**
+ * @type {() => {speakers:any[],styles:any[]}}
+ */
 export const useGlobalStore = create((set, get) => ({
   speakers: [],
   styles: [],

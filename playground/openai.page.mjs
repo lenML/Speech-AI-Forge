@@ -95,7 +95,7 @@ const useStore = create((set, get) => ({
   params: {
     input: "你好，这是一个测试 [lbreak]",
     voice: "female2",
-    style: "text",
+    style: "",
     speed: 1,
   },
   setParams: (params) =>
@@ -162,13 +162,14 @@ export const OpenaiPage = () => {
 
   return html`
     <${OpenaiPageContainer}>
-      <div>
+      <fieldset>
+        <legend>text</legend>
         <textarea value=${input} onInput=${handleInput}></textarea>
-      </div>
+      </fieldset>
       <fieldset>
         <legend>Payload</legend>
         <label>
-          Speaker:
+          Voice:
           <select value=${voice} onChange=${handleVoice}>
             <option value="-1">*random</option>
             ${speakers.map(

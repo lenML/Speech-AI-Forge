@@ -22,6 +22,8 @@ class APIClient {
     prompt1 = "",
     prompt2 = "",
     prefix = "",
+    bs = 8,
+    thr = 100,
   }) {
     try {
       const response = await this.client.get("/v1/tts", {
@@ -37,6 +39,8 @@ class APIClient {
           prompt1,
           prompt2,
           prefix,
+          bs,
+          thr,
         },
         responseType: "blob", // Important for handling binary data
       });
@@ -171,6 +175,18 @@ class APIClient {
       return response.data;
     } catch (error) {
       console.error("Error updating speakers:", error);
+      throw error;
+    }
+  }
+
+  async googleTTTS(payload) {
+    try {
+      const response = await this.client.post("/v1/text:synthesize", payload, {
+        responseType: "json",
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error synthesizing TTS with Google:", error);
       throw error;
     }
   }
