@@ -106,6 +106,16 @@ apt-get install rubberband-cli
 1. 从[此处](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z)下载并解压 ffmpeg 的 Windows 二进制文件。
 2. 将 ffmpeg 的`/bin`文件夹中的 .exe 文件解压到 `项目目录/ffmpeg` 文件夹内
 
+文件 (window) 目录应该如下
+
+```
+./ffmpeg
+├── ffmpeg.exe
+├── ffprobe.exe
+├── ffplay.exe
+└── put_ffmpeg_here
+```
+
 ## 5. 安装 python 依赖
 
 ### pytorch

@@ -24,17 +24,17 @@ You can experience and deploy ChatTTS-Forge through the following methods:
   - 2.1. [Model Loading Memory Requirements](#ModelLoadingMemoryRequirements)
   - 2.2. [Batch Size Memory Requirements](#BatchSizeMemoryRequirements)
 - 3. [Features](#Features)
-- 4. [Interface](#Interface)
-- 5. [ Installation and Running](#InstallationandRunning)
-  - 5.1. [ `webui.py`: WebUI](#webui.py:WebUI)
-    - 5.1.1. [WebUI Features](#WebUIFeatures)
-  - 5.2. [`launch.py`: API Server](#launch.py:APIServer)
-- 6. [Benchmark](#Benchmark)
-- 7. [demo](#demo)
-  - 7.1. [风格化控制](#)
-  - 7.2. [长文本生成](#-1)
-- 8. [SSML](#SSML)
-- 9. [Speaking style](#Speakingstyle)
+- 4. [ Installation and Running](#InstallationandRunning)
+  - 4.1. [ `webui.py`: WebUI](#webui.py:WebUI)
+    - 4.1.1. [WebUI Features](#WebUIFeatures)
+  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
+- 5. [Benchmark](#Benchmark)
+- 6. [demo](#demo)
+  - 6.1. [风格化控制](#)
+  - 6.2. [长文本生成](#-1)
+- 7. [SSML](#SSML)
+- 8. [Speaking style](#Speakingstyle)
+- 9. [Speaker.pt File](#Speaker.ptFile)
 - 10. [Docker](#Docker)
   - 10.1. [Image](#Image)
   - 10.2. [Manual build](#Manualbuild)
@@ -98,39 +98,12 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 - **Speaker Import and Export**: Supports importing and exporting speakers for easy customization.
 - **Speaker Merging**: Supports merging speakers and fine-tuning them.
 
-## 4. <a name='Interface'></a>Interface
-
-<table>
-  <tr>
-    <th>Project</th>
-    <th>Description</th>
-    <th>Deployment or Usage Method</th>
-    <th>Image</th>
-  </tr>
-  <tr>
-    <td rowspan="2">API</td>
-    <td>Provides various forms of text-to-speech interfaces. Visit <code>http://localhost:8000/docs</code> for detailed information after deployment.</td>
-    <td>Run <code>python launch.py</code></td>
-    <td rowspan="2"><img src="./docs/api.png" alt="API Documentation"><br><img src="./docs/playground.png" alt="Playground"></td>
-  </tr>
-  <tr>
-    <td>Includes a Playground front-end page independent of Python code and Gradio, facilitating API debugging.</td>
-    <td>Visit <code>http://localhost:8000/playground/index.html</code> after deployment</td>
-  </tr>
-  <tr>
-    <td>WebUI</td>
-    <td>In some scenarios (such as HuggingFace/Colab), WebUI is needed. Here is a simple implementation. Please note that WebUI does not support write operations to any local files.</td>
-    <td>Run <code>python webui.py</code></td>
-    <td><img src="./docs/webui.png" alt="WebUI"></td>
-  </tr>
-</table>
-
-## 5. <a name='InstallationandRunning'></a> Installation and Running
+## 4. <a name='InstallationandRunning'></a> Installation and Running
 
 1. Ensure that the [related dependencies](./docs/dependencies.md) are correctly installed.
 2. Start the required services according to your needs. The specific startup parameters are as follows.
 
-### 5.1. <a name='webui.py:WebUI'></a> `webui.py`: WebUI
+### 4.1. <a name='webui.py:WebUI'></a> `webui.py`: WebUI
 
 WebUI.py is a script used to configure and start the Gradio Web UI interface.
 
@@ -158,7 +131,7 @@ All parameters:
 
 > Since `MKL FFT doesn't support tensors of type: Half`, `--half` and `--use_cpu="all"` cannot be used simultaneously.
 
-#### 5.1.1. <a name='WebUIFeatures'></a>WebUI Features
+#### 4.1.1. <a name='WebUIFeatures'></a>WebUI Features
 
 [Click here for a detailed introduction with images](./docs/webui_features.md)
 
@@ -183,7 +156,7 @@ All parameters:
   - [WIP] ASR
   - [WIP] Inpainting
 
-### 5.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 Launch.py is the startup script for ChatTTS-Forge, used to configure and launch the API server.
 
@@ -209,7 +182,7 @@ Once the `launch.py` script has started successfully, you can check if the API i
 
 [Detailed API documentation](./docs/api.md)
 
-## 6. <a name='Benchmark'></a>Benchmark
+## 5. <a name='Benchmark'></a>Benchmark
 
 > You can reproduce this using `./tests/benchmark/tts_benchmark.py`
 
@@ -239,9 +212,9 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 
-## 7. <a name='demo'></a>demo
+## 6. <a name='demo'></a>demo
 
-### 7.1. <a name=''></a>风格化控制
+### 6.1. <a name=''></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -281,7 +254,7 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 </details>
 
-### 7.2. <a name='-1'></a>长文本生成
+### 6.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -303,13 +276,30 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 </details>
 
-## 8. <a name='SSML'></a>SSML
+## 7. <a name='SSML'></a>SSML
 
 [SSML readme](./docs/SSML.md)
 
-## 9. <a name='Speakingstyle'></a>Speaking style
+## 8. <a name='Speakingstyle'></a>Speaking style
 
 [style readme](./docs/sytles.md)
+
+## 9. <a name='Speaker.ptFile'></a>Speaker.pt File
+
+1. How to Generate
+
+   > You can generate a .pt file using the speaker creation and fusion features in the webui.
+
+2. How to Export
+
+   > Click download in the webui to export.
+
+3. How to Import
+
+   > Upload the file in the speaker upload section of the webui.
+
+4. How to Import into the Service
+   > Place the .pt file into the `data/speakers` directory, then restart the service or call the API to add it to the system.
 
 ## 10. <a name='Docker'></a>Docker
 

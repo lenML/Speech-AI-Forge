@@ -24,17 +24,17 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   - 2.1. [加载模型显存要求](#)
   - 2.2. [Batch Size 显存要求](#BatchSize)
 - 3. [Features](#Features)
-- 4. [Interface](#Interface)
-- 5. [ Installation and Running](#InstallationandRunning)
-  - 5.1. [`webui.py`: WebUI](#webui.py:WebUI)
-    - 5.1.1. [webui features](#webuifeatures)
-  - 5.2. [`launch.py`: API Server](#launch.py:APIServer)
-- 6. [Benchmark](#Benchmark)
-- 7. [demo](#demo)
-  - 7.1. [风格化控制](#-1)
-  - 7.2. [长文本生成](#-1)
-- 8. [SSML](#SSML)
-- 9. [Speaking style](#Speakingstyle)
+- 4. [ Installation and Running](#InstallationandRunning)
+  - 4.1. [`webui.py`: WebUI](#webui.py:WebUI)
+    - 4.1.1. [webui features](#webuifeatures)
+  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
+- 5. [Benchmark](#Benchmark)
+- 6. [demo](#demo)
+  - 6.1. [风格化控制](#-1)
+  - 6.2. [长文本生成](#-1)
+- 7. [SSML](#SSML)
+- 8. [Speaking style](#Speakingstyle)
+- 9. [Speaker.pt 文件](#Speaker.pt)
 - 10. [Docker](#Docker)
   - 10.1. [镜像](#-1)
   - 10.2. [手动 build](#build)
@@ -98,39 +98,12 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 - **Speaker 导入导出**: 支持 Speaker 导入导出，方便定制
 - **Speaker 融合**: 支持 Speaker 融合，微调说话人
 
-## 4. <a name='Interface'></a>Interface
-
-<table>
-  <tr>
-    <th>项目</th>
-    <th>描述</th>
-    <th>部署或使用方式</th>
-    <th>图片</th>
-  </tr>
-  <tr>
-    <td rowspan="2">API</td>
-    <td>提供多种形式的文本转语音接口。部署后访问 <code>http://localhost:8000/docs</code> 查看详细信息。</td>
-    <td>运行 <code>python launch.py</code></td>
-    <td rowspan="2"><img src="./docs/api.png" alt="API 文档"><br><img src="./docs/playground.png" alt="Playground"></td>
-  </tr>
-  <tr>
-    <td>包含一个独立于 Python 代码和 Gradio 的 Playground 前端页面，方便调试 API。</td>
-    <td>部署后访问 <code>http://localhost:8000/playground/index.html</code></td>
-  </tr>
-  <tr>
-    <td>WebUI</td>
-    <td>在某些场景（如 HuggingFace/Colab）中需要使用 WebUI，这里提供了一个简单实现。请注意，WebUI 不支持对任何本地文件的写操作。</td>
-    <td>运行 <code>python webui.py</code></td>
-    <td><img src="./docs/webui.png" alt="WebUI"></td>
-  </tr>
-</table>
-
-## 5. <a name='InstallationandRunning'></a> Installation and Running
+## 4. <a name='InstallationandRunning'></a> Installation and Running
 
 1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
 2. 根据你的需求启动需要的服务，具体启动参数如下。
 
-### 5.1. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
+### 4.1. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
 
 WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
@@ -161,7 +134,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 > 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
 
-#### 5.1.1. <a name='webuifeatures'></a>webui features
+#### 4.1.1. <a name='webuifeatures'></a>webui features
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
@@ -186,7 +159,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
   - [WIP] ASR
   - [WIP] Inpainting
 
-### 5.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 某些情况，你并不需要 webui，那么可以使用这个脚本启动单纯的 api 服务。
 
@@ -212,7 +185,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 [详细 API 文档](./docs/api.md)
 
-## 6. <a name='Benchmark'></a>Benchmark
+## 5. <a name='Benchmark'></a>Benchmark
 
 > 可使用 `./tests/benchmark/tts_benchmark.py` 复现
 
@@ -242,9 +215,9 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 | 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
 | 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
 
-## 7. <a name='demo'></a>demo
+## 6. <a name='demo'></a>demo
 
-### 7.1. <a name='-1'></a>风格化控制
+### 6.1. <a name='-1'></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -284,7 +257,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-### 7.2. <a name='-1'></a>长文本生成
+### 6.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -306,13 +279,30 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-## 8. <a name='SSML'></a>SSML
+## 7. <a name='SSML'></a>SSML
 
 [SSML readme](./docs/SSML.md)
 
-## 9. <a name='Speakingstyle'></a>Speaking style
+## 8. <a name='Speakingstyle'></a>Speaking style
 
 [style readme](./docs/sytles.md)
+
+## 9. <a name='Speaker.pt'></a>Speaker.pt 文件
+
+1. 如何生成
+
+   > 使用 webui 中的 spaker 创建和融合功能都可以生成 .pt 文件
+
+2. 如何导出
+
+   > webui 中点击下载即可导出
+
+3. 如何导入
+
+   > webui 中 spaaker 上传文件处上传即可
+
+4. 如何导入到服务中
+   > .pt 文件，放到 `data/speakers` 目录之下，重启服务或者调用 api 即可添加到系统中
 
 ## 10. <a name='Docker'></a>Docker
 
