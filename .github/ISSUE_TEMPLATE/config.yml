@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/lenML/ChatTTS-Forge/discussions
+    about: 提问、讨论、想法、分享请移步 Discussions
+  - name: 阅读文档
+    url: https://github.com/lenML/ChatTTS-Forge/blob/master/README.md
+    about: 建议您发布 issue 前先仔细阅读项目文档
+  - name: Colab 测试
+    url: https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.ipynb
+    about: 可尝试在 colab 中测试相关功能
+  - name: 线上测试
+    url: https://huggingface.co/spaces/lenML/ChatTTS-Forge
+    about: 可在 HuggingFace 线上环境测试相关功能
