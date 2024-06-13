@@ -1,5 +1,14 @@
 # Changelog
 
+<a name="0.6.1-rc"></a>
+
+## 0.6.1-rc (2024-06-13)
+
+### Added
+
+- ✨ add webui 分割器配置 [[589327b](https://github.com/lenML/ChatTTS-Forge/commit/589327b729188d1385838816b9807e894eb128b0)]
+- ✨ add &#x60;eos&#x60; params to all api [[79c994f](https://github.com/lenML/ChatTTS-Forge/commit/79c994fadf7d60ea432b62f4000b62b67efe7259)]
+
 <a name="0.6.0"></a>
 
 ## 0.6.0 (2024-06-12)
