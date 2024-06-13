@@ -118,7 +118,7 @@ All parameters:
 | `--debug`              | `bool` | `False`     | Enable debug mode                                                          |
 | `--compile`            | `bool` | `False`     | Enable model compilation                                                   |
 | `--auth`               | `str`  | `None`      | Username and password for authentication in the format `username:password` |
-| `--half`               | `bool` | `False`     | Enable f16 half-precision inference                                        |
+| `--no_half`            | `bool` | `False`     | Enable f32 full-precision inference                                        |
 | `--off_tqdm`           | `bool` | `False`     | Disable tqdm progress bar                                                  |
 | `--tts_max_len`        | `int`  | `1000`      | Maximum text length for TTS (Text-to-Speech)                               |
 | `--ssml_max_len`       | `int`  | `2000`      | Maximum text length for SSML (Speech Synthesis Markup Language)            |
@@ -128,9 +128,7 @@ All parameters:
 | `--webui_experimental` | `bool` | `False`     | Enable experimental features (incomplete features)                         |
 | `--language`           | `str`  | `zh-CN`     | Set webui localization                                                     |
 
-> Enabling `--half` can significantly reduce memory usage. If the batch size is greater than 8, it is recommended to enable half.
-
-> Since `MKL FFT doesn't support tensors of type: Half`, `--half` and `--use_cpu="all"` cannot be used simultaneously.
+> Due to `MKL FFT doesn't support tensors of type: Half`, you need to enable `--no_half` when using `--use_cpu="all"`.
 
 #### 4.1.1. <a name='WebUIFeatures'></a>WebUI Features
 

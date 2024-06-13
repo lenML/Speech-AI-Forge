@@ -44,9 +44,9 @@ def create_api(app, exclude=[]):
 def setup_model_args(parser: argparse.ArgumentParser):
     parser.add_argument("--compile", action="store_true", help="Enable model compile")
     parser.add_argument(
-        "--half",
+        "--no_half",
         action="store_true",
-        help="Enable half precision for model inference",
+        help="Disalbe half precision for model inference",
     )
     parser.add_argument(
         "--off_tqdm",
@@ -84,7 +84,7 @@ def process_model_args(args):
     compile = env.get_and_update_env(args, "compile", False, bool)
     device_id = env.get_and_update_env(args, "device_id", None, str)
     use_cpu = env.get_and_update_env(args, "use_cpu", [], list)
-    half = env.get_and_update_env(args, "half", False, bool)
+    no_half = env.get_and_update_env(args, "no_half", False, bool)
     off_tqdm = env.get_and_update_env(args, "off_tqdm", False, bool)
     debug_generate = env.get_and_update_env(args, "debug_generate", False, bool)
 

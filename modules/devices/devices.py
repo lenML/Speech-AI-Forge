@@ -127,7 +127,7 @@ def reset_device():
     global dtype_gpt
     global dtype_decoder
 
-    if config.runtime_env_vars.half:
+    if not config.runtime_env_vars.no_half:
         dtype = torch.float16
         dtype_dvae = torch.float16
         dtype_vocos = torch.float16

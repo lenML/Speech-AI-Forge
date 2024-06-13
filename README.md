@@ -118,7 +118,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--debug`              | `bool` | `False`     | 启用调试模式                                       |
 | `--compile`            | `bool` | `False`     | 启用模型编译                                       |
 | `--auth`               | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
-| `--half`               | `bool` | `False`     | 开启 f16 半精度推理                                |
+| `--no_half`            | `bool` | `False`     | 使用 f32 全精度推理                                |
 | `--off_tqdm`           | `bool` | `False`     | 关闭 tqdm 进度条                                   |
 | `--tts_max_len`        | `int`  | `1000`      | TTS（文本到语音）的最大文本长度                    |
 | `--ssml_max_len`       | `int`  | `2000`      | SSML（语音合成标记语言）的最大文本长度             |
@@ -131,9 +131,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 > 从 webui.py 入口启动， 可与 api 同时启动，api 的配置在下方 launch.py 脚本参数中说明， 开启后可在 `http://localhost:7860/docs` 查看 api
 
-> 开启 `--half` 可以大幅减少显存占用。如果 batch size 大于 8 建议开启 half。
-
-> 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--half` 和 `--use_cpu="all"` 不能同时使用
+> 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--use_cpu="all"` 时需要开启 `--no_half`
 
 #### 4.1.1. <a name='webuifeatures'></a>webui features
 
@@ -176,7 +174,7 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 | `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
 | `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
 | `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
-| `--half`          | `bool` | `False`     | 开启 f16 半精度推理                             |
+| `--no_half`       | `bool` | `False`     | 使用 f32 全精度推理                             |
 | `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
 | `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
 | `--device_id`     | `str`  | `None`      | 指定使用 gpu device_id                          |
