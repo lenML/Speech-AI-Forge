@@ -71,10 +71,11 @@ class TTSAudioSegment(Box):
 
 
 class SynthesizeSegments:
-    def __init__(self, batch_size: int = 8):
+    def __init__(self, batch_size: int = 8, eos=""):
         self.batch_size = batch_size
         self.batch_default_spk_seed = rng.np_rng()
         self.batch_default_infer_seed = rng.np_rng()
+        self.eos = eos
 
     def segment_to_generate_params(
         self, segment: Union[SSMLSegment, SSMLBreak]
@@ -156,7 +157,7 @@ class SynthesizeSegments:
         for i in range(0, len(bucket), self.batch_size):
             batch = bucket[i : i + self.batch_size]
             param_arr = [self.segment_to_generate_params(segment) for segment in batch]
-            texts = [params.text for params in param_arr]
+            texts = [params.text + self.eos for params in param_arr]
 
             params = param_arr[0]
             audio_datas = generate_audio.generate_audio_batch(

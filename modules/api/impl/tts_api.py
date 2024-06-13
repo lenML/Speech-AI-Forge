@@ -38,6 +38,7 @@ class TTSParams(BaseModel):
     prefix: str = Query("", description="Text prefix for inference")
     bs: str = Query("8", description="Batch size for inference")
     thr: str = Query("100", description="Threshold for sentence spliter")
+    eos: str = Query("", description="End of sentence str")
 
 
 async def synthesize_tts(params: TTSParams = Depends()):
@@ -87,6 +88,7 @@ async def synthesize_tts(params: TTSParams = Depends()):
         prefix = params.prefix or calc_params.get("prefix", params.prefix)
         prompt1 = params.prompt1 or calc_params.get("prompt1", params.prompt1)
         prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
+        eos = params.eos or ""
 
         batch_size = int(params.bs)
         threshold = int(params.thr)
@@ -103,6 +105,7 @@ async def synthesize_tts(params: TTSParams = Depends()):
             prefix=prefix,
             batch_size=batch_size,
             spliter_threshold=threshold,
+            end_of_sentence=eos,
         )
 
         buffer = io.BytesIO()

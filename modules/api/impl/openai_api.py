@@ -41,6 +41,8 @@ class AudioSpeechRequest(BaseModel):
     spliter_threshold: float = Field(
         100, ge=10, le=1024, description="Threshold for sentence spliter"
     )
+    # end of sentence
+    eos: str = "[uv_break]"
 
 
 async def openai_speech_api(
@@ -52,6 +54,7 @@ async def openai_speech_api(
     input_text = request.input
     voice = request.voice
     style = request.style
+    eos = request.eos
     response_format = request.response_format
     batch_size = request.batch_size
     spliter_threshold = request.spliter_threshold
@@ -95,6 +98,7 @@ async def openai_speech_api(
             prompt1=prompt1,
             prompt2=prompt2,
             prefix=prefix,
+            end_of_sentence=eos,
         )
 
         if speed != 1:

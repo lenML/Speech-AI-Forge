@@ -44,6 +44,9 @@ class VoiceSelectionParams(BaseModel):
     topK: int = 20
     seed: int = 42
 
+    # end_of_sentence
+    eos: str = "[uv_break]"
+
 
 class AudioConfig(BaseModel):
     audioEncoding: api_utils.AudioFormat = "mp3"
@@ -87,6 +90,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     language_code = voice.languageCode
     voice_name = voice.name
     infer_seed = voice.seed or 42
+    eos = voice.eos or "[uv_break]"
     audio_format = audioConfig.audioEncoding or "mp3"
     speaking_rate = audioConfig.speakingRate or 1
     pitch = audioConfig.pitch or 0
@@ -137,6 +141,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
                 prefix=params.get("prefix", ""),
                 batch_size=batch_size,
                 spliter_threshold=spliter_threshold,
+                end_of_sentence=eos,
             )
 
         elif input.ssml:

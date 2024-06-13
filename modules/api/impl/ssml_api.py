@@ -26,6 +26,9 @@ class SSMLRequest(BaseModel):
     # NOTE: 🤔 也许这个值应该配置成系统变量？ 传进来有点奇怪
     batch_size: int = 4
 
+    # end of sentence
+    eos: str = "[uv_break]"
+
 
 async def synthesize_ssml(
     request: SSMLRequest = Body(
@@ -36,6 +39,7 @@ async def synthesize_ssml(
         ssml = request.ssml
         format = request.format.lower()
         batch_size = request.batch_size
+        eos = request.eos
 
         if batch_size < 1:
             raise HTTPException(
@@ -55,7 +59,7 @@ async def synthesize_ssml(
         for seg in segments:
             seg["text"] = text_normalize(seg["text"], is_end=True)
 
-        synthesize = SynthesizeSegments(batch_size)
+        synthesize = SynthesizeSegments(batch_size=batch_size, eos=eos)
         audio_segments = synthesize.synthesize_segments(segments)
         combined_audio = combine_audio_segments(audio_segments)
         buffer = io.BytesIO()
