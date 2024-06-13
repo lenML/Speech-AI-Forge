@@ -22,7 +22,6 @@ def create_ssml_interface():
                 ssml_button = gr.Button("🔊Synthesize SSML", variant="primary")
         with gr.Column(scale=1):
             with gr.Group():
-                # 参数
                 gr.Markdown("🎛️Parameters")
                 # batch size
                 batch_size_input = gr.Slider(
@@ -30,6 +29,19 @@ def create_ssml_interface():
                     value=4,
                     minimum=1,
                     maximum=webui_config.max_batch_size,
+                    step=1,
+                )
+            with gr.Group():
+                gr.Markdown("🎛️Spliter")
+                eos_input = gr.Textbox(
+                    label="eos",
+                    value="[uv_break]",
+                )
+                spliter_thr_input = gr.Slider(
+                    label="Spliter Threshold",
+                    value=100,
+                    minimum=50,
+                    maximum=1000,
                     step=1,
                 )
 
@@ -49,7 +61,14 @@ def create_ssml_interface():
 
     ssml_button.click(
         synthesize_ssml,
-        inputs=[ssml_input, batch_size_input, enable_enhance, enable_de_noise],
+        inputs=[
+            ssml_input,
+            batch_size_input,
+            enable_enhance,
+            enable_de_noise,
+            eos_input,
+            spliter_thr_input,
+        ],
         outputs=ssml_output,
     )
 

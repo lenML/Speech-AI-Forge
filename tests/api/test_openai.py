@@ -1,12 +1,11 @@
 import os
-from pytest import mark
 from modules.api.impl.openai_api import AudioSpeechRequest
 
 import tests.conftest
 import pytest
 
 
-@mark.parametrize(
+@pytest.mark.parametrize(
     "input_text, voice",
     [
         ("Hello, world [lbreak]", "female2"),

@@ -1,8 +1,10 @@
+import copy
 from box import Box
 from pydub import AudioSegment
 from typing import List, Union
 from scipy.io.wavfile import write
 import io
+from modules.SentenceSplitter import SentenceSplitter
 from modules.api.utils import calc_spk_style
 from modules.ssml_parser.SSMLParser import SSMLSegment, SSMLBreak, SSMLContext
 from modules.utils import rng
@@ -71,11 +73,12 @@ class TTSAudioSegment(Box):
 
 
 class SynthesizeSegments:
-    def __init__(self, batch_size: int = 8, eos=""):
+    def __init__(self, batch_size: int = 8, eos="", spliter_thr=100):
         self.batch_size = batch_size
         self.batch_default_spk_seed = rng.np_rng()
         self.batch_default_infer_seed = rng.np_rng()
         self.eos = eos
+        self.spliter_thr = spliter_thr
 
     def segment_to_generate_params(
         self, segment: Union[SSMLSegment, SSMLBreak]
@@ -205,9 +208,38 @@ class SynthesizeSegments:
 
         return buckets
 
+    def split_segments(self, segments: List[Union[SSMLSegment, SSMLBreak]]):
+        """
+        将 segments 中的 text 经过 spliter 处理成多个 segments
+        """
+        spliter = SentenceSplitter(threshold=self.spliter_thr)
+        ret_segments: List[Union[SSMLSegment, SSMLBreak]] = []
+
+        for segment in segments:
+            if isinstance(segment, SSMLBreak):
+                ret_segments.append(segment)
+                continue
+
+            text = segment.text
+            if not text:
+                continue
+
+            sentences = spliter.parse(text)
+            for sentence in sentences:
+                ret_segments.append(
+                    SSMLSegment(
+                        text=sentence,
+                        attrs=segment.attrs.copy(),
+                        params=copy.copy(segment.params),
+                    )
+                )
+
+        return ret_segments
+
     def synthesize_segments(
         self, segments: List[Union[SSMLSegment, SSMLBreak]]
     ) -> List[AudioSegment]:
+        segments = self.split_segments(segments)
         audio_segments = [None] * len(segments)
         buckets = self.bucket_segments(segments)
 

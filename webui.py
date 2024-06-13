@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 
 from modules.api.api_setup import (
@@ -106,6 +107,7 @@ def process_webui_args(args):
         auth=auth,
         show_api=False,
         prevent_thread_lock=True,
+        inbrowser=sys.platform == "win32",
         app_kwargs={
             "title": app_title,
             "description": app_description,

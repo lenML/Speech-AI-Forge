@@ -80,6 +80,9 @@
   "readme": "readme",
   "changelog": "changelog",
   "💼Speaker file": "💼音色文件",
+  "🎛️Spliter": "🎛️分割器配置",
+  "eos": "句尾词",
+  "Spliter Threshold": "分割器阈值",
   "TTS_STYLE_GUIDE": ["后缀为 _p 表示带prompt，效果更强但是影响质量"],
   "SSML_SPLITER_GUIDE": [
     "- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`",

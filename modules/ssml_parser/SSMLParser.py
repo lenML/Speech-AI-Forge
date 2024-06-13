@@ -11,8 +11,8 @@ import copy
 
 
 class SSMLContext(Box):
-    def __init__(self, parent=None):
-        self.parent: Union[SSMLContext, None] = parent
+    def __init__(self, *args, **kwargs):
+        self.parent: Union[SSMLContext, None] = None
 
         self.style = None
         self.spk = None
@@ -29,18 +29,14 @@ class SSMLContext(Box):
         self.prompt2 = None
         self.prefix = None
 
-    def clone(self):
-        ctx = SSMLContext()
-        for k, v in self.items():
-            ctx[k] = v
-        return ctx
+        super().__init__(*args, **kwargs)
 
 
 class SSMLSegment(Box):
-    def __init__(self, text: str, attrs=SSMLContext()):
-        self.attrs = attrs
+    def __init__(self, text: str, attrs=SSMLContext(), params=None):
+        self.attrs = SSMLContext(**attrs)
         self.text = text
-        self.params = None
+        self.params = params
 
 
 class SSMLBreak:
@@ -68,7 +64,7 @@ class SSMLParser:
         root = etree.fromstring(ssml)
 
         root_ctx = SSMLContext()
-        segments = []
+        segments: List[Union[SSMLSegment, SSMLBreak]] = []
         self.resolve(root, root_ctx, segments)
 
         return segments
@@ -89,8 +85,13 @@ def create_ssml_parser():
     parser = SSMLParser()
 
     @parser.resolver("speak")
-    def tag_speak(element, context, segments, parser):
-        ctx = context.clone() if context is not None else SSMLContext()
+    def tag_speak(
+        element: etree.Element,
+        context: Box,
+        segments: List[Union[SSMLSegment, SSMLBreak]],
+        parser: SSMLParser,
+    ):
+        ctx = context.copy() if context is not None else SSMLContext()
 
         version = element.get("version")
         if version != "0.1":
@@ -100,8 +101,13 @@ def create_ssml_parser():
             parser.resolve(child, ctx, segments)
 
     @parser.resolver("voice")
-    def tag_voice(element, context, segments, parser):
-        ctx = context.clone() if context is not None else SSMLContext()
+    def tag_voice(
+        element: etree.Element,
+        context: Box,
+        segments: List[Union[SSMLSegment, SSMLBreak]],
+        parser: SSMLParser,
+    ):
+        ctx = context.copy() if context is not None else SSMLContext()
 
         ctx.spk = element.get("spk", ctx.spk)
         ctx.style = element.get("style", ctx.style)
@@ -131,13 +137,23 @@ def create_ssml_parser():
                 segments.append(SSMLSegment(child.tail.strip(), ctx))
 
     @parser.resolver("break")
-    def tag_break(element, context, segments, parser):
+    def tag_break(
+        element: etree.Element,
+        context: Box,
+        segments: List[Union[SSMLSegment, SSMLBreak]],
+        parser: SSMLParser,
+    ):
         time_ms = int(element.get("time", "0").replace("ms", ""))
         segments.append(SSMLBreak(time_ms))
 
     @parser.resolver("prosody")
-    def tag_prosody(element, context, segments, parser):
-        ctx = context.clone() if context is not None else SSMLContext()
+    def tag_prosody(
+        element: etree.Element,
+        context: Box,
+        segments: List[Union[SSMLSegment, SSMLBreak]],
+        parser: SSMLParser,
+    ):
+        ctx = context.copy() if context is not None else SSMLContext()
 
         ctx.spk = element.get("spk", ctx.spk)
         ctx.style = element.get("style", ctx.style)

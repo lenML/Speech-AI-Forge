@@ -29,32 +29,6 @@ def create_tts_interface():
 
     with gr.Row():
         with gr.Column(scale=1):
-            with gr.Group():
-                gr.Markdown("🎛️Sampling")
-                temperature_input = gr.Slider(
-                    0.01, 2.0, value=0.3, step=0.01, label="Temperature"
-                )
-                top_p_input = gr.Slider(0.1, 1.0, value=0.7, step=0.1, label="Top P")
-                top_k_input = gr.Slider(1, 50, value=20, step=1, label="Top K")
-                batch_size_input = gr.Slider(
-                    1,
-                    webui_config.max_batch_size,
-                    value=4,
-                    step=1,
-                    label="Batch Size",
-                )
-
-            with gr.Row():
-                with gr.Group():
-                    gr.Markdown("🎭Style")
-                    gr.Markdown("TTS_STYLE_GUIDE")
-                    style_input_dropdown = gr.Dropdown(
-                        choices=styles,
-                        # label="Choose Style",
-                        interactive=True,
-                        show_label=False,
-                        value="*auto",
-                    )
             with gr.Row():
                 with gr.Group():
                     gr.Markdown("🗣️Speaker")
@@ -102,7 +76,47 @@ def create_tts_interface():
                                 fn=load_spk_info,
                                 inputs=[spk_file_upload],
                                 outputs=[infos],
-                            ),
+                            )
+
+            with gr.Row():
+                with gr.Group():
+                    gr.Markdown("🎭Style")
+                    gr.Markdown("TTS_STYLE_GUIDE")
+                    style_input_dropdown = gr.Dropdown(
+                        choices=styles,
+                        # label="Choose Style",
+                        interactive=True,
+                        show_label=False,
+                        value="*auto",
+                    )
+
+            with gr.Group():
+                gr.Markdown("🎛️Sampling")
+                temperature_input = gr.Slider(
+                    0.01, 2.0, value=0.3, step=0.01, label="Temperature"
+                )
+                top_p_input = gr.Slider(0.1, 1.0, value=0.7, step=0.1, label="Top P")
+                top_k_input = gr.Slider(1, 50, value=20, step=1, label="Top K")
+                batch_size_input = gr.Slider(
+                    1,
+                    webui_config.max_batch_size,
+                    value=4,
+                    step=1,
+                    label="Batch Size",
+                )
+            with gr.Group():
+                gr.Markdown("🎛️Spliter")
+                eos_input = gr.Textbox(
+                    label="eos",
+                    value="[uv_break]",
+                )
+                spliter_thr_input = gr.Slider(
+                    label="Spliter Threshold",
+                    value=100,
+                    minimum=50,
+                    maximum=1000,
+                    step=1,
+                )
 
             with gr.Group():
                 gr.Markdown("💃Inference Seed")
@@ -253,6 +267,8 @@ def create_tts_interface():
             enable_enhance,
             enable_de_noise,
             spk_file_upload,
+            spliter_thr_input,
+            eos_input,
         ],
         outputs=tts_output,
     )

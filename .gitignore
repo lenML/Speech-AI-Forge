@@ -177,3 +177,8 @@ cython_debug/
 /ffmpeg/ffmpeg.exe
 /ffmpeg/ffprobe.exe
 /ffmpeg/ffplay.exe
+
+.vscode
+
+tests/test_outputs
+tests/test_inputs

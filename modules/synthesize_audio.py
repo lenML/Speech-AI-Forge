@@ -7,6 +7,7 @@ from modules import generate_audio as generate
 
 
 from modules.speaker import Speaker
+from modules.ssml_parser.SSMLParser import SSMLSegment
 from modules.utils import audio
 
 
@@ -29,9 +30,9 @@ def synthesize_audio(
     sentences = spliter.parse(text)
 
     text_segments = [
-        {
-            "text": s + end_of_sentence,
-            "params": {
+        SSMLSegment(
+            text=s,
+            params={
                 "temperature": temperature,
                 "top_P": top_P,
                 "top_K": top_K,
@@ -42,10 +43,12 @@ def synthesize_audio(
                 "prompt2": prompt2,
                 "prefix": prefix,
             },
-        }
+        )
         for s in sentences
     ]
-    synthesizer = SynthesizeSegments(batch_size)
+    synthesizer = SynthesizeSegments(
+        batch_size=batch_size, eos=end_of_sentence, spliter_thr=spliter_threshold
+    )
     audio_segments = synthesizer.synthesize_segments(text_segments)
 
     combined_audio = combine_audio_segments(audio_segments)

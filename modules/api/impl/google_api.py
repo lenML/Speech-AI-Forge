@@ -98,7 +98,6 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
     batch_size = audioConfig.batchSize or 1
 
-    # TODO spliter_threshold
     spliter_threshold = audioConfig.spliterThreshold or 100
 
     # TODO sample_rate
@@ -156,7 +155,9 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
                     status_code=422, detail="The SSML text is empty or parsing failed."
                 )
 
-            synthesize = SynthesizeSegments(batch_size=batch_size)
+            synthesize = SynthesizeSegments(
+                batch_size=batch_size, eos=eos, spliter_thr=spliter_threshold
+            )
             audio_segments = synthesize.synthesize_segments(segments)
             combined_audio = combine_audio_segments(audio_segments)
 

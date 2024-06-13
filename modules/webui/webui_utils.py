@@ -95,6 +95,8 @@ def synthesize_ssml(
     batch_size=4,
     enable_enhance=False,
     enable_denoise=False,
+    eos: str = "[uv_break]",
+    spliter_thr: int = 100,
 ):
     try:
         batch_size = int(batch_size)
@@ -114,7 +116,9 @@ def synthesize_ssml(
     if len(segments) == 0:
         return None
 
-    synthesize = SynthesizeSegments(batch_size=batch_size)
+    synthesize = SynthesizeSegments(
+        batch_size=batch_size, eos=eos, spliter_thr=spliter_thr
+    )
     audio_segments = synthesize.synthesize_segments(segments)
     combined_audio = combine_audio_segments(audio_segments)
 
@@ -151,6 +155,8 @@ def tts_generate(
     enable_enhance=False,
     enable_denoise=False,
     spk_file=None,
+    spliter_thr: int = 100,
+    eos: str = "[uv_break]",
 ):
     try:
         batch_size = int(batch_size)
@@ -199,6 +205,8 @@ def tts_generate(
         prompt2=prompt2,
         prefix=prefix,
         batch_size=batch_size,
+        end_of_sentence=eos,
+        spliter_threshold=spliter_thr,
     )
 
     audio_data, sample_rate = apply_audio_enhance(

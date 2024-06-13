@@ -29,8 +29,10 @@ class SSMLRequest(BaseModel):
     # end of sentence
     eos: str = "[uv_break]"
 
+    spliter_thr: int = 100
 
-async def synthesize_ssml(
+
+async def synthesize_ssml_api(
     request: SSMLRequest = Body(
         ..., description="JSON body with SSML string and format"
     )
@@ -40,10 +42,16 @@ async def synthesize_ssml(
         format = request.format.lower()
         batch_size = request.batch_size
         eos = request.eos
+        spliter_thr = request.spliter_thr
 
         if batch_size < 1:
             raise HTTPException(
                 status_code=400, detail="Batch size must be greater than 0."
+            )
+
+        if spliter_thr < 50:
+            raise HTTPException(
+                status_code=400, detail="Spliter threshold must be greater than 50."
             )
 
         if not ssml or ssml == "":
@@ -59,7 +67,9 @@ async def synthesize_ssml(
         for seg in segments:
             seg["text"] = text_normalize(seg["text"], is_end=True)
 
-        synthesize = SynthesizeSegments(batch_size=batch_size, eos=eos)
+        synthesize = SynthesizeSegments(
+            batch_size=batch_size, eos=eos, spliter_thr=spliter_thr
+        )
         audio_segments = synthesize.synthesize_segments(segments)
         combined_audio = combine_audio_segments(audio_segments)
         buffer = io.BytesIO()
@@ -81,4 +91,4 @@ async def synthesize_ssml(
 
 
 def setup(api_manager: APIManager):
-    api_manager.post("/v1/ssml", response_class=FileResponse)(synthesize_ssml)
+    api_manager.post("/v1/ssml", response_class=FileResponse)(synthesize_ssml_api)
