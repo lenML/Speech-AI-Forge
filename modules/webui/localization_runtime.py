@@ -7,6 +7,7 @@ class LocalizationVars:
 
         self.ssml_examples = []
         self.tts_examples = []
+        self.podcast_default = []
 
 
 class ZHLocalizationVars(LocalizationVars):
@@ -167,6 +168,69 @@ class ZHLocalizationVars(LocalizationVars):
             },
         ]
 
+        self.podcast_default = [
+            [
+                1,
+                "female2",
+                "你好，欢迎收听今天的播客内容。今天我们要聊的是中华料理。",
+                "podcast",
+            ],
+            [
+                2,
+                "Alice",
+                "嗨，我特别期待这个话题！中华料理真的是博大精深。",
+                "podcast",
+            ],
+            [
+                3,
+                "Bob",
+                "没错，中华料理有着几千年的历史，而且每个地区都有自己的特色菜。",
+                "podcast",
+            ],
+            [
+                4,
+                "female2",
+                "那我们先从最有名的川菜开始吧。川菜以其麻辣著称，是很多人的最爱。",
+                "podcast",
+            ],
+            [
+                5,
+                "Alice",
+                "对，我特别喜欢吃麻婆豆腐和辣子鸡。那种麻辣的感觉真是让人难以忘怀。",
+                "podcast",
+            ],
+            [
+                6,
+                "Bob",
+                "除了川菜，粤菜也是很受欢迎的。粤菜讲究鲜美，像是白切鸡和蒸鱼都是经典。",
+                "podcast",
+            ],
+            [
+                7,
+                "female2",
+                "对啊，粤菜的烹饪方式比较清淡，更注重食材本身的味道。",
+                "podcast",
+            ],
+            [
+                8,
+                "Alice",
+                "还有北京的京菜，像北京烤鸭，那可是来北京必吃的美食。",
+                "podcast",
+            ],
+            [
+                9,
+                "Bob",
+                "不仅如此，还有淮扬菜、湘菜、鲁菜等等，每个菜系都有其独特的风味。",
+                "podcast",
+            ],
+            [
+                10,
+                "female2",
+                "对对对，像淮扬菜的狮子头，湘菜的剁椒鱼头，都是让人垂涎三尺的美味。",
+                "podcast",
+            ],
+        ]
+
 
 class ENLocalizationVars(LocalizationVars):
     def __init__(self):
@@ -223,4 +287,66 @@ class ENLocalizationVars(LocalizationVars):
             {
                 "text": "Don't ever let somebody tell you you can't do something. Not even me. Alright? You got a dream, you gotta protect it. When people can't do something themselves, they're gonna tell you that you can't do it. You want something, go get it. Period.",
             },
+        ]
+        self.podcast_default = [
+            [
+                1,
+                "female2",
+                "Hello, welcome to today's podcast. Today, we're going to talk about global cuisine.",
+                "podcast",
+            ],
+            [
+                2,
+                "Alice",
+                "Hi, I'm really excited about this topic! Global cuisine is incredibly diverse and fascinating.",
+                "podcast",
+            ],
+            [
+                3,
+                "Bob",
+                "Absolutely, every country has its own unique culinary traditions and specialties.",
+                "podcast",
+            ],
+            [
+                4,
+                "female2",
+                "Let's start with Italian cuisine. Italian food is loved worldwide, especially for its pasta and pizza.",
+                "podcast",
+            ],
+            [
+                5,
+                "Alice",
+                "Yes, I especially love a good Margherita pizza and a hearty plate of spaghetti carbonara. The flavors are simply amazing.",
+                "podcast",
+            ],
+            [
+                6,
+                "Bob",
+                "Besides Italian cuisine, Japanese cuisine is also very popular. Dishes like sushi and ramen have become global favorites.",
+                "podcast",
+            ],
+            [
+                7,
+                "female2",
+                "Exactly, Japanese cuisine is known for its emphasis on fresh ingredients and delicate presentation.",
+                "podcast",
+            ],
+            [
+                8,
+                "Alice",
+                "And then there's Mexican cuisine, with its bold flavors and colorful dishes like tacos and guacamole.",
+                "podcast",
+            ],
+            [
+                9,
+                "Bob",
+                "Not to mention, there's also Indian cuisine, Thai cuisine, French cuisine, and so many more, each with its own distinctive flavors and techniques.",
+                "podcast",
+            ],
+            [
+                10,
+                "female2",
+                "Yes, like Indian curry, Thai tom yum soup, and French croissants, these are all mouth-watering dishes that are loved by people all over the world.",
+                "podcast",
+            ],
         ]
