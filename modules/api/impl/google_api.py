@@ -13,6 +13,7 @@ from modules.Enhancer.ResembleEnhance import (
 )
 from modules.api.Api import APIManager
 from modules.synthesize_audio import synthesize_audio
+from modules.utils import audio
 from modules.utils.audio import apply_prosody_to_audio_data
 from modules.normalization import text_normalize
 
@@ -100,8 +101,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
     spliter_threshold = audioConfig.spliterThreshold or 100
 
-    # TODO sample_rate
-    sample_rate_hertz = audioConfig.sampleRateHertz or 24000
+    sample_rate = audioConfig.sampleRateHertz or 24000
 
     params = api_utils.calc_spk_style(spk=voice.name, style=voice.style)
 
@@ -144,7 +144,6 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
             )
 
         elif input.ssml:
-            # 处理SSML合成逻辑
             parser = create_ssml_parser()
             segments = parser.parse(input.ssml)
             for seg in segments:
@@ -161,13 +160,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
             audio_segments = synthesize.synthesize_segments(segments)
             combined_audio = combine_audio_segments(audio_segments)
 
-            buffer = io.BytesIO()
-            combined_audio.export(buffer, format="wav")
-
-            buffer.seek(0)
-
-            audio_data = buffer.read()
-
+            sample_rate, audio_data = audio.pydub_to_np(combined_audio)
         else:
             raise HTTPException(
                 status_code=422, detail="Either text or SSML input must be provided."

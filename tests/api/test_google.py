@@ -8,7 +8,7 @@ import tests.conftest
 @pytest.fixture
 def google_text_synthesize_request():
     return {
-        "input": {"text": "这是一个测试文本。"},
+        "input": {"text": "这是一个测试文本。", "ssml": ""},
         "voice": {
             "languageCode": "ZH-CN",
             "name": "female2",
@@ -31,15 +31,70 @@ def google_text_synthesize_request():
     }
 
 
+@pytest.mark.parametrize(
+    "enable_enhancer, speed",
+    [
+        (True, 1),
+        (False, 1.5),
+    ],
+)
 @pytest.mark.google_api
-def test_google_text_synthesize_success(client, google_text_synthesize_request):
+def test_google_text_synthesize_success(
+    client, google_text_synthesize_request, enable_enhancer, speed
+):
+    google_text_synthesize_request["enhancerConfig"] = {
+        "enabled": enable_enhancer,
+    }
+    google_text_synthesize_request["audioConfig"]["speakingRate"] = speed
+
     response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
     assert response.status_code == 200
     assert "audioContent" in response.json()
 
     with open(
         os.path.join(
-            tests.conftest.test_outputs_dir, "google_text_synthesize_success.mp3"
+            tests.conftest.test_outputs_dir,
+            f"google_success_{'ehc' if enable_enhancer else 'no_ehc'}_s{str(speed)}.mp3",
+        ),
+        "wb",
+    ) as f:
+        b64_str = response.json()["audioContent"]
+        b64_str = b64_str.split(",")[1]
+        f.write(base64.b64decode(b64_str))
+
+
+@pytest.mark.parametrize(
+    "enable_enhancer, speed",
+    [
+        (True, 1),
+        (False, 1.5),
+    ],
+)
+@pytest.mark.google_api
+def test_google_text_synthesize_ssml_success(
+    client, google_text_synthesize_request, enable_enhancer, speed
+):
+    del google_text_synthesize_request["input"]["text"]
+    google_text_synthesize_request["input"][
+        "ssml"
+    ] = """
+    <speak version="0.1">
+        <voice>这是一个测试文本。</voice>
+    </speak>
+    """
+    google_text_synthesize_request["enhancerConfig"] = {
+        "enabled": enable_enhancer,
+    }
+    google_text_synthesize_request["audioConfig"]["speakingRate"] = speed
+
+    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+    assert response.status_code == 200
+    assert "audioContent" in response.json()
+
+    with open(
+        os.path.join(
+            tests.conftest.test_outputs_dir,
+            f"google_success_{'ehc' if enable_enhancer else 'no_ehc'}_s{str(speed)}.mp3",
         ),
         "wb",
     ) as f:
