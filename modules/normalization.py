@@ -120,6 +120,7 @@ character_map = {
     "~": " ",
     "～": " ",
     "/": " ",
+    "·": " ",
 }
 
 character_to_word = {
@@ -282,6 +283,9 @@ def text_normalize(text, is_end=False):
 
 
 if __name__ == "__main__":
+    from modules.devices import devices
+
+    devices.reset_device()
     test_cases = [
         "ChatTTS是专门为对话场景设计的文本转语音模型，例如LLM助手对话任务。它支持英文和中文两种语言。最大的模型使用了10万小时以上的中英文数据进行训练。在HuggingFace中开源的版本为4万小时训练且未SFT的版本.",
         " [oral_9] [laugh_0] [break_0] 电 [speed_0] 影 [speed_0] 中 梁朝伟 [speed_9] 扮演的陈永仁的编号27149",
@@ -319,6 +323,7 @@ State-of-the-art Machine Learning for PyTorch, TensorFlow, and JAX.
         """
 120米
 有12%的概率会下雨
+埃隆·马斯克
 """,
     ]
 
