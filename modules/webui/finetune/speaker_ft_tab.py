@@ -1,6 +1,3 @@
-import fcntl
-import os
-from subprocess import Popen
 import gradio as gr
 
 from modules.Enhancer.ResembleEnhance import unload_enhancer

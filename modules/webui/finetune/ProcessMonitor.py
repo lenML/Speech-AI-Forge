@@ -1,5 +1,5 @@
 import os
-import fcntl
+import sys
 import subprocess
 import threading
 
@@ -23,10 +23,14 @@ class ProcessMonitor:
         # Set pipes to non-blocking mode
         fd_out = self.process.stdout.fileno()
         fd_err = self.process.stderr.fileno()
-        fl_out = fcntl.fcntl(fd_out, fcntl.F_GETFL)
-        fl_err = fcntl.fcntl(fd_err, fcntl.F_GETFL)
-        fcntl.fcntl(fd_out, fcntl.F_SETFL, fl_out | os.O_NONBLOCK)
-        fcntl.fcntl(fd_err, fcntl.F_SETFL, fl_err | os.O_NONBLOCK)
+
+        if sys.platform != "win32":
+            import fcntl
+
+            fl_out = fcntl.fcntl(fd_out, fcntl.F_GETFL)
+            fl_err = fcntl.fcntl(fd_err, fcntl.F_GETFL)
+            fcntl.fcntl(fd_out, fcntl.F_SETFL, fl_out | os.O_NONBLOCK)
+            fcntl.fcntl(fd_err, fcntl.F_SETFL, fl_err | os.O_NONBLOCK)
 
         # Start threads to read stdout and stderr
         threading.Thread(target=self._read_stdout).start()
