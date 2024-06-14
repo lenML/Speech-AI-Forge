@@ -223,19 +223,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--tar_in_memory", action="store_true", help="load tarball in memory"
     )
-    parser.add_argument(
-        "--process_ahead",
-        action="store_true",
-        help="process all data ahead during dataset initialization",
-    )
-    parser.add_argument("--speaker_embeds_path", type=str)
 
     args = parser.parse_args()
 
     data_path: str = args.data_path
     tar_path: str | None = args.tar_path
     tar_in_memory: bool = args.tar_in_memory
-    process_ahead: bool = args.process_ahead
     train_text: bool = args.train_text
     # gpt_lora: bool = args.gpt_lora
     # gpt_kbit: int = args.gpt_kbit
@@ -253,7 +246,6 @@ if __name__ == "__main__":
         vocos_model=chat.pretrain_models["vocos"],
         tar_path=tar_path,
         tar_in_memory=tar_in_memory,
-        process_ahead=process_ahead,
         device=devices.device,
         # speakers=None,  # set(['speaker_A', 'speaker_B'])
     )

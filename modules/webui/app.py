@@ -7,6 +7,7 @@ from modules import config
 from modules.webui import gradio_extensions, webui_config
 
 from modules.webui.changelog_tab import create_changelog_tab
+from modules.webui.finetune.ft_tab import create_ft_tabs
 from modules.webui.localization_runtime import ENLocalizationVars, ZHLocalizationVars
 from modules.webui.ssml.podcast_tab import create_ssml_podcast_tab
 from modules.webui.system_tab import create_system_tab
@@ -118,6 +119,8 @@ def create_interface():
                 gr.Markdown("🚧 Under construction")
             with gr.TabItem("ASR", visible=webui_config.experimental):
                 gr.Markdown("🚧 Under construction")
+            with gr.TabItem("Finetune", visible=webui_config.experimental):
+                create_ft_tabs(demo)
 
             with gr.TabItem("System"):
                 create_system_tab()
