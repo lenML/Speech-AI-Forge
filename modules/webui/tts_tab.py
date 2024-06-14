@@ -216,7 +216,8 @@ def create_tts_interface():
                 )
                 refine_button = gr.Button("✍️Refine Text")
 
-            with gr.Group():
+            # 由于使用不是很方便，所以列为实验性功能
+            with gr.Group(visible=webui_config.experimental):
                 gr.Markdown("🔧Prompt engineering")
                 prompt1_input = gr.Textbox(label="Prompt 1")
                 prompt2_input = gr.Textbox(label="Prompt 2")
