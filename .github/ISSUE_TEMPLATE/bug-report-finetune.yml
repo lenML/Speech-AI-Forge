@@ -1,6 +1,6 @@
-name: "\U0001F41B Bug report"
-description: "功能运行不正常 / 失效"
-title: "[BUG] "
+name: "\U0001F41B Bug report: ft"
+description: "Finetune 功能运行不正常 / 失效"
+title: "[BUG:FT] "
 labels: bug
 assignees: zhzLuke96
 body:
@@ -66,14 +66,6 @@ body:
       placeholder: 请输入操作系统信息
     validations:
       required: true
-  - type: input
-    id: browser-info
-    attributes:
-      label: 浏览器信息
-      description: 请填写浏览器信息（如果适用，比如webui报错）
-      placeholder: 请输入浏览器信息
-    validations:
-      required: false
   - type: textarea
     id: description
     attributes:
@@ -86,7 +78,7 @@ body:
     id: reproduce-steps
     attributes:
       label: 复现步骤
-      description: 请详细描述如何复现该 BUG
+      description: 请详细描述如何复现该 BUG。请提供 API 调用参数，和具体报错的调用接口 URL。
       placeholder: 请输入复现步骤
     validations:
       required: true

@@ -1,0 +1,117 @@
+name: "\U0001F41B Bug report: api"
+description: "API 功能运行不正常 / 失效"
+title: "[BUG:API] "
+labels: bug
+assignees: zhzLuke96
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先阅读 [README.md](https://github.com/lenML/ChatTTS-Forge/blob/master/README.md) 和 [dependencies.md](https://github.com/lenML/ChatTTS-Forge/blob/master/docs/dependencies.md) 文件，并确保您的环境配置正确。
+        在提交问题之前，请搜索现有的 issues 和 discussions 以避免重复。
+        如果您的问题是关于使用公共服务，请先联系服务提供者。
+  - type: checkboxes
+    id: readme-check
+    attributes:
+      label: 阅读 README.md 和 dependencies.md
+      description: 提交前请确认您已经阅读过 README.md 和 dependencies.md 文件。
+      options:
+        - label: 我已经阅读过 README.md 和 dependencies.md 文件
+          required: true
+  - type: checkboxes
+    id: issue-check
+    attributes:
+      label: 检索 issue 和 discussion
+      description: 对于您遇到的 BUG，是否已经确认之前没有其他 issue 或 discussion 涉及？
+      options:
+        - label: 我已经确认之前没有 issue 或 discussion 涉及此 BUG
+          required: true
+  - type: checkboxes
+    id: latest-check
+    attributes:
+      label: 检查 Forge 版本
+      description: 是否使用当前最新代码或稳定版本（[Tags](https://github.com/lenML/ChatTTS-Forge/tags)中标注的稳定 coomit 版本）？
+      options:
+        - label: 我已经确认问题发生在最新代码或稳定版本中
+          required: true
+  - type: input
+    id: commit-hash
+    attributes:
+      label: Forge Commit 或者 Tag
+      description: 请填写 Forge 的 Commit 或者 Tag
+      placeholder: 请输入 Forge 的 Commit 或者 Tag
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python 版本
+      description: 请填写 Python 的版本号
+      placeholder: 请输入 Python 版本号
+    validations:
+      required: true
+  - type: input
+    id: pytorch-version
+    attributes:
+      label: PyTorch 版本
+      description: 请填写 PyTorch 的版本号
+      placeholder: 请输入 PyTorch 版本号
+    validations:
+      required: true
+  - type: input
+    id: os-info
+    attributes:
+      label: 操作系统信息
+      description: 请填写操作系统信息
+      placeholder: 请输入操作系统信息
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: BUG 描述
+      description: 请详细描述 BUG 是什么
+      placeholder: 请输入 BUG 描述
+    validations:
+      required: true
+  - type: input
+    id: bug-endpoint
+    attributes:
+      label: BUG 端点
+      description: 请填写出现 BUG 的 API 端点。例如：`/v1/tts`
+      placeholder: 请输入 BUG 端点
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce-params
+    attributes:
+      label: 复现参数
+      description: "请提供复现 BUG 的调用参数。例如：{ 'text': '你好' } 或者 ?text=你好"
+      placeholder: 请输入复现参数
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+      description: 请描述您期望的结果是什么
+      placeholder: 请输入期望结果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      description: 请描述实际得到的结果是什么
+      placeholder: 请输入实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 错误信息
+      description: 请附上运行时的日志或错误信息
+      render: shell
+      placeholder: 请输入日志或错误信息
+    validations:
+      required: false
