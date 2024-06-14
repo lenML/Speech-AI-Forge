@@ -76,6 +76,8 @@ def generate_audio_batch(
             params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
         logger.debug(("spk", spk))
     elif isinstance(spk, Speaker):
+        if not isinstance(spk.emb, torch.Tensor):
+            raise ValueError("spk.pt is broken, please retrain the model.")
         params_infer_code["spk_emb"] = spk.emb
         logger.debug(("spk", spk.name))
     else:

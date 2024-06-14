@@ -29,13 +29,15 @@ class Speaker:
         speaker.emb = tensor
         return speaker
 
-    def __init__(self, seed, name="", gender="", describe=""):
+    def __init__(
+        self, seed_or_tensor: Union[int, torch.Tensor], name="", gender="", describe=""
+    ):
         self.id = uuid.uuid4()
-        self.seed = seed
+        self.seed = -2 if isinstance(seed_or_tensor, torch.Tensor) else seed_or_tensor
         self.name = name
         self.gender = gender
         self.describe = describe
-        self.emb = None
+        self.emb = None if isinstance(seed_or_tensor, int) else seed_or_tensor
 
         # TODO replace emb => tokens
         self.tokens = []

@@ -182,3 +182,5 @@ cython_debug/
 
 tests/test_outputs
 tests/test_inputs
+
+/datasets/data_*
