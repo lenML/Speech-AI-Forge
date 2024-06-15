@@ -127,6 +127,12 @@ def reset_device():
     global dtype_gpt
     global dtype_decoder
 
+    if "all" in config.runtime_env_vars.use_cpu and not config.runtime_env_vars.no_half:
+        logger.warning(
+            "Cannot use half precision with CPU, using full precision instead"
+        )
+        config.runtime_env_vars.no_half = True
+
     if not config.runtime_env_vars.no_half:
         dtype = torch.float16
         dtype_dvae = torch.float16
@@ -144,7 +150,7 @@ def reset_device():
 
         logger.info("Using full precision: torch.float32")
 
-    if config.runtime_env_vars.use_cpu == "all":
+    if "all" in config.runtime_env_vars.use_cpu:
         device = cpu
     else:
         device = get_optimal_device()
