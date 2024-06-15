@@ -3,12 +3,20 @@ from pytest import fixture
 from fastapi.testclient import TestClient
 
 import fastapi
+import argparse
 
-from modules.api.api_setup import create_api
+from modules.api.api_setup import (
+    create_api,
+    process_model_args,
+    setup_model_args,
+)
 from modules.devices import devices
 from modules import config
 
-
+parser = argparse.ArgumentParser(description="Test")
+setup_model_args(parser)
+args = parser.parse_args()
+process_model_args(args)
 config.runtime_env_vars.off_tqdm = True
 devices.reset_device()
 app_instance = create_api(fastapi.FastAPI())
