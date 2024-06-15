@@ -45,10 +45,9 @@ def train_speaker_embeddings(
             )
             for speaker in dataset.speakers
         }
-
-    for speaker_embed in speaker_embeds.values():
-        std, mean = chat.pretrain_models["spk_stat"].chunk(2)
-        speaker_embed.data = speaker_embed.data * std + mean
+        for speaker_embed in speaker_embeds.values():
+            std, mean = chat.pretrain_models["spk_stat"].chunk(2)
+            speaker_embed.data = speaker_embed.data * std + mean
 
     SPEAKER_TOKEN_ID = tokenizer.convert_tokens_to_ids("[spk_emb]")
     AUDIO_EOS_TOKEN_ID = 0
@@ -277,15 +276,20 @@ if __name__ == "__main__":
         speaker: Speaker(speaker_embed.detach().cpu(), f"ep{epochs}_{speaker}")
         for speaker, speaker_embed in speaker_embeds.items()
     }
+    time_str = np.datetime_as_string(np.datetime64("now", "s"))
+    time_str = time_str.replace(":", "_").replace(" ", "_").replace("-", "_")
     for speaker, speaker_out in speaker_outs.items():
-        torch.save(speaker_out, pathlib.Path(save_folder) / f"spk_{speaker}.pt")
+        torch.save(
+            speaker_out,
+            pathlib.Path(save_folder) / f"spk_{speaker}_{time_str}_ep{epochs}.pt",
+        )
 
 # example
 """
 python -m modules.finetune.train_speaker \
     --data_path datasets/data_speaker_a/speaker_a.list \
     --save_folder ./data \
-    --init_spaker ./data/speakers/Bob.pt \
+    --init_speaker ./data/speakers/Bob.pt \
     --epochs 100 \
     --batch_size 6 \
     --train_text
