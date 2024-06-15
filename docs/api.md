@@ -2,6 +2,26 @@
 
 使用 `launch.py` 脚本启动 `api` 服务之后，你可以在 `http://localhost:7870/docs` 下查看和简单测试 `api`
 
+所有参数：
+
+| 参数              | 类型   | 默认值      | 描述                                            |
+| ----------------- | ------ | ----------- | ----------------------------------------------- |
+| `--host`          | `str`  | `"0.0.0.0"` | 服务器主机地址                                  |
+| `--port`          | `int`  | `8000`      | 服务器端口                                      |
+| `--reload`        | `bool` | `False`     | 启用自动重载功能（用于开发）                    |
+| `--compile`       | `bool` | `False`     | 启用模型编译                                    |
+| `--lru_size`      | `int`  | `64`        | 设置请求缓存池的大小；设置为 0 禁用 `lru_cache` |
+| `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
+| `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
+| `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
+| `--no_half`       | `bool` | `False`     | 使用 f32 全精度推理                             |
+| `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
+| `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
+| `--device_id`     | `str`  | `None`      | 指定使用 gpu device_id                          |
+| `--use_cpu`       | `str`  | `None`      | 当前可选值 `"all"`                              |
+
+launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
+
 下面特殊接口的介绍
 
 ## <a name='OpenAIAPI:v1audiospeech'></a>OpenAI API: `v1/audio/speech`

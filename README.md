@@ -23,28 +23,23 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 - 2. [GPU 显存要求](#GPU)
   - 2.1. [加载模型显存要求](#)
   - 2.2. [Batch Size 显存要求](#BatchSize)
-- 3. [Features](#Features)
-- 4. [ Installation and Running](#InstallationandRunning)
-  - 4.1. [`webui.py`: WebUI](#webui.py:WebUI)
-    - 4.1.1. [webui features](#webuifeatures)
-  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
-    - 4.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
-- 5. [Benchmark](#Benchmark)
-- 6. [demo](#demo)
-  - 6.1. [风格化控制](#-1)
-  - 6.2. [长文本生成](#-1)
-- 7. [SSML](#SSML)
-- 8. [Speaking style](#Speakingstyle)
-- 9. [Speaker.pt 文件](#Speaker.pt)
-- 10. [Docker](#Docker)
-  - 10.1. [镜像](#-1)
-  - 10.2. [手动 build](#build)
-- 11. [Roadmap](#Roadmap)
-- 12. [FAQ](#FAQ)
-  - 12.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
-  - 12.2. [什么是 Prefix？](#Prefix)
-  - 12.3. [Style 中 `_p` 的区别是什么？](#Style_p)
-  - 12.4. [为什么开启了 `--compile` 很慢？](#--compile)
+- 3. [ Installation and Running](#InstallationandRunning)
+  - 3.1. [webui features](#webuifeatures)
+  - 3.2. [`launch.py`: API Server](#launch.py:APIServer)
+    - 3.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
+- 4. [demo](#demo)
+  - 4.1. [风格化控制](#-1)
+  - 4.2. [长文本生成](#-1)
+- 5. [Docker](#Docker)
+  - 5.1. [镜像](#-1)
+  - 5.2. [手动 build](#build)
+- 6. [Roadmap](#Roadmap)
+- 7. [FAQ](#FAQ)
+  - 7.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
+  - 7.2. [什么是 Prefix？](#Prefix)
+  - 7.3. [Style 中 `_p` 的区别是什么？](#Style_p)
+  - 7.4. [为什么开启了 `--compile` 很慢？](#--compile)
+  - 7.5. [为什么 colab 里面非常慢只有 2 it/s ？](#colab2its)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -76,64 +71,15 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 - Batch Size 为 8 时，需 6~14GB 显存。
 - Half Batch Size 为上表中的 Batch Size 的一半，显存要求也相应减半。
 
-## 3. <a name='Features'></a>Features
-
-- **全面的 API 服务**: 提供所有功能的 API 访问，方便集成。
-- **超长文本生成**: 支持生成 1000 字以上的长文本，保持一致性。
-- **风格管理**: 通过名称或 ID 复用说话风格，内置 32 种不同风格。
-- **说话人管理**: 通过名称或 ID 高效复用说话人。
-- **风格提示词注入**: 通过注入提示词灵活调整输出风格。
-- **batch 生成**: 支持自动分桶并批量生成。
-- **类 SSML 支持**: 使用类 SSML 语法创建丰富的音频长文本。
-- **独立 refine API**: 提供单独的 refine 调试接口，提升调试效率。
-- **OpenAI 风格 API**: 提供类似 OpenAI 的 `/v1/audio/speech` 语音生成接口。
-- **Google 风格 API**: 提供类似 Google 的 `/v1/text:synthesize` 文本合成接口。
-- **友好的调试 GUI**: 独立于 Gradio 的 playground，简化调试流程。
-- **文本标准化**:
-  - **Markdown**: 自动检测处理 markdown 格式文本。
-  - **数字转写**: 自动将数字转为模型可识别的文本。
-  - **Emoji 适配**: 自动翻译 emoji 为可读文本。
-  - **基于分词器**: 基于 tokenizer 预处理文本，覆盖模型所有不支持字符范围。
-  - **中英文识别**: 适配英文环境。
-- **音质增强**: 继承音质增强、降噪模型提升输出质量
-- **Speaker 导入导出**: 支持 Speaker 导入导出，方便定制
-- **Speaker 融合**: 支持 Speaker 融合，微调说话人
-
-## 4. <a name='InstallationandRunning'></a> Installation and Running
+## 3. <a name='InstallationandRunning'></a> Installation and Running
 
 1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
-2. 根据你的需求启动需要的服务，具体启动参数如下。
+2. 根据你的需求启动需要的服务。
 
-### 4.1. <a name='webui.py:WebUI'></a>`webui.py`: WebUI
+- webui: `python webui.py`
+- api: `python launch.py`
 
-WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
-
-所有参数：
-
-| 参数                   | 类型   | 默认值      | 描述                                               |
-| ---------------------- | ------ | ----------- | -------------------------------------------------- |
-| `--server_name`        | `str`  | `"0.0.0.0"` | 服务器主机地址                                     |
-| `--server_port`        | `int`  | `7860`      | 服务器端口                                         |
-| `--share`              | `bool` | `False`     | 启用共享模式，允许外部访问                         |
-| `--debug`              | `bool` | `False`     | 启用调试模式                                       |
-| `--compile`            | `bool` | `False`     | 启用模型编译                                       |
-| `--auth`               | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
-| `--no_half`            | `bool` | `False`     | 使用 f32 全精度推理                                |
-| `--off_tqdm`           | `bool` | `False`     | 关闭 tqdm 进度条                                   |
-| `--tts_max_len`        | `int`  | `1000`      | TTS（文本到语音）的最大文本长度                    |
-| `--ssml_max_len`       | `int`  | `2000`      | SSML（语音合成标记语言）的最大文本长度             |
-| `--max_batch_size`     | `int`  | `8`         | TTS 的最大批处理大小                               |
-| `--device_id`          | `str`  | `None`      | 指定使用 gpu device_id                             |
-| `--use_cpu`            | `str`  | `None`      | 当前可选值 `"all"`                                 |
-| `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
-| `--language`           | `str`  | `zh-CN`     | 设置 webui 本地化                                  |
-| `--api`                | `bool` | `False`     | 是否开启 API                                       |
-
-> 从 webui.py 入口启动， 可与 api 同时启动，api 的配置在下方 launch.py 脚本参数中说明， 开启后可在 `http://localhost:7860/docs` 查看 api
-
-> 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--use_cpu="all"` 时需要开启 `--no_half`
-
-#### 4.1.1. <a name='webuifeatures'></a>webui features
+### 3.1. <a name='webuifeatures'></a>webui features
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
@@ -155,36 +101,22 @@ WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
   - enhance: 音质增强提高输出质量
   - denoise: 去除噪音
 - Experimental 实验功能
+  - fintune
+    - speaker embedding
+    - [WIP] GPT lora
+    - [WIP] AE
   - [WIP] ASR
   - [WIP] Inpainting
 
-### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 3.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 某些情况，你并不需要 webui，那么可以使用这个脚本启动单纯的 api 服务。
-
-所有参数：
-
-| 参数              | 类型   | 默认值      | 描述                                            |
-| ----------------- | ------ | ----------- | ----------------------------------------------- |
-| `--host`          | `str`  | `"0.0.0.0"` | 服务器主机地址                                  |
-| `--port`          | `int`  | `8000`      | 服务器端口                                      |
-| `--reload`        | `bool` | `False`     | 启用自动重载功能（用于开发）                    |
-| `--compile`       | `bool` | `False`     | 启用模型编译                                    |
-| `--lru_size`      | `int`  | `64`        | 设置请求缓存池的大小；设置为 0 禁用 `lru_cache` |
-| `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
-| `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
-| `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
-| `--no_half`       | `bool` | `False`     | 使用 f32 全精度推理                             |
-| `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
-| `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
-| `--device_id`     | `str`  | `None`      | 指定使用 gpu device_id                          |
-| `--use_cpu`       | `str`  | `None`      | 当前可选值 `"all"`                              |
 
 launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
 
 [详细 API 文档](./docs/api.md)
 
-#### 4.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
+#### 3.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
 
 通过 `/v1/xtts_v2` 系列 api，你可以方便的将 ChatTTS-Forge 连接到你的 SillyTavern 中。
 
@@ -199,39 +131,9 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 ![sillytavern_tts](./docs/sillytavern_tts.png)
 
-## 5. <a name='Benchmark'></a>Benchmark
+## 4. <a name='demo'></a>demo
 
-> 可使用 `./tests/benchmark/tts_benchmark.py` 复现
-
-测试平台
-
-- GPU: `GeForce RTX 2080 Ti`
-- CPU: `3.4hz 24core`
-
-以下为 batch size 为 8 时的结果，完整扫描看 `performance_results.csv`
-
-| Batch size | Use decoder | Half precision | Compile model | Use CPU | GPU Memory | Duration | RTF  |
-| ---------- | ----------- | -------------- | ------------- | ------- | ---------- | -------- | ---- |
-| 8          | ✅          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.22 |
-| 8          | ✅          | ✅             | ✅            | ❌      | 0.89       | 39.34    | 0.24 |
-| 8          | ❌          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.23 |
-| 8          | ❌          | ✅             | ✅            | ❌      | 0.90       | 39.34    | 0.24 |
-| 8          | ❌          | ❌             | ❌            | ❌      | 1.70       | 36.78    | 0.29 |
-| 8          | ✅          | ❌             | ❌            | ❌      | 1.72       | 36.78    | 0.29 |
-| 8          | ❌          | ✅             | ❌            | ❌      | 1.02       | 35.75    | 0.40 |
-| 8          | ✅          | ✅             | ❌            | ❌      | 0.95       | 35.75    | 0.40 |
-| 8          | ❌          | ❌             | ❌            | ✅      | N/A        | 49.92    | 0.58 |
-| 8          | ❌          | ❌             | ✅            | ✅      | N/A        | 49.92    | 0.58 |
-| 8          | ✅          | ❌             | ✅            | ✅      | N/A        | 49.92    | 0.58 |
-| 8          | ✅          | ❌             | ❌            | ✅      | N/A        | 49.92    | 0.60 |
-| 8          | ❌          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
-| 8          | ❌          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
-| 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
-| 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
-
-## 6. <a name='demo'></a>demo
-
-### 6.1. <a name='-1'></a>风格化控制
+### 4.1. <a name='-1'></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -271,7 +173,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-### 6.2. <a name='-1'></a>长文本生成
+### 4.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -293,38 +195,13 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-## 7. <a name='SSML'></a>SSML
+## 5. <a name='Docker'></a>Docker
 
-[SSML readme](./docs/SSML.md)
-
-## 8. <a name='Speakingstyle'></a>Speaking style
-
-[style readme](./docs/sytles.md)
-
-## 9. <a name='Speaker.pt'></a>Speaker.pt 文件
-
-1. 如何生成
-
-   > 使用 webui 中的 spaker 创建和融合功能都可以生成 .pt 文件
-
-2. 如何导出
-
-   > webui 中点击下载即可导出
-
-3. 如何导入
-
-   > webui 中 spaaker 上传文件处上传即可
-
-4. 如何导入到服务中
-   > .pt 文件，放到 `data/speakers` 目录之下，重启服务或者调用 api 即可添加到系统中
-
-## 10. <a name='Docker'></a>Docker
-
-### 10.1. <a name='-1'></a>镜像
+### 5.1. <a name='-1'></a>镜像
 
 WIP 开发中
 
-### 10.2. <a name='build'></a>手动 build
+### 5.2. <a name='build'></a>手动 build
 
 下载模型: `python -m scripts.download_models --source modelscope`
 
@@ -336,32 +213,44 @@ WIP 开发中
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-## 11. <a name='Roadmap'></a>Roadmap
+## 6. <a name='Roadmap'></a>Roadmap
 
 WIP
 
-## 12. <a name='FAQ'></a>FAQ
+## 7. <a name='FAQ'></a>FAQ
 
-### 12.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
+### 7.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
 
 Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
 
 - Prompt1 插入到第一个 [Stts] 之前
 - Prompt2 插入到第一个 [Stts] 之后
 
-### 12.2. <a name='Prefix'></a>什么是 Prefix？
+### 7.2. <a name='Prefix'></a>什么是 Prefix？
 
 Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
 
-### 12.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
+### 7.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
 
 Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
 
-### 12.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
+### 7.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
 
 由于还未实现推理 padding 所以如果每次推理 shape 改变都可能触发 torch 进行 compile
 
 > 暂时不建议开启
+
+### 7.5. <a name='colab2its'></a>为什么 colab 里面非常慢只有 2 it/s ？
+
+请确保使用 gpu 而非 cpu。
+
+- 点击菜单栏 【修改】
+- 点击 【笔记本设置】
+- 选择 【硬件加速器】 => T4 GPU
+
+# Documents
+
+在这里可以找到 [更多文档](./docs/readme.md)
 
 # Contributing
 

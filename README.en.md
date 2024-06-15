@@ -23,28 +23,23 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 - 2. [GPU Memory Requirements](#GPUMemoryRequirements)
   - 2.1. [Model Loading Memory Requirements](#ModelLoadingMemoryRequirements)
   - 2.2. [Batch Size Memory Requirements](#BatchSizeMemoryRequirements)
-- 3. [Features](#Features)
-- 4. [ Installation and Running](#InstallationandRunning)
-  - 4.1. [ `webui.py`: WebUI](#webui.py:WebUI)
-    - 4.1.1. [WebUI Features](#WebUIFeatures)
-  - 4.2. [`launch.py`: API Server](#launch.py:APIServer)
-    - 4.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
-- 5. [Benchmark](#Benchmark)
-- 6. [demo](#demo)
-  - 6.1. [风格化控制](#)
-  - 6.2. [长文本生成](#-1)
-- 7. [SSML](#SSML)
-- 8. [Speaking style](#Speakingstyle)
-- 9. [Speaker.pt File](#Speaker.ptFile)
-- 10. [Docker](#Docker)
-  - 10.1. [Image](#Image)
-  - 10.2. [Manual build](#Manualbuild)
-- 11. [Roadmap](#Roadmap)
-- 12. [FAQ](#FAQ)
-  - 12.1. [What are Prompt1 and Prompt2?](#WhatarePrompt1andPrompt2)
-  - 12.2. [What is Prefix?](#WhatisPrefix)
-  - 12.3. [What is the difference in Style with `_p`?](#WhatisthedifferenceinStylewith_p)
-  - 12.4. [Why is it slow when `--compile` is enabled?](#Whyisitslowwhen--compileisenabled)
+- 3. [ Installation and Running](#InstallationandRunning)
+     - 3.1. [WebUI Features](#WebUIFeatures)
+  - 3.1. [`launch.py`: API Server](#launch.py:APIServer)
+    - 3.1.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
+- 4. [demo](#demo)
+  - 4.1. [风格化控制](#)
+  - 4.2. [长文本生成](#-1)
+- 5. [Docker](#Docker)
+  - 5.1. [Image](#Image)
+  - 5.2. [Manual build](#Manualbuild)
+- 6. [Roadmap](#Roadmap)
+- 7. [FAQ](#FAQ)
+  - 7.1. [What are Prompt1 and Prompt2?](#WhatarePrompt1andPrompt2)
+  - 7.2. [What is Prefix?](#WhatisPrefix)
+  - 7.3. [What is the difference in Style with `_p`?](#WhatisthedifferenceinStylewith_p)
+  - 7.4. [Why is it slow when `--compile` is enabled?](#Whyisitslowwhen--compileisenabled)
+  - 7.5. [7.5. Why is Colab very slow with only 2 it/s?](#WhyisColabveryslowwithonly2its)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -76,61 +71,15 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 - For Batch Size = 8, 8~14GB of memory is required.
 - Half Batch Size means half of the above-mentioned Batch Size, and the memory requirements are also halved accordingly.
 
-## 3. <a name='Features'></a>Features
-
-- **Comprehensive API Services**: Provides API access to all functionalities for easy integration.
-- **Ultra-long Text Generation**: Supports generating texts longer than 1000 characters while maintaining consistency.
-- **Style Management**: Reuse speaking styles by name or ID, with 32 built-in styles.
-- **Speaker Management**: Efficiently reuse speakers by name or ID.
-- **Style Prompt Injection**: Flexibly adjust output styles by injecting prompts.
-- **Batch Generation**: Supports automatic bucketing and batch generation.
-- **SSML-like Support**: Create rich audio long texts using SSML-like syntax.
-- **Independent Refine API**: Provides a separate refine debugging interface to improve debugging efficiency.
-- **OpenAI-style API**: Provides a speech generation interface similar to OpenAI's `/v1/audio/speech`.
-- **Google-style API**: Provides a text synthesis interface similar to Google's `/v1/text:synthesize`.
-- **User-friendly Debugging GUI**: An independent playground from Gradio to simplify the debugging process.
-- **Text Normalization**:
-  - **Markdown**: Automatically detects and processes markdown formatted texts.
-  - **Number Transcription**: Automatically converts numbers to text recognizable by the model.
-  - **Emoji Adaptation**: Automatically translates emojis into readable text.
-  - **Tokenizer-based**: Preprocesses texts based on tokenizer, covering all unsupported character ranges of the model.
-  - **Chinese-English Recognition**: Adapts to English environments.
-- **Audio Quality Enhancement**: Inherits audio quality enhancement and noise reduction models to improve output quality.
-- **Speaker Import and Export**: Supports importing and exporting speakers for easy customization.
-- **Speaker Merging**: Supports merging speakers and fine-tuning them.
-
-## 4. <a name='InstallationandRunning'></a> Installation and Running
+## 3. <a name='InstallationandRunning'></a> Installation and Running
 
 1. Ensure that the [related dependencies](./docs/dependencies.md) are correctly installed.
-2. Start the required services according to your needs. The specific startup parameters are as follows.
+2. Start the required services according to your needs.
 
-### 4.1. <a name='webui.py:WebUI'></a> `webui.py`: WebUI
+- webui: `python webui.py`
+- api: `python launch.py`
 
-WebUI.py is a script used to configure and start the Gradio Web UI interface.
-
-All parameters:
-
-| Parameter              | Type   | Default     | Description                                                                |
-| ---------------------- | ------ | ----------- | -------------------------------------------------------------------------- |
-| `--server_name`        | `str`  | `"0.0.0.0"` | Server host address                                                        |
-| `--server_port`        | `int`  | `7860`      | Server port                                                                |
-| `--share`              | `bool` | `False`     | Enable share mode, allowing external access                                |
-| `--debug`              | `bool` | `False`     | Enable debug mode                                                          |
-| `--compile`            | `bool` | `False`     | Enable model compilation                                                   |
-| `--auth`               | `str`  | `None`      | Username and password for authentication in the format `username:password` |
-| `--no_half`            | `bool` | `False`     | Enable f32 full-precision inference                                        |
-| `--off_tqdm`           | `bool` | `False`     | Disable tqdm progress bar                                                  |
-| `--tts_max_len`        | `int`  | `1000`      | Maximum text length for TTS (Text-to-Speech)                               |
-| `--ssml_max_len`       | `int`  | `2000`      | Maximum text length for SSML (Speech Synthesis Markup Language)            |
-| `--max_batch_size`     | `int`  | `8`         | Maximum batch size for TTS                                                 |
-| `--device_id`          | `str`  | `None`      | Specify the GPU device_id to use                                           |
-| `--use_cpu`            | `str`  | `None`      | Currently selectable value is `"all"`                                      |
-| `--webui_experimental` | `bool` | `False`     | Enable experimental features (incomplete features)                         |
-| `--language`           | `str`  | `zh-CN`     | Set webui localization                                                     |
-
-> Due to `MKL FFT doesn't support tensors of type: Half`, you need to enable `--no_half` when using `--use_cpu="all"`.
-
-#### 4.1.1. <a name='WebUIFeatures'></a>WebUI Features
+#### 3.1. <a name='WebUIFeatures'></a>WebUI Features
 
 [Click here for a detailed introduction with images](./docs/webui_features.md)
 
@@ -152,36 +101,22 @@ All parameters:
   - Enhance: Improves output quality
   - Denoise: Removes noise
 - Experimental features:
+  - fintune
+    - speaker embedding
+    - [WIP] GPT lora
+    - [WIP] AE
   - [WIP] ASR
   - [WIP] Inpainting
 
-### 4.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 3.1. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 Launch.py is the startup script for ChatTTS-Forge, used to configure and launch the API server.
-
-All parameters:
-
-| Parameter         | Type   | Default     | Description                                                             |
-| ----------------- | ------ | ----------- | ----------------------------------------------------------------------- |
-| `--host`          | `str`  | `"0.0.0.0"` | Server host address                                                     |
-| `--port`          | `int`  | `8000`      | Server port                                                             |
-| `--reload`        | `bool` | `False`     | Enable auto-reload (for development)                                    |
-| `--compile`       | `bool` | `False`     | Enable model compilation                                                |
-| `--lru_size`      | `int`  | `64`        | Set the size of the request cache pool; set to 0 to disable `lru_cache` |
-| `--cors_origin`   | `str`  | `"*"`       | Allowed CORS origins; use `*` to allow all origins                      |
-| `--no_playground` | `bool` | `False`     | Disable playground entry                                                |
-| `--no_docs`       | `bool` | `False`     | Disable docs entry                                                      |
-| `--half`          | `bool` | `False`     | Enable f16 half-precision inference                                     |
-| `--off_tqdm`      | `bool` | `False`     | Disable tqdm progress bar                                               |
-| `--exclude`       | `str`  | `""`        | Exclude unnecessary APIs                                                |
-| `--device_id`     | `str`  | `None`      | Specify GPU device ID                                                   |
-| `--use_cpu`       | `str`  | `None`      | Current optional value is `"all"`                                       |
 
 Once the `launch.py` script has started successfully, you can check if the API is enabled at `/docs`.
 
 [Detailed API documentation](./docs/api.md)
 
-#### 4.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
+#### 3.1.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
 
 Through the `/v1/xtts_v2` series API, you can easily connect ChatTTS-Forge to your SillyTavern.
 
@@ -196,39 +131,9 @@ Here's a simple configuration guide:
 
 ![sillytavern_tts](./docs/sillytavern_tts.png)
 
-## 5. <a name='Benchmark'></a>Benchmark
+## 4. <a name='demo'></a>demo
 
-> You can reproduce this using `./tests/benchmark/tts_benchmark.py`
-
-Test Platform
-
-- GPU: `GeForce RTX 2080 Ti`
-- CPU: `3.4Hz 24-core`
-
-The results for a batch size of 8 are as follows. For the full scan, see `performance_results.csv`.
-
-| Batch size | Use decoder | Half precision | Compile model | Use CPU | GPU Memory | Duration | RTF  |
-| ---------- | ----------- | -------------- | ------------- | ------- | ---------- | -------- | ---- |
-| 8          | ✅          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.22 |
-| 8          | ✅          | ✅             | ✅            | ❌      | 0.89       | 39.34    | 0.24 |
-| 8          | ❌          | ❌             | ✅            | ❌      | 1.72       | 36.78    | 0.23 |
-| 8          | ❌          | ✅             | ✅            | ❌      | 0.90       | 39.34    | 0.24 |
-| 8          | ❌          | ❌             | ❌            | ❌      | 1.70       | 36.78    | 0.29 |
-| 8          | ✅          | ❌             | ❌            | ❌      | 1.72       | 36.78    | 0.29 |
-| 8          | ❌          | ✅             | ❌            | ❌      | 1.02       | 35.75    | 0.40 |
-| 8          | ✅          | ✅             | ❌            | ❌      | 0.95       | 35.75    | 0.40 |
-| 8          | ❌          | ❌             | ❌            | ✅      | N/A        | 49.92    | 0.58 |
-| 8          | ❌          | ❌             | ✅            | ✅      | N/A        | 49.92    | 0.58 |
-| 8          | ✅          | ❌             | ✅            | ✅      | N/A        | 49.92    | 0.58 |
-| 8          | ✅          | ❌             | ❌            | ✅      | N/A        | 49.92    | 0.60 |
-| 8          | ❌          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
-| 8          | ❌          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
-| 8          | ✅          | ✅             | ❌            | ✅      | N/A        | N/A      | N/A  |
-| 8          | ✅          | ✅             | ✅            | ✅      | N/A        | N/A      | N/A  |
-
-## 6. <a name='demo'></a>demo
-
-### 6.1. <a name=''></a>风格化控制
+### 4.1. <a name=''></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -268,7 +173,7 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 </details>
 
-### 6.2. <a name='-1'></a>长文本生成
+### 4.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -290,38 +195,13 @@ The results for a batch size of 8 are as follows. For the full scan, see `perfor
 
 </details>
 
-## 7. <a name='SSML'></a>SSML
+## 5. <a name='Docker'></a>Docker
 
-[SSML readme](./docs/SSML.md)
-
-## 8. <a name='Speakingstyle'></a>Speaking style
-
-[style readme](./docs/sytles.md)
-
-## 9. <a name='Speaker.ptFile'></a>Speaker.pt File
-
-1. How to Generate
-
-   > You can generate a .pt file using the speaker creation and fusion features in the webui.
-
-2. How to Export
-
-   > Click download in the webui to export.
-
-3. How to Import
-
-   > Upload the file in the speaker upload section of the webui.
-
-4. How to Import into the Service
-   > Place the .pt file into the `data/speakers` directory, then restart the service or call the API to add it to the system.
-
-## 10. <a name='Docker'></a>Docker
-
-### 10.1. <a name='Image'></a>Image
+### 5.1. <a name='Image'></a>Image
 
 WIP
 
-### 10.2. <a name='Manualbuild'></a>Manual build
+### 5.2. <a name='Manualbuild'></a>Manual build
 
 download models
 
@@ -337,32 +217,40 @@ Environment variable configuration
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-## 11. <a name='Roadmap'></a>Roadmap
+## 6. <a name='Roadmap'></a>Roadmap
 
 WIP
 
-## 12. <a name='FAQ'></a>FAQ
+## 7. <a name='FAQ'></a>FAQ
 
-### 12.1. <a name='WhatarePrompt1andPrompt2'></a>What are Prompt1 and Prompt2?
+### 7.1. <a name='WhatarePrompt1andPrompt2'></a>What are Prompt1 and Prompt2?
 
 Prompt1 and Prompt2 are system prompts with different insertion points. The current model is very sensitive to the first [Stts] token, hence the need for two prompts.
 
 - Prompt1 is inserted before the first [Stts].
 - Prompt2 is inserted after the first [Stts].
 
-### 12.2. <a name='WhatisPrefix'></a>What is Prefix?
+### 7.2. <a name='WhatisPrefix'></a>What is Prefix?
 
 The prefix is primarily used to control the model's generation capabilities, similar to the refine prompt in the official examples. This prefix should only contain special non-lexical tokens, such as `[laugh_0]`, `[oral_0]`, `[speed_0]`, `[break_0]`, etc.
 
-### 12.3. <a name='WhatisthedifferenceinStylewith_p'></a>What is the difference in Style with `_p`?
+### 7.3. <a name='WhatisthedifferenceinStylewith_p'></a>What is the difference in Style with `_p`?
 
 Styles with `_p` use both prompt and prefix, while those without `_p` use only the prefix.
 
-### 12.4. <a name='Whyisitslowwhen--compileisenabled'></a>Why is it slow when `--compile` is enabled?
+### 7.4. <a name='Whyisitslowwhen--compileisenabled'></a>Why is it slow when `--compile` is enabled?
 
 Due to the lack of inference padding, any change in the inference shape may trigger torch to compile.
 
 > It is currently not recommended to enable this.
+
+### 7.5. <a name='WhyisColabveryslowwithonly2its'></a>7.5. Why is Colab very slow with only 2 it/s?
+
+Make sure you are using a GPU instead of a CPU.
+
+- Click on the menu bar **[Edit]**
+- Click **[Notebook settings]**
+- Select **[Hardware accelerator]** => T4 GPU
 
 # Contributing
 
