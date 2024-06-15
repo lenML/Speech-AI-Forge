@@ -64,7 +64,7 @@ def create_spk_from_seed(
     chat_tts = load_chat_tts()
     with SeedContext(seed, True):
         emb = chat_tts.sample_random_speaker()
-    spk = Speaker(seed=-2, name=name, gender=gender, describe=desc)
+    spk = Speaker(seed_or_tensor=-2, name=name, gender=gender, describe=desc)
     spk.emb = emb
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp_file:

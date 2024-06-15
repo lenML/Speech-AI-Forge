@@ -25,7 +25,7 @@ class Speaker:
 
     @staticmethod
     def from_tensor(tensor):
-        speaker = Speaker(seed=-2)
+        speaker = Speaker(seed_or_tensor=-2)
         speaker.emb = tensor
         return speaker
 
@@ -124,7 +124,9 @@ class SpeakerManager:
     ):
         if filename == "":
             filename = name
-        speaker = Speaker(seed=-2, name=name, gender=gender, describe=describe)
+        speaker = Speaker(
+            seed_or_tensor=-2, name=name, gender=gender, describe=describe
+        )
         if isinstance(tensor, torch.Tensor):
             speaker.emb = tensor
         if isinstance(tensor, list):
