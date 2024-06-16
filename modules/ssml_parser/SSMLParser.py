@@ -1,13 +1,10 @@
 from lxml import etree
 
 
-from typing import Any, List, Dict, Union
+from typing import List, Union
 import logging
 
-from modules.data import styles_mgr
-from modules.speaker import speaker_mgr
 from box import Box
-import copy
 
 
 class SSMLContext(Box):

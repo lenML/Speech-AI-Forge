@@ -182,6 +182,7 @@ class SynthesizeSegments:
 
                 audio_segment = audio_data_to_segment(audio_data, sr)
                 audio_segment = apply_prosody(audio_segment, rate, volume, pitch)
+                # compare by Box object
                 original_index = src_segments.index(segment)
                 audio_segments[original_index] = audio_segment
 
@@ -226,13 +227,13 @@ class SynthesizeSegments:
 
             sentences = spliter.parse(text)
             for sentence in sentences:
-                ret_segments.append(
-                    SSMLSegment(
-                        text=sentence,
-                        attrs=segment.attrs.copy(),
-                        params=copy.copy(segment.params),
-                    )
+                seg = SSMLSegment(
+                    text=sentence,
+                    attrs=segment.attrs.copy(),
+                    params=copy.copy(segment.params),
                 )
+                ret_segments.append(seg)
+                setattr(seg, "_idx", len(ret_segments) - 1)
 
         return ret_segments
 
