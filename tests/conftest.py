@@ -15,7 +15,7 @@ from modules import config
 
 parser = argparse.ArgumentParser(description="Test")
 setup_model_args(parser)
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 process_model_args(args)
 config.runtime_env_vars.off_tqdm = True
 devices.reset_device()

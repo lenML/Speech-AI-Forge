@@ -37,6 +37,17 @@ def test_synthesize_tts(client):
 
 
 @pytest.mark.tts_api
+def test_long_same_text_synthesize_tts(client):
+    tts_params = default_tts_params.copy()
+    tts_params["text"] = tts_params["text"] * 12
+
+    response = client.get("/v1/tts", params=tts_params)
+    print(response.content)
+    assert response.status_code == 200
+    assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
+
+
+@pytest.mark.tts_api
 def test_synthesize_tts_missing_text(client):
     tts_params = default_tts_params.copy()
     tts_params["text"] = ""
