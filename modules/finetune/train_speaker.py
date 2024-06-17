@@ -45,9 +45,10 @@ def train_speaker_embeddings(
             )
             for speaker in dataset.speakers
         }
-        for speaker_embed in speaker_embeds.values():
-            std, mean = chat.pretrain_models["spk_stat"].chunk(2)
-            speaker_embed.data = speaker_embed.data * std + mean
+
+    for speaker_embed in speaker_embeds.values():
+        std, mean = chat.pretrain_models["spk_stat"].chunk(2)
+        speaker_embed.data = speaker_embed.data * std + mean
 
     SPEAKER_TOKEN_ID = tokenizer.convert_tokens_to_ids("[spk_emb]")
     AUDIO_EOS_TOKEN_ID = 0
@@ -166,13 +167,13 @@ def train_speaker_embeddings(
                 audio_logits.flatten(0, 2), labels[:, text_len:].flatten(0, 2)
             )
             loss = audio_loss
-            if train_text:
-                text_logits = gpt.head_text(text_hidden_states)
-                text_loss = loss_fn(
-                    text_logits.flatten(0, 1), labels[:, 1:text_len, 0].flatten(0, 1)
-                )
-                loss += text_loss
-                logger.meters["text_loss"].update(text_loss.item(), n=batch_size)
+
+            text_logits = gpt.head_text(text_hidden_states)
+            text_loss = loss_fn(
+                text_logits.flatten(0, 1), labels[:, 1:text_len, 0].flatten(0, 1)
+            )
+            loss += text_loss
+            logger.meters["text_loss"].update(text_loss.item(), n=batch_size)
 
             gpt_gen_mel_specs = decoder_decoder(
                 audio_hidden_states[:, :-1].transpose(1, 2)
@@ -181,7 +182,12 @@ def train_speaker_embeddings(
             loss += 0.01 * mse_loss
 
             optimizer.zero_grad()
-            loss.backward()
+
+            if train_text:
+                # just for test
+                text_loss.backward()
+            else:
+                loss.backward()
             torch.nn.utils.clip_grad_norm_(speaker_embeds.values(), 1.0)
             optimizer.step()
             logger.meters["loss"].update(loss.item(), n=batch_size)
@@ -203,6 +209,7 @@ if __name__ == "__main__":
     from modules.speaker import Speaker
 
     config.runtime_env_vars.no_half = True
+    config.runtime_env_vars.use_cpu = []
     devices.reset_device()
 
     parser = argparse.ArgumentParser()
