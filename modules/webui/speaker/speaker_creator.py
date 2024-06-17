@@ -54,7 +54,7 @@ names_list = [
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def create_spk_from_seed(
     seed: int,
     name: str,
@@ -75,7 +75,7 @@ def create_spk_from_seed(
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def test_spk_voice(seed: int, text: str):
     return tts_generate(
         spk=seed,

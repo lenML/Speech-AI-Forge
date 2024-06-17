@@ -9,7 +9,7 @@ from modules.utils.hf import spaces
 
 # NOTE: 因为 text_normalize 需要使用 tokenizer
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
     ssml = ""
     indent = " " * 2

@@ -10,8 +10,11 @@ except:
         def __init__(self):
             pass
 
-        def GPU(self, fn):
-            return fn
+        def GPU(self, *args, **kwargs):
+            def _GPU(func):
+                return func
+
+            return _GPU
 
     spaces = NoneSpaces()
     is_spaces_env = False

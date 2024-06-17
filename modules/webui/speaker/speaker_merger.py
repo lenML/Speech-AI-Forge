@@ -75,7 +75,7 @@ def merge_spk(
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def merge_and_test_spk_voice(
     spk_a, spk_a_w, spk_b, spk_b_w, spk_c, spk_c_w, spk_d, spk_d_w, test_text
 ):
@@ -96,7 +96,7 @@ def merge_and_test_spk_voice(
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def merge_spk_to_file(
     spk_a,
     spk_a_w,

@@ -83,13 +83,13 @@ def segments_length_limit(
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
     return _apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance)
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def synthesize_ssml(
     ssml: str,
     batch_size=4,
@@ -137,7 +137,7 @@ def synthesize_ssml(
 
 
 # @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def tts_generate(
     text,
     temperature=0.3,
@@ -218,14 +218,14 @@ def tts_generate(
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def refine_text(text: str, prompt: str):
     text = text_normalize(text)
     return refiner.refine_text(text, prompt=prompt)
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def split_long_text(long_text_input):
     spliter = SentenceSplitter(webui_config.spliter_threshold)
     sentences = spliter.parse(long_text_input)

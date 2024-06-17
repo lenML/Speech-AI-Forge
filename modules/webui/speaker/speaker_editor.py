@@ -9,7 +9,7 @@ import tempfile
 
 
 @torch.inference_mode()
-@spaces.GPU
+@spaces.GPU(duration=120)
 def test_spk_voice(spk_file, text: str):
     if spk_file == "" or spk_file is None:
         return None
