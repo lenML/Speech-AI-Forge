@@ -1,10 +1,9 @@
 import copy
 import re
 from box import Box
+import numpy as np
 from pydub import AudioSegment
 from typing import List, Union
-from scipy.io.wavfile import write
-import io
 from modules.SentenceSplitter import SentenceSplitter
 from modules.api.utils import calc_spk_style
 from modules.ssml_parser.SSMLParser import SSMLSegment, SSMLBreak, SSMLContext
@@ -15,17 +14,23 @@ from modules.normalization import text_normalize
 import logging
 import json
 
-from modules.speaker import Speaker, speaker_mgr
+from modules.speaker import Speaker
 
 logger = logging.getLogger(__name__)
 
 
-def audio_data_to_segment(audio_data, sr):
-    byte_io = io.BytesIO()
-    write(byte_io, rate=sr, data=audio_data)
-    byte_io.seek(0)
-
-    return AudioSegment.from_file(byte_io, format="wav")
+def audio_data_to_segment(audio_data: np.ndarray, sr: int):
+    """
+    optimize: https://github.com/lenML/ChatTTS-Forge/issues/57
+    """
+    audio_data = (audio_data * 32767).astype(np.int16)
+    audio_segment = AudioSegment(
+        audio_data.tobytes(),
+        frame_rate=sr,
+        sample_width=audio_data.dtype.itemsize,
+        channels=1,
+    )
+    return audio_segment
 
 
 def combine_audio_segments(audio_segments: list[AudioSegment]) -> AudioSegment:
