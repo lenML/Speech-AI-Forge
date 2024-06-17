@@ -1,38 +1,25 @@
-import base64
-from typing import Literal
+from typing import Union
 from fastapi import HTTPException
 
-import io
-import soundfile as sf
 from pydantic import BaseModel
 
 
-from modules.Enhancer.ResembleEnhance import (
-    apply_audio_enhance,
-    apply_audio_enhance_full,
-)
 from modules.api.Api import APIManager
-from modules.synthesize_audio import synthesize_audio
-from modules.utils import audio
-from modules.utils.audio import apply_prosody_to_audio_data
-from modules.normalization import text_normalize
+from modules.api.impl.handler.SSMLHandler import SSMLHandler
+from modules.api.impl.handler.TTSHandler import TTSHandler
+from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
+from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
+from modules.api.impl.model.enhancer_model import EnhancerConfig
 
-from modules import generate_audio as generate
-from modules.speaker import speaker_mgr
+from modules.speaker import Speaker, speaker_mgr
 
-
-from modules.ssml_parser.SSMLParser import create_ssml_parser
-from modules.SynthesizeSegments import (
-    SynthesizeSegments,
-    combine_audio_segments,
-)
 
 from modules.api import utils as api_utils
 
 
 class SynthesisInput(BaseModel):
-    text: str = ""
-    ssml: str = ""
+    text: Union[str, None] = None
+    ssml: Union[str, None] = None
 
 
 class VoiceSelectionParams(BaseModel):
@@ -50,22 +37,13 @@ class VoiceSelectionParams(BaseModel):
 
 
 class AudioConfig(BaseModel):
-    audioEncoding: api_utils.AudioFormat = "mp3"
+    audioEncoding: AudioFormat = AudioFormat.mp3
     speakingRate: float = 1
     pitch: float = 0
     volumeGainDb: float = 0
     sampleRateHertz: int = 24000
-    batchSize: int = 1
+    batchSize: int = 4
     spliterThreshold: int = 100
-
-
-class EnhancerConfig(BaseModel):
-    enabled: bool = False
-    model: str = "resemble-enhance"
-    nfe: int = 32
-    solver: Literal["midpoint", "rk4", "euler"] = "midpoint"
-    lambd: float = 0.5
-    tau: float = 0.5
 
 
 class GoogleTextSynthesizeRequest(BaseModel):
@@ -92,7 +70,11 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     voice_name = voice.name
     infer_seed = voice.seed or 42
     eos = voice.eos or "[uv_break]"
-    audio_format = audioConfig.audioEncoding or "mp3"
+    audio_format = audioConfig.audioEncoding
+
+    if not isinstance(audio_format, AudioFormat) and isinstance(audio_format, str):
+        audio_format = AudioFormat(audio_format)
+
     speaking_rate = audioConfig.speakingRate or 1
     pitch = audioConfig.pitch or 0
     volume_gain_db = audioConfig.volumeGainDb or 0
@@ -101,6 +83,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
     spliter_threshold = audioConfig.spliterThreshold or 100
 
+    # TODO
     sample_rate = audioConfig.sampleRateHertz or 24000
 
     params = api_utils.calc_spk_style(spk=voice.name, style=voice.style)
@@ -111,92 +94,68 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
             status_code=422, detail="The specified voice name is not supported."
         )
 
-    if audio_format != "mp3" and audio_format != "wav":
+    if not isinstance(params.get("spk"), Speaker):
         raise HTTPException(
-            status_code=422, detail="Invalid audio encoding format specified."
+            status_code=422, detail="The specified voice name is not supported."
         )
 
-    if enhancerConfig.enabled:
-        # TODO enhancer params checker
-        pass
+    speaker = params.get("spk")
+    tts_config = ChatTTSConfig(
+        style=params.get("style", ""),
+        temperature=voice.temperature,
+        top_k=voice.topK,
+        top_p=voice.topP,
+    )
+    infer_config = InferConfig(
+        batch_size=batch_size,
+        spliter_threshold=spliter_threshold,
+        eos=eos,
+        seed=infer_seed,
+    )
+    adjust_config = AdjustConfig(
+        speaking_rate=speaking_rate,
+        pitch=pitch,
+        volume_gain_db=volume_gain_db,
+    )
+    enhancer_config = enhancerConfig
 
+    mime_type = f"audio/{audio_format.value}"
+    if audio_format == AudioFormat.mp3:
+        mime_type = "audio/mpeg"
     try:
         if input.text:
-            # 处理文本合成逻辑
-            text = text_normalize(input.text, is_end=True)
-            sample_rate, audio_data = synthesize_audio(
-                text,
-                temperature=(
-                    voice.temperature
-                    if voice.temperature
-                    else params.get("temperature", 0.3)
-                ),
-                top_P=voice.topP if voice.topP else params.get("top_p", 0.7),
-                top_K=voice.topK if voice.topK else params.get("top_k", 20),
-                spk=params.get("spk", -1),
-                infer_seed=infer_seed,
-                prompt1=params.get("prompt1", ""),
-                prompt2=params.get("prompt2", ""),
-                prefix=params.get("prefix", ""),
-                batch_size=batch_size,
-                spliter_threshold=spliter_threshold,
-                end_of_sentence=eos,
+            text_content = input.text
+
+            handler = TTSHandler(
+                text_content=text_content,
+                spk=speaker,
+                tts_config=tts_config,
+                infer_config=infer_config,
+                adjust_config=adjust_config,
+                enhancer_config=enhancer_config,
             )
+
+            base64_string = handler.enqueue_to_base64(format=audio_format)
+            return {"audioContent": f"data:{mime_type};base64,{base64_string}"}
 
         elif input.ssml:
-            parser = create_ssml_parser()
-            segments = parser.parse(input.ssml)
-            for seg in segments:
-                seg["text"] = text_normalize(seg["text"], is_end=True)
+            ssml_content = input.ssml
 
-            if len(segments) == 0:
-                raise HTTPException(
-                    status_code=422, detail="The SSML text is empty or parsing failed."
-                )
-
-            synthesize = SynthesizeSegments(
-                batch_size=batch_size, eos=eos, spliter_thr=spliter_threshold
+            handler = SSMLHandler(
+                ssml_content=ssml_content,
+                infer_config=infer_config,
+                adjust_config=adjust_config,
+                enhancer_config=enhancer_config,
             )
-            audio_segments = synthesize.synthesize_segments(segments)
-            combined_audio = combine_audio_segments(audio_segments)
 
-            sample_rate, audio_data = audio.pydub_to_np(combined_audio)
+            base64_string = handler.enqueue_to_base64(format=audio_format)
+
+            return {"audioContent": f"data:{mime_type};base64,{base64_string}"}
+
         else:
             raise HTTPException(
-                status_code=422, detail="Either text or SSML input must be provided."
+                status_code=422, detail="Invalid input text or ssml specified."
             )
-
-        if enhancerConfig.enabled:
-            audio_data, sample_rate = apply_audio_enhance_full(
-                audio_data=audio_data,
-                sr=sample_rate,
-                nfe=enhancerConfig.nfe,
-                solver=enhancerConfig.solver,
-                lambd=enhancerConfig.lambd,
-                tau=enhancerConfig.tau,
-            )
-
-        audio_data = apply_prosody_to_audio_data(
-            audio_data,
-            rate=speaking_rate,
-            pitch=pitch,
-            volume=volume_gain_db,
-            sr=sample_rate,
-        )
-
-        buffer = io.BytesIO()
-        sf.write(buffer, audio_data, sample_rate, format="wav")
-        buffer.seek(0)
-
-        if audio_format == "mp3":
-            buffer = api_utils.wav_to_mp3(buffer)
-
-        base64_encoded = base64.b64encode(buffer.read())
-        base64_string = base64_encoded.decode("utf-8")
-
-        return {
-            "audioContent": f"data:audio/{audio_format.lower()};base64,{base64_string}"
-        }
 
     except Exception as e:
         import logging

@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 from typing import Any, Union
 
-import torch
 
-from modules.speaker import Speaker, speaker_mgr
+from modules.speaker import speaker_mgr
 
 
 from modules.data import styles_mgr
@@ -13,16 +12,8 @@ from pydub import AudioSegment
 from modules.ssml import merge_prompt
 
 
-from enum import Enum
-
-
 class ParamsTypeError(Exception):
     pass
-
-
-class AudioFormat(str, Enum):
-    mp3 = "mp3"
-    wav = "wav"
 
 
 class BaseResponse(BaseModel):
@@ -35,7 +26,7 @@ def success_response(data: Any, message: str = "ok") -> BaseResponse:
 
 
 def wav_to_mp3(wav_data, bitrate="48k"):
-    audio = AudioSegment.from_wav(
+    audio: AudioSegment = AudioSegment.from_wav(
         wav_data,
     )
     return audio.export(format="mp3", bitrate=bitrate)

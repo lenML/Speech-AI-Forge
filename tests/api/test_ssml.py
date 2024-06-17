@@ -14,7 +14,7 @@ def test_synthesize_ssml_success(client):
         },
     )
     assert response.status_code == 200
-    assert response.headers["content-type"] == "audio/mp3"
+    assert response.headers["content-type"] == "audio/mpeg"
 
 
 @pytest.mark.ssml_api
@@ -46,5 +46,5 @@ def test_synthesize_ssml_invalid_format(client):
             "batch_size": 4,
         },
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert "detail" in response.json()

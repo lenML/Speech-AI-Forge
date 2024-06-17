@@ -31,6 +31,7 @@ async def refiner_prompt_post(request: RefineTextRequest):
         text = request.text
         if request.normalize:
             text = text_normalize(request.text)
+        # TODO 其实这里可以做 spliter 和 batch 处理
         refined_text = refiner.refine_text(
             text=text,
             prompt=request.prompt,

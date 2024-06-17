@@ -71,8 +71,8 @@ const useStore = create((set, get) => ({
     spk: "female2",
     style: "chat",
     temperature: 0.3,
-    top_P: 1,
-    top_K: 20,
+    top_p: 1,
+    top_k: 20,
     seed: -1,
     format: "mp3",
     prompt1: "",
@@ -417,10 +417,10 @@ export const TTSPage = () => {
               min="0.01"
               max="1"
               step="0.01"
-              value=${tts.top_P}
-              onInput=${(e) => setTTS({ top_P: e.target.value })}
+              value=${tts.top_p}
+              onInput=${(e) => setTTS({ top_p: e.target.value })}
             />
-            ${tts.top_P}
+            ${tts.top_p}
           </label>
           <label>
             Top K:
@@ -429,10 +429,10 @@ export const TTSPage = () => {
               min="1"
               max="50"
               step="1"
-              value=${tts.top_K}
-              onInput=${(e) => setTTS({ top_K: e.target.value })}
+              value=${tts.top_k}
+              onInput=${(e) => setTTS({ top_k: e.target.value })}
             />
-            ${tts.top_K}
+            ${tts.top_k}
           </label>
           <label>
             Seed:

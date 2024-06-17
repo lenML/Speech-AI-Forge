@@ -2,33 +2,27 @@ import pytest
 import base64
 import os
 
+from modules.api.impl.google_api import (
+    GoogleTextSynthesizeRequest,
+    SynthesisInput,
+    VoiceSelectionParams,
+    AudioConfig,
+    EnhancerConfig,
+)
 import tests.conftest
 
 
 @pytest.fixture
-def google_text_synthesize_request():
-    return {
-        "input": {"text": "这是一个测试文本。", "ssml": ""},
-        "voice": {
-            "languageCode": "ZH-CN",
-            "name": "female2",
-            "style": "",
-            "temperature": 0.5,
-            "topP": 0.8,
-            "topK": 50,
-            "seed": 42,
-        },
-        "audioConfig": {
-            "audioEncoding": "mp3",
-            "speakingRate": 1.0,
-            "pitch": 0.0,
-            "volumeGainDb": 0.0,
-            "sampleRateHertz": 24000,
-            "batchSize": 1,
-            "spliterThreshold": 100,
-        },
-        "enhancerConfig": {},
-    }
+def body():
+    req = GoogleTextSynthesizeRequest(
+        input=SynthesisInput(),
+        voice=VoiceSelectionParams(),
+        audioConfig=AudioConfig(),
+        enhancerConfig=EnhancerConfig(),
+    )
+    req.input.text = "This is a test text."
+
+    return req
 
 
 @pytest.mark.parametrize(
@@ -40,14 +34,12 @@ def google_text_synthesize_request():
 )
 @pytest.mark.google_api
 def test_google_text_synthesize_success(
-    client, google_text_synthesize_request, enable_enhancer, speed
+    client, body: GoogleTextSynthesizeRequest, enable_enhancer, speed
 ):
-    google_text_synthesize_request["enhancerConfig"] = {
-        "enabled": enable_enhancer,
-    }
-    google_text_synthesize_request["audioConfig"]["speakingRate"] = speed
+    body.enhancerConfig.enabled = enable_enhancer
+    body.audioConfig.speakingRate = speed
 
-    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+    response = client.post("/v1/text:synthesize", json=body.model_dump())
     assert response.status_code == 200
     assert "audioContent" in response.json()
 
@@ -72,22 +64,18 @@ def test_google_text_synthesize_success(
 )
 @pytest.mark.google_api
 def test_google_text_synthesize_ssml_success(
-    client, google_text_synthesize_request, enable_enhancer, speed
+    client, body: GoogleTextSynthesizeRequest, enable_enhancer, speed
 ):
-    del google_text_synthesize_request["input"]["text"]
-    google_text_synthesize_request["input"][
-        "ssml"
-    ] = """
+    body.input.text = None
+    body.input.ssml = """
     <speak version="0.1">
         <voice>这是一个测试文本。</voice>
     </speak>
     """
-    google_text_synthesize_request["enhancerConfig"] = {
-        "enabled": enable_enhancer,
-    }
-    google_text_synthesize_request["audioConfig"]["speakingRate"] = speed
+    body.enhancerConfig.enabled = enable_enhancer
+    body.audioConfig.speakingRate = speed
 
-    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+    response = client.post("/v1/text:synthesize", json=body.model_dump())
     assert response.status_code == 200
     assert "audioContent" in response.json()
 
@@ -113,42 +101,22 @@ def test_google_text_synthesize_missing_input(
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_invalid_voice(client, google_text_synthesize_request):
-    google_text_synthesize_request.update(
-        {
-            "voice": {
-                "languageCode": "EN-US",
-                "name": "invalid_voice",
-                "style": "",
-                "temperature": 0.5,
-                "topP": 0.8,
-                "topK": 50,
-                "seed": 42,
-            }
-        }
-    )
-    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+def test_google_text_synthesize_invalid_voice(
+    client, body: GoogleTextSynthesizeRequest
+):
+    body.voice.name = "invalid_voice"
+
+    response = client.post("/v1/text:synthesize", json=body.model_dump())
     assert response.status_code == 422
     assert "detail" in response.json()
 
 
 @pytest.mark.google_api
 def test_google_text_synthesize_invalid_audio_encoding(
-    client, google_text_synthesize_request
+    client, body: GoogleTextSynthesizeRequest
 ):
-    google_text_synthesize_request.update(
-        {
-            "audioConfig": {
-                "audioEncoding": "invalid_format",
-                "speakingRate": 1.0,
-                "pitch": 0.0,
-                "volumeGainDb": 0.0,
-                "sampleRateHertz": 24000,
-                "batchSize": 1,
-                "spliterThreshold": 100,
-            },
-        }
-    )
-    response = client.post("/v1/text:synthesize", json=google_text_synthesize_request)
+    body.audioConfig.audioEncoding = "invalid_format"
+
+    response = client.post("/v1/text:synthesize", json=body.model_dump())
     assert response.status_code == 422
     assert "detail" in response.json()

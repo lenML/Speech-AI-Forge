@@ -1,27 +1,22 @@
 from fastapi import HTTPException, Body
 from fastapi.responses import StreamingResponse
 
-import io
 from pydantic import BaseModel
 from fastapi.responses import FileResponse
 
 
-from modules.normalization import text_normalize
-from modules.ssml_parser.SSMLParser import create_ssml_parser
-from modules.SynthesizeSegments import (
-    SynthesizeSegments,
-    combine_audio_segments,
-)
+from modules.api.impl.handler.SSMLHandler import SSMLHandler
+from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
+from modules.api.impl.model.chattts_model import InferConfig
+from modules.api.impl.model.enhancer_model import EnhancerConfig
 
-
-from modules.api import utils as api_utils
 
 from modules.api.Api import APIManager
 
 
 class SSMLRequest(BaseModel):
     ssml: str
-    format: str = "mp3"
+    format: AudioFormat = "mp3"
 
     # NOTE: 🤔 也许这个值应该配置成系统变量？ 传进来有点奇怪
     batch_size: int = 4
@@ -30,6 +25,9 @@ class SSMLRequest(BaseModel):
     eos: str = "[uv_break]"
 
     spliter_thr: int = 100
+
+    enhancer: EnhancerConfig = EnhancerConfig()
+    adjuster: AdjustConfig = AdjustConfig()
 
 
 async def synthesize_ssml_api(
@@ -43,6 +41,8 @@ async def synthesize_ssml_api(
         batch_size = request.batch_size
         eos = request.eos
         spliter_thr = request.spliter_thr
+        enhancer = request.enhancer
+        adjuster = request.adjuster
 
         if batch_size < 1:
             raise HTTPException(
@@ -62,22 +62,27 @@ async def synthesize_ssml_api(
                 status_code=400, detail="Format must be 'mp3' or 'wav'."
             )
 
-        parser = create_ssml_parser()
-        segments = parser.parse(ssml)
-        for seg in segments:
-            seg["text"] = text_normalize(seg["text"], is_end=True)
-
-        synthesize = SynthesizeSegments(
-            batch_size=batch_size, eos=eos, spliter_thr=spliter_thr
+        infer_config = InferConfig(
+            batch_size=batch_size,
+            spliter_threshold=spliter_thr,
+            eos=eos,
         )
-        audio_segments = synthesize.synthesize_segments(segments)
-        combined_audio = combine_audio_segments(audio_segments)
-        buffer = io.BytesIO()
-        combined_audio.export(buffer, format="wav")
-        buffer.seek(0)
-        if format == "mp3":
-            buffer = api_utils.wav_to_mp3(buffer)
-        return StreamingResponse(buffer, media_type=f"audio/{format}")
+        adjust_config = adjuster
+        enhancer_config = enhancer
+
+        handler = SSMLHandler(
+            ssml_content=ssml,
+            infer_config=infer_config,
+            adjust_config=adjust_config,
+            enhancer_config=enhancer_config,
+        )
+
+        buffer = handler.enqueue_to_buffer(format=request.format)
+
+        mime_type = f"audio/{format}"
+        if format == AudioFormat.mp3:
+            mime_type = "audio/mpeg"
+        return StreamingResponse(buffer, media_type=mime_type)
 
     except Exception as e:
         import logging

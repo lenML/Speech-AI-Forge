@@ -1,39 +1,37 @@
 from fastapi import File, Form, HTTPException, Body, UploadFile
+
+from numpy import clip
+from pydantic import BaseModel, Field
 from fastapi.responses import StreamingResponse
 
-import io
-from numpy import clip
-import soundfile as sf
-from pydantic import BaseModel, Field
-from fastapi.responses import FileResponse
+
+from modules.api.impl.handler.TTSHandler import TTSHandler
+from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
+from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
+from modules.api.impl.model.enhancer_model import EnhancerConfig
 
 
-from modules.synthesize_audio import synthesize_audio
-from modules.normalization import text_normalize
-
-from modules import generate_audio as generate
-
-
-from typing import List, Literal, Optional, Union
-import pyrubberband as pyrb
+from typing import List, Optional
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 
-from modules.speaker import speaker_mgr
+from modules.speaker import Speaker, speaker_mgr
 from modules.data import styles_mgr
-
-import numpy as np
 
 
 class AudioSpeechRequest(BaseModel):
     input: str  # 需要合成的文本
     model: str = "chattts-4w"
     voice: str = "female2"
-    response_format: Literal["mp3", "wav"] = "mp3"
+    response_format: AudioFormat = "mp3"
     speed: float = Field(1, ge=0.1, le=10, description="Speed of the audio")
     seed: int = 42
+
     temperature: float = 0.3
+    top_k: int = 20
+    top_p: float = 0.7
+
     style: str = ""
     # 是否开启batch合成，小于等于1表示不适用batch
     # 开启batch合成会自动分割句子
@@ -43,6 +41,9 @@ class AudioSpeechRequest(BaseModel):
     )
     # end of sentence
     eos: str = "[uv_break]"
+
+    enhance: bool = False
+    denoise: bool = False
 
 
 async def openai_speech_api(
@@ -55,7 +56,14 @@ async def openai_speech_api(
     voice = request.voice
     style = request.style
     eos = request.eos
+    seed = request.seed
+
     response_format = request.response_format
+    if not isinstance(response_format, AudioFormat) and isinstance(
+        response_format, str
+    ):
+        response_format = AudioFormat(response_format)
+
     batch_size = request.batch_size
     spliter_threshold = request.spliter_threshold
     speed = request.speed
@@ -71,49 +79,45 @@ async def openai_speech_api(
     except:
         raise HTTPException(status_code=400, detail="Invalid style.")
 
+    ctx_params = api_utils.calc_spk_style(spk=voice, style=style)
+
+    speaker = ctx_params.get("spk")
+    if not isinstance(speaker, Speaker):
+        raise HTTPException(status_code=400, detail="Invalid voice.")
+
+    tts_config = ChatTTSConfig(
+        style=style,
+        temperature=request.temperature,
+        top_k=request.top_k,
+        top_p=request.top_p,
+    )
+    infer_config = InferConfig(
+        batch_size=batch_size,
+        spliter_threshold=spliter_threshold,
+        eos=eos,
+        seed=seed,
+    )
+    adjust_config = AdjustConfig(speaking_rate=speed)
+    enhancer_config = EnhancerConfig(
+        enabled=request.enhance or request.denoise or False,
+        lambd=0.9 if request.denoise else 0.1,
+    )
     try:
-        # Normalize the text
-        text = text_normalize(input_text, is_end=True)
-
-        # Calculate speaker and style based on input voice
-        params = api_utils.calc_spk_style(spk=voice, style=style)
-
-        spk = params.get("spk", -1)
-        seed = params.get("seed", request.seed or 42)
-        temperature = params.get("temperature", request.temperature or 0.3)
-        prompt1 = params.get("prompt1", "")
-        prompt2 = params.get("prompt2", "")
-        prefix = params.get("prefix", "")
-
-        # Generate audio
-        sample_rate, audio_data = synthesize_audio(
-            text,
-            temperature=temperature,
-            top_P=0.7,
-            top_K=20,
-            spk=spk,
-            infer_seed=seed,
-            batch_size=batch_size,
-            spliter_threshold=spliter_threshold,
-            prompt1=prompt1,
-            prompt2=prompt2,
-            prefix=prefix,
-            end_of_sentence=eos,
+        handler = TTSHandler(
+            text_content=input_text,
+            spk=speaker,
+            tts_config=tts_config,
+            infer_config=infer_config,
+            adjust_config=adjust_config,
+            enhancer_config=enhancer_config,
         )
 
-        if speed != 1:
-            audio_data = pyrb.time_stretch(audio_data, sample_rate, speed)
+        buffer = handler.enqueue_to_buffer(response_format)
 
-        # Convert audio data to wav format
-        buffer = io.BytesIO()
-        sf.write(buffer, audio_data, sample_rate, format="wav")
-        buffer.seek(0)
-
-        if response_format == "mp3":
-            # Convert wav to mp3
-            buffer = api_utils.wav_to_mp3(buffer)
-
-        return StreamingResponse(buffer, media_type="audio/mp3")
+        mime_type = f"audio/{response_format.value}"
+        if response_format == AudioFormat.mp3:
+            mime_type = "audio/mpeg"
+        return StreamingResponse(buffer, media_type=mime_type)
 
     except Exception as e:
         import logging
@@ -150,7 +154,6 @@ class TranscriptionsVerboseResponse(BaseModel):
 def setup(app: APIManager):
     app.post(
         "/v1/audio/speech",
-        response_class=FileResponse,
         description="""
 openai api document: 
 [https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)
