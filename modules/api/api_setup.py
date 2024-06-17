@@ -1,9 +1,10 @@
 import logging
+from modules.Enhancer.ResembleEnhance import load_enhancer
 from modules.devices import devices
 import argparse
 
-import torch
 from modules import config
+from modules.models import load_chat_tts
 from modules.utils import env
 from modules import generate_audio
 from modules.api.Api import APIManager
@@ -77,6 +78,11 @@ def setup_model_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Enable debug mode for audio generation",
     )
+    parser.add_argument(
+        "--preload_models",
+        action="store_true",
+        help="Preload all models at startup",
+    )
 
 
 def process_model_args(args):
@@ -87,6 +93,7 @@ def process_model_args(args):
     no_half = env.get_and_update_env(args, "no_half", False, bool)
     off_tqdm = env.get_and_update_env(args, "off_tqdm", False, bool)
     debug_generate = env.get_and_update_env(args, "debug_generate", False, bool)
+    preload_models = env.get_and_update_env(args, "preload_models", False, bool)
 
     generate_audio.setup_lru_cache()
     devices.reset_device()
@@ -94,6 +101,10 @@ def process_model_args(args):
 
     if debug_generate:
         generate_audio.logger.setLevel(logging.DEBUG)
+
+    if preload_models:
+        load_chat_tts()
+        load_enhancer()
 
 
 def setup_uvicon_args(parser: argparse.ArgumentParser):

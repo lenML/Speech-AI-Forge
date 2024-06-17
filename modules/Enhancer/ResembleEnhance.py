@@ -1,6 +1,5 @@
 import gc
-import os
-from typing import List, Literal
+from typing import Literal
 
 import numpy as np
 from modules.devices import devices
@@ -14,7 +13,6 @@ from modules.utils.constants import MODELS_DIR
 from pathlib import Path
 
 from threading import Lock
-from modules import config
 
 import logging
 
