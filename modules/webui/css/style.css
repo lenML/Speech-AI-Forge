@@ -66,9 +66,9 @@
     display: none !important;
   }
   
-  .progress-bar{
+  /* .progress-bar{
     height: 30px !important;
-  }
+  } */
   
   .progress-bar span {
       text-align: right;

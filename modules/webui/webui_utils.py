@@ -1,14 +1,13 @@
-import io
 from typing import Union
 import numpy as np
 
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
-from modules.devices import devices
 from modules.synthesize_audio import synthesize_audio
 from modules.utils.hf import spaces
 from modules.webui import webui_config
 
 import torch
+import gradio as gr
 
 from modules.ssml_parser.SSMLParser import create_ssml_parser, SSMLBreak, SSMLSegment
 from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
@@ -24,7 +23,6 @@ from modules import refiner
 from modules.utils import audio
 from modules.SentenceSplitter import SentenceSplitter
 
-from pydub import AudioSegment
 import torch.profiler
 
 
@@ -97,6 +95,7 @@ def synthesize_ssml(
     enable_denoise=False,
     eos: str = "[uv_break]",
     spliter_thr: int = 100,
+    progress=gr.Progress(track_tqdm=True),
 ):
     try:
         batch_size = int(batch_size)
@@ -157,6 +156,7 @@ def tts_generate(
     spk_file=None,
     spliter_thr: int = 100,
     eos: str = "[uv_break]",
+    progress=gr.Progress(track_tqdm=True),
 ):
     try:
         batch_size = int(batch_size)
@@ -219,7 +219,11 @@ def tts_generate(
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def refine_text(text: str, prompt: str):
+def refine_text(
+    text: str,
+    prompt: str,
+    progress=gr.Progress(track_tqdm=True),
+):
     text = text_normalize(text)
     return refiner.refine_text(text, prompt=prompt)
 
