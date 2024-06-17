@@ -1,9 +1,8 @@
 import numpy as np
 import torch
 
+from modules import config, models
 from modules.utils.SeedContext import SeedContext
-
-from modules import models, config
 
 
 @torch.inference_mode()

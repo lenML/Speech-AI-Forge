@@ -1,17 +1,13 @@
+import argparse
 import os
-from pytest import fixture
-from fastapi.testclient import TestClient
 
 import fastapi
-import argparse
+from fastapi.testclient import TestClient
+from pytest import fixture
 
-from modules.api.api_setup import (
-    create_api,
-    process_model_args,
-    setup_model_args,
-)
-from modules.devices import devices
 from modules import config
+from modules.api.api_setup import create_api, process_model_args, setup_model_args
+from modules.devices import devices
 
 parser = argparse.ArgumentParser(description="Test")
 setup_model_args(parser)

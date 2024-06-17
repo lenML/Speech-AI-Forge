@@ -1,15 +1,13 @@
 import os
 from typing import Union
 
+import soundfile as sf
 import torch
 import torchaudio
+
 from modules.Denoiser.AudioDenoiser import AudioDenoiser
-
-from modules.utils.constants import MODELS_DIR
-
 from modules.devices import devices
-
-import soundfile as sf
+from modules.utils.constants import MODELS_DIR
 
 ad: Union[AudioDenoiser, None] = None
 

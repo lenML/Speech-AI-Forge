@@ -1,8 +1,9 @@
-import torch
 import logging
-from packaging import version
+
+import torch
 import torch.backends
 import torch.backends.mps
+from packaging import version
 
 logger = logging.getLogger(__name__)
 

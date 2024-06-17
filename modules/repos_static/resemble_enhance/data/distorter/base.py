@@ -2,8 +2,8 @@ import itertools
 import os
 import random
 import time
-from typing import Union
 import warnings
+from typing import Union
 
 import numpy as np
 

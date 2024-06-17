@@ -12,7 +12,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("in_dir", type=Path, help="Path to input audio folder")
     parser.add_argument("out_dir", type=Path, help="Output folder")
-    parser.add_argument("--run_dir", type=Path, default="runs/denoiser", help="Path to run folder")
+    parser.add_argument(
+        "--run_dir", type=Path, default="runs/denoiser", help="Path to run folder"
+    )
     parser.add_argument("--suffix", type=str, default=".wav", help="File suffix")
     parser.add_argument("--device", type=str, default="cuda", help="Device")
     args = parser.parse_args()

@@ -12,7 +12,9 @@ from .inference import denoise, enhance
 
 @torch.inference_mode()
 def main():
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument("in_dir", type=Path, help="Path to input audio folder")
     parser.add_argument("out_dir", type=Path, help="Output folder")
     parser.add_argument(

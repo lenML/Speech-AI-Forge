@@ -44,7 +44,9 @@ def praat_augment(wav, sr):
     sound = parselmouth.Sound(wav, sr)
     formant_shift_ratio = random.uniform(1.1, 1.5)
     pitch_range_factor = random.uniform(0.5, 2.0)
-    sound = parselmouth.praat.call(sound, "Change gender", 75, 600, formant_shift_ratio, 0, pitch_range_factor, 1.0)
+    sound = parselmouth.praat.call(
+        sound, "Change gender", 75, 600, formant_shift_ratio, 0, pitch_range_factor, 1.0
+    )
     wav = np.array(sound.values)[0].astype(np.float32)
     return wav
 
@@ -73,7 +75,9 @@ class Dataset(DatasetBase):
         if len(self.bg_paths) == 0:
             raise ValueError(f"No background audio files found in {hp.bg_dir}")
 
-        logger.info(f"Found {len(self.fg_paths)} foreground files and {len(self.bg_paths)} background files")
+        logger.info(
+            f"Found {len(self.fg_paths)} foreground files and {len(self.bg_paths)} background files"
+        )
 
         self.training = training
         self.max_retries = max_retries
@@ -121,7 +125,9 @@ class Dataset(DatasetBase):
         fg_path = self.fg_paths[index]
 
         if self.training and random.random() < self.silent_fg_prob:
-            fg_wav = np.zeros(int(self.hp.training_seconds * self.hp.wav_rate), dtype=np.float32)
+            fg_wav = np.zeros(
+                int(self.hp.training_seconds * self.hp.wav_rate), dtype=np.float32
+            )
         else:
             fg_wav = self._load_wav(fg_path)
             if random.random() < self.hp.praat_augment_prob and self.training:
@@ -132,14 +138,20 @@ class Dataset(DatasetBase):
             fg_dwav = None
             bg_dwav = None
         else:
-            fg_dwav = _normalize(self.distorter(fg_wav, self.hp.wav_rate)).astype(np.float32)
+            fg_dwav = _normalize(self.distorter(fg_wav, self.hp.wav_rate)).astype(
+                np.float32
+            )
             if self.training:
                 bg_path = random.choice(self.bg_paths)
             else:
                 # Deterministic for validation
                 bg_path = self.bg_paths[index % len(self.bg_paths)]
-            bg_wav = self._load_wav(bg_path, length=len(fg_wav), random_crop=self.training)
-            bg_dwav = _normalize(self.distorter(bg_wav, self.hp.wav_rate)).astype(np.float32)
+            bg_wav = self._load_wav(
+                bg_path, length=len(fg_wav), random_crop=self.training
+            )
+            bg_dwav = _normalize(self.distorter(bg_wav, self.hp.wav_rate)).astype(
+                np.float32
+            )
 
         return dict(
             fg_wav=fg_wav,
@@ -154,7 +166,9 @@ class Dataset(DatasetBase):
                 return self._getitem_unsafe(index)
             except Exception as e:
                 if i == self.max_retries - 1:
-                    raise RuntimeError(f"Failed to load {self.fg_paths[index]} after {self.max_retries} retries") from e
+                    raise RuntimeError(
+                        f"Failed to load {self.fg_paths[index]} after {self.max_retries} retries"
+                    ) from e
                 logger.debug(f"Error loading {self.fg_paths[index]}: {e}, skipping")
                 index = np.random.randint(0, len(self))
 

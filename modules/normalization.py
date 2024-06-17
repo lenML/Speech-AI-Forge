@@ -1,9 +1,11 @@
-from functools import lru_cache
-from modules.utils.zh_normalization.text_normlization import *
-import emojiswitch
-from modules.utils.markdown import markdown_to_text
-from modules import models
 import re
+from functools import lru_cache
+
+import emojiswitch
+
+from modules import models
+from modules.utils.markdown import markdown_to_text
+from modules.utils.zh_normalization.text_normlization import *
 
 # 是否关闭 unk token 检查
 # NOTE: 单测的时候用于跳过模型加载

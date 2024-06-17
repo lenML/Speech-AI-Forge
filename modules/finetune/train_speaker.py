@@ -3,9 +3,10 @@ import torch.nn.functional as F
 import transformers
 
 from modules.finetune.model.encoder import DVAEEncoder, get_encoder_config
-from modules.finetune.utils.output import get_ansi_len, output_iter, ansi
-from .utils.logger import MetricLogger
+from modules.finetune.utils.output import ansi, get_ansi_len, output_iter
+
 from .utils.dataset import AudioCollator, XzListTar
+from .utils.logger import MetricLogger
 from .utils.model import quantize
 
 IGNORE_TOKEN_ID = transformers.trainer_pt_utils.LabelSmoother.ignore_index
@@ -201,11 +202,13 @@ def train_speaker_embeddings(
 if __name__ == "__main__":
     import argparse
     import os
-    import numpy as np
     import pathlib
-    from modules.models import load_chat_tts
-    from modules.devices import devices
+
+    import numpy as np
+
     from modules import config
+    from modules.devices import devices
+    from modules.models import load_chat_tts
     from modules.speaker import Speaker
 
     config.runtime_env_vars.no_half = True

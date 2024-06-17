@@ -1,21 +1,21 @@
-import os
 import logging
-from omegaconf import OmegaConf
+import os
 
 import torch
+from huggingface_hub import snapshot_download
+from omegaconf import OmegaConf
 from vocos import Vocos
+
+from .infer.api import infer_code, refine_text
 from .model.dvae import DVAE
 from .model.gpt import GPT_warpper
 from .utils.infer_utils import (
-    count_invalid_characters,
-    detect_language,
     apply_character_map,
     apply_half2full_map,
+    count_invalid_characters,
+    detect_language,
 )
 from .utils.io_utils import get_latest_modified_file
-from .infer.api import refine_text, infer_code
-
-from huggingface_hub import snapshot_download
 
 logging.basicConfig(level=logging.INFO)
 

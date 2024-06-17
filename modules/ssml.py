@@ -1,17 +1,12 @@
-from lxml import etree
-
-
-from typing import Any, List, Dict
-import numpy as np
-
-
 import logging
+import random
+from typing import Any, Dict, List
+
+import numpy as np
+from lxml import etree
 
 from modules.data import styles_mgr
 from modules.speaker import speaker_mgr
-
-import random
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,26 +1,24 @@
-import logging
-from modules.Enhancer.ResembleEnhance import load_enhancer
-from modules.devices import devices
 import argparse
+import logging
 
-from modules import config
-from modules.models import load_chat_tts
-from modules.utils import env
-from modules import generate_audio
+from modules import config, generate_audio
 from modules.api.Api import APIManager
-
 from modules.api.impl import (
-    style_api,
-    tts_api,
-    ssml_api,
     google_api,
+    models_api,
     openai_api,
+    ping_api,
     refiner_api,
     speaker_api,
-    ping_api,
-    models_api,
+    ssml_api,
+    style_api,
+    tts_api,
     xtts_v2_api,
 )
+from modules.devices import devices
+from modules.Enhancer.ResembleEnhance import load_enhancer
+from modules.models import load_chat_tts
+from modules.utils import env
 
 logger = logging.getLogger(__name__)
 

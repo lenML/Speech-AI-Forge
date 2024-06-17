@@ -1,11 +1,10 @@
+import json
+
 import torch
 import torch.nn as nn
-
 from audio_denoiser.modules.Permute import Permute
 from audio_denoiser.modules.SimpleRoberta import SimpleRoberta
 from audio_denoiser.modules.SpectrogramScaler import SpectrogramScaler
-
-import json
 
 
 class AudioNoiseModel(nn.Module):

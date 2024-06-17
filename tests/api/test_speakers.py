@@ -1,6 +1,6 @@
 import os
-from pytest import mark
 
+from pytest import mark
 
 from modules.utils import constants
 

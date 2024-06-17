@@ -1,15 +1,17 @@
 import logging
 import math
 from typing import Union
+
 import torch
 import torchaudio
-from torch import nn
-from audio_denoiser.helpers.torch_helper import batched_apply
-from modules.Denoiser.AudioNosiseModel import load_audio_denosier_model
 from audio_denoiser.helpers.audio_helper import (
     create_spectrogram,
     reconstruct_from_spectrogram,
 )
+from audio_denoiser.helpers.torch_helper import batched_apply
+from torch import nn
+
+from modules.Denoiser.AudioNosiseModel import load_audio_denosier_model
 
 _expected_t_std = 0.23
 _recommended_backend = "soundfile"

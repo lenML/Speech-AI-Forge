@@ -1,7 +1,6 @@
+from modules import config
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-
-from modules import config
 
 
 def setup(app: APIManager):

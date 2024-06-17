@@ -1,11 +1,12 @@
+import tempfile
+
 import gradio as gr
 import torch
+
 from modules.speaker import Speaker
 from modules.utils.hf import spaces
 from modules.webui import webui_config
 from modules.webui.webui_utils import tts_generate
-
-import tempfile
 
 
 @torch.inference_mode()

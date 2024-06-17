@@ -1,29 +1,23 @@
 from typing import Union
-import numpy as np
 
+import gradio as gr
+import numpy as np
+import torch
+import torch.profiler
+
+from modules import refiner
+from modules.api.utils import calc_spk_style
+from modules.data import styles_mgr
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
+from modules.normalization import text_normalize
+from modules.SentenceSplitter import SentenceSplitter
+from modules.speaker import Speaker, speaker_mgr
+from modules.ssml_parser.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_parser
 from modules.synthesize_audio import synthesize_audio
+from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
+from modules.utils import audio
 from modules.utils.hf import spaces
 from modules.webui import webui_config
-
-import torch
-import gradio as gr
-
-from modules.ssml_parser.SSMLParser import create_ssml_parser, SSMLBreak, SSMLSegment
-from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
-
-from modules.speaker import speaker_mgr, Speaker
-from modules.data import styles_mgr
-
-from modules.api.utils import calc_spk_style
-
-from modules.normalization import text_normalize
-from modules import refiner
-
-from modules.utils import audio
-from modules.SentenceSplitter import SentenceSplitter
-
-import torch.profiler
 
 
 def get_speakers():

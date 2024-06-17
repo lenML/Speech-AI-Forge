@@ -1,15 +1,16 @@
-import pytest
 import base64
 import os
 
+import pytest
+
+import tests.conftest
 from modules.api.impl.google_api import (
+    AudioConfig,
+    EnhancerConfig,
     GoogleTextSynthesizeRequest,
     SynthesisInput,
     VoiceSelectionParams,
-    AudioConfig,
-    EnhancerConfig,
 )
-import tests.conftest
 
 
 @pytest.fixture

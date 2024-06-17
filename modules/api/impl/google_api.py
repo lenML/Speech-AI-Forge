@@ -1,20 +1,16 @@
 from typing import Union
-from fastapi import HTTPException
 
+from fastapi import HTTPException
 from pydantic import BaseModel
 
-
+from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 from modules.api.impl.handler.SSMLHandler import SSMLHandler
 from modules.api.impl.handler.TTSHandler import TTSHandler
 from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
 from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
 from modules.api.impl.model.enhancer_model import EnhancerConfig
-
 from modules.speaker import Speaker, speaker_mgr
-
-
-from modules.api import utils as api_utils
 
 
 class SynthesisInput(BaseModel):

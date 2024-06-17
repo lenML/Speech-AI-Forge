@@ -25,7 +25,9 @@ def get_stft_cfgs(hp: HParams):
 
 def stft(x, n_fft, hop_length, win_length, window):
     dtype = x.dtype
-    x = torch.stft(x.float(), n_fft, hop_length, win_length, window, return_complex=True)
+    x = torch.stft(
+        x.float(), n_fft, hop_length, win_length, window, return_complex=True
+    )
     x = x.abs().to(dtype)
     x = x.transpose(2, 1)  # (b f t) -> (b t f)
     return x
@@ -62,7 +64,9 @@ class STFTLoss(nn.Module):
         self.stft_cfg = stft_cfg
         self.spectral_convergenge_loss = SpectralConvergengeLoss()
         self.log_stft_magnitude_loss = LogSTFTMagnitudeLoss()
-        self.register_buffer("window", getattr(torch, window)(stft_cfg["win_length"]), persistent=False)
+        self.register_buffer(
+            "window", getattr(torch, window)(stft_cfg["win_length"]), persistent=False
+        )
 
     def forward(self, x, y):
         """Calculate forward propagation.
@@ -104,7 +108,9 @@ class MRSTFTLoss(nn.Module):
             Tensor: Multi resolution spectral convergence loss value.
             Tensor: Multi resolution log STFT magnitude loss value.
         """
-        assert x.dim() == 2 and y.dim() == 2, f"(b t) is expected, but got {x.shape} and {y.shape}."
+        assert (
+            x.dim() == 2 and y.dim() == 2
+        ), f"(b t) is expected, but got {x.shape} and {y.shape}."
 
         dtype = x.dtype
 

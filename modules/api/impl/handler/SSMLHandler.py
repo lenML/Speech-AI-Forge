@@ -1,14 +1,14 @@
-from fastapi import HTTPException
 import numpy as np
+from fastapi import HTTPException
 
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
-from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 from modules.api.impl.handler.AudioHandler import AudioHandler
 from modules.api.impl.model.audio_model import AdjustConfig
 from modules.api.impl.model.chattts_model import InferConfig
 from modules.api.impl.model.enhancer_model import EnhancerConfig
+from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
 from modules.normalization import text_normalize
 from modules.ssml_parser.SSMLParser import create_ssml_parser
+from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 from modules.utils import audio
 
 

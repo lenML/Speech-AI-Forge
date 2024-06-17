@@ -1,17 +1,18 @@
-import subprocess as sp
+import csv
+import logging
 import os
+import subprocess as sp
 import time
+import tracemalloc
+
 import numpy as np
 import torch
-from modules.generate_audio import generate_audio_batch
-from modules.models import reload_chat_tts, unload_chat_tts
+
 from modules import config
 from modules.devices import devices
+from modules.generate_audio import generate_audio_batch
+from modules.models import reload_chat_tts, unload_chat_tts
 from modules.utils import audio
-import csv
-
-import logging
-import tracemalloc
 
 logger = logging.getLogger(__name__)
 

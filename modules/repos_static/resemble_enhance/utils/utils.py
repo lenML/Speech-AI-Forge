@@ -42,23 +42,19 @@ T = TypeVar("T")
 
 
 @overload
-def tree_map(fn: Callable, x: list[T]) -> list[T]:
-    ...
+def tree_map(fn: Callable, x: list[T]) -> list[T]: ...
 
 
 @overload
-def tree_map(fn: Callable, x: tuple[T]) -> tuple[T]:
-    ...
+def tree_map(fn: Callable, x: tuple[T]) -> tuple[T]: ...
 
 
 @overload
-def tree_map(fn: Callable, x: dict[str, T]) -> dict[str, T]:
-    ...
+def tree_map(fn: Callable, x: dict[str, T]) -> dict[str, T]: ...
 
 
 @overload
-def tree_map(fn: Callable, x: T) -> T:
-    ...
+def tree_map(fn: Callable, x: T) -> T: ...
 
 
 def tree_map(fn: Callable, x):

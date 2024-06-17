@@ -1,9 +1,10 @@
-from functools import lru_cache
-import sys
-import torch
-from modules import config
-
 import logging
+import sys
+from functools import lru_cache
+
+import torch
+
+from modules import config
 
 logger = logging.getLogger(__name__)
 

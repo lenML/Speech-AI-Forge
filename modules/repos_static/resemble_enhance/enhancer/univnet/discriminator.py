@@ -182,7 +182,9 @@ class Discriminator(nn.Module):
             self.loss_type_("wgan")
         else:
             length_difference = (fake.shape[-1] - real.shape[-1]) / real.shape[-1]
-            assert length_difference < 0.05, f"length_difference should be smaller than 5%"
+            assert (
+                length_difference < 0.05
+            ), f"length_difference should be smaller than 5%"
 
             self.loss_type_("hinge")
             real = real.to(self.dummy_float)
@@ -193,7 +195,9 @@ class Discriminator(nn.Module):
         losses = {}
 
         assert fake.dim() == 2, f"(B, T) is expected, but got {fake.shape}."
-        assert real is None or real.dim() == 2, f"(B, T) is expected, but got {real.shape}."
+        assert (
+            real is None or real.dim() == 2
+        ), f"(B, T) is expected, but got {real.shape}."
 
         fake = fake.unsqueeze(1)
 

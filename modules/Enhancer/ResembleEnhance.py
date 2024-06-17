@@ -1,20 +1,17 @@
 import gc
+import logging
+from pathlib import Path
+from threading import Lock
 from typing import Literal
 
 import numpy as np
+import torch
+
 from modules.devices import devices
 from modules.repos_static.resemble_enhance.enhancer.enhancer import Enhancer
 from modules.repos_static.resemble_enhance.enhancer.hparams import HParams
 from modules.repos_static.resemble_enhance.inference import inference
-
-import torch
-
 from modules.utils.constants import MODELS_DIR
-from pathlib import Path
-
-from threading import Lock
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -155,8 +152,8 @@ def apply_audio_enhance(
 
 
 if __name__ == "__main__":
-    import torchaudio
     import gradio as gr
+    import torchaudio
 
     device = torch.device("cuda")
 

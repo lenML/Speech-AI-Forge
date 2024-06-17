@@ -1,10 +1,7 @@
 from fastapi import HTTPException
-
 from pydantic import BaseModel
 
-
 from modules import refiner
-
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 from modules.normalization import text_normalize

@@ -1,10 +1,11 @@
 import pytest
 from lxml import etree
+
 from modules.ssml_parser.SSMLParser import (
-    create_ssml_parser,
-    SSMLSegment,
     SSMLBreak,
     SSMLContext,
+    SSMLSegment,
+    create_ssml_parser,
 )
 
 

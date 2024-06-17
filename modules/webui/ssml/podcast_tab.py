@@ -3,8 +3,8 @@ import pandas as pd
 import torch
 
 from modules.normalization import text_normalize
-from modules.webui import webui_config, webui_utils
 from modules.utils.hf import spaces
+from modules.webui import webui_config, webui_utils
 
 
 # NOTE: 因为 text_normalize 需要使用 tokenizer

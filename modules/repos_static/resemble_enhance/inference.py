@@ -8,11 +8,10 @@ from torchaudio.functional import resample
 from torchaudio.transforms import MelSpectrogram
 from tqdm import trange
 
+from modules import config
 from modules.devices import devices
 
 from .hparams import HParams
-
-from modules import config
 
 logger = logging.getLogger(__name__)
 

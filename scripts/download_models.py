@@ -1,9 +1,9 @@
 import argparse
 import time
 
-from scripts.ModelDownloader import ModelDownloader
 from scripts.dl_chattts import ChatTTSDownloader
 from scripts.dl_enhance import ResembleEnhanceDownloader
+from scripts.ModelDownloader import ModelDownloader
 
 
 def main():

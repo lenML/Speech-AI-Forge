@@ -1,10 +1,11 @@
 import base64
 import io
+
 import numpy as np
 import soundfile as sf
 
-from modules.api.impl.model.audio_model import AudioFormat
 from modules.api import utils as api_utils
+from modules.api.impl.model.audio_model import AudioFormat
 
 
 class AudioHandler:

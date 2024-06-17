@@ -1,20 +1,21 @@
 import copy
-import re
-from box import Box
-import numpy as np
-from pydub import AudioSegment
-from typing import List, Union
-from modules.SentenceSplitter import SentenceSplitter
-from modules.api.utils import calc_spk_style
-from modules.ssml_parser.SSMLParser import SSMLSegment, SSMLBreak, SSMLContext
-from modules.utils import rng
-from modules.utils.audio import time_stretch, pitch_shift
-from modules import generate_audio
-from modules.normalization import text_normalize
-import logging
 import json
+import logging
+import re
+from typing import List, Union
 
+import numpy as np
+from box import Box
+from pydub import AudioSegment
+
+from modules import generate_audio
+from modules.api.utils import calc_spk_style
+from modules.normalization import text_normalize
+from modules.SentenceSplitter import SentenceSplitter
 from modules.speaker import Speaker
+from modules.ssml_parser.SSMLParser import SSMLBreak, SSMLContext, SSMLSegment
+from modules.utils import rng
+from modules.utils.audio import pitch_shift, time_stretch
 
 logger = logging.getLogger(__name__)
 

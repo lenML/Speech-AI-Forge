@@ -1,8 +1,9 @@
 import os
+
 import pytest
 
-from modules.api.impl.tts_api import TTSParams
 import tests
+from modules.api.impl.tts_api import TTSParams
 
 default_tts_params = TTSParams(
     text="Hello, world!",

@@ -1,19 +1,17 @@
 import io
+import logging
+
+import soundfile as sf
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from modules.api import utils as api_utils
-from modules.api.Api import APIManager
-
-import soundfile as sf
 
 from modules import config
+from modules.api import utils as api_utils
+from modules.api.Api import APIManager
 from modules.normalization import text_normalize
 from modules.speaker import speaker_mgr
 from modules.synthesize_audio import synthesize_audio
-
-import logging
-
 from modules.utils.audio import apply_prosody_to_audio_data
 
 logger = logging.getLogger(__name__)

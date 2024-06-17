@@ -1,5 +1,7 @@
 import gradio as gr
 import torch
+
+from modules.webui import webui_config
 from modules.webui.webui_utils import (
     get_speakers,
     get_styles,
@@ -7,7 +9,6 @@ from modules.webui.webui_utils import (
     refine_text,
     tts_generate,
 )
-from modules.webui import webui_config
 
 
 def create_tts_interface():

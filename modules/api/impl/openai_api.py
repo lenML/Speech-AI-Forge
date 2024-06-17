@@ -1,23 +1,18 @@
-from fastapi import File, Form, HTTPException, Body, UploadFile
+from typing import List, Optional
 
+from fastapi import Body, File, Form, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from numpy import clip
 from pydantic import BaseModel, Field
-from fastapi.responses import StreamingResponse
 
-
+from modules.api import utils as api_utils
+from modules.api.Api import APIManager
 from modules.api.impl.handler.TTSHandler import TTSHandler
 from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
 from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
 from modules.api.impl.model.enhancer_model import EnhancerConfig
-
-
-from typing import List, Optional
-
-from modules.api import utils as api_utils
-from modules.api.Api import APIManager
-
-from modules.speaker import Speaker, speaker_mgr
 from modules.data import styles_mgr
+from modules.speaker import Speaker, speaker_mgr
 
 
 class AudioSpeechRequest(BaseModel):

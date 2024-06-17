@@ -1,10 +1,8 @@
-from lxml import etree
-
-
-from typing import List, Union
 import logging
+from typing import List, Union
 
 from box import Box
+from lxml import etree
 
 
 class SSMLContext(Box):

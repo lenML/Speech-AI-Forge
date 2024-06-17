@@ -1,6 +1,5 @@
 import os
 
-
 cwd = os.getcwd()
 utils_path = os.path.dirname(os.path.realpath(__file__))
 modules_path = os.path.dirname(utils_path)

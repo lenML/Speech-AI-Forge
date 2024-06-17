@@ -1,13 +1,13 @@
 import io
+import tempfile
+
 import gradio as gr
 import torch
 
+from modules.speaker import Speaker, speaker_mgr
 from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
 from modules.webui.webui_utils import get_speakers, tts_generate
-from modules.speaker import speaker_mgr, Speaker
-
-import tempfile
 
 
 def spk_to_tensor(spk):

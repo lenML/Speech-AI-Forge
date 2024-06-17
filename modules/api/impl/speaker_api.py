@@ -1,9 +1,10 @@
+import torch
 from fastapi import HTTPException
 from pydantic import BaseModel
-import torch
-from modules.speaker import speaker_mgr
+
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
+from modules.speaker import speaker_mgr
 
 
 class CreateSpeaker(BaseModel):

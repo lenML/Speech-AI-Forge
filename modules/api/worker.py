@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+
 import dotenv
 from fastapi import FastAPI
 
@@ -12,6 +13,7 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
+from modules import config
 from modules.api.api_setup import (
     process_api_args,
     process_model_args,
@@ -20,7 +22,6 @@ from modules.api.api_setup import (
     setup_uvicon_args,
 )
 from modules.api.app_config import app_description, app_title, app_version
-from modules import config
 from modules.utils.torch_opt import configure_torch_optimizations
 
 dotenv.load_dotenv(

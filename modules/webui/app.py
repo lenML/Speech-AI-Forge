@@ -5,17 +5,16 @@ import gradio as gr
 
 from modules import config
 from modules.webui import gradio_extensions, webui_config
-
 from modules.webui.changelog_tab import create_changelog_tab
 from modules.webui.finetune.ft_tab import create_ft_tabs
 from modules.webui.localization_runtime import ENLocalizationVars, ZHLocalizationVars
+from modules.webui.readme_tab import create_readme_tab
+from modules.webui.speaker_tab import create_speaker_panel
 from modules.webui.ssml.podcast_tab import create_ssml_podcast_tab
+from modules.webui.ssml.spliter_tab import create_spliter_tab
+from modules.webui.ssml.ssml_tab import create_ssml_interface
 from modules.webui.system_tab import create_system_tab
 from modules.webui.tts_tab import create_tts_interface
-from modules.webui.ssml.ssml_tab import create_ssml_interface
-from modules.webui.ssml.spliter_tab import create_spliter_tab
-from modules.webui.speaker_tab import create_speaker_panel
-from modules.webui.readme_tab import create_readme_tab
 
 logger = logging.getLogger(__name__)
 

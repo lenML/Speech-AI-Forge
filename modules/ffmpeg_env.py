@@ -1,6 +1,7 @@
-import os
-from modules.utils.constants import ROOT_DIR
 import logging
+import os
+
+from modules.utils.constants import ROOT_DIR
 
 logger = logging.getLogger(__name__)
 

@@ -88,11 +88,17 @@ class UpActDown(nn.Module):
 
 class AMPBlock(nn.Sequential):
     def __init__(self, channels, *, kernel_size=3, dilations=(1, 3, 5)):
-        super().__init__(*(self._make_layer(channels, kernel_size, d) for d in dilations))
+        super().__init__(
+            *(self._make_layer(channels, kernel_size, d) for d in dilations)
+        )
 
     def _make_layer(self, channels, kernel_size, dilation):
         return nn.Sequential(
-            weight_norm(nn.Conv1d(channels, channels, kernel_size, dilation=dilation, padding="same")),
+            weight_norm(
+                nn.Conv1d(
+                    channels, channels, kernel_size, dilation=dilation, padding="same"
+                )
+            ),
             UpActDown(act=SnakeBeta(channels)),
             weight_norm(nn.Conv1d(channels, channels, kernel_size, padding="same")),
         )

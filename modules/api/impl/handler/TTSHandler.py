@@ -1,13 +1,13 @@
 import numpy as np
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
+
 from modules.api.impl.handler.AudioHandler import AudioHandler
 from modules.api.impl.model.audio_model import AdjustConfig
 from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
 from modules.api.impl.model.enhancer_model import EnhancerConfig
+from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
 from modules.normalization import text_normalize
 from modules.speaker import Speaker
 from modules.synthesize_audio import synthesize_audio
-
 from modules.utils.audio import apply_prosody_to_audio_data
 
 

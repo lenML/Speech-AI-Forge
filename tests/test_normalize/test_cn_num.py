@@ -1,7 +1,7 @@
 import pytest
 
-from modules.normalization import text_normalize
 from modules import normalization
+from modules.normalization import text_normalize
 
 normalization.DISABLE_UNK_TOKEN_CHECK = True
 

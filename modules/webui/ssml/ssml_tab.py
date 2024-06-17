@@ -1,8 +1,7 @@
 import gradio as gr
-from modules.webui.webui_utils import (
-    synthesize_ssml,
-)
+
 from modules.webui import webui_config
+from modules.webui.webui_utils import synthesize_ssml
 
 
 def create_ssml_interface():

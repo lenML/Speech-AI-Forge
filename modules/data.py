@@ -1,6 +1,5 @@
 from modules.utils.CsvMgr import BaseManager
 
-
 # speakers_mgr = BaseManager("./data/speakers.csv")
 styles_mgr = BaseManager("./data/styles.csv")
 

@@ -1,8 +1,10 @@
-import torch
-import random
-import numpy as np
-from modules.utils import rng
 import logging
+import random
+
+import numpy as np
+import torch
+
+from modules.utils import rng
 
 logger = logging.getLogger(__name__)
 

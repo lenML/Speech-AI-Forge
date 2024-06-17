@@ -1,22 +1,23 @@
-import os
 import logging
+import os
 
-from modules.api.api_setup import setup_api_args, setup_model_args, setup_uvicon_args
 from modules.ffmpeg_env import setup_ffmpeg_path
 
-setup_ffmpeg_path()
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+try:
+    setup_ffmpeg_path()
+    logging.basicConfig(
+        level=os.getenv("LOG_LEVEL", "INFO"),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+except BaseException:
+    pass
 
 import argparse
+
 import uvicorn
 
-from modules import config
+from modules.api.api_setup import setup_api_args, setup_model_args, setup_uvicon_args
 from modules.utils import env
-
-from fastapi import FastAPI
 
 logger = logging.getLogger(__name__)
 

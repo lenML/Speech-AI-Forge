@@ -1,8 +1,9 @@
 import os
-from modules.api.impl.openai_api import AudioSpeechRequest
+
+import pytest
 
 import tests.conftest
-import pytest
+from modules.api.impl.openai_api import AudioSpeechRequest
 
 
 @pytest.mark.parametrize(

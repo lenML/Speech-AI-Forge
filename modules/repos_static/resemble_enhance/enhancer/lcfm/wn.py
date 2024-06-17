@@ -30,7 +30,9 @@ class WNLayer(nn.Module):
         if local_dim is not None:
             self.lconv = nn.Conv1d(local_dim, local_output_dim, 1)
 
-        self.dconv = nn.Conv1d(hidden_dim, local_output_dim, kernel_size, dilation=dilation, padding="same")
+        self.dconv = nn.Conv1d(
+            hidden_dim, local_output_dim, kernel_size, dilation=dilation, padding="same"
+        )
 
         self.out = nn.Conv1d(hidden_dim, 2 * hidden_dim, kernel_size=1)
 

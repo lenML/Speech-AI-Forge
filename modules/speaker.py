@@ -1,12 +1,12 @@
 import os
+import uuid
 from typing import Union
-from box import Box
+
 import torch
+from box import Box
 
 from modules import models
 from modules.utils.SeedContext import SeedContext
-
-import uuid
 
 
 def create_speaker_from_seed(seed):

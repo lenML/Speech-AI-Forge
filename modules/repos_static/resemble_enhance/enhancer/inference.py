@@ -7,8 +7,8 @@ import torch
 
 from ..inference import inference
 from .download import download
-from .hparams import HParams
 from .enhancer import Enhancer
+from .hparams import HParams
 
 logger = logging.getLogger(__name__)
 

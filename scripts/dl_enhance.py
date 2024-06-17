@@ -1,5 +1,6 @@
 import requests
 from tqdm import tqdm
+
 from scripts.ModelDownloader import ModelDownloader
 
 

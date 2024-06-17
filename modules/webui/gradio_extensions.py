@@ -2,11 +2,12 @@
 
 import os
 from pathlib import Path
+
 import gradio as gr
 
 from modules import config
-from .localization import localization_js
 
+from .localization import localization_js
 
 GradioTemplateResponseOriginal = gr.routes.templates.TemplateResponse
 

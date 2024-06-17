@@ -42,7 +42,9 @@ class Normalizer(nn.Module):
             self.running_var_unsafe = x.var()
         else:
             self.running_mean_unsafe = self._ema(self.running_mean_unsafe, x.mean())
-            self.running_var_unsafe = self._ema(self.running_var_unsafe, (x - self.running_mean).pow(2).mean())
+            self.running_var_unsafe = self._ema(
+                self.running_var_unsafe, (x - self.running_mean).pow(2).mean()
+            )
 
     def forward(self, x: Tensor, update=True):
         if self.training and update:

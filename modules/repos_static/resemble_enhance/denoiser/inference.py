@@ -4,7 +4,6 @@ from functools import cache
 import torch
 
 from ..denoiser.denoiser import Denoiser
-
 from ..inference import inference
 from .hparams import HParams
 

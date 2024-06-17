@@ -51,23 +51,36 @@ class UNetBlock(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, input_dim, output_dim, hidden_dim=16, num_blocks=4, num_middle_blocks=2):
+    def __init__(
+        self, input_dim, output_dim, hidden_dim=16, num_blocks=4, num_middle_blocks=2
+    ):
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.input_proj = nn.Conv2d(input_dim, hidden_dim, 3, padding=1)
         self.encoder_blocks = nn.ModuleList(
             [
-                UNetBlock(input_dim=hidden_dim * 2**i, output_dim=hidden_dim * 2 ** (i + 1), scale_factor=0.5)
+                UNetBlock(
+                    input_dim=hidden_dim * 2**i,
+                    output_dim=hidden_dim * 2 ** (i + 1),
+                    scale_factor=0.5,
+                )
                 for i in range(num_blocks)
             ]
         )
         self.middle_blocks = nn.ModuleList(
-            [UNetBlock(input_dim=hidden_dim * 2**num_blocks) for _ in range(num_middle_blocks)]
+            [
+                UNetBlock(input_dim=hidden_dim * 2**num_blocks)
+                for _ in range(num_middle_blocks)
+            ]
         )
         self.decoder_blocks = nn.ModuleList(
             [
-                UNetBlock(input_dim=hidden_dim * 2 ** (i + 1), output_dim=hidden_dim * 2**i, scale_factor=2)
+                UNetBlock(
+                    input_dim=hidden_dim * 2 ** (i + 1),
+                    output_dim=hidden_dim * 2**i,
+                    scale_factor=2,
+                )
                 for i in reversed(range(num_blocks))
             ]
         )

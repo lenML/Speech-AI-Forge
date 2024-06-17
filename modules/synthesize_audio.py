@@ -1,13 +1,11 @@
 import io
 from typing import Union
-from modules.SentenceSplitter import SentenceSplitter
-from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 
 from modules import generate_audio as generate
-
-
+from modules.SentenceSplitter import SentenceSplitter
 from modules.speaker import Speaker
 from modules.ssml_parser.SSMLParser import SSMLSegment
+from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 from modules.utils import audio
 
 

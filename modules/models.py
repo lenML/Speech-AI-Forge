@@ -1,12 +1,12 @@
-import threading
-import torch
-from modules.ChatTTS import ChatTTS
-from modules import config
-from modules.devices import devices
-
-import logging
 import gc
+import logging
+import threading
 
+import torch
+
+from modules import config
+from modules.ChatTTS import ChatTTS
+from modules.devices import devices
 
 logger = logging.getLogger(__name__)
 

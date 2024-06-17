@@ -1,6 +1,6 @@
+import logging
 import os
 import sys
-import logging
 
 from modules.api.api_setup import (
     process_api_args,
@@ -9,21 +9,25 @@ from modules.api.api_setup import (
     setup_model_args,
 )
 from modules.ffmpeg_env import setup_ffmpeg_path
-from modules.utils.env import get_and_update_env
-from modules.api.app_config import app_description, app_title, app_version
-from modules.utils.torch_opt import configure_torch_optimizations
 
-setup_ffmpeg_path()
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+try:
+    setup_ffmpeg_path()
+    logging.basicConfig(
+        level=os.getenv("LOG_LEVEL", "INFO"),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+except BaseException:
+    pass
 
-from modules.webui import webui_config
-from modules import config
-from modules.webui.app import webui_init, create_interface
 import argparse
+
+from modules import config
+from modules.api.app_config import app_description, app_title, app_version
 from modules.gradio_dcls_fix import dcls_patch
+from modules.utils.env import get_and_update_env
+from modules.utils.torch_opt import configure_torch_optimizations
+from modules.webui import webui_config
+from modules.webui.app import create_interface, webui_init
 
 dcls_patch()
 

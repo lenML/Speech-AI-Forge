@@ -6,7 +6,13 @@ from .custom import RandomGaussianNoise, RandomRIR
 class Distorter(Chain):
     def __init__(self, hp: HParams, training: bool = False, mode: str = "enhancer"):
         # Lazy import
-        from .sox import RandomBandpassDistorter, RandomEqualizer, RandomLowpassDistorter, RandomOverdrive, RandomReverb
+        from .sox import (
+            RandomBandpassDistorter,
+            RandomEqualizer,
+            RandomLowpassDistorter,
+            RandomOverdrive,
+            RandomReverb,
+        )
 
         if training:
             permutation = Permutation(

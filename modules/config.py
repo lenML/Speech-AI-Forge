@@ -1,9 +1,9 @@
 import sys
 
 import torch
-from modules.utils.JsonObject import JsonObject
 
-from modules.utils import git, ffmpeg
+from modules.utils import ffmpeg, git
+from modules.utils.JsonObject import JsonObject
 
 # TODO impl RuntimeEnvVars() class
 runtime_env_vars = JsonObject({})

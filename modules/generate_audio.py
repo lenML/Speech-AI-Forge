@@ -1,18 +1,15 @@
+import gc
+import logging
+from typing import Union
+
 import numpy as np
 import torch
 
-from modules.speaker import Speaker
-from modules.utils.SeedContext import SeedContext
-
-from modules import models, config
-
-import logging
-import gc
-
+from modules import config, models
 from modules.devices import devices
-from typing import Union
-
+from modules.speaker import Speaker
 from modules.utils.cache import conditional_cache
+from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
 

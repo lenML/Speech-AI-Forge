@@ -30,7 +30,9 @@ class MelSpectrogram(nn.Module):
             norm="slaney",
             mel_scale="slaney",
         )
-        self.register_buffer("stft_magnitude_min", torch.FloatTensor([hp.stft_magnitude_min]))
+        self.register_buffer(
+            "stft_magnitude_min", torch.FloatTensor([hp.stft_magnitude_min])
+        )
         self.min_level_db = 20 * np.log10(hp.stft_magnitude_min)
         self.preemphasis = hp.preemphasis
         self.hop_size = hp.hop_size
@@ -50,7 +52,9 @@ class MelSpectrogram(nn.Module):
         mel = self.melspec(wav)
         mel = self._amp_to_db(mel)
         mel_normed = self._normalize(mel)
-        assert not pad or mel_normed.shape[-1] == 1 + wav.shape[-1] // self.hop_size  # Sanity check
+        assert (
+            not pad or mel_normed.shape[-1] == 1 + wav.shape[-1] // self.hop_size
+        )  # Sanity check
         mel_normed = mel_normed.to(device)
         return mel_normed  # (M, T)
 

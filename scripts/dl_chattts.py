@@ -1,6 +1,7 @@
 import os
-import sys
 import shutil
+import sys
+
 from scripts.ModelDownloader import ModelDownloader
 
 

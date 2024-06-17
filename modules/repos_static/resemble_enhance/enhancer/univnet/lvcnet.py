@@ -39,12 +39,18 @@ class KernelPredictor(torch.nn.Module):
         self.conv_kernel_size = conv_kernel_size
         self.conv_layers = conv_layers
 
-        kpnet_kernel_channels = conv_in_channels * conv_out_channels * conv_kernel_size * conv_layers  # l_w
+        kpnet_kernel_channels = (
+            conv_in_channels * conv_out_channels * conv_kernel_size * conv_layers
+        )  # l_w
         kpnet_bias_channels = conv_out_channels * conv_layers  # l_b
 
         self.input_conv = nn.Sequential(
-            weight_norm(nn.Conv1d(cond_channels, kpnet_hidden_channels, 5, padding=2, bias=True)),
-            getattr(nn, kpnet_nonlinear_activation)(**kpnet_nonlinear_activation_params),
+            weight_norm(
+                nn.Conv1d(cond_channels, kpnet_hidden_channels, 5, padding=2, bias=True)
+            ),
+            getattr(nn, kpnet_nonlinear_activation)(
+                **kpnet_nonlinear_activation_params
+            ),
         )
 
         self.residual_convs = nn.ModuleList()
@@ -62,7 +68,9 @@ class KernelPredictor(torch.nn.Module):
                             bias=True,
                         )
                     ),
-                    getattr(nn, kpnet_nonlinear_activation)(**kpnet_nonlinear_activation_params),
+                    getattr(nn, kpnet_nonlinear_activation)(
+                        **kpnet_nonlinear_activation_params
+                    ),
                     weight_norm(
                         nn.Conv1d(
                             kpnet_hidden_channels,
@@ -72,7 +80,9 @@ class KernelPredictor(torch.nn.Module):
                             bias=True,
                         )
                     ),
-                    getattr(nn, kpnet_nonlinear_activation)(**kpnet_nonlinear_activation_params),
+                    getattr(nn, kpnet_nonlinear_activation)(
+                        **kpnet_nonlinear_activation_params
+                    ),
                 )
             )
         self.kernel_conv = weight_norm(
@@ -165,7 +175,9 @@ class LVCBlock(torch.nn.Module):
         if downsampling:
             self.convt_pre = nn.Sequential(
                 nn.LeakyReLU(lReLU_slope),
-                weight_norm(nn.Conv1d(in_channels, in_channels, 2 * stride + 1, padding="same")),
+                weight_norm(
+                    nn.Conv1d(in_channels, in_channels, 2 * stride + 1, padding="same")
+                ),
                 nn.AvgPool1d(stride, stride),
             )
         else:
@@ -196,7 +208,15 @@ class LVCBlock(torch.nn.Module):
             self.conv_blocks.append(
                 nn.Sequential(
                     nn.LeakyReLU(lReLU_slope),
-                    weight_norm(nn.Conv1d(in_channels, in_channels, conv_kernel_size, dilation=d, padding="same")),
+                    weight_norm(
+                        nn.Conv1d(
+                            in_channels,
+                            in_channels,
+                            conv_kernel_size,
+                            dilation=d,
+                            padding="same",
+                        )
+                    ),
                     nn.LeakyReLU(lReLU_slope),
                 )
             )
@@ -260,8 +280,12 @@ class LVCBlock(torch.nn.Module):
         ), f"length of (x, kernel) is not matched, {in_length} != {kernel_length} * {hop_size}"
 
         padding = dilation * int((kernel_size - 1) / 2)
-        x = F.pad(x, (padding, padding), "constant", 0)  # (batch, in_channels, in_length + 2*padding)
-        x = x.unfold(2, hop_size + 2 * padding, hop_size)  # (batch, in_channels, kernel_length, hop_size + 2*padding)
+        x = F.pad(
+            x, (padding, padding), "constant", 0
+        )  # (batch, in_channels, in_length + 2*padding)
+        x = x.unfold(
+            2, hop_size + 2 * padding, hop_size
+        )  # (batch, in_channels, kernel_length, hop_size + 2*padding)
 
         if hop_size < dilation:
             x = F.pad(x, (0, dilation), "constant", 0)
@@ -269,8 +293,12 @@ class LVCBlock(torch.nn.Module):
             3, dilation, dilation
         )  # (batch, in_channels, kernel_length, (hop_size + 2*padding)/dilation, dilation)
         x = x[:, :, :, :, :hop_size]
-        x = x.transpose(3, 4)  # (batch, in_channels, kernel_length, dilation, (hop_size + 2*padding)/dilation)
-        x = x.unfold(4, kernel_size, 1)  # (batch, in_channels, kernel_length, dilation, _, kernel_size)
+        x = x.transpose(
+            3, 4
+        )  # (batch, in_channels, kernel_length, dilation, (hop_size + 2*padding)/dilation)
+        x = x.unfold(
+            4, kernel_size, 1
+        )  # (batch, in_channels, kernel_length, dilation, _, kernel_size)
 
         o = torch.einsum("bildsk,biokl->bolsd", x, kernel)
         o = o.to(memory_format=torch.channels_last_3d)

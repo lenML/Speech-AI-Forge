@@ -1,11 +1,9 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
+import fnmatch
 import logging
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
-import fnmatch
 
 
 def is_excluded(path, exclude_patterns):

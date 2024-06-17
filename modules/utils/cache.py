@@ -1,7 +1,7 @@
-from typing import Callable, TypeVar, Any
-from typing_extensions import ParamSpec
+from functools import _CacheInfo, lru_cache
+from typing import Any, Callable, TypeVar
 
-from functools import lru_cache, _CacheInfo
+from typing_extensions import ParamSpec
 
 
 def conditional_cache(maxsize: int, condition: Callable):

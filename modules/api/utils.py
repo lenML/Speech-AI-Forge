@@ -1,14 +1,10 @@
-from pydantic import BaseModel
 from typing import Any, Union
 
-
-from modules.speaker import speaker_mgr
-
-
-from modules.data import styles_mgr
-
+from pydantic import BaseModel
 from pydub import AudioSegment
 
+from modules.data import styles_mgr
+from modules.speaker import speaker_mgr
 from modules.ssml import merge_prompt
 
 
