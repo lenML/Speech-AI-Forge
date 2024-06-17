@@ -26,9 +26,37 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 ## <a name='OpenAIAPI:v1audiospeech'></a>OpenAI API: `v1/audio/speech`
 
-openai 接口比较简单，`input` 为必填项，其余均可为空。
+### 1. 语音合成 API
 
-一个简单的请求示例如下：
+#### Endpoint
+
+`POST /v1/audio/speech`
+
+#### 请求体
+
+| 参数名              | 类型     | 默认值         | 描述                                                                                |
+| ------------------- | -------- | -------------- | ----------------------------------------------------------------------------------- |
+| `input`             | `string` | **必填**       | 需要合成的文本                                                                      |
+| `model`             | `string` | `"chattts-4w"` | 模型名称                                                                            |
+| `voice`             | `string` | `"female2"`    | 语音类型                                                                            |
+| `response_format`   | `string` | `"mp3"`        | 响应音频格式，可选值：`mp3`, `wav`, `ogg`                                           |
+| `speed`             | `float`  | `1`            | 音频播放速度，范围是 `0.1` 到 `10`                                                  |
+| `seed`              | `int`    | `42`           | 随机种子                                                                            |
+| `temperature`       | `float`  | `0.3`          | 控制生成的温度参数                                                                  |
+| `top_k`             | `int`    | `20`           | 生成文本时考虑的最高概率词的数量                                                    |
+| `top_p`             | `float`  | `0.7`          | 生成文本时的累积概率阈值                                                            |
+| `style`             | `string` | `""`           | 风格                                                                                |
+| `batch_size`        | `int`    | `1`            | 是否开启 batch 合成，小于等于 1 表示不使用 batch 合成（不推荐），范围是 `1` 到 `20` |
+| `spliter_threshold` | `float`  | `100`          | 开启 batch 合成时，句子分割的阈值，范围是 `10` 到 `1024`                            |
+| `eos`               | `string` | `"[uv_break]"` | 句子结束标志                                                                        |
+| `enhance`           | `bool`   | `false`        | 是否启用增强功能                                                                    |
+| `denoise`           | `bool`   | `false`        | 是否启用降噪功能                                                                    |
+
+#### 响应
+
+返回一个音频文件，格式根据 `response_format` 参数确定。
+
+#### 示例
 
 ```bash
 curl http://localhost:7870/v1/audio/speech \
@@ -47,33 +75,97 @@ curl http://localhost:7870/v1/audio/speech \
 
 ## <a name='GoogleAPI:v1text:synthesize'></a>Google API: `/v1/text:synthesize`
 
-google 接口略复杂，但是某些时候用这个是必要的，因为这个接口将会返回 base64 格式的 audio
+### Endpoint
 
-一个简单的请求示例如下：
+`POST /v1/text:synthesize`
+
+### Description
+
+This endpoint synthesizes speech from text or SSML input using the Google Text-to-Speech API. It accepts various configuration parameters to customize the speech synthesis process. The API is designed to be compatible with Google's API while supporting additional parameters specific to this system.
+
+### Request Body
+
+| Field            | Type                   | Description                                                                                          |
+| ---------------- | ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `input`          | `SynthesisInput`       | Contains either `text` or `ssml` to be synthesized.                                                  |
+| `voice`          | `VoiceSelectionParams` | Specifies the voice parameters, including language code, speaker name, style, and other TTS options. |
+| `audioConfig`    | `AudioConfig`          | Specifies the audio configuration, such as encoding format, speaking rate, pitch, and volume gain.   |
+| `enhancerConfig` | `EnhancerConfig`       | (Optional) Additional configuration for audio enhancement.                                           |
+
+#### SynthesisInput
+
+| Field  | Type  | Description                       |
+| ------ | ----- | --------------------------------- |
+| `text` | `str` | The text input to be synthesized. |
+| `ssml` | `str` | The SSML input to be synthesized. |
+
+#### VoiceSelectionParams
+
+| Field          | Type    | Description                                         |
+| -------------- | ------- | --------------------------------------------------- |
+| `languageCode` | `str`   | The language code for the voice (default: "ZH-CN"). |
+| `name`         | `str`   | The name of the voice (default: "female2").         |
+| `style`        | `str`   | The style of the voice (default: "").               |
+| `temperature`  | `float` | The temperature for the TTS model (default: 0.3).   |
+| `topP`         | `float` | The topP value for the TTS model (default: 0.7).    |
+| `topK`         | `int`   | The topK value for the TTS model (default: 20).     |
+| `seed`         | `int`   | The seed value for inference (default: 42).         |
+| `eos`          | `str`   | The end-of-sentence marker (default: "[uv_break]"). |
+
+#### AudioConfig
+
+| Field              | Type          | Description                                               |
+| ------------------ | ------------- | --------------------------------------------------------- |
+| `audioEncoding`    | `AudioFormat` | The audio encoding format (default: `AudioFormat.mp3`).   |
+| `speakingRate`     | `float`       | The speaking rate (default: 1).                           |
+| `pitch`            | `float`       | The pitch (default: 0).                                   |
+| `volumeGainDb`     | `float`       | The volume gain in dB (default: 0).                       |
+| `sampleRateHertz`  | `int`         | The sample rate in Hertz (default: 24000).                |
+| `batchSize`        | `int`         | The batch size for inference (default: 4).                |
+| `spliterThreshold` | `int`         | The splitter threshold for text splitting (default: 100). |
+
+#### EnhancerConfig
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| ...   | ...  | ...         |
+
+### Response
+
+| Field          | Type  | Description                                        |
+| -------------- | ----- | -------------------------------------------------- |
+| `audioContent` | `str` | The base64-encoded audio content of the synthesis. |
+
+### Example CURL Request
 
 ```bash
-curl "http://localhost:7870/v1/text:synthesize" -X POST \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Content-Type: application/json; charset=utf-8" \
-  -d '{
-  "input": {
-    "text": "Hello, ChatTTS Forage Google Endpoint Test. [lbreak]"
-  },
-  "voice": {
-    "languageCode": "zh-CN",
-    "name": "female2",
-    "temperature": 0.3,
-    "topP": 0.7,
-    "topK": 20,
-    "seed": 42
-  },
-  "audioConfig": {
-    "audioEncoding": "mp3"
-  },
-  "enhancerConfig": {
-    "enabled": true
-  }
-}' -o response.json
+curl -X POST "http://localhost:7870/v1/text:synthesize" \
+    -H "Content-Type: application/json" \
+    -d '{
+        "input": {
+            "text": "Hello, this is a test."
+        },
+        "voice": {
+            "languageCode": "ZH-CN",
+            "name": "female2",
+            "style": "",
+            "temperature": 0.3,
+            "topP": 0.7,
+            "topK": 20,
+            "seed": 42,
+            "eos": "[uv_break]"
+        },
+        "audioConfig": {
+            "audioEncoding": "mp3",
+            "speakingRate": 1,
+            "pitch": 0,
+            "volumeGainDb": 0,
+            "sampleRateHertz": 24000,
+            "batchSize": 4,
+            "spliterThreshold": 100
+        },
+        "enhancerConfig": null
+    }'
 ```
 
 ## playground
