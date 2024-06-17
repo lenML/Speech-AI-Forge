@@ -1,4 +1,5 @@
 import copy
+import re
 from box import Box
 from pydub import AudioSegment
 from typing import List, Union
@@ -160,7 +161,21 @@ class SynthesizeSegments:
         for i in range(0, len(bucket), self.batch_size):
             batch = bucket[i : i + self.batch_size]
             param_arr = [self.segment_to_generate_params(segment) for segment in batch]
-            texts = [params.text + self.eos for params in param_arr]
+
+            def append_eos(text: str):
+                text = text.strip()
+                eos_arr = ["[uv_break]", "[v_break]", "[lbreak]", "[llbreak]"]
+                has_eos = False
+                for eos in eos_arr:
+                    if eos in text:
+                        has_eos = True
+                        break
+                if not has_eos:
+                    text += self.eos
+                return text
+
+            # 这里会添加 end_of_text 到 text 之后
+            texts = [append_eos(params.text) for params in param_arr]
 
             params = param_arr[0]
             audio_datas = generate_audio.generate_audio_batch(
@@ -234,6 +249,23 @@ class SynthesizeSegments:
                 )
                 ret_segments.append(seg)
                 setattr(seg, "_idx", len(ret_segments) - 1)
+
+        def is_none_speak_segment(segment: SSMLSegment):
+            text = segment.text.strip()
+            regexp = r"\[[^\]]+?\]"
+            text = re.sub(regexp, "", text)
+            text = text.strip()
+            if not text:
+                return True
+            return False
+
+        # 将 none_speak 合并到前一个 speak segment
+        for i in range(1, len(ret_segments)):
+            if is_none_speak_segment(ret_segments[i]):
+                ret_segments[i - 1].text += ret_segments[i].text
+                ret_segments[i].text = ""
+        # 移除空的 segment
+        ret_segments = [seg for seg in ret_segments if seg.text.strip()]
 
         return ret_segments
 

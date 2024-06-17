@@ -33,8 +33,6 @@ class AudioSpeechRequest(BaseModel):
     top_p: float = 0.7
 
     style: str = ""
-    # 是否开启batch合成，小于等于1表示不适用batch
-    # 开启batch合成会自动分割句子
     batch_size: int = Field(1, ge=1, le=20, description="Batch size")
     spliter_threshold: float = Field(
         100, ge=10, le=1024, description="Threshold for sentence spliter"
