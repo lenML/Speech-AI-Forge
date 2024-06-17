@@ -1,7 +1,6 @@
 name: "\U0001F646‍♂️ Any issues"
 description: Anything you talking.
 title: "[ISSUE] "
-assignees: zhzLuke96
 body:
   - type: markdown
     attributes:
