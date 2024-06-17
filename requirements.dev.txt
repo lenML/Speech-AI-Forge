@@ -33,7 +33,7 @@ filelock==3.14.0
 fonttools==4.53.0
 frozendict==2.4.4
 fsspec==2024.5.0
-gradio==4.29.0
+gradio==4.36.1
 gradio_client==0.16.1
 grpcio==1.64.1
 h11==0.14.0
