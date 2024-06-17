@@ -25,7 +25,7 @@ def speaker_editor_ui():
         spk: Speaker = Speaker.from_file(spk_file)
         spk.name = name
         spk.gender = gender
-        spk.desc = desc
+        spk.describe = desc
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp_file:
             torch.save(spk, tmp_file)
