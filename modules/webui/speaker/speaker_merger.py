@@ -38,12 +38,8 @@ def merge_spk(
     tensor_c = spk_to_tensor(spk_c)
     tensor_d = spk_to_tensor(spk_d)
 
-    assert (
-        tensor_a is not None
-        or tensor_b is not None
-        or tensor_c is not None
-        or tensor_d is not None
-    ), "At least one speaker should be selected"
+    if tensor_a is None and tensor_b is None and tensor_c is None and tensor_d is None:
+        raise gr.Error("At least one speaker should be selected")
 
     merge_tensor = torch.zeros_like(
         tensor_a
