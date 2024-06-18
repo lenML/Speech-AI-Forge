@@ -2,12 +2,49 @@
 
 <a name="0.6.1-rc"></a>
 
-## 0.6.1-rc (2024-06-13)
+## 0.6.1-rc (2024-06-17)
 
 ### Added
 
+- ✨ add &#x60;--preload_models&#x60; [[73a41e0](https://github.com/lenML/ChatTTS-Forge/commit/73a41e009cd4426dfe4b0a35325da68189966390)]
+- ✨ add webui progress [[778802d](https://github.com/lenML/ChatTTS-Forge/commit/778802ded12de340520f41a3e1bdb852f00bd637)]
+- ✨ add merger error [[51060bc](https://github.com/lenML/ChatTTS-Forge/commit/51060bc343a6308493b7d582e21dca62eacaa7cb)]
+- ✨ tts prompt &#x3D;&gt; experimental [[d3e6315](https://github.com/lenML/ChatTTS-Forge/commit/d3e6315a3cb8b1fa254cefb2efe2bae7c74a50f8)]
+- ✨ add 基本的 speaker finetune ui [[5f68f19](https://github.com/lenML/ChatTTS-Forge/commit/5f68f193e78f470bd2c3ca4b9fa1008cf809e753)]
+- ✨ add speaker finetune [[5ce27ed](https://github.com/lenML/ChatTTS-Forge/commit/5ce27ed7e4da6c96bb3fd016b8b491768faf319d)]
+- ✨ add &#x60;--ino_half&#x60; remove &#x60;--half&#x60; [[5820e57](https://github.com/lenML/ChatTTS-Forge/commit/5820e576b288df50b929fbdfd9d0d6b6f548b54e)]
+- ✨ add webui podcast 默认值 [[dd786a8](https://github.com/lenML/ChatTTS-Forge/commit/dd786a83733a71d005ff7efe6312e35d652b2525)]
 - ✨ add webui 分割器配置 [[589327b](https://github.com/lenML/ChatTTS-Forge/commit/589327b729188d1385838816b9807e894eb128b0)]
 - ✨ add &#x60;eos&#x60; params to all api [[79c994f](https://github.com/lenML/ChatTTS-Forge/commit/79c994fadf7d60ea432b62f4000b62b67efe7259)]
+
+### Changed
+
+- 🎨 run formatter [[8c267e1](https://github.com/lenML/ChatTTS-Forge/commit/8c267e151152fe2090528104627ec031453d4ed5)]
+- ⚡ Optimize &#x60;audio_data_to_segment&#x60; [#57](https://github.com/lenML/ChatTTS-Forge/issues/57) [[d33809c](https://github.com/lenML/ChatTTS-Forge/commit/d33809c60a3ac76a01f71de4fd26b315d066c8d3)]
+- ⚡ map_location&#x3D;&quot;cpu&quot; [[0f58c10](https://github.com/lenML/ChatTTS-Forge/commit/0f58c10a445efaa9829f862acb4fb94bc07f07bf)]
+- ⚡ colab use default GPU [[c7938ad](https://github.com/lenML/ChatTTS-Forge/commit/c7938adb6d3615f37210b1f3cbe4671f93d58285)]
+- ⚡ improve hf calling [[2dde612](https://github.com/lenML/ChatTTS-Forge/commit/2dde6127906ce6e77a970b4cd96e68f7a5417c6a)]
+- 🍱 add &#x60;bob_ft10.pt&#x60; [[9eee965](https://github.com/lenML/ChatTTS-Forge/commit/9eee965425a7d6640eba22d843db4975dd3e355a)]
+- ⚡ enhance SynthesizeSegments [[0bb4dd7](https://github.com/lenML/ChatTTS-Forge/commit/0bb4dd7676c38249f10bf0326174ff8b74b2abae)]
+- 🍱 add &#x60;bob_ft10.pt&#x60; [[bef1b02](https://github.com/lenML/ChatTTS-Forge/commit/bef1b02435c39830612b18738bb31ac48e340fc6)]
+- ♻️ refactor api [[671fcc3](https://github.com/lenML/ChatTTS-Forge/commit/671fcc38a570d0cb7de0a214d318281084c9608c)]
+- ⚡ improve xtts_v2 api [[206fabc](https://github.com/lenML/ChatTTS-Forge/commit/206fabc76f1dbad261c857cb02f8c99c21e99eef)]
+- ⚡ train text &#x3D;&gt; just text [[e2037e0](https://github.com/lenML/ChatTTS-Forge/commit/e2037e0f97f15ff560fce14bbdc3926e3261bff9)]
+- ⚡ improve TN [[a0069ed](https://github.com/lenML/ChatTTS-Forge/commit/a0069ed2d0c3122444e873fb13b9922f9ab88a79)]
+
+### Fixed
+
+- 🐛 fix webui speaker_editor missing &#x60;describe&#x60; [[2a2a36d](https://github.com/lenML/ChatTTS-Forge/commit/2a2a36d62d8f253fc2e17ccc558038dbcc99d1ee)]
+- 💚 Dependabot alerts [[f501860](https://github.com/lenML/ChatTTS-Forge/commit/f5018607f602769d4dda7aa00573b9a06e659d91)]
+- 🐛 fix &#x60;numpy&lt;2&#x60; [#50](https://github.com/lenML/ChatTTS-Forge/issues/50) [[e4fea4f](https://github.com/lenML/ChatTTS-Forge/commit/e4fea4f80b31d962f02cd1146ce8c73bf75b6a39)]
+- 🐛 fix Box() index [#49](https://github.com/lenML/ChatTTS-Forge/issues/49) add testcase [[d982e33](https://github.com/lenML/ChatTTS-Forge/commit/d982e33ed30749d7ae6570ade5ec7b560a3d1f06)]
+- 🐛 fix Box() index [#49](https://github.com/lenML/ChatTTS-Forge/issues/49) [[1788318](https://github.com/lenML/ChatTTS-Forge/commit/1788318a96c014a53ee41c4db7d60fdd4b15cfca)]
+- 🐛 fix &#x60;--use_cpu&#x60; [#47](https://github.com/lenML/ChatTTS-Forge/issues/47) update conftest [[4095b08](https://github.com/lenML/ChatTTS-Forge/commit/4095b085c4c6523f2579e00edfb1569d65608ca2)]
+- 🐛 fix &#x60;--use_cpu&#x60; [#47](https://github.com/lenML/ChatTTS-Forge/issues/47) [[221962f](https://github.com/lenML/ChatTTS-Forge/commit/221962fd0f61d3f269918b26a814cbcd5aabd1f0)]
+- 🐛 fix webui speaker args [[3b3c331](https://github.com/lenML/ChatTTS-Forge/commit/3b3c3311dd0add0e567179fc38223a3cc5e56f6e)]
+- 🐛 fix speaker trainer [[52d473f](https://github.com/lenML/ChatTTS-Forge/commit/52d473f37f6a3950d4c8738c294f048f11198776)]
+- 🐛 兼容 win32 [[7ffa37f](https://github.com/lenML/ChatTTS-Forge/commit/7ffa37f3d36fb9ba53ab051b2fce6229920b1208)]
+- 🐛 fix google api ssml synthesize [#43](https://github.com/lenML/ChatTTS-Forge/issues/43) [[1566f88](https://github.com/lenML/ChatTTS-Forge/commit/1566f8891c22d63681d756deba70374e2b75d078)]
 
 <a name="0.6.0"></a>
 
