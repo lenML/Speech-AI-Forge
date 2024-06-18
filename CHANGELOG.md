@@ -1,8 +1,7 @@
 # Changelog
 
-<a name="0.6.1-rc"></a>
-
-## 0.6.1-rc (2024-06-17)
+<a name="0.6.1"></a>
+## 0.6.1 (2024-06-18)
 
 ### Added
 
@@ -19,6 +18,7 @@
 
 ### Changed
 
+- ⬆️ Bump urllib3 from 2.2.1 to 2.2.2 [[097c15b](https://github.com/lenML/ChatTTS-Forge/commit/097c15ba56f8197a4f26adcfb77336a70e5ed806)]
 - 🎨 run formatter [[8c267e1](https://github.com/lenML/ChatTTS-Forge/commit/8c267e151152fe2090528104627ec031453d4ed5)]
 - ⚡ Optimize &#x60;audio_data_to_segment&#x60; [#57](https://github.com/lenML/ChatTTS-Forge/issues/57) [[d33809c](https://github.com/lenML/ChatTTS-Forge/commit/d33809c60a3ac76a01f71de4fd26b315d066c8d3)]
 - ⚡ map_location&#x3D;&quot;cpu&quot; [[0f58c10](https://github.com/lenML/ChatTTS-Forge/commit/0f58c10a445efaa9829f862acb4fb94bc07f07bf)]
@@ -45,6 +45,19 @@
 - 🐛 fix speaker trainer [[52d473f](https://github.com/lenML/ChatTTS-Forge/commit/52d473f37f6a3950d4c8738c294f048f11198776)]
 - 🐛 兼容 win32 [[7ffa37f](https://github.com/lenML/ChatTTS-Forge/commit/7ffa37f3d36fb9ba53ab051b2fce6229920b1208)]
 - 🐛 fix google api ssml synthesize [#43](https://github.com/lenML/ChatTTS-Forge/issues/43) [[1566f88](https://github.com/lenML/ChatTTS-Forge/commit/1566f8891c22d63681d756deba70374e2b75d078)]
+
+### Miscellaneous
+
+-  Merge pull request [#58](https://github.com/lenML/ChatTTS-Forge/issues/58) from lenML/dependabot/pip/urllib3-2.2.2 [[f259f18](https://github.com/lenML/ChatTTS-Forge/commit/f259f180af57f9a6938b14bf263d0387b6900e57)]
+- 📝 update changelog [[b9da7ec](https://github.com/lenML/ChatTTS-Forge/commit/b9da7ec1afed416a825e9e4a507b8263f69bf47e)]
+- 📝 update [[8439437](https://github.com/lenML/ChatTTS-Forge/commit/84394373de66b81a9f7f70ef8484254190e292ab)]
+- 📝 update [[ef97206](https://github.com/lenML/ChatTTS-Forge/commit/ef972066558d0b229d6d0b3d83bb4f8e8517558f)]
+- 📝 improve readme.md [[7bf3de2](https://github.com/lenML/ChatTTS-Forge/commit/7bf3de2afb41b9a29071bec18ee6306ce8e70183)]
+- 📝 add bug report forms [[091cf09](https://github.com/lenML/ChatTTS-Forge/commit/091cf0958a719236c77107acf4cfb8c0ba090946)]
+- 📝 update changelog [[3d519ec](https://github.com/lenML/ChatTTS-Forge/commit/3d519ec8a20098c2de62631ae586f39053dd89a5)]
+- 📝 update [[66963f8](https://github.com/lenML/ChatTTS-Forge/commit/66963f8ff8f29c298de64cd4a54913b1d3e29a6a)]
+- 📝 update [[b7a63b5](https://github.com/lenML/ChatTTS-Forge/commit/b7a63b59132d2c8dbb4ad2e15bd23713f00f0084)]
+
 
 <a name="0.6.0"></a>
 
