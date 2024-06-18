@@ -2,12 +2,6 @@ import logging
 import os
 import sys
 
-from modules.api.api_setup import (
-    process_api_args,
-    process_model_args,
-    setup_api_args,
-    setup_model_args,
-)
 from modules.ffmpeg_env import setup_ffmpeg_path
 
 try:
@@ -22,6 +16,12 @@ except BaseException:
 import argparse
 
 from modules import config
+from modules.api.api_setup import (
+    process_api_args,
+    process_model_args,
+    setup_api_args,
+    setup_model_args,
+)
 from modules.api.app_config import app_description, app_title, app_version
 from modules.gradio_dcls_fix import dcls_patch
 from modules.utils.env import get_and_update_env
