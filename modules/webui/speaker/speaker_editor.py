@@ -11,14 +11,15 @@ from modules.webui.webui_utils import tts_generate
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def test_spk_voice(spk_file, text: str):
+def test_spk_voice(
+    spk_file,
+    text: str,
+    progress=gr.Progress(track_tqdm=True),
+):
     if spk_file == "" or spk_file is None:
         return None
     spk = Speaker.from_file(spk_file)
-    return tts_generate(
-        spk=spk,
-        text=text,
-    )
+    return tts_generate(spk=spk, text=text, progress=progress)
 
 
 def speaker_editor_ui():

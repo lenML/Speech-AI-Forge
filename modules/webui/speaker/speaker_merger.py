@@ -77,7 +77,16 @@ def merge_spk(
 @torch.inference_mode()
 @spaces.GPU(duration=120)
 def merge_and_test_spk_voice(
-    spk_a, spk_a_w, spk_b, spk_b_w, spk_c, spk_c_w, spk_d, spk_d_w, test_text
+    spk_a,
+    spk_a_w,
+    spk_b,
+    spk_b_w,
+    spk_c,
+    spk_c_w,
+    spk_d,
+    spk_d_w,
+    test_text,
+    progress=gr.Progress(track_tqdm=True),
 ):
     merged_spk = merge_spk(
         spk_a,
@@ -89,10 +98,7 @@ def merge_and_test_spk_voice(
         spk_d,
         spk_d_w,
     )
-    return tts_generate(
-        spk=merged_spk,
-        text=test_text,
-    )
+    return tts_generate(spk=merged_spk, text=test_text, progress=progress)
 
 
 @torch.inference_mode()

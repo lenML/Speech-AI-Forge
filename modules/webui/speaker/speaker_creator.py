@@ -77,11 +77,12 @@ def create_spk_from_seed(
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def test_spk_voice(seed: int, text: str):
-    return tts_generate(
-        spk=seed,
-        text=text,
-    )
+def test_spk_voice(
+    seed: int,
+    text: str,
+    progress=gr.Progress(track_tqdm=True),
+):
+    return tts_generate(spk=seed, text=text, progress=progress)
 
 
 def random_speaker():
