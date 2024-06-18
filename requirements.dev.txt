@@ -149,7 +149,7 @@ typer==0.12.3
 typing_extensions==4.12.0
 tzdata==2024.1
 ujson==5.10.0
-urllib3==2.2.1
+urllib3==2.2.2
 uvicorn==0.30.0
 uvloop==0.19.0
 vector-quantize-pytorch==1.14.24
