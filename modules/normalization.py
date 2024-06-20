@@ -3,7 +3,10 @@ from functools import lru_cache
 
 import emojiswitch
 
+from typing import Literal
+
 from modules import models
+from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.markdown import markdown_to_text
 from modules.utils.zh_normalization.text_normlization import *
 
@@ -26,7 +29,7 @@ def is_eng(text):
 
 
 @lru_cache(maxsize=64)
-def guess_lang(text):
+def guess_lang(text) -> Literal["zh", "en"]:
     if is_chinese(text):
         return "zh"
     if is_eng(text):
@@ -182,6 +185,17 @@ def replace_unk_tokens(text):
     replaced_chars = [char if char in vocab_set else " , " for char in text]
     output_text = "".join(replaced_chars)
     return output_text
+
+
+homo_replacer = HomophonesReplacer(map_file_path="./data/homophones_map.json")
+
+
+@post_normalize()
+def replace_homophones(text):
+    lang = guess_lang(text)
+    if lang == "zh":
+        text = homo_replacer.replace(text)
+    return text
 
 
 ## ---------- pre normalize ----------
