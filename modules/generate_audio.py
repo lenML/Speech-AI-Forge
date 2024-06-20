@@ -130,7 +130,7 @@ def generate_audio_batch(
 
     with SeedContext(infer_seed, True):
         wavs = chat_tts.generate_audio(
-            texts=texts, params_infer_code=params_infer_code, use_decoder=use_decoder
+            prompt=texts, params_infer_code=params_infer_code, use_decoder=use_decoder
         )
 
     if config.auto_gc:
