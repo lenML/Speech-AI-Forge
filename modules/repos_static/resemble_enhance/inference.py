@@ -188,7 +188,7 @@ def inference(
         torch.cuda.synchronize()
 
     elapsed_time = time.perf_counter() - start_time
-    logger.info(
+    logger.debug(
         f"Elapsed time: {elapsed_time:.3f} s, {hwav.shape[-1] / elapsed_time / 1000:.3f} kHz"
     )
     devices.torch_gc()
