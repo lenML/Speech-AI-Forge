@@ -1,4 +1,5 @@
 import copy
+import io
 import json
 import logging
 import re
@@ -7,6 +8,7 @@ from typing import List, Union
 import numpy as np
 from box import Box
 from pydub import AudioSegment
+from scipy.io import wavfile
 
 from modules import generate_audio
 from modules.api.utils import calc_spk_style
@@ -20,10 +22,34 @@ from modules.utils.audio import pitch_shift, time_stretch
 logger = logging.getLogger(__name__)
 
 
+def audio_data_to_segment_slow(audio_data, sr):
+    byte_io = io.BytesIO()
+    wavfile.write(byte_io, rate=sr, data=audio_data)
+    byte_io.seek(0)
+
+    return AudioSegment.from_file(byte_io, format="wav")
+
+
+def clip_audio(audio_data: np.ndarray, threshold: float = 0.99):
+    audio_data = np.clip(audio_data, -threshold, threshold)
+    return audio_data
+
+
+def normalize_audio(audio_data: np.ndarray, norm_factor: float = 0.8):
+    max_amplitude = np.max(np.abs(audio_data))
+    if max_amplitude > 0:
+        audio_data = audio_data / max_amplitude * norm_factor
+    return audio_data
+
+
 def audio_data_to_segment(audio_data: np.ndarray, sr: int):
     """
     optimize: https://github.com/lenML/ChatTTS-Forge/issues/57
     """
+
+    audio_data = normalize_audio(audio_data)
+    audio_data = clip_audio(audio_data)
+
     audio_data = (audio_data * 32767).astype(np.int16)
     audio_segment = AudioSegment(
         audio_data.tobytes(),
