@@ -294,22 +294,16 @@ class Chat:
         params_refine_text={},
         params_infer_code={"prompt": "[speed_5]"},
         use_decoder=True,
-        do_text_normalization=True,
-        lang=None,
         stream=False,
-        do_homophone_replacement=True,
     ):
         res_gen = self._infer(
-            text,
-            skip_refine_text,
-            refine_text_only,
-            params_refine_text,
-            params_infer_code,
-            use_decoder,
-            do_text_normalization,
-            lang,
-            stream,
-            do_homophone_replacement,
+            text=text,
+            skip_refine_text=skip_refine_text,
+            refine_text_only=refine_text_only,
+            params_refine_text=params_refine_text,
+            params_infer_code=params_infer_code,
+            use_decoder=use_decoder,
+            stream=stream,
         )
         if stream:
             return res_gen
@@ -318,7 +312,7 @@ class Chat:
 
     def refiner_prompt(self, text, params_refine_text={}, stream=False):
         return self.infer(
-            text,
+            text=text,
             skip_refine_text=False,
             refine_text_only=True,
             params_refine_text=params_refine_text,
