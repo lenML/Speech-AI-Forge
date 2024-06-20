@@ -143,9 +143,12 @@ class Chat:
             gpt.load_state_dict(torch.load(gpt_ckpt_path, map_location=map_location))
             if compile and "cuda" in str(device):
                 self.logger.info("compile gpt model")
-                gpt.gpt.forward = torch.compile(
-                    gpt.gpt.forward, backend="inductor", dynamic=True
-                )
+                try:
+                    gpt.gpt.forward = torch.compile(
+                        gpt.gpt.forward, backend="inductor", dynamic=True
+                    )
+                except RuntimeError as e:
+                    logging.warning(f"Compile failed,{e}. fallback to normal mode.")
             self.pretrain_models["gpt"] = gpt
             spk_stat_path = os.path.join(os.path.dirname(gpt_ckpt_path), "spk_stat.pt")
             assert os.path.exists(
