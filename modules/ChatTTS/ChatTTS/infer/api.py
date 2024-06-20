@@ -17,6 +17,7 @@ def infer_code(
     prompt1="",
     prompt2="",
     prefix="",
+    stream=False,
     **kwargs,
 ):
 
@@ -83,6 +84,7 @@ def infer_code(
         eos_token=num_code,
         max_new_token=max_new_token,
         infer_text=False,
+        stream=stream,
         **kwargs,
     )
 
@@ -98,6 +100,7 @@ def refine_text(
     repetition_penalty=1.0,
     max_new_token=384,
     prompt="",
+    stream=False,
     **kwargs,
 ):
     device = next(models["gpt"].parameters()).device
@@ -152,6 +155,7 @@ def refine_text(
         )[None],
         max_new_token=max_new_token,
         infer_text=True,
+        stream=stream,
         **kwargs,
     )
     return result

@@ -1,6 +1,7 @@
 import logging
 import os
 
+import numpy as np
 import torch
 from huggingface_hub import snapshot_download
 from omegaconf import OmegaConf
@@ -173,7 +174,7 @@ class Chat:
 
         self.check_model()
 
-    def infer(
+    def _infer(
         self,
         text,
         skip_refine_text=False,
@@ -181,6 +182,8 @@ class Chat:
         params_refine_text={},
         params_infer_code={"prompt": "[speed_5]"},
         use_decoder=True,
+        stream=False,
+        stream_text=False,
     ):
 
         assert self.check_model(use_decoder=use_decoder)
@@ -200,113 +203,142 @@ class Chat:
                 text[i] = apply_character_map(t)
 
         if not skip_refine_text:
-            text_tokens = refine_text(self.pretrain_models, text, **params_refine_text)[
-                "ids"
-            ]
+            text_tokens_gen = refine_text(
+                self.pretrain_models, text, stream=stream, **params_refine_text
+            )
 
-            text_tokens = [
-                i[
-                    i
-                    < self.pretrain_models["tokenizer"].convert_tokens_to_ids(
-                        "[break_0]"
-                    )
+            def decode_text(text_tokens):
+                text_tokens = [
+                    i[
+                        i
+                        < self.pretrain_models["tokenizer"].convert_tokens_to_ids(
+                            "[break_0]"
+                        )
+                    ]
+                    for i in text_tokens
                 ]
-                for i in text_tokens
-            ]
-            text = self.pretrain_models["tokenizer"].batch_decode(text_tokens)
-
-            if refine_text_only:
+                text = self.pretrain_models["tokenizer"].batch_decode(text_tokens)
                 return text
+
+            if stream_text:
+                for result in text_tokens_gen:
+                    text_incomplete = decode_text(result["ids"])
+                    if refine_text_only and stream:
+                        yield text_incomplete
+                    if refine_text_only:
+                        return
+            else:
+                result = next(text_tokens_gen)
+                text = decode_text(result["ids"])
+                if refine_text_only:
+                    yield text
+            if refine_text_only:
+                return
 
         text = [params_infer_code.get("prompt", "") + i for i in text]
         params_infer_code.pop("prompt", "")
-        result = infer_code(
-            self.pretrain_models, text, **params_infer_code, return_hidden=use_decoder
+        result_gen = infer_code(
+            self.pretrain_models,
+            text,
+            **params_infer_code,
+            return_hidden=use_decoder,
+            stream=stream,
         )
-
         if use_decoder:
-            mel_spec = [
-                self.pretrain_models["decoder"](i[None].permute(0, 2, 1))
-                for i in result["hiddens"]
-            ]
+            field = "hiddens"
+            docoder_name = "decoder"
         else:
-            mel_spec = [
-                self.pretrain_models["dvae"](i[None].permute(0, 2, 1))
-                for i in result["ids"]
-            ]
+            field = "ids"
+            docoder_name = "dvae"
+        vocos_decode = lambda spec: [
+            self.pretrain_models["vocos"]
+            .decode(i.cpu() if torch.backends.mps.is_available() else i)
+            .cpu()
+            .numpy()
+            for i in spec
+        ]
+        if stream:
 
-        wav = [self.pretrain_models["vocos"].decode(i).cpu().numpy() for i in mel_spec]
+            length = 0
+            for result in result_gen:
+                chunk_data = result[field][0]
+                assert len(result[field]) == 1
+                start_seek = length
+                length = len(chunk_data)
+                self.logger.debug(
+                    f"{start_seek=} total len: {length}, new len: {length - start_seek = }"
+                )
+                chunk_data = chunk_data[start_seek:]
+                if not len(chunk_data):
+                    continue
+                self.logger.debug(f"new hidden {len(chunk_data)=}")
+                mel_spec = [
+                    self.pretrain_models[docoder_name](i[None].permute(0, 2, 1))
+                    for i in [chunk_data]
+                ]
+                wav = vocos_decode(mel_spec)
+                self.logger.debug(f"yield wav chunk {len(wav[0])=} {len(wav[0][0])=}")
+                yield wav
+            return
+        mel_spec = [
+            self.pretrain_models[docoder_name](i[None].permute(0, 2, 1))
+            for i in next(result_gen)[field]
+        ]
+        yield vocos_decode(mel_spec)
 
-        return wav
-
-    def refiner_prompt(
+    def infer(
         self,
         text,
+        skip_refine_text=False,
+        refine_text_only=False,
         params_refine_text={},
-    ) -> str:
+        params_infer_code={"prompt": "[speed_5]"},
+        use_decoder=True,
+        do_text_normalization=True,
+        lang=None,
+        stream=False,
+        do_homophone_replacement=True,
+    ):
+        res_gen = self._infer(
+            text,
+            skip_refine_text,
+            refine_text_only,
+            params_refine_text,
+            params_infer_code,
+            use_decoder,
+            do_text_normalization,
+            lang,
+            stream,
+            do_homophone_replacement,
+        )
+        if stream:
+            return res_gen
+        else:
+            return next(res_gen)
 
-        # assert self.check_model(use_decoder=False)
-
-        if not isinstance(text, list):
-            text = [text]
-
-        for i, t in enumerate(text):
-            reserved_tokens = self.pretrain_models[
-                "tokenizer"
-            ].additional_special_tokens
-            invalid_characters = count_invalid_characters(t, reserved_tokens)
-            if len(invalid_characters):
-                self.logger.log(
-                    logging.WARNING, f"Invalid characters found! : {invalid_characters}"
-                )
-                text[i] = apply_character_map(t)
-
-        text_tokens = refine_text(self.pretrain_models, text, **params_refine_text)[
-            "ids"
-        ]
-        text_tokens = [
-            i[i < self.pretrain_models["tokenizer"].convert_tokens_to_ids("[break_0]")]
-            for i in text_tokens
-        ]
-        text = self.pretrain_models["tokenizer"].batch_decode(text_tokens)
-
-        return text[0]
+    def refiner_prompt(self, text, params_refine_text={}, stream=False):
+        return self.infer(
+            text,
+            skip_refine_text=False,
+            refine_text_only=True,
+            params_refine_text=params_refine_text,
+            stream=stream,
+        )
 
     def generate_audio(
         self,
         prompt,
         params_infer_code={"prompt": "[speed_5]"},
         use_decoder=True,
-    ) -> list:
-
-        # assert self.check_model(use_decoder=use_decoder)
-
-        if not isinstance(prompt, list):
-            prompt = [prompt]
-
-        prompt = [params_infer_code.get("prompt", "") + i for i in prompt]
-        params_infer_code.pop("prompt", "")
-        result = infer_code(
-            self.pretrain_models,
+        stream=False,
+    ):
+        return self.infer(
             prompt,
-            return_hidden=use_decoder,
-            **params_infer_code,
+            skip_refine_text=True,
+            params_infer_code=params_infer_code,
+            use_decoder=use_decoder,
+            stream=stream,
         )
-
-        if use_decoder:
-            mel_spec = [
-                self.pretrain_models["decoder"](i[None].permute(0, 2, 1))
-                for i in result["hiddens"]
-            ]
-        else:
-            mel_spec = [
-                self.pretrain_models["dvae"](i[None].permute(0, 2, 1))
-                for i in result["ids"]
-            ]
-
-        wav = [self.pretrain_models["vocos"].decode(i).cpu().numpy() for i in mel_spec]
-
-        return wav
 
     def sample_random_speaker(
         self,

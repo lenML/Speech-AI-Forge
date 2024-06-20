@@ -1,3 +1,4 @@
+from typing import Generator
 import numpy as np
 import torch
 
@@ -31,4 +32,10 @@ def refine_text(
                 "disable_tqdm": config.runtime_env_vars.off_tqdm,
             },
         )
+        if isinstance(refined_text, Generator):
+            raise NotImplementedError(
+                "Refiner is not yet implemented for generator output"
+            )
+        if isinstance(refined_text, list):
+            refined_text = "\n".join(refined_text)
         return refined_text

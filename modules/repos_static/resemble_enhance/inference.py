@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.nn.utils.parametrize import remove_parametrizations
 from torchaudio.functional import resample
 from torchaudio.transforms import MelSpectrogram
-from tqdm import trange
+from functools import partial
 
 from modules import config
 from modules.devices import devices
@@ -142,10 +142,10 @@ def inference(
     chunk_seconds: float = 30.0,
     overlap_seconds: float = 1.0,
 ):
+    from tqdm import trange
+
     if config.runtime_env_vars.off_tqdm:
-        trange = range
-    else:
-        from tqdm import trange
+        trange = partial(trange, disable=True)
 
     remove_weight_norm_recursively(model)
 
