@@ -10,6 +10,41 @@ class APIClient {
     });
   }
 
+  synthesizeTTSUrl({
+    text,
+    spk = "female2",
+    style = "chat",
+    temperature = 0.3,
+    top_p = 0.7,
+    top_k = 20,
+    seed = 34060637,
+    format = "mp3",
+    prompt1 = "",
+    prompt2 = "",
+    prefix = "",
+    bs = 8,
+    thr = 100,
+    stream = false,
+  }) {
+    const params = new URLSearchParams({
+      text,
+      spk,
+      style,
+      temperature,
+      top_p,
+      top_k,
+      seed,
+      format,
+      prompt1,
+      prompt2,
+      prefix,
+      bs,
+      thr,
+      stream,
+    });
+    return `${this.client.defaults.baseURL}v1/tts?${params.toString()}`;
+  }
+
   async synthesizeTTS({
     text,
     spk = "female2",
