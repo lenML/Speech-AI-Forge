@@ -195,12 +195,14 @@ class Chat:
             reserved_tokens = self.pretrain_models[
                 "tokenizer"
             ].additional_special_tokens
-            invalid_characters = count_invalid_characters(t, reserved_tokens)
+            invalid_characters = count_invalid_characters(
+                t, reserved_tokens=reserved_tokens
+            )
             if len(invalid_characters):
                 self.logger.log(
                     logging.WARNING, f"Invalid characters found! : {invalid_characters}"
                 )
-                text[i] = apply_character_map(t)
+                text[i] = apply_character_map(t, reserved_tokens=reserved_tokens)
 
         if not skip_refine_text:
             text_tokens_gen = refine_text(

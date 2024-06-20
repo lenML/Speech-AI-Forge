@@ -146,11 +146,35 @@ halfwidth_2_fullwidth_map = {
 }
 
 
-def apply_half2full_map(text):
-    translation_table = str.maketrans(halfwidth_2_fullwidth_map)
-    return text.translate(translation_table)
+def replace_unsupported_chars(text, replace_dict, reserved_tokens: list = []):
+    escaped_tokens = [re.escape(token) for token in reserved_tokens]
+    special_tokens_pattern = "|".join(escaped_tokens)
+    tokens = re.split(f"({special_tokens_pattern})", text)
+
+    def replace_chars(segment):
+        for old_char, new_char in replace_dict.items():
+            segment = segment.replace(old_char, new_char)
+        return segment
+
+    result = "".join(
+        (
+            replace_chars(segment)
+            if not re.match(special_tokens_pattern, segment)
+            else segment
+        )
+        for segment in tokens
+    )
+
+    return result
 
 
-def apply_character_map(text):
-    translation_table = str.maketrans(character_map)
-    return text.translate(translation_table)
+def apply_half2full_map(text, reserved_tokens: list = []):
+    return replace_unsupported_chars(
+        text, halfwidth_2_fullwidth_map, reserved_tokens=reserved_tokens
+    )
+
+
+def apply_character_map(text, reserved_tokens: list = []):
+    return replace_unsupported_chars(
+        text, character_map, reserved_tokens=reserved_tokens
+    )
