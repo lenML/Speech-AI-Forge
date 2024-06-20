@@ -10,6 +10,10 @@ from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
 from modules.api.impl.model.enhancer_model import EnhancerConfig
 from modules.speaker import Speaker
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class TTSParams(BaseModel):
     text: str = Query(..., description="Text to synthesize")
@@ -43,6 +47,8 @@ class TTSParams(BaseModel):
     speed: float = Query(1.0, description="Speed of the audio")
     pitch: float = Query(0, description="Pitch of the audio")
     volume_gain: float = Query(0, description="Volume gain of the audio")
+
+    stream: bool = Query(False, description="Stream the audio")
 
 
 async def synthesize_tts(params: TTSParams = Depends()):
@@ -132,14 +138,22 @@ async def synthesize_tts(params: TTSParams = Depends()):
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
         )
-
-        buffer = handler.enqueue_to_buffer(format=AudioFormat(params.format))
-
         media_type = f"audio/{params.format}"
         if params.format == "mp3":
             media_type = "audio/mpeg"
-        return StreamingResponse(buffer, media_type=media_type)
 
+        if params.stream:
+            if infer_config.batch_size != 1:
+                # 流式生成下仅支持 batch size 为 1，当前请求参数将被忽略
+                logger.warning(
+                    f"Batch size {infer_config.batch_size} is not supported in streaming mode, will set to 1"
+                )
+
+            buffer_gen = handler.enqueue_to_stream(format=AudioFormat(params.format))
+            return StreamingResponse(buffer_gen, media_type=media_type)
+        else:
+            buffer = handler.enqueue_to_buffer(format=AudioFormat(params.format))
+            return StreamingResponse(buffer, media_type=media_type)
     except Exception as e:
         import logging
 

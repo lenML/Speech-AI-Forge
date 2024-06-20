@@ -1,17 +1,20 @@
 import gc
 import logging
-from typing import Union
+from typing import Generator, Union
 
 import numpy as np
 import torch
 
 from modules import config, models
+from modules.ChatTTS import ChatTTS
 from modules.devices import devices
 from modules.speaker import Speaker
 from modules.utils.cache import conditional_cache
 from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
+
+SAMPLE_RATE = 24000
 
 
 def generate_audio(
@@ -42,20 +45,18 @@ def generate_audio(
     return (sample_rate, wav)
 
 
-@torch.inference_mode()
-def generate_audio_batch(
+def parse_infer_params(
     texts: list[str],
+    chat_tts: ChatTTS.Chat,
     temperature: float = 0.3,
     top_P: float = 0.7,
     top_K: float = 20,
     spk: Union[int, Speaker] = -1,
     infer_seed: int = -1,
-    use_decoder: bool = True,
     prompt1: str = "",
     prompt2: str = "",
     prefix: str = "",
 ):
-    chat_tts = models.load_chat_tts()
     params_infer_code = {
         "spk_emb": None,
         "temperature": temperature,
@@ -97,18 +98,93 @@ def generate_audio_batch(
         }
     )
 
+    return params_infer_code
+
+
+@torch.inference_mode()
+def generate_audio_batch(
+    texts: list[str],
+    temperature: float = 0.3,
+    top_P: float = 0.7,
+    top_K: float = 20,
+    spk: Union[int, Speaker] = -1,
+    infer_seed: int = -1,
+    use_decoder: bool = True,
+    prompt1: str = "",
+    prompt2: str = "",
+    prefix: str = "",
+):
+    chat_tts = models.load_chat_tts()
+    params_infer_code = parse_infer_params(
+        texts=texts,
+        chat_tts=chat_tts,
+        temperature=temperature,
+        top_P=top_P,
+        top_K=top_K,
+        spk=spk,
+        infer_seed=infer_seed,
+        prompt1=prompt1,
+        prompt2=prompt2,
+        prefix=prefix,
+    )
+
     with SeedContext(infer_seed, True):
         wavs = chat_tts.generate_audio(
-            texts, params_infer_code, use_decoder=use_decoder
+            texts=texts, params_infer_code=params_infer_code, use_decoder=use_decoder
         )
-
-    sample_rate = 24000
 
     if config.auto_gc:
         devices.torch_gc()
         gc.collect()
 
-    return [(sample_rate, np.array(wav).flatten().astype(np.float32)) for wav in wavs]
+    return [(SAMPLE_RATE, np.array(wav).flatten().astype(np.float32)) for wav in wavs]
+
+
+# TODO: generate_audio_stream 也应该支持 lru cache
+@torch.inference_mode()
+def generate_audio_stream(
+    text: str,
+    temperature: float = 0.3,
+    top_P: float = 0.7,
+    top_K: float = 20,
+    spk: Union[int, Speaker] = -1,
+    infer_seed: int = -1,
+    use_decoder: bool = True,
+    prompt1: str = "",
+    prompt2: str = "",
+    prefix: str = "",
+) -> Generator[tuple[int, np.ndarray], None, None]:
+    chat_tts = models.load_chat_tts()
+    texts = [text]
+    params_infer_code = parse_infer_params(
+        texts=texts,
+        chat_tts=chat_tts,
+        temperature=temperature,
+        top_P=top_P,
+        top_K=top_K,
+        spk=spk,
+        infer_seed=infer_seed,
+        prompt1=prompt1,
+        prompt2=prompt2,
+        prefix=prefix,
+    )
+
+    with SeedContext(infer_seed, True):
+        wavs_gen = chat_tts.generate_audio(
+            prompt=texts,
+            params_infer_code=params_infer_code,
+            use_decoder=use_decoder,
+            stream=True,
+        )
+
+        for wav in wavs_gen:
+            yield [SAMPLE_RATE, np.array(wav).flatten().astype(np.float32)]
+
+    if config.auto_gc:
+        devices.torch_gc()
+        gc.collect()
+
+    return
 
 
 lru_cache_enabled = False

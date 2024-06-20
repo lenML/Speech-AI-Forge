@@ -1,3 +1,4 @@
+from typing import Generator
 import numpy as np
 
 from modules.api.impl.handler.AudioHandler import AudioHandler
@@ -8,7 +9,12 @@ from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
 from modules.normalization import text_normalize
 from modules.speaker import Speaker
 from modules.synthesize_audio import synthesize_audio
+from modules.synthesize_stream import synthesize_stream
 from modules.utils.audio import apply_prosody_to_audio_data
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class TTSHandler(AudioHandler):
@@ -95,3 +101,32 @@ class TTSHandler(AudioHandler):
         )
 
         return audio_data, sample_rate
+
+    def enqueue_stream(self) -> Generator[tuple[np.ndarray, int], None, None]:
+        text = text_normalize(self.text_content)
+        tts_config = self.tts_config
+        infer_config = self.infer_config
+        adjust_config = self.adjest_config
+        enhancer_config = self.enhancer_config
+
+        if enhancer_config.enabled:
+            logger.warning(
+                "enhancer_config is enabled, but it is not supported in stream mode"
+            )
+
+        gen = synthesize_stream(
+            text,
+            spk=self.spk,
+            temperature=tts_config.temperature,
+            top_P=tts_config.top_p,
+            top_K=tts_config.top_k,
+            prompt1=tts_config.prompt1,
+            prompt2=tts_config.prompt2,
+            prefix=tts_config.prefix,
+            infer_seed=infer_config.seed,
+            spliter_threshold=infer_config.spliter_threshold,
+            end_of_sentence=infer_config.eos,
+        )
+
+        for sr, wav in gen:
+            yield wav, sr

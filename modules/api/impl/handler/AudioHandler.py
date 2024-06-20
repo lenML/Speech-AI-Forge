@@ -1,5 +1,6 @@
 import base64
 import io
+from typing import Generator
 
 import numpy as np
 import soundfile as sf
@@ -10,7 +11,24 @@ from modules.api.impl.model.audio_model import AudioFormat
 
 class AudioHandler:
     def enqueue(self) -> tuple[np.ndarray, int]:
-        raise NotImplementedError
+        raise NotImplementedError("Method 'enqueue' must be implemented by subclass")
+
+    def enqueue_stream(self) -> Generator[tuple[np.ndarray, int], None, None]:
+        raise NotImplementedError(
+            "Method 'enqueue_stream' must be implemented by subclass"
+        )
+
+    def enqueue_to_stream(self, format: AudioFormat) -> Generator[bytes, None, None]:
+        for audio_data, sample_rate in self.enqueue_stream():
+            buffer = io.BytesIO()
+            sf.write(buffer, audio_data, sample_rate, format="wav")
+            buffer.seek(0)
+
+            if format == AudioFormat.mp3:
+                buffer = api_utils.wav_to_mp3(buffer)
+
+            binary = buffer.read()
+            yield binary
 
     def enqueue_to_buffer(self, format: AudioFormat) -> io.BytesIO:
         audio_data, sample_rate = self.enqueue()

@@ -186,7 +186,7 @@ class Chat:
         stream_text=False,
     ):
 
-        assert self.check_model(use_decoder=use_decoder)
+        # assert self.check_model(use_decoder=use_decoder)
 
         if not isinstance(text, list):
             text = [text]
