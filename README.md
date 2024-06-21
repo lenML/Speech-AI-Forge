@@ -127,7 +127,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 3. 切换 `TTS Provider` 为 `XTTSv2`
 4. 勾选 `Enabled`
 5. 选择/配置 `Voice`
-6. **[关键]** 设置 `Provider Endpoint` 到 `http://localhost:7870/v1/xtts_v2`
+6. **[关键]** 设置 `Provider Endpoint` 到 `http://localhost:8000/v1/xtts_v2`
 
 ![sillytavern_tts](./docs/sillytavern_tts.png)
 

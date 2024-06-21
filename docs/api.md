@@ -1,6 +1,6 @@
 # API
 
-使用 `launch.py` 脚本启动 `api` 服务之后，你可以在 `http://localhost:7870/docs` 下查看和简单测试 `api`
+使用 `launch.py` 脚本启动 `api` 服务之后，你可以在 `http://localhost:8000/docs` 下查看和简单测试 `api`
 
 所有参数：
 
@@ -59,7 +59,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 #### 示例
 
 ```bash
-curl http://localhost:7870/v1/audio/speech \
+curl http://localhost:8000/v1/audio/speech \
   -H "Authorization: Bearer anything_your_wanna" \
   -H "Content-Type: application/json" \
   -d '{
@@ -139,7 +139,7 @@ This endpoint synthesizes speech from text or SSML input using the Google Text-t
 ### Example CURL Request
 
 ```bash
-curl -X POST "http://localhost:7870/v1/text:synthesize" \
+curl -X POST "http://localhost:8000/v1/text:synthesize" \
     -H "Content-Type: application/json" \
     -d '{
         "input": {

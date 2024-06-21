@@ -127,7 +127,7 @@ Here's a simple configuration guide:
 3. Switch `TTS Provider` to `XTTSv2`.
 4. Check `Enabled`.
 5. Select/configure `Voice`.
-6. **[Key Step]** Set the `Provider Endpoint` to `http://localhost:7870/v1/xtts_v2`.
+6. **[Key Step]** Set the `Provider Endpoint` to `http://localhost:8000/v1/xtts_v2`.
 
 ![sillytavern_tts](./docs/sillytavern_tts.png)
 

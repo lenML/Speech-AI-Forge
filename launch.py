@@ -36,8 +36,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    host = env.get_and_update_env(args, "host", "0.0.0.0", str)
-    port = env.get_and_update_env(args, "port", 7870, int)
+    host = env.get_and_update_env(args, "api_host", "0.0.0.0", str)
+    port = env.get_and_update_env(args, "api_port", 8000, int)
     reload = env.get_and_update_env(args, "reload", False, bool)
     workers = env.get_and_update_env(args, "workers", 1, int)
     log_level = env.get_and_update_env(args, "log_level", "info", str)

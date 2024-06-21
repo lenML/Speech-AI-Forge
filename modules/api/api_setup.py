@@ -106,8 +106,8 @@ def process_model_args(args):
 
 
 def setup_uvicon_args(parser: argparse.ArgumentParser):
-    parser.add_argument("--host", type=str, help="Host to run the server on")
-    parser.add_argument("--port", type=int, help="Port to run the server on")
+    parser.add_argument("--api_host", type=str, help="Host to run the server on")
+    parser.add_argument("--api_port", type=int, help="Port to run the server on")
     parser.add_argument(
         "--reload", action="store_true", help="Enable auto-reload for development"
     )
