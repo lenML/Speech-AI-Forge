@@ -21,6 +21,14 @@ def split_zhon_sentence(text):
     return result
 
 
+def split_zhon_paragraph(text):
+    lines = text.split("\n")
+    result = []
+    for line in lines:
+        result.extend(split_zhon_sentence(line))
+    return result
+
+
 # 解析文本 并根据停止符号分割成句子
 # 可以设置最大阈值，即如果分割片段小于这个阈值会与下一段合并
 class SentenceSplitter:
@@ -28,7 +36,7 @@ class SentenceSplitter:
         self.sentence_threshold = threshold
 
     def parse(self, text):
-        sentences = split_zhon_sentence(text)
+        sentences = split_zhon_paragraph(text)
 
         # 合并小于最大阈值的片段
         merged_sentences = []
