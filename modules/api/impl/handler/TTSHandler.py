@@ -12,7 +12,7 @@ from modules.normalization import text_normalize
 from modules.speaker import Speaker
 from modules.synthesize_audio import synthesize_audio
 from modules.synthesize_stream import synthesize_stream
-from modules.utils.audio import apply_prosody_to_audio_data
+from modules.utils.audio import apply_normalize, apply_prosody_to_audio_data
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +99,12 @@ class TTSHandler(AudioHandler):
             volume=adjust_config.volume_gain_db,
             sr=sample_rate,
         )
+
+        if adjust_config.normalize:
+            sample_rate, audio_data = apply_normalize(
+                audio_data=audio_data,
+                headroom=adjust_config.headroom,
+            )
 
         return audio_data, sample_rate
 

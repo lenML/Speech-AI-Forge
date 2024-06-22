@@ -1,7 +1,5 @@
-import io
 from typing import Union
 
-from modules import generate_audio as generate
 from modules.SentenceSplitter import SentenceSplitter
 from modules.speaker import Speaker
 from modules.ssml_parser.SSMLParser import SSMLSegment

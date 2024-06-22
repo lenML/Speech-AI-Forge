@@ -4,7 +4,7 @@ from io import BytesIO
 import numpy as np
 import pyrubberband as pyrb
 import soundfile as sf
-from pydub import AudioSegment
+from pydub import AudioSegment, effects
 
 INT16_MAX = np.iinfo(np.int16).max
 
@@ -112,6 +112,16 @@ def apply_prosody_to_audio_data(
         audio_data = pyrb.pitch_shift(audio_data, sr=sr, n_steps=pitch)
 
     return audio_data
+
+
+def apply_normalize(
+    audio_data: np.ndarray,
+    headroom: float = 1,
+):
+    segment = ndarray_to_segment(audio_data, 24000)
+    segment = effects.normalize(seg=segment, headroom=headroom)
+
+    return pydub_to_np(segment)
 
 
 if __name__ == "__main__":

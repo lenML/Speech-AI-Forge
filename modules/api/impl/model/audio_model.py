@@ -12,3 +12,7 @@ class AdjustConfig(BaseModel):
     pitch: float = 0
     speed_rate: float = 1
     volume_gain_db: float = 0
+
+    # 响度均衡
+    normalize: bool = True
+    headroom: float = 1

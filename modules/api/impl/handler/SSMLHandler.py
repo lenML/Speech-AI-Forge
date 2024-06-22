@@ -91,4 +91,10 @@ class SSMLHandler(AudioHandler):
             sr=sample_rate,
         )
 
+        if adjust_config.normalize:
+            sample_rate, audio_data = audio.apply_normalize(
+                audio_data=audio_data,
+                headroom=adjust_config.headroom,
+            )
+
         return audio_data, sample_rate
