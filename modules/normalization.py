@@ -1,4 +1,6 @@
 import re
+import html
+import ftfy
 from functools import lru_cache
 from typing import Literal
 
@@ -198,6 +200,18 @@ def replace_homophones(text):
 
 
 ## ---------- pre normalize ----------
+
+
+@pre_normalize()
+def html_unescape(text):
+    text = html.unescape(text)
+    text = html.unescape(text)
+    return text
+
+
+@pre_normalize()
+def fix_text(text):
+    return ftfy.fix_text(text=text)
 
 
 @pre_normalize()
