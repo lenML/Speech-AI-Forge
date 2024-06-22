@@ -3,6 +3,7 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import logging
+from functools import partial
 
 import torch
 import torch.nn as nn
@@ -13,7 +14,6 @@ from torch.nn.utils.parametrizations import weight_norm
 from tqdm import tqdm
 from transformers import LlamaConfig, LlamaModel
 from transformers.cache_utils import Cache
-from functools import partial
 
 
 class LlamaMLP(nn.Module):

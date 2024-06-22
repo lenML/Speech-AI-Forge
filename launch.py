@@ -18,6 +18,9 @@ import uvicorn
 
 from modules.api.api_setup import setup_api_args, setup_model_args, setup_uvicon_args
 from modules.utils import env
+from modules.utils.ignore_warn import ignore_useless_warnings
+
+ignore_useless_warnings()
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,6 @@
+import logging
 from typing import Generator
+
 import numpy as np
 
 from modules.api.impl.handler.AudioHandler import AudioHandler
@@ -11,8 +13,6 @@ from modules.speaker import Speaker
 from modules.synthesize_audio import synthesize_audio
 from modules.synthesize_stream import synthesize_stream
 from modules.utils.audio import apply_prosody_to_audio_data
-
-import logging
 
 logger = logging.getLogger(__name__)
 

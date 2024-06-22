@@ -25,11 +25,13 @@ from modules.api.api_setup import (
 from modules.api.app_config import app_description, app_title, app_version
 from modules.gradio_dcls_fix import dcls_patch
 from modules.utils.env import get_and_update_env
+from modules.utils.ignore_warn import ignore_useless_warnings
 from modules.utils.torch_opt import configure_torch_optimizations
 from modules.webui import webui_config
 from modules.webui.app import create_interface, webui_init
 
 dcls_patch()
+ignore_useless_warnings()
 
 
 def setup_webui_args(parser: argparse.ArgumentParser):

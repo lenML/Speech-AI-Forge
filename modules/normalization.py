@@ -1,9 +1,8 @@
 import re
 from functools import lru_cache
+from typing import Literal
 
 import emojiswitch
-
-from typing import Literal
 
 from modules import models
 from modules.utils.HomophonesReplacer import HomophonesReplacer

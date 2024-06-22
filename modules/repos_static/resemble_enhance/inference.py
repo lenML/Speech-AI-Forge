@@ -1,12 +1,12 @@
 import logging
 import time
+from functools import partial
 
 import torch
 import torch.nn.functional as F
 from torch.nn.utils.parametrize import remove_parametrizations
 from torchaudio.functional import resample
 from torchaudio.transforms import MelSpectrogram
-from functools import partial
 
 from modules import config
 from modules.devices import devices
