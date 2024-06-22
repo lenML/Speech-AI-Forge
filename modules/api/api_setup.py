@@ -64,6 +64,7 @@ def setup_model_args(parser: argparse.ArgumentParser):
         help="use CPU as torch device for specified modules",
         default=[],
         type=str.lower,
+        choices=["all", "chattts", "enhancer", "trainer"],
     )
     parser.add_argument(
         "--lru_size",

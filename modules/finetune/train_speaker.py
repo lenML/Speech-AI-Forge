@@ -255,7 +255,7 @@ if __name__ == "__main__":
         vocos_model=chat.pretrain_models["vocos"],
         tar_path=tar_path,
         tar_in_memory=tar_in_memory,
-        device=devices.device,
+        device=devices.get_device_for("trainer"),
         # speakers=None,  # set(['speaker_A', 'speaker_B'])
     )
 
@@ -267,7 +267,7 @@ if __name__ == "__main__":
         speaker_embeds = {
             speaker: torch.tensor(
                 spk.emb,
-                device=devices.device,
+                device=devices.get_device_for("trainer"),
                 requires_grad=True,
             )
             for speaker in dataset.speakers

@@ -92,7 +92,10 @@ def get_optimal_device():
 
 
 def get_device_for(task):
-    if task in config.cmd_opts.use_cpu or "all" in config.cmd_opts.use_cpu:
+    if (
+        task in config.runtime_env_vars.use_cpu
+        or "all" in config.runtime_env_vars.use_cpu
+    ):
         return cpu
 
     return get_optimal_device()

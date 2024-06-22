@@ -25,7 +25,7 @@ def load_chat_tts_in_thread():
         compile=config.runtime_env_vars.compile,
         source="local",
         local_path="./models/ChatTTS",
-        device=devices.device,
+        device=devices.get_device_for("chattts"),
         dtype=devices.dtype,
         dtype_vocos=devices.dtype_vocos,
         dtype_dvae=devices.dtype_dvae,

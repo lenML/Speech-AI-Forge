@@ -85,7 +85,7 @@ def load_enhancer() -> ResembleEnhance:
         if resemble_enhance is None:
             logger.info("Loading ResembleEnhance model")
             resemble_enhance = ResembleEnhance(
-                device=devices.device, dtype=devices.dtype
+                device=devices.get_device_for("enhancer"), dtype=devices.dtype
             )
             resemble_enhance.load_model()
             logger.info("ResembleEnhance model loaded")
