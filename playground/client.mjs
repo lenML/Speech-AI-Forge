@@ -1,5 +1,24 @@
 import axios from "axios";
 
+/**
+ *
+ * @param {string} baseURL - The base URL to join with the paths and search params
+ * @param {string[]} paths - The paths to join with the base URL
+ * @param {URLSearchParams} searchParams - The search params to append to the URL
+ * @returns {string} - The joined URL
+ */
+function url_join(baseURL, paths, searchParams) {
+  const url = new URL(baseURL);
+  const pathnames = [...url.pathname.split("/").filter((x) => x), ...paths];
+
+  url.pathname = pathnames.join("/").replace(/\/{2,}/g, "/");
+
+  for (const [key, value] of searchParams) {
+    url.searchParams.append(key, value);
+  }
+  return url.toString();
+}
+
 class APIClient {
   constructor(baseURL) {
     this.client = axios.create({
@@ -42,7 +61,13 @@ class APIClient {
       thr,
       stream,
     });
-    return `${this.client.defaults.baseURL}v1/tts?${params.toString()}`;
+    // return `${this.client.defaults.baseURL}v1/tts?${params.toString()}`;
+
+    // const url = new URL("/v1/tts", this.client.defaults.baseURL);
+    // url.search = params.toString();
+    // return url.toString();
+
+    return url_join(this.client.defaults.baseURL, ["v1/tts"], params);
   }
 
   async synthesizeTTS({
