@@ -2,25 +2,61 @@
 
 使用 `launch.py` 脚本启动 `api` 服务之后，你可以在 `http://localhost:7870/docs` 下查看和简单测试 `api`
 
-所有参数：
+```
+usage: launch.py [-h] [--cors_origin CORS_ORIGIN] [--no_playground] [--no_docs] [--exclude EXCLUDE]
+                 [--compile] [--no_half] [--off_tqdm] [--device_id DEVICE_ID]
+                 [--use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]] [--lru_size LRU_SIZE]
+                 [--debug_generate] [--preload_models] [--host HOST] [--port PORT] [--reload]
+                 [--workers WORKERS] [--log_level LOG_LEVEL] [--access_log] [--proxy_headers]
+                 [--timeout_keep_alive TIMEOUT_KEEP_ALIVE]
+                 [--timeout_graceful_shutdown TIMEOUT_GRACEFUL_SHUTDOWN] [--ssl_keyfile SSL_KEYFILE]
+                 [--ssl_certfile SSL_CERTFILE] [--ssl_keyfile_password SSL_KEYFILE_PASSWORD]
 
-| 参数              | 类型   | 默认值      | 描述                                            |
-| ----------------- | ------ | ----------- | ----------------------------------------------- |
-| `--host`          | `str`  | `"0.0.0.0"` | 服务器主机地址                                  |
-| `--port`          | `int`  | `8000`      | 服务器端口                                      |
-| `--reload`        | `bool` | `False`     | 启用自动重载功能（用于开发）                    |
-| `--compile`       | `bool` | `False`     | 启用模型编译                                    |
-| `--lru_size`      | `int`  | `64`        | 设置请求缓存池的大小；设置为 0 禁用 `lru_cache` |
-| `--cors_origin`   | `str`  | `"*"`       | 允许的 CORS 源，使用 `*` 允许所有源             |
-| `--no_playground` | `bool` | `False`     | 关闭 playground 入口                            |
-| `--no_docs`       | `bool` | `False`     | 关闭 docs 入口                                  |
-| `--no_half`       | `bool` | `False`     | 使用 f32 全精度推理                             |
-| `--off_tqdm`      | `bool` | `False`     | 关闭 tqdm 进度条                                |
-| `--exclude`       | `str`  | `""`        | 排除不需要的 api                                |
-| `--device_id`     | `str`  | `None`      | 指定使用 gpu device_id                          |
-| `--use_cpu`       | `str`  | `None`      | 当前可选值 `"all"`                              |
+Start the FastAPI server with command line arguments
 
-launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
+options:
+  -h, --help            show this help message and exit
+  --cors_origin CORS_ORIGIN
+                        Allowed CORS origins. Use '*' to allow all origins.
+  --no_playground       Disable the playground entry
+  --no_docs             Disable the documentation entry
+  --exclude EXCLUDE     Exclude the specified API from the server
+  --compile             Enable model compile
+  --no_half             Disalbe half precision for model inference
+  --off_tqdm            Disable tqdm progress bar
+  --device_id DEVICE_ID
+                        Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be
+                        needed before)
+  --use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]
+                        use CPU as torch device for specified modules
+  --lru_size LRU_SIZE   Set the size of the request cache pool, set it to 0 will disable lru_cache
+  --debug_generate      Enable debug mode for audio generation
+  --preload_models      Preload all models at startup
+  --host HOST           Host to run the server on
+  --port PORT           Port to run the server on
+  --reload              Enable auto-reload for development
+  --workers WORKERS     Number of worker processes
+  --log_level LOG_LEVEL
+                        Log level
+  --access_log          Enable access log
+  --proxy_headers       Enable proxy headers
+  --timeout_keep_alive TIMEOUT_KEEP_ALIVE
+                        Keep-alive timeout duration
+  --timeout_graceful_shutdown TIMEOUT_GRACEFUL_SHUTDOWN
+                        Graceful shutdown timeout duration
+  --ssl_keyfile SSL_KEYFILE
+                        SSL key file path
+  --ssl_certfile SSL_CERTFILE
+                        SSL certificate file path
+  --ssl_keyfile_password SSL_KEYFILE_PASSWORD
+                        SSL key file password
+```
+
+tips:
+
+- 所有参数均可在 .env.api 中以大写形式配置 （比如 no_docs => NO_DOCS）
+- 在命令行之后的参数优先级高于 .env 参数
+- launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
 
 下面特殊接口的介绍
 

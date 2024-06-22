@@ -4,30 +4,60 @@
 
 WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
-所有参数：
+```
+usage: webui.py [-h] [--server_name SERVER_NAME] [--server_port SERVER_PORT] [--share] [--debug]
+                [--auth AUTH] [--tts_max_len TTS_MAX_LEN] [--ssml_max_len SSML_MAX_LEN]
+                [--max_batch_size MAX_BATCH_SIZE] [--webui_experimental] [--language LANGUAGE] [--api]
+                [--compile] [--no_half] [--off_tqdm] [--device_id DEVICE_ID]
+                [--use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]] [--lru_size LRU_SIZE]
+                [--debug_generate] [--preload_models] [--cors_origin CORS_ORIGIN] [--no_playground]
+                [--no_docs] [--exclude EXCLUDE]
 
-| 参数                   | 类型   | 默认值      | 描述                                               |
-| ---------------------- | ------ | ----------- | -------------------------------------------------- |
-| `--server_name`        | `str`  | `"0.0.0.0"` | 服务器主机地址                                     |
-| `--server_port`        | `int`  | `7860`      | 服务器端口                                         |
-| `--share`              | `bool` | `False`     | 启用共享模式，允许外部访问                         |
-| `--debug`              | `bool` | `False`     | 启用调试模式                                       |
-| `--compile`            | `bool` | `False`     | 启用模型编译                                       |
-| `--auth`               | `str`  | `None`      | 用于认证的用户名和密码，格式为 `username:password` |
-| `--no_half`            | `bool` | `False`     | 使用 f32 全精度推理                                |
-| `--off_tqdm`           | `bool` | `False`     | 关闭 tqdm 进度条                                   |
-| `--tts_max_len`        | `int`  | `1000`      | TTS（文本到语音）的最大文本长度                    |
-| `--ssml_max_len`       | `int`  | `2000`      | SSML（语音合成标记语言）的最大文本长度             |
-| `--max_batch_size`     | `int`  | `8`         | TTS 的最大批处理大小                               |
-| `--device_id`          | `str`  | `None`      | 指定使用 gpu device_id                             |
-| `--use_cpu`            | `str`  | `None`      | 当前可选值 `"all"`                                 |
-| `--webui_experimental` | `bool` | `False`     | 是否开启实验功能（不完善的功能）                   |
-| `--language`           | `str`  | `zh-CN`     | 设置 webui 本地化                                  |
-| `--api`                | `bool` | `False`     | 是否开启 API                                       |
+Gradio App
 
-> 从 webui.py 入口启动， 可与 api 同时启动，api 的配置在下方 launch.py 脚本参数中说明， 开启后可在 `http://localhost:7860/docs` 查看 api
+options:
+  -h, --help            show this help message and exit
+  --server_name SERVER_NAME
+                        server name
+  --server_port SERVER_PORT
+                        server port
+  --share               share the gradio interface
+  --debug               enable debug mode
+  --auth AUTH           username:password for authentication
+  --tts_max_len TTS_MAX_LEN
+                        Max length of text for TTS
+  --ssml_max_len SSML_MAX_LEN
+                        Max length of text for SSML
+  --max_batch_size MAX_BATCH_SIZE
+                        Max batch size for TTS
+  --webui_experimental  Enable webui_experimental features
+  --language LANGUAGE   Set the default language for the webui
+  --api                 use api=True to launch the API together with the webui (run launch.py for only API
+                        server)
+  --compile             Enable model compile
+  --no_half             Disalbe half precision for model inference
+  --off_tqdm            Disable tqdm progress bar
+  --device_id DEVICE_ID
+                        Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be
+                        needed before)
+  --use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]
+                        use CPU as torch device for specified modules
+  --lru_size LRU_SIZE   Set the size of the request cache pool, set it to 0 will disable lru_cache
+  --debug_generate      Enable debug mode for audio generation
+  --preload_models      Preload all models at startup
+  --cors_origin CORS_ORIGIN
+                        Allowed CORS origins. Use '*' to allow all origins.
+  --no_playground       Disable the playground entry
+  --no_docs             Disable the documentation entry
+  --exclude EXCLUDE     Exclude the specified API from the server
+```
 
-> 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--use_cpu="all"` 时需要开启 `--no_half`
+tips:
+
+- 所有参数均可在 .env.webui 中以大写形式配置 （比如 no_docs => NO_DOCS）
+- 在命令行之后的参数优先级高于 .env 参数
+- 从 webui.py 入口启动， 可与 api 同时启动，api 的配置在下方 launch.py 脚本参数中说明， 开启后可在 `http://localhost:7860/docs` 查看 api
+- 由于 `MKL FFT doesn't support tensors of type: Half` 所以 `--use_cpu="all"` 时需要开启 `--no_half`
 
 ## TTS
 
