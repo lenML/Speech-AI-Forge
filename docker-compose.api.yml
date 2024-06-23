@@ -8,7 +8,7 @@ services:
     volumes:
       - "./:/app"
     ports:
-      - "8000:8000"
+      - "7870:7870"
     environment:
       NVIDIA_VISIBLE_DEVICES: all
     command: >
