@@ -100,8 +100,7 @@
   ],
 
   "TTS_TEXT_GUIDE": [
-    "- If the last character is swallowed and not read, try adding `[lbreak]` at the end.",
-    "- If the input text is all in English, it is recommended to disable text standardization."
+    "- If the last character is swallowed and not read, try adding `[lbreak]` at the end."
   ],
 
   "SPEAKER_MERGER_GUIDE": [

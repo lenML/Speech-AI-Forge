@@ -106,10 +106,7 @@
     "- 关于SSML可以看这个 [文档](https://github.com/lenML/ChatTTS-Forge/blob/main/docs/SSML.md)"
   ],
 
-  "TTS_TEXT_GUIDE": [
-    "- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`",
-    "- If the input text is all in English, it is recommended to check disable_normalize"
-  ],
+  "TTS_TEXT_GUIDE": ["- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`"],
 
   "SPEAKER_MERGER_GUIDE": [
     "### 音色融合",
