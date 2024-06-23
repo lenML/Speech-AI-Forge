@@ -1,11 +1,18 @@
 # Changelog
 
 <a name="0.6.2-rc"></a>
-
-## 0.6.2-rc (2024-06-22)
+## 0.6.2-rc (2024-06-23)
 
 ### Added
 
+- ✨ add adjuster to webui [[01f09b4](https://github.com/lenML/ChatTTS-Forge/commit/01f09b4fad2eb8b24a16b7768403de4975d51774)]
+- ✨ stream mode support adjuster [[585d2dd](https://github.com/lenML/ChatTTS-Forge/commit/585d2dd488d8f8387e0d9435fb399f090a41b9cc)]
+- ✨ improve xtts_v2 api [[fec66c7](https://github.com/lenML/ChatTTS-Forge/commit/fec66c7c00939a3c7c15e007536e037ac01153fa)]
+- ✨ improve normalize [[d0da37e](https://github.com/lenML/ChatTTS-Forge/commit/d0da37e43f1de4088ef638edd90723f93894b1d2)]
+- ✨ improve normalize/spliter [[163b649](https://github.com/lenML/ChatTTS-Forge/commit/163b6490e4d453c37cc259ce27208f55d10a9084)]
+- ✨ add loudness equalization [[bc8bda7](https://github.com/lenML/ChatTTS-Forge/commit/bc8bda74825c31985d3cc1a44366ad92af1b623a)]
+- ✨ support &#x60;--use_cpu&#x3D;chattts,enhancer,trainer,all&#x60; [[23023bc](https://github.com/lenML/ChatTTS-Forge/commit/23023bc610f6f74a157faa8a6c6aacf64d91d870)]
+- ✨ improve normalizetion.py [[1a7c0ed](https://github.com/lenML/ChatTTS-Forge/commit/1a7c0ed3923234ceadb79f397fa7577f9e682f2d)]
 - ✨ ignore_useless_warnings [[4b9a32e](https://github.com/lenML/ChatTTS-Forge/commit/4b9a32ef821d85ceaf3d62af8f871aeb5088e084)]
 - ✨ enhance logger, info &#x3D;&gt; debug [[73bc8e7](https://github.com/lenML/ChatTTS-Forge/commit/73bc8e72b40146debd0a59100b1cca4cc42f5029)]
 - ✨ add playground.stream page [[31377b0](https://github.com/lenML/ChatTTS-Forge/commit/31377b060c182519d74a12d81e66c8e73686bcd8)]
@@ -13,13 +20,15 @@
 
 ### Changed
 
-- 🍱 add \_p_en [[56f1fbf](https://github.com/lenML/ChatTTS-Forge/commit/56f1fbf1f3fff6f76ca8c29aa12a6ddef665cf9f)]
+- 🍱 add _p_en [[56f1fbf](https://github.com/lenML/ChatTTS-Forge/commit/56f1fbf1f3fff6f76ca8c29aa12a6ddef665cf9f)]
 - 🍱 update prompt [[4f95b31](https://github.com/lenML/ChatTTS-Forge/commit/4f95b31679225e1ee144a411a9cfa9b30c598450)]
 - ⚡ Reduce popping sounds [[2d0fd68](https://github.com/lenML/ChatTTS-Forge/commit/2d0fd688ad1a5cff1e6aafc0502aee26de3f1d75)]
 - ⚡ improve &#x60;apply_character_map&#x60; [[ea7399f](https://github.com/lenML/ChatTTS-Forge/commit/ea7399facc5c29327a7870bd66ad6222f5731ce3)]
 
 ### Fixed
 
+- 🐛 fix &#x60;apply_normalize&#x60; missing &#x60;sr&#x60; [[2db6d65](https://github.com/lenML/ChatTTS-Forge/commit/2db6d65ef8fbf8a3a213cbdc3d4b1143396cc165)]
+- 🐛 fix sentence spliter [[5d8937c](https://github.com/lenML/ChatTTS-Forge/commit/5d8937c169d5f7784920a93834df0480dd3a67b3)]
 - 🐛 fix playground url_join [[53e7cbc](https://github.com/lenML/ChatTTS-Forge/commit/53e7cbc6103bc0e3bb83767a9233c45285b77e75)]
 - 🐛 fix generate_audio args [[a7a698c](https://github.com/lenML/ChatTTS-Forge/commit/a7a698c760b5bc97c90a144a4a7afb5e17414995)]
 - 🐛 fix infer func [[b0de527](https://github.com/lenML/ChatTTS-Forge/commit/b0de5275342c02d332a50d0ab5ac171a7007b300)]
@@ -28,10 +37,15 @@
 
 ### Miscellaneous
 
-- Windows not yet supported for torch.compile fix [[74ac27d](https://github.com/lenML/ChatTTS-Forge/commit/74ac27d56a370f87560329043c42be27022ca0f5)]
-- fix: replace mispronounced words in TTS [[de66e6b](https://github.com/lenML/ChatTTS-Forge/commit/de66e6b8f7f8b5c10e7ac54f7b2488c798e5ef81)]
-- feat: support stream mode [[3da0f0c](https://github.com/lenML/ChatTTS-Forge/commit/3da0f0cb7f213dee40d00a89093166ad9e1d17a0)]
-- optimize: mps audio quality by contiguous scores [[1e4d79f](https://github.com/lenML/ChatTTS-Forge/commit/1e4d79f1a81a3ac8697afff0e44f0cfd2608599a)]
+- 📝 添加整合包地址 [[26122d4](https://github.com/lenML/ChatTTS-Forge/commit/26122d4cfd975206211fc37491348cf40aa39561)]
+- 📝 details &#x60;.env&#x60; file and cli usage docs [[ec3d36f](https://github.com/lenML/ChatTTS-Forge/commit/ec3d36f8a67215e243e6b8225aa9144ac888313a)]
+- 📝 update changelog [[22996e9](https://github.com/lenML/ChatTTS-Forge/commit/22996e9f0c42d9cad59950aecfe6b16413f2ab40)]
+-  Windows not yet supported for torch.compile fix [[74ac27d](https://github.com/lenML/ChatTTS-Forge/commit/74ac27d56a370f87560329043c42be27022ca0f5)]
+-  fix: replace mispronounced words in TTS [[de66e6b](https://github.com/lenML/ChatTTS-Forge/commit/de66e6b8f7f8b5c10e7ac54f7b2488c798e5ef81)]
+-  feat: support stream mode [[3da0f0c](https://github.com/lenML/ChatTTS-Forge/commit/3da0f0cb7f213dee40d00a89093166ad9e1d17a0)]
+-  optimize: mps audio quality by contiguous scores [[1e4d79f](https://github.com/lenML/ChatTTS-Forge/commit/1e4d79f1a81a3ac8697afff0e44f0cfd2608599a)]
+- 📝 update changelog [[ab55c14](https://github.com/lenML/ChatTTS-Forge/commit/ab55c149d48edc52f1de9c6d4fe6e6ed78b3b134)]
+
 
 <a name="0.6.1"></a>
 

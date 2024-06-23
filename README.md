@@ -40,6 +40,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
   - 7.3. [Style 中 `_p` 的区别是什么？](#Style_p)
   - 7.4. [为什么开启了 `--compile` 很慢？](#--compile)
   - 7.5. [为什么 colab 里面非常慢只有 2 it/s ？](#colab2its)
+- 8. [离线整合包](#-1)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -248,7 +249,7 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 - 点击 【笔记本设置】
 - 选择 【硬件加速器】 => T4 GPU
 
-## 离线整合包
+## 8. <a name='-1'></a>离线整合包
 
 感谢 @Phrixus2023 提供的整合包：
 https://pan.baidu.com/s/1ZBv6rC9A2P1OwQ2VPDpdzw?pwd=8xvw
