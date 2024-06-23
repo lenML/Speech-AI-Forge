@@ -10,7 +10,8 @@ import langdetect
 from modules import models
 from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.markdown import markdown_to_text
-from modules.utils.zh_normalization.text_normlization import *
+from modules.utils.html import remove_html_tags as _remove_html_tags
+from modules.utils.zh_normalization.text_normlization import TextNormalizer
 
 
 # 是否关闭 unk token 检查
@@ -226,6 +227,11 @@ def apply_markdown_to_text(text):
     if is_markdown(text):
         text = markdown_to_text(text)
     return text
+
+
+@pre_normalize()
+def remove_html_tags(text):
+    return _remove_html_tags(text)
 
 
 # 将 "xxx" => \nxxx\n
