@@ -248,6 +248,14 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 - 点击 【笔记本设置】
 - 选择 【硬件加速器】 => T4 GPU
 
+## 离线整合包
+
+感谢 @Phrixus2023 提供的整合包：
+https://pan.baidu.com/s/1ZBv6rC9A2P1OwQ2VPDpdzw?pwd=8xvw
+
+相关讨论：
+https://github.com/lenML/ChatTTS-Forge/discussions/65
+
 # Documents
 
 在这里可以找到 [更多文档](./docs/readme.md)
