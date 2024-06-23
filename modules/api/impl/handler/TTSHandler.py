@@ -137,4 +137,20 @@ class TTSHandler(AudioHandler):
 
         # FIXME: 很奇怪，合并出来的音频每个 chunk 之前会有一段异常，暂时没有查出来是哪里的问题，可能是解码时候切割漏了？或者多了？
         for sr, wav in gen:
+
+            wav = apply_prosody_to_audio_data(
+                audio_data=wav,
+                rate=adjust_config.speed_rate,
+                pitch=adjust_config.pitch,
+                volume=adjust_config.volume_gain_db,
+                sr=sr,
+            )
+
+            if adjust_config.normalize:
+                sr, wav = apply_normalize(
+                    audio_data=wav,
+                    headroom=adjust_config.headroom,
+                    sr=sr,
+                )
+
             yield wav, sr
