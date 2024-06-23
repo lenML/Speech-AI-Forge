@@ -91,6 +91,28 @@ class ZHLocalizationVars(LocalizationVars):
 
         self.tts_examples = [
             {
+                "text": """
+Fear is the path to the dark side. Fear leads to anger. Anger leads to hate. Hate leads to suffering.
+恐惧是通向黑暗之路。恐惧导致愤怒。愤怒引发仇恨。仇恨造成痛苦。 [lbreak]
+Do. Or do not. There is no try.
+要么做，要么不做，没有试试看。[lbreak]
+Peace is a lie, there is only passion.
+安宁即是谎言，激情方为王道。[lbreak]
+Through passion, I gain strength.
+我以激情换取力量。[lbreak]
+Through strength, I gain power.
+以力量赚取权力。[lbreak]
+Through power, I gain victory.
+以权力赢取胜利。[lbreak]
+Through victory, my chains are broken.
+于胜利中超越自我。[lbreak]
+The Force shall free me.
+原力任我逍遥。[lbreak]
+May the force be with you!
+愿原力与你同在！[lbreak]
+              """.strip()
+            },
+            {
                 "text": "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
             },
             {

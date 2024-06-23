@@ -5,11 +5,13 @@ from functools import lru_cache
 from typing import Literal
 
 import emojiswitch
+import langdetect
 
 from modules import models
 from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.markdown import markdown_to_text
 from modules.utils.zh_normalization.text_normlization import *
+
 
 # 是否关闭 unk token 检查
 # NOTE: 单测的时候用于跳过模型加载
@@ -18,15 +20,20 @@ DISABLE_UNK_TOKEN_CHECK = False
 
 @lru_cache(maxsize=64)
 def is_chinese(text):
-    # 中文字符的 Unicode 范围是 \u4e00-\u9fff
-    chinese_pattern = re.compile(r"[\u4e00-\u9fff]")
-    return bool(chinese_pattern.search(text))
+    try:
+        lang = langdetect.detect(text)
+        return lang.lower() in ["zh", "zh-cn", "zh-tw"]
+    except langdetect.LangDetectException:
+        return False
 
 
 @lru_cache(maxsize=64)
 def is_eng(text):
-    eng_pattern = re.compile(r"[a-zA-Z]")
-    return bool(eng_pattern.search(text))
+    try:
+        lang = langdetect.detect(text)
+        return lang.lower() in ["en"]
+    except langdetect.LangDetectException:
+        return False
 
 
 @lru_cache(maxsize=64)

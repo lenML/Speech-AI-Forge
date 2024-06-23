@@ -1,6 +1,7 @@
 import re
 
 import zhon
+import langdetect
 
 
 def split_zhon_sentence(text):
@@ -21,11 +22,35 @@ def split_zhon_sentence(text):
     return result
 
 
+def split_en_sentence(text):
+    """
+    Split English text into sentences.
+    """
+    # Define a regex pattern for English sentence splitting
+    pattern = re.compile(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s")
+    result = pattern.split(text)
+
+    # Filter out any empty strings or strings that are just whitespace
+    result = [sentence.strip() for sentence in result if sentence.strip()]
+
+    return result
+
+
+def is_eng_sentence(text):
+    try:
+        return langdetect.detect(text) == "en"
+    except langdetect.LangDetectException:
+        return False
+
+
 def split_zhon_paragraph(text):
     lines = text.split("\n")
     result = []
     for line in lines:
-        result.extend(split_zhon_sentence(line))
+        if is_eng_sentence(line):
+            result.extend(split_en_sentence(line))
+        else:
+            result.extend(split_zhon_sentence(line))
     return result
 
 
