@@ -104,6 +104,7 @@ class TTSHandler(AudioHandler):
             sample_rate, audio_data = apply_normalize(
                 audio_data=audio_data,
                 headroom=adjust_config.headroom,
+                sr=sample_rate,
             )
 
         return audio_data, sample_rate

@@ -117,8 +117,9 @@ def apply_prosody_to_audio_data(
 def apply_normalize(
     audio_data: np.ndarray,
     headroom: float = 1,
+    sr: int = 24000,
 ):
-    segment = ndarray_to_segment(audio_data, 24000)
+    segment = ndarray_to_segment(audio_data, sr)
     segment = effects.normalize(seg=segment, headroom=headroom)
 
     return pydub_to_np(segment)
