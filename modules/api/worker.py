@@ -5,7 +5,9 @@ import os
 import dotenv
 from fastapi import FastAPI
 
+from launch import setup_uvicon_args
 from modules.ffmpeg_env import setup_ffmpeg_path
+from modules.models_setup import process_model_args, setup_model_args
 
 setup_ffmpeg_path()
 logging.basicConfig(
@@ -14,13 +16,7 @@ logging.basicConfig(
 )
 
 from modules import config
-from modules.api.api_setup import (
-    process_api_args,
-    process_model_args,
-    setup_api_args,
-    setup_model_args,
-    setup_uvicon_args,
-)
+from modules.api.api_setup import process_api_args, setup_api_args
 from modules.api.app_config import app_description, app_title, app_version
 from modules.utils.torch_opt import configure_torch_optimizations
 

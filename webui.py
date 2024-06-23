@@ -6,6 +6,7 @@ from modules.ffmpeg_env import setup_ffmpeg_path
 
 try:
     setup_ffmpeg_path()
+    # NOTE: 因为 logger 都是在模块中初始化，所以这个 config 必须在最前面
     logging.basicConfig(
         level=os.getenv("LOG_LEVEL", "INFO"),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -16,14 +17,10 @@ except BaseException:
 import argparse
 
 from modules import config
-from modules.api.api_setup import (
-    process_api_args,
-    process_model_args,
-    setup_api_args,
-    setup_model_args,
-)
+from modules.api.api_setup import process_api_args, setup_api_args
 from modules.api.app_config import app_description, app_title, app_version
 from modules.gradio_dcls_fix import dcls_patch
+from modules.models_setup import process_model_args, setup_model_args
 from modules.utils.env import get_and_update_env
 from modules.utils.ignore_warn import ignore_useless_warnings
 from modules.utils.torch_opt import configure_torch_optimizations
