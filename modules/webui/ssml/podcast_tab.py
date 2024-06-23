@@ -124,7 +124,7 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
 
     def send_to_ssml(msg, spk, style, sheet: pd.DataFrame):
         if sheet.empty:
-            return gr.Error("Please add some text to the script table.")
+            raise gr.Error("Please add some text to the script table.")
         msg, spk, style, ssml = merge_dataframe_to_ssml(msg, spk, style, sheet)
         return [
             msg,

@@ -1,7 +1,7 @@
 import re
 
-import zhon
 import langdetect
+import zhon
 
 
 def split_zhon_sentence(text):

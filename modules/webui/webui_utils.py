@@ -6,6 +6,11 @@ import torch
 import torch.profiler
 
 from modules import refiner
+from modules.api.impl.handler.SSMLHandler import SSMLHandler
+from modules.api.impl.handler.TTSHandler import TTSHandler
+from modules.api.impl.model.audio_model import AdjustConfig
+from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
+from modules.api.impl.model.enhancer_model import EnhancerConfig
 from modules.api.utils import calc_spk_style
 from modules.data import styles_mgr
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
@@ -13,8 +18,6 @@ from modules.normalization import text_normalize
 from modules.SentenceSplitter import SentenceSplitter
 from modules.speaker import Speaker, speaker_mgr
 from modules.ssml_parser.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_parser
-from modules.synthesize_audio import synthesize_audio
-from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
 from modules.utils import audio
 from modules.utils.hf import spaces
 from modules.webui import webui_config
@@ -89,6 +92,11 @@ def synthesize_ssml(
     enable_denoise=False,
     eos: str = "[uv_break]",
     spliter_thr: int = 100,
+    pitch: float = 0,
+    speed_rate: float = 1,
+    volume_gain_db: float = 0,
+    normalize: bool = True,
+    headroom: float = 1,
     progress=gr.Progress(track_tqdm=True),
 ):
     try:
@@ -99,7 +107,7 @@ def synthesize_ssml(
     ssml = ssml.strip()
 
     if ssml == "":
-        return None
+        raise gr.Error("SSML is empty, please input some SSML")
 
     parser = create_ssml_parser()
     segments = parser.parse(ssml)
@@ -107,21 +115,35 @@ def synthesize_ssml(
     segments = segments_length_limit(segments, max_len)
 
     if len(segments) == 0:
-        return None
+        raise gr.Error("No valid segments in SSML")
 
-    synthesize = SynthesizeSegments(
-        batch_size=batch_size, eos=eos, spliter_thr=spliter_thr
+    infer_config = InferConfig(
+        batch_size=batch_size,
+        spliter_threshold=spliter_thr,
+        eos=eos,
+        # NOTE: SSML not support `infer_seed` contorl
+        # seed=42,
     )
-    audio_segments = synthesize.synthesize_segments(segments)
-    combined_audio = combine_audio_segments(audio_segments)
+    adjust_config = AdjustConfig(
+        pitch=pitch,
+        speed_rate=speed_rate,
+        volume_gain_db=volume_gain_db,
+        normalize=normalize,
+        headroom=headroom,
+    )
+    enhancer_config = EnhancerConfig(
+        enabled=enable_denoise or enable_enhance or False,
+        lambd=0.9 if enable_denoise else 0.1,
+    )
 
-    sr = combined_audio.frame_rate
-    audio_data, sr = apply_audio_enhance(
-        audio.audiosegment_to_librosawav(combined_audio),
-        sr,
-        enable_denoise,
-        enable_enhance,
+    handler = SSMLHandler(
+        ssml_content=ssml,
+        infer_config=infer_config,
+        adjust_config=adjust_config,
+        enhancer_config=enhancer_config,
     )
+
+    audio_data, sr = handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio.audio_to_int16(audio_data)
@@ -150,6 +172,11 @@ def tts_generate(
     spk_file=None,
     spliter_thr: int = 100,
     eos: str = "[uv_break]",
+    pitch: float = 0,
+    speed_rate: float = 1,
+    volume_gain_db: float = 0,
+    normalize: bool = True,
+    headroom: float = 1,
     progress=gr.Progress(track_tqdm=True),
 ):
     try:
@@ -161,10 +188,10 @@ def tts_generate(
     text = text.strip()[0:max_len]
 
     if text == "":
-        return None
+        raise gr.Error("Text is empty, please input some text")
 
     if style == "*auto":
-        style = None
+        style = ""
 
     if isinstance(top_k, float):
         top_k = int(top_k)
@@ -181,31 +208,53 @@ def tts_generate(
     infer_seed = np.clip(infer_seed, -1, 2**32 - 1, out=None, dtype=np.float64)
     infer_seed = int(infer_seed)
 
-    if not disable_normalize:
-        text = text_normalize(text)
-
     if spk_file:
-        spk = Speaker.from_file(spk_file)
+        try:
+            spk: Speaker = Speaker.from_file(spk_file)
+        except Exception:
+            raise gr.Error("Failed to load speaker file")
 
-    sample_rate, audio_data = synthesize_audio(
-        text=text,
+        if isinstance(spk.emb, torch.Tensor):
+            raise gr.Error("Speaker file is not supported")
+
+    tts_config = ChatTTSConfig(
+        style=style,
         temperature=temperature,
-        top_P=top_p,
-        top_K=top_k,
-        spk=spk,
-        infer_seed=infer_seed,
-        use_decoder=use_decoder,
+        top_k=top_k,
+        top_p=top_p,
+        prefix=prefix,
         prompt1=prompt1,
         prompt2=prompt2,
-        prefix=prefix,
+    )
+    infer_config = InferConfig(
         batch_size=batch_size,
-        end_of_sentence=eos,
         spliter_threshold=spliter_thr,
+        eos=eos,
+        seed=infer_seed,
+    )
+    adjust_config = AdjustConfig(
+        pitch=pitch,
+        speed_rate=speed_rate,
+        volume_gain_db=volume_gain_db,
+        normalize=normalize,
+        headroom=headroom,
+    )
+    enhancer_config = EnhancerConfig(
+        enabled=enable_denoise or enable_enhance or False,
+        lambd=0.9 if enable_denoise else 0.1,
     )
 
-    audio_data, sample_rate = apply_audio_enhance(
-        audio_data, sample_rate, enable_denoise, enable_enhance
+    handler = TTSHandler(
+        text_content=text,
+        spk=spk,
+        tts_config=tts_config,
+        infer_config=infer_config,
+        adjust_config=adjust_config,
+        enhancer_config=enhancer_config,
     )
+
+    audio_data, sample_rate = handler.enqueue()
+
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio.audio_to_int16(audio_data)
     return sample_rate, audio_data

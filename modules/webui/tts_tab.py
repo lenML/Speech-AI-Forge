@@ -229,13 +229,55 @@ def create_tts_interface():
                 )
 
             with gr.Group():
+                gr.Markdown("🎛️Adjuster")
+                # 调节 speed pitch volume
+                # 可以选择开启 响度均衡
+
+                speed_input = gr.Slider(
+                    label="Speed",
+                    value=1.0,
+                    minimum=0.5,
+                    maximum=2.0,
+                    step=0.1,
+                )
+                pitch_input = gr.Slider(
+                    label="Pitch",
+                    value=0,
+                    minimum=-12,
+                    maximum=12,
+                    step=0.1,
+                )
+                volume_up_input = gr.Slider(
+                    label="Volume Gain",
+                    value=0,
+                    minimum=-12,
+                    maximum=12,
+                    step=0.1,
+                )
+
+                enable_loudness_normalization = gr.Checkbox(
+                    value=True,
+                    label="Enable Loudness EQ",
+                )
+                headroom_input = gr.Slider(
+                    label="Headroom",
+                    value=1,
+                    minimum=0,
+                    maximum=12,
+                    step=0.1,
+                )
+
+            with gr.Group():
                 gr.Markdown("🔊Generate")
                 disable_normalize_input = gr.Checkbox(
-                    value=False, label="Disable Normalize"
+                    value=False,
+                    label="Disable Normalize",
+                    # 不需要了
+                    visible=False,
                 )
 
                 with gr.Group():
-                    gr.Markdown("💪🏼Enhance")
+                    # gr.Markdown("💪🏼Enhance")
                     enable_enhance = gr.Checkbox(value=True, label="Enable Enhance")
                     enable_de_noise = gr.Checkbox(value=False, label="Enable De-noise")
                 tts_button = gr.Button(
@@ -271,6 +313,11 @@ def create_tts_interface():
             spk_file_upload,
             spliter_thr_input,
             eos_input,
+            pitch_input,
+            speed_input,
+            volume_up_input,
+            enable_loudness_normalization,
+            headroom_input,
         ],
         outputs=tts_output,
     )
