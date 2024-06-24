@@ -6,8 +6,9 @@ from fastapi.testclient import TestClient
 from pytest import fixture
 
 from modules import config
-from modules.api.api_setup import create_api, process_model_args, setup_model_args
+from modules.api.api_setup import create_api
 from modules.devices import devices
+from modules.models_setup import process_model_args, setup_model_args
 
 parser = argparse.ArgumentParser(description="Test")
 setup_model_args(parser)

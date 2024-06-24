@@ -83,3 +83,20 @@ def test_synthesize_tts_large_top_k(client):
     response = client.get("/v1/tts", params=tts_params.model_dump())
 
     assert response.status_code == 422
+
+
+@pytest.mark.tts_api
+def test_adjust_tts_generate(client):
+    tts_params = default_tts_params.model_copy()
+    tts_params.text = "Hello, world! I am a test case."
+    tts_params.speed = 1.5
+
+    response = client.get("/v1/tts", params=tts_params.model_dump())
+    assert response.status_code == 200
+    assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
+
+    with open(
+        os.path.join(tests.conftest.test_outputs_dir, "tts_api_adjust_success.mp3"),
+        "wb",
+    ) as f:
+        f.write(response.content)
