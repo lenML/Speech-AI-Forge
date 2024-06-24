@@ -1,13 +1,11 @@
 import html
 import re
-from functools import lru_cache
-from typing import Literal
 
 import emojiswitch
 import ftfy
-import langdetect
 
 from modules import models
+from modules.utils.detect_lang import guess_lang
 from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.html import remove_html_tags as _remove_html_tags
 from modules.utils.markdown import markdown_to_text
@@ -16,33 +14,6 @@ from modules.utils.zh_normalization.text_normlization import TextNormalizer
 # 是否关闭 unk token 检查
 # NOTE: 单测的时候用于跳过模型加载
 DISABLE_UNK_TOKEN_CHECK = False
-
-
-@lru_cache(maxsize=64)
-def is_chinese(text):
-    try:
-        lang = langdetect.detect(text)
-        return lang.lower() in ["zh", "zh-cn", "zh-tw"]
-    except langdetect.LangDetectException:
-        return False
-
-
-@lru_cache(maxsize=64)
-def is_eng(text):
-    try:
-        lang = langdetect.detect(text)
-        return lang.lower() in ["en"]
-    except langdetect.LangDetectException:
-        return False
-
-
-@lru_cache(maxsize=64)
-def guess_lang(text) -> Literal["zh", "en"]:
-    if is_chinese(text):
-        return "zh"
-    if is_eng(text):
-        return "en"
-    return "zh"
 
 
 post_normalize_pipeline = []
@@ -332,6 +303,7 @@ if __name__ == "__main__":
         " [oral_9] [laugh_0] [break_0] 电 [speed_0] 影 [speed_0] 中 梁朝伟 [speed_9] 扮演的陈永仁的编号27149",
         " 明天有62％的概率降雨",
         "大🍌，一条大🍌，嘿，你的感觉真的很奇妙  [lbreak]",
+        "I like eating 🍏",
         """
 # 你好，世界
 ```js

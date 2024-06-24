@@ -10,7 +10,7 @@ normalization.DISABLE_UNK_TOKEN_CHECK = True
     "input_text, expected_output",
     [
         # 测试标题
-        ("# 你好，世界", "你好，世界"),
+        ("# 你好，世界", "你好,世界"),
         # 测试代码块
         ("```js\nconsole.log('1')\n```", ""),
         # 测试加粗
@@ -53,7 +53,7 @@ console.log('1')
 ---
             """.strip(),
             # FIXME: 有序list现在没有序列号...
-            "你好，世界\n加粗\n一条文本\nGoogle\n项目一\n项目二\n第一项\n第二项\n这是一段引用",
+            "你好,世界\n加粗\n一条文本\nGoogle\n项目一\n项目二\n第一项\n第二项\n这是一段引用",
         ),
     ],
 )

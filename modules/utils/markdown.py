@@ -36,6 +36,7 @@ class PlainTextRenderer(mistune.HTMLRenderer):
             return html + "\n" + text + "\n"
         return "\n" + text + "\n"
 
+    # FIXME: 现在的 list 转换没法保留序号
     def list_item(self, text):
         return "" + text + "\n"
 

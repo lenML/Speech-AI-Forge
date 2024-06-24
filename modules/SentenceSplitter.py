@@ -1,7 +1,8 @@
 import re
 
-import langdetect
 import zhon
+
+from modules.utils.detect_lang import guess_lang
 
 
 def split_zhon_sentence(text):
@@ -37,10 +38,7 @@ def split_en_sentence(text):
 
 
 def is_eng_sentence(text):
-    try:
-        return langdetect.detect(text) == "en"
-    except langdetect.LangDetectException:
-        return False
+    return guess_lang(text) == "en"
 
 
 def split_zhon_paragraph(text):
