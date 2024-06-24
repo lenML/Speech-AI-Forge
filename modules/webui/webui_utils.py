@@ -217,7 +217,7 @@ def tts_generate(
         except Exception:
             raise gr.Error("Failed to load speaker file")
 
-        if isinstance(spk.emb, torch.Tensor):
+        if not isinstance(spk.emb, torch.Tensor):
             raise gr.Error("Speaker file is not supported")
 
     tts_config = ChatTTSConfig(
