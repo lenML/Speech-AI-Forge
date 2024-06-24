@@ -62,11 +62,10 @@ def create_spk_from_seed(
     gender: str,
     desc: str,
 ):
-    chat_tts = load_chat_tts()
-    with SeedContext(seed, True):
-        emb = chat_tts.sample_random_speaker()
-    spk = Speaker(seed_or_tensor=-2, name=name, gender=gender, describe=desc)
-    spk.emb = emb
+    spk = Speaker.from_seed(seed)
+    spk.name = name
+    spk.gender = gender
+    spk.describe = desc
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp_file:
         torch.save(spk, tmp_file)
@@ -82,7 +81,8 @@ def test_spk_voice(
     text: str,
     progress=gr.Progress(track_tqdm=True),
 ):
-    return tts_generate(spk=seed, text=text, progress=progress)
+    spk = Speaker.from_seed(seed)
+    return tts_generate(spk=spk, text=text, progress=progress)
 
 
 def random_speaker():

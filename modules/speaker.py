@@ -29,6 +29,12 @@ class Speaker:
         speaker.emb = tensor
         return speaker
 
+    @staticmethod
+    def from_seed(seed: int):
+        speaker = Speaker(seed_or_tensor=seed)
+        speaker.emb = create_speaker_from_seed(seed)
+        return speaker
+
     def __init__(
         self, seed_or_tensor: Union[int, torch.Tensor], name="", gender="", describe=""
     ):

@@ -208,6 +208,9 @@ def tts_generate(
     infer_seed = np.clip(infer_seed, -1, 2**32 - 1, out=None, dtype=np.float64)
     infer_seed = int(infer_seed)
 
+    if isinstance(spk, int):
+        spk = Speaker.from_seed(spk)
+
     if spk_file:
         try:
             spk: Speaker = Speaker.from_file(spk_file)
