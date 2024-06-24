@@ -25,3 +25,4 @@ cn2an
 # audio_denoiser
 python-box
 ftfy
+librosa
