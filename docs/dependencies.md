@@ -83,26 +83,45 @@ git clone https://github.com/lenML/ChatTTS-Forge.git --depth=1
 
 - **ffmpeg** 或 **libav**（推荐使用 ffmpeg）
 
-### 安装 ffmpeg
+### 脚本安装
+
+执行此脚本即可自动安装后音频后端
+
+```
+python -m scripts.download_audio_backend
+```
+
+### 手动安装
+
+若安装脚本失效，可参考下面的指南自行手动安装
 
 **Mac（使用 [Homebrew](http://brew.sh)）**:
 
 ```bash
 brew install ffmpeg
+brew install rubberband
 ```
 
 **Linux（使用 aptitude）**:
 
 ```bash
 apt-get install ffmpeg libavcodec-extra
+apt-get install rubberband-cli
 ```
 
 **Windows**:
 
 > 若你已经安装有 ffmpeg，并可以在命令行中调用，那么无需进行下面的下载和安装
 
+下载 ffmpeg
+
 1. 从[此处](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z)下载并解压 ffmpeg 的 Windows 二进制文件。
 2. 将 ffmpeg 的`/bin`文件夹中的 .exe 文件解压到 `项目目录/ffmpeg` 文件夹内
+
+下载 rubberband
+
+1. 从[此处](https://breakfastquay.com/files/releases/rubberband-3.3.0-gpl-executable-windows.zip)下载并解压 rubberband 的 Windows 二进制文件。
+2. 将 压缩包中 `rubberband-3.3.0-gpl-executable-windows` 文件夹下的 .exe/.dll 文件解压到 `项目目录/ffmpeg` 文件夹内
 
 文件 (window) 目录应该如下
 
@@ -111,6 +130,10 @@ apt-get install ffmpeg libavcodec-extra
 ├── ffmpeg.exe
 ├── ffprobe.exe
 ├── ffplay.exe
+├── ffplay.exe
+├── rubberband.exe
+├── rubberband-r3.exe
+├── sndfile.dll
 └── put_ffmpeg_here
 ```
 
