@@ -27,3 +27,4 @@ cn2an
 python-box
 ftfy
 librosa
+pyrubberband

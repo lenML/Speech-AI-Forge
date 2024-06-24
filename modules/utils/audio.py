@@ -4,7 +4,7 @@ from io import BytesIO
 import numpy as np
 import soundfile as sf
 from pydub import AudioSegment, effects
-import librosa
+import pyrubberband as pyrb
 
 INT16_MAX = np.iinfo(np.int16).max
 
@@ -90,28 +90,21 @@ def apply_prosody_to_audio_segment(
     return audio_segment
 
 
-# FIXME: 使用 librosa.effects 会有音质损失
 def apply_prosody_to_audio_data(
     audio_data: np.ndarray,
     rate: float = 1,
     volume: float = 0,
-    pitch: int = 0,
+    pitch: float = 0,
     sr: int = 24000,
 ) -> np.ndarray:
-    if audio_data.ndim != 1:
-        audio_data = audio_data.mean(axis=1)
-
-    # Adjust volume
-    if volume != 0:
-        audio_data = audio_data + volume
-
-    # Adjust rate (speed)
     if rate != 1:
-        audio_data = librosa.effects.time_stretch(audio_data, rate=rate)
+        audio_data = pyrb.time_stretch(audio_data, sr=sr, rate=rate)
 
-    # Adjust pitch
+    if volume != 0:
+        audio_data = audio_data * volume
+
     if pitch != 0:
-        audio_data = librosa.effects.pitch_shift(audio_data, sr=sr, n_steps=pitch)
+        audio_data = pyrb.pitch_shift(audio_data, sr=sr, n_steps=pitch)
 
     return audio_data
 
