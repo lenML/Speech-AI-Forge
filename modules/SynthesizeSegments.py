@@ -17,7 +17,7 @@ from modules.SentenceSplitter import SentenceSplitter
 from modules.speaker import Speaker
 from modules.ssml_parser.SSMLParser import SSMLBreak, SSMLContext, SSMLSegment
 from modules.utils import rng
-from modules.utils.audio import pitch_shift, time_stretch
+from modules.utils.audio import apply_prosody_to_audio_segment
 
 logger = logging.getLogger(__name__)
 
@@ -65,21 +65,6 @@ def combine_audio_segments(audio_segments: list[AudioSegment]) -> AudioSegment:
     for segment in audio_segments:
         combined_audio += segment
     return combined_audio
-
-
-def apply_prosody(
-    audio_segment: AudioSegment, rate: float, volume: float, pitch: float
-) -> AudioSegment:
-    if rate != 1:
-        audio_segment = time_stretch(audio_segment, rate)
-
-    if volume != 0:
-        audio_segment += volume
-
-    if pitch != 0:
-        audio_segment = pitch_shift(audio_segment, pitch)
-
-    return audio_segment
 
 
 def to_number(value, t, default=0):
@@ -228,7 +213,9 @@ class SynthesizeSegments:
                 pitch = float(segment.get("pitch", "0"))
 
                 audio_segment = audio_data_to_segment(audio_data, sr)
-                audio_segment = apply_prosody(audio_segment, rate, volume, pitch)
+                audio_segment = apply_prosody_to_audio_segment(
+                    audio_segment, rate=rate, volume=volume, pitch=pitch
+                )
                 # compare by Box object
                 original_index = src_segments.index(segment)
                 audio_segments[original_index] = audio_segment

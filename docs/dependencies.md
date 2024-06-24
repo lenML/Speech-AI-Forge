@@ -82,7 +82,6 @@ git clone https://github.com/lenML/ChatTTS-Forge.git --depth=1
 音频后处理操作（如加速、减速、提高音量等）依赖以下库：
 
 - **ffmpeg** 或 **libav**（推荐使用 ffmpeg）
-- **rubberband-cli**（仅 Linux 环境需要）
 
 ### 安装 ffmpeg
 
@@ -96,7 +95,6 @@ brew install ffmpeg
 
 ```bash
 apt-get install ffmpeg libavcodec-extra
-apt-get install rubberband-cli
 ```
 
 **Windows**:

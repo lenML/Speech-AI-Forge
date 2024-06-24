@@ -4,7 +4,6 @@ lxml
 pydub
 fastapi
 soundfile
-pyrubberband
 omegaconf
 pypinyin
 pandas
@@ -27,4 +26,3 @@ cn2an
 # audio_denoiser
 python-box
 ftfy
-langdetect

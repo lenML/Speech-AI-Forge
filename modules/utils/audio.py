@@ -2,7 +2,6 @@ import sys
 from io import BytesIO
 
 import numpy as np
-import pyrubberband as pyrb
 import soundfile as sf
 from pydub import AudioSegment, effects
 
@@ -50,7 +49,7 @@ def pydub_to_np(audio: AudioSegment) -> tuple[int, np.ndarray]:
     )
 
 
-def ndarray_to_segment(ndarray, frame_rate):
+def ndarray_to_segment(ndarray: np.ndarray, frame_rate: int) -> AudioSegment:
     buffer = BytesIO()
     sf.write(buffer, ndarray, frame_rate, format="wav")
     buffer.seek(0)
@@ -60,58 +59,49 @@ def ndarray_to_segment(ndarray, frame_rate):
     return sound
 
 
-def time_stretch(input_segment: AudioSegment, time_factor: float) -> AudioSegment:
-    """
-    factor range -> [0.2,10]
-    """
-    time_factor = np.clip(time_factor, 0.2, 10)
-    sr = input_segment.frame_rate
-    y = audiosegment_to_librosawav(input_segment)
-    y_stretch = pyrb.time_stretch(y, sr, time_factor)
-
-    sound = ndarray_to_segment(
-        y_stretch,
-        frame_rate=sr,
-    )
-    return sound
-
-
-def pitch_shift(
-    input_segment: AudioSegment,
-    pitch_shift_factor: float,
+def apply_prosody_to_audio_segment(
+    audio_segment: AudioSegment,
+    rate: float = 1,
+    volume: float = 0,
+    pitch: int = 0,
+    sr: int = 24000,
 ) -> AudioSegment:
-    """
-    factor range -> [-12,12]
-    """
-    pitch_shift_factor = np.clip(pitch_shift_factor, -12, 12)
-    sr = input_segment.frame_rate
-    y = audiosegment_to_librosawav(input_segment)
-    y_shift = pyrb.pitch_shift(y, sr, pitch_shift_factor)
+    # Adjust rate (speed)
+    if rate != 1:
+        audio_segment = effects.speedup(audio_segment, playback_speed=rate)
 
-    sound = ndarray_to_segment(
-        y_shift,
-        frame_rate=sr,
-    )
-    return sound
+    # Adjust volume
+    if volume != 0:
+        audio_segment = audio_segment + volume
+
+    # Adjust pitch
+    if pitch != 0:
+        audio_segment = audio_segment._spawn(
+            audio_segment.raw_data,
+            overrides={
+                "frame_rate": int(audio_segment.frame_rate * (2.0 ** (pitch / 12.0)))
+            },
+        ).set_frame_rate(sr)
+
+    return audio_segment
 
 
 def apply_prosody_to_audio_data(
     audio_data: np.ndarray,
     rate: float = 1,
     volume: float = 0,
-    pitch: float = 0,
+    pitch: int = 0,
     sr: int = 24000,
 ) -> np.ndarray:
-    if rate != 1:
-        audio_data = pyrb.time_stretch(audio_data, sr=sr, rate=rate)
+    audio_segment = ndarray_to_segment(audio_data, sr)
 
-    if volume != 0:
-        audio_data = audio_data * volume
+    audio_segment = apply_prosody_to_audio_segment(
+        audio_segment, rate=rate, volume=volume, pitch=pitch, sr=sr
+    )
 
-    if pitch != 0:
-        audio_data = pyrb.pitch_shift(audio_data, sr=sr, n_steps=pitch)
+    processed_audio_data = np.array(audio_segment.get_array_of_samples())
 
-    return audio_data
+    return processed_audio_data
 
 
 def apply_normalize(

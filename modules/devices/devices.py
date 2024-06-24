@@ -131,6 +131,9 @@ def reset_device():
     global dtype_gpt
     global dtype_decoder
 
+    if config.runtime_env_vars.use_cpu is None:
+        config.runtime_env_vars.use_cpu = []
+
     if "all" in config.runtime_env_vars.use_cpu and not config.runtime_env_vars.no_half:
         logger.warning(
             "Cannot use half precision with CPU, using full precision instead"
