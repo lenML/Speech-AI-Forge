@@ -149,6 +149,14 @@ apt-get install rubberband-cli
 pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 -f https://mirror.sjtu.edu.cn/pytorch-wheels/torch_stable.html
 ```
 
+如果上面无法安装 cuda 版本，可以参考下面的指令安装指定版本 torch
+
+```bash
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torch-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchaudio-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+```
+
 ### 其余依赖
 
 ```bash
