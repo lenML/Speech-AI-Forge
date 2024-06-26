@@ -73,8 +73,9 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
                     show_label=False,
                     value="*auto",
                 )
+
             with gr.Group():
-                gr.Markdown("🗣️Seed")
+                gr.Markdown("💃Inference Seed")
                 infer_seed_input = gr.Number(
                     value=42,
                     label="Inference Seed",
@@ -84,10 +85,23 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
                 )
                 infer_seed_rand_button = gr.Button(
                     value="🎲",
+                    # tooltip="Random Seed",
                     variant="secondary",
                 )
 
-            send_btn = gr.Button("📩Send to SSML", variant="primary")
+            with gr.Group():
+                gr.Markdown("🎛️Spliter")
+                eos_input = gr.Textbox(
+                    label="eos",
+                    value="[uv_break]",
+                )
+                spliter_thr_input = gr.Slider(
+                    label="Spliter Threshold",
+                    value=100,
+                    minimum=50,
+                    maximum=1000,
+                    step=1,
+                )
 
         with gr.Column(scale=3):
             with gr.Group():
@@ -102,18 +116,20 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
                 )
                 long_text_split_button = gr.Button("🔪Split Text")
 
-    with gr.Row():
-        with gr.Column(scale=3):
             with gr.Group():
                 gr.Markdown("🎨Output")
                 long_text_output = gr.DataFrame(
                     headers=["index", "text", "length"],
                     datatype=["number", "str", "number"],
                     elem_id="long-text-output",
-                    interactive=False,
+                    interactive=True,
                     wrap=True,
                     value=[],
+                    row_count=(0, "dynamic"),
+                    col_count=(3, "fixed"),
                 )
+
+                send_btn = gr.Button("📩Send to SSML", variant="primary")
 
     spk_input_dropdown.change(
         fn=lambda x: x.startswith("*") and "-1" or x.split(":")[-1].strip(),
@@ -132,8 +148,14 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
     )
     long_text_split_button.click(
         split_long_text,
-        inputs=[long_text_input],
-        outputs=[long_text_output],
+        inputs=[
+            long_text_input,
+            spliter_thr_input,
+            eos_input,
+        ],
+        outputs=[
+            long_text_output,
+        ],
     )
 
     infer_seed_rand_button.click(

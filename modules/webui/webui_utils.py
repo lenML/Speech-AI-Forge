@@ -276,11 +276,12 @@ def refine_text(
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def split_long_text(long_text_input):
-    spliter = SentenceSplitter(webui_config.spliter_threshold)
+def split_long_text(long_text_input, spliter_threshold=100, eos=""):
+    spliter = SentenceSplitter(threshold=spliter_threshold)
     sentences = spliter.parse(long_text_input)
-    sentences = [text_normalize(s) for s in sentences]
+    sentences = [text_normalize(s) + eos for s in sentences]
     data = []
     for i, text in enumerate(sentences):
-        data.append([i, text, len(text)])
+        token_length = spliter.count_tokens(text)
+        data.append([i, text, token_length])
     return data
