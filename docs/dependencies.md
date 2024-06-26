@@ -157,6 +157,10 @@ pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchaudio-2.3.1%2B
 pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%2Bcu121-cp310-cp310-linux_x86_64.whl
 ```
 
+### flash attn (可选)
+
+详见: https://github.com/Dao-AILab/flash-attention
+
 ### 其余依赖
 
 ```bash
