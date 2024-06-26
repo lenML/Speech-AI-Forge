@@ -5,84 +5,83 @@ import zhon
 from modules.utils.detect_lang import guess_lang
 
 
-def split_zhon_sentence(text):
-    result = []
-    pattern = re.compile(zhon.hanzi.sentence)
-    start = 0
-    for match in pattern.finditer(text):
-        # 获取匹配的中文句子
-        end = match.end()
-        result.append(text[start:end])
-        start = end
-
-    # 最后一个中文句子后面的内容（如果有）也需要添加到结果中
-    if start < len(text):
-        result.append(text[start:])
-
-    result = [t for t in result if t.strip()]
-    return result
-
-
-def split_en_sentence(text):
-    """
-    Split English text into sentences.
-    """
-    # Define a regex pattern for English sentence splitting
-    pattern = re.compile(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s")
-    result = pattern.split(text)
-
-    # Filter out any empty strings or strings that are just whitespace
-    result = [sentence.strip() for sentence in result if sentence.strip()]
-
-    return result
-
-
-def is_eng_sentence(text):
-    return guess_lang(text) == "en"
-
-
-def split_zhon_paragraph(text):
-    lines = text.split("\n")
-    result = []
-    for line in lines:
-        if is_eng_sentence(line):
-            result.extend(split_en_sentence(line))
-        else:
-            result.extend(split_zhon_sentence(line))
-    return result
-
-
 # 解析文本 并根据停止符号分割成句子
 # 可以设置最大阈值，即如果分割片段小于这个阈值会与下一段合并
 class SentenceSplitter:
+    SEP_TOKEN = " "
+
     def __init__(self, threshold=100):
         self.sentence_threshold = threshold
 
-    def parse(self, text):
-        sentences = split_zhon_paragraph(text)
+    def parse(self, text: str):
+        sentences = self.split_paragraph(text)
+        sentences = self.merge_text_by_threshold(sentences)
 
-        # 合并小于最大阈值的片段
-        merged_sentences = []
-        temp_sentence = []
-        for sentence in sentences:
-            if len(sentence) < self.sentence_threshold:
-                temp_sentence.extend(sentence)
-                if len(temp_sentence) >= self.sentence_threshold:
-                    merged_sentences.append(temp_sentence)
-                    temp_sentence = []
+        return sentences
+
+    def merge_text_by_threshold(self, setences: list[str]):
+        """
+        Merge text by threshold.
+
+        If the length of the text is less than the threshold, merge it with the next text.
+        """
+        merged_sentences: list[str] = []
+        temp_sentence = ""
+        for sentence in setences:
+            if len(temp_sentence) + len(sentence) < self.sentence_threshold:
+                temp_sentence += SentenceSplitter.SEP_TOKEN + sentence
             else:
-                if temp_sentence:
-                    merged_sentences.append(temp_sentence)
-                    temp_sentence = []
-                merged_sentences.append(sentence)
+                merged_sentences.append(temp_sentence)
+                temp_sentence = sentence
 
         if temp_sentence:
             merged_sentences.append(temp_sentence)
+        return merged_sentences
 
-        joind_sentences = [
-            "".join(sentence) for sentence in merged_sentences if sentence
-        ]
-        return joind_sentences
+    def split_paragraph(self, text: str):
+        """
+        Split text into sentences.
+        """
+        lines = text.split("\n")
+        sentences: list[str] = []
+        for line in lines:
+            if self.is_eng_sentence(line):
+                sentences.extend(self.split_en_sentence(line))
+            else:
+                sentences.extend(self.split_zhon_sentence(line))
+        return sentences
+
+    def is_eng_sentence(self, text: str):
+        return guess_lang(text) == "en"
+
+    def split_en_sentence(self, text: str):
+        """
+        Split English text into sentences.
+        """
+        pattern = re.compile(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s")
+        sentences = pattern.split(text)
+
+        sentences = [sentence.strip() for sentence in sentences if sentence.strip()]
+
+        return sentences
+
+    def split_zhon_sentence(self, text: str):
+        """
+        Split Chinese text into sentences.
+        """
+        sentences: list[str] = []
+        pattern = re.compile(zhon.hanzi.sentence)
+        start = 0
+        for match in pattern.finditer(text):
+            end = match.end()
+            sentences.append(text[start:end])
+            start = end
+
+        if start < len(text):
+            sentences.append(text[start:])
+
+        sentences = [t for t in sentences if t.strip()]
+        return sentences
 
 
 if __name__ == "__main__":
