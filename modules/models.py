@@ -3,6 +3,7 @@ import logging
 import threading
 
 import torch
+from transformers import LlamaTokenizer
 
 from modules import config
 from modules.ChatTTS import ChatTTS
@@ -76,3 +77,9 @@ def reload_chat_tts():
     instance = load_chat_tts()
     logger.info("ChatTTS models reloaded")
     return instance
+
+
+def get_tokenizer() -> LlamaTokenizer:
+    chat_tts = load_chat_tts()
+    tokenizer = chat_tts.pretrain_models["tokenizer"]
+    return tokenizer

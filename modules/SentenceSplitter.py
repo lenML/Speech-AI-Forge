@@ -2,6 +2,7 @@ import re
 
 import zhon
 
+from modules.models import get_tokenizer
 from modules.utils.detect_lang import guess_lang
 
 
@@ -11,7 +12,15 @@ class SentenceSplitter:
     SEP_TOKEN = " "
 
     def __init__(self, threshold=100):
+        assert (
+            isinstance(threshold, int) and threshold > 0
+        ), "Threshold must be greater than 0."
+
         self.sentence_threshold = threshold
+        self.tokenizer = get_tokenizer()
+
+    def count_tokens(self, text: str):
+        return len(self.tokenizer.tokenize(text))
 
     def parse(self, text: str):
         sentences = self.split_paragraph(text)
