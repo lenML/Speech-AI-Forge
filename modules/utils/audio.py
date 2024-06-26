@@ -2,9 +2,9 @@ import sys
 from io import BytesIO
 
 import numpy as np
+import pyrubberband as pyrb
 import soundfile as sf
 from pydub import AudioSegment, effects
-import pyrubberband as pyrb
 
 INT16_MAX = np.iinfo(np.int16).max
 

@@ -1,10 +1,12 @@
 import os
 import shutil
+import tempfile
 import urllib.request
 import zipfile
-from tqdm import tqdm
 from pathlib import Path
-import tempfile
+
+from tqdm import tqdm
+
 from modules.utils.constants import ROOT_DIR
 
 BIN_DIR_PATH = Path("./ffmpeg")
