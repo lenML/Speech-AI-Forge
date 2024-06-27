@@ -22,6 +22,12 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
     indent = " " * 2
 
     for i, row in dataframe.iterrows():
+        text = row.iloc[1]
+        text = text_normalize(text)
+
+        if text.strip() == "":
+            continue
+
         ssml += f"{indent}<voice"
         if spk:
             ssml += f' spk="{spk}"'
@@ -30,7 +36,7 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
         if seed:
             ssml += f' seed="{seed}"'
         ssml += ">\n"
-        ssml += f"{indent}{indent}{text_normalize(row.iloc[1])}\n"
+        ssml += f"{indent}{indent}{text}\n"
         ssml += f"{indent}</voice>\n"
     # 原封不动输出回去是为了触发 loadding 效果
     return dataframe, spk, style, seed, f"<speak version='0.1'>\n{ssml}</speak>"

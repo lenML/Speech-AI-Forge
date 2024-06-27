@@ -19,13 +19,18 @@ def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
         spk = row.get("speaker")
         style = row.get("style")
 
+        text = text_normalize(text)
+
+        if text.strip() == "":
+            continue
+
         ssml += f"{indent}<voice"
         if spk:
             ssml += f' spk="{spk}"'
         if style:
             ssml += f' style="{style}"'
         ssml += ">\n"
-        ssml += f"{indent}{indent}{text_normalize(text)}\n"
+        ssml += f"{indent}{indent}{text}\n"
         ssml += f"{indent}</voice>\n"
     # 原封不动输出回去是为了触发 loadding 效果
     return msg, spk, style, f"<speak version='0.1'>\n{ssml}</speak>"
@@ -42,6 +47,7 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
     with gr.Row():
         with gr.Column(scale=1):
             with gr.Group():
+                gr.Markdown("🗣️Speaker")
                 spk_input_dropdown = gr.Dropdown(
                     choices=get_spk_choices(),
                     interactive=True,
@@ -55,13 +61,19 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
                     show_label=False,
                     value="*auto",
                 )
+
             with gr.Group():
+                gr.Markdown("📝Text Input")
                 msg = gr.Textbox(
-                    lines=5, label="Message", placeholder="Type speaker message here"
+                    lines=5,
+                    label="Message",
+                    show_label=False,
+                    placeholder="Type speaker message here",
                 )
                 add = gr.Button("Add")
                 undo = gr.Button("Undo")
                 clear = gr.Button("Clear")
+
         with gr.Column(scale=5):
             with gr.Group():
                 gr.Markdown("📔Script")
@@ -75,7 +87,7 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
                     col_count=(4, "fixed"),
                 )
 
-    send_to_ssml_btn = gr.Button("📩Send to SSML", variant="primary")
+            send_to_ssml_btn = gr.Button("📩Send to SSML", variant="primary")
 
     def add_message(msg, spk, style, sheet: pd.DataFrame):
         if not msg:

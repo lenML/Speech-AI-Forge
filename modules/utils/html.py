@@ -1,6 +1,6 @@
-from html.parser import HTMLParser
 import html
 import re
+from html.parser import HTMLParser
 
 
 # NOTE: 现在没用这个，因为不好解决转义字符的问题
