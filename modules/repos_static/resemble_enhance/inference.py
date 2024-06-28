@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.nn.utils.parametrize import remove_parametrizations
 from torchaudio.functional import resample
 from torchaudio.transforms import MelSpectrogram
+from tqdm import trange
 
 from modules.devices import devices
 
