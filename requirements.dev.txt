@@ -159,3 +159,4 @@ Werkzeug==3.0.3
 zhon==2.0.2
 ftfy==6.2.0
 pyrubberband==0.3.0
+pybase16384==0.3.7

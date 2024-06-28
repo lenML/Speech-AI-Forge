@@ -28,3 +28,4 @@ python-box
 ftfy
 librosa
 pyrubberband
+pybase16384
