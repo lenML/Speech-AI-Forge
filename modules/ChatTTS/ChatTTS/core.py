@@ -325,7 +325,14 @@ class Chat:
             cfg = OmegaConf.load(gpt_config_path)
             gpt = GPT(**cfg, device=device, logger=self.logger).eval()
             assert gpt_ckpt_path, "gpt_ckpt_path should not be None"
-            gpt.load_state_dict(torch.load(gpt_ckpt_path, weights_only=True, mmap=True))
+            gpt.load_state_dict(
+                torch.load(
+                    gpt_ckpt_path,
+                    weights_only=True,
+                    mmap=True,
+                    map_location=map_location,
+                )
+            )
             if compile and "cuda" in str(device):
                 try:
                     gpt.gpt.forward = torch.compile(
@@ -351,7 +358,12 @@ class Chat:
             coef = str(decoder)
             assert decoder_ckpt_path, "decoder_ckpt_path should not be None"
             decoder.load_state_dict(
-                torch.load(decoder_ckpt_path, weights_only=True, mmap=True)
+                torch.load(
+                    decoder_ckpt_path,
+                    weights_only=True,
+                    mmap=True,
+                    map_location=map_location,
+                )
             )
             self.decoder = decoder
             self.logger.log(logging.INFO, "decoder loaded.")
