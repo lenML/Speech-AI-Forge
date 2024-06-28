@@ -80,10 +80,10 @@ async def synthesize_tts(params: TTSParams = Depends()):
             )
 
         # Validate format
-        if params.format not in ["mp3", "wav"]:
+        if params.format not in AudioFormat.__members__:
             raise HTTPException(
                 status_code=422,
-                detail="Invalid format. Supported formats are mp3 and wav",
+                detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
             )
 
         calc_params = api_utils.calc_spk_style(spk=params.spk, style=params.style)

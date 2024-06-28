@@ -81,6 +81,23 @@ def generate_audio_batch(
     spk_emb = parse_infer_spk_emb(
         spk=spk,
     )
+    logger.debug(
+        (
+            "[generate_audio_batch]",
+            {
+                "texts": texts,
+                "temperature": temperature,
+                "top_P": top_P,
+                "top_K": top_K,
+                "spk": spk,
+                "infer_seed": infer_seed,
+                "use_decoder": use_decoder,
+                "prompt1": prompt1,
+                "prompt2": prompt2,
+                "prefix": prefix,
+            },
+        )
+    )
 
     with SeedContext(infer_seed, True):
         infer = ChatTTSInfer(instance=chat_tts)
@@ -121,6 +138,23 @@ def generate_audio_stream(
     texts = [text]
     spk_emb = parse_infer_spk_emb(
         spk=spk,
+    )
+    logger.debug(
+        (
+            "[generate_audio_stream]",
+            {
+                "text": text,
+                "temperature": temperature,
+                "top_P": top_P,
+                "top_K": top_K,
+                "spk": spk,
+                "infer_seed": infer_seed,
+                "use_decoder": use_decoder,
+                "prompt1": prompt1,
+                "prompt2": prompt2,
+                "prefix": prefix,
+            },
+        )
     )
 
     with SeedContext(infer_seed, True):

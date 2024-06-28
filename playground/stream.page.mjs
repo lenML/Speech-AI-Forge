@@ -213,6 +213,7 @@ const StreamForm = () => {
           <select name="format" value=${params.format} onChange=${handleChange}>
             <option value="mp3">mp3</option>
             <option value="wav">wav</option>
+            <option value="ogg">ogg</option>
           </select>
         </label>
         <button type="submit">Synthesize</button>

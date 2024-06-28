@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class AudioFormat(str, Enum):
     mp3 = "mp3"
     wav = "wav"
+    ogg = "ogg"
 
 
 class AdjustConfig(BaseModel):

@@ -1,12 +1,38 @@
 import base64
 import io
 from typing import Generator
+import wave
 
 import numpy as np
 import soundfile as sf
 
 from modules.api import utils as api_utils
 from modules.api.impl.model.audio_model import AudioFormat
+
+from pydub import AudioSegment
+
+from modules.utils.audio import ndarray_to_segment
+
+
+def wave_header_chunk(frame_input=b"", channels=1, sample_width=2, sample_rate=24000):
+    wav_buf = io.BytesIO()
+    with wave.open(wav_buf, "wb") as vfout:
+        vfout.setnchannels(channels)
+        vfout.setsampwidth(sample_width)
+        vfout.setframerate(sample_rate)
+        vfout.writeframes(frame_input)
+    wav_buf.seek(0)
+    return wav_buf.read()
+
+
+wav_header = wave_header_chunk()
+
+
+def read_to_wav(audio_data: np.ndarray, buffer: io.BytesIO):
+    audio_data = audio_data / np.max(np.abs(audio_data))
+    chunk = (audio_data * 32768).astype(np.int16)
+    buffer.write(chunk.tobytes())
+    return buffer
 
 
 class AudioHandler:
@@ -18,28 +44,57 @@ class AudioHandler:
             "Method 'enqueue_stream' must be implemented by subclass"
         )
 
-    def enqueue_to_stream(self, format: AudioFormat) -> Generator[bytes, None, None]:
-        for audio_data, sample_rate in self.enqueue_stream():
-            buffer = io.BytesIO()
-            sf.write(buffer, audio_data, sample_rate, format="wav")
+    def encode_audio(
+        self, audio_data: np.ndarray, sample_rate: int, format: AudioFormat
+    ) -> io.BytesIO:
+        buffer = io.BytesIO()
+        audio_segment: AudioSegment = ndarray_to_segment(
+            audio_data, frame_rate=sample_rate
+        )
+
+        if format == AudioFormat.mp3:
+            audio_segment.export(buffer, format="mp3")
             buffer.seek(0)
+        elif format == AudioFormat.wav:
+            audio_segment.export(buffer, format="wav")
+            buffer.seek(len(wav_header))
+        elif format == AudioFormat.ogg:
+            # FIXME: 有 bug，会莫名其妙中断输出...
+            audio_segment.export(buffer, format="ogg")
+            buffer.seek(0)
+        else:
+            raise ValueError(f"Invalid audio format: {format}")
 
-            if format == AudioFormat.mp3:
-                buffer = api_utils.wav_to_mp3(buffer)
+        return buffer
 
-            binary = buffer.read()
-            yield binary
+    # just for test
+    def enqueue_to_stream_join(
+        self, format: AudioFormat
+    ) -> Generator[bytes, None, None]:
+        if format == AudioFormat.wav:
+            yield wav_header
+
+        data = None
+        for audio_data, sample_rate in self.enqueue_stream():
+            data = audio_data if data is None else np.concatenate((data, audio_data))
+        buffer = self.encode_audio(data, sample_rate, format)
+        yield buffer.read()
+
+    def enqueue_to_stream(self, format: AudioFormat) -> Generator[bytes, None, None]:
+        if format == AudioFormat.wav:
+            yield wav_header
+
+        for audio_data, sample_rate in self.enqueue_stream():
+            buffer = self.encode_audio(audio_data, sample_rate, format)
+            yield buffer.read()
+
+        # print("AudioHandler: enqueue_to_stream done")
 
     def enqueue_to_buffer(self, format: AudioFormat) -> io.BytesIO:
         audio_data, sample_rate = self.enqueue()
-
-        buffer = io.BytesIO()
-        sf.write(buffer, audio_data, sample_rate, format="wav")
-        buffer.seek(0)
-
-        if format == AudioFormat.mp3:
-            buffer = api_utils.wav_to_mp3(buffer)
-
+        buffer = self.encode_audio(audio_data, sample_rate, format)
+        if format == AudioFormat.wav:
+            buffer = io.BytesIO(wav_header + buffer.read())
         return buffer
 
     def enqueue_to_bytes(self, format: AudioFormat) -> bytes:

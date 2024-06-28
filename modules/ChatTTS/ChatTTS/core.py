@@ -390,7 +390,7 @@ class Chat:
         params_infer_code=InferCodeParams(),
     ):
 
-        assert self.has_loaded(use_decoder=use_decoder)
+        # assert self.has_loaded(use_decoder=use_decoder)
 
         if not isinstance(text, list):
             text = [text]

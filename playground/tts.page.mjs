@@ -457,6 +457,7 @@ export const TTSPage = () => {
             >
               <option value="mp3">MP3</option>
               <option value="wav">WAV</option>
+              <option value="ogg">ogg</option>
             </select>
           </label>
           <label>
