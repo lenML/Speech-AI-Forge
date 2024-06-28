@@ -11,11 +11,13 @@ import torch.utils.data
 import torchaudio
 import transformers
 import vocos
-from torchvision.datasets.utils import download_url
 
-from modules.ChatTTS.ChatTTS.utils.infer_utils import (
-    apply_character_map,
-    count_invalid_characters,
+from modules.ChatTTS.ChatTTS.norm import Normalizer
+
+normalizer = Normalizer(
+    os.path.join(
+        os.path.dirname(__file__), "../../ChatTTS/ChatTTS", "res", "homophones_map.json"
+    ),
 )
 
 
@@ -190,10 +192,7 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
         text: str,
         lang: str,
     ) -> torch.Tensor:
-        invalid_characters = count_invalid_characters(text)
-        if len(invalid_characters):
-            # self.logger.log(logging.WARNING, f'Invalid characters found! : {invalid_characters}')
-            text = apply_character_map(text)
+        text = normalizer(text)
 
         # if not skip_refine_text:
         #     text_tokens = refine_text(self.pretrain_models, text, **params_refine_text)['ids']

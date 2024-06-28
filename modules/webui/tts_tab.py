@@ -118,30 +118,9 @@ def create_tts_interface():
                     maximum=1000,
                     step=1,
                 )
-
-            with gr.Group():
-                gr.Markdown("💃Inference Seed")
-                infer_seed_input = gr.Number(
-                    value=42,
-                    label="Inference Seed",
-                    show_label=False,
-                    minimum=-1,
-                    maximum=2**32 - 1,
-                )
-                infer_seed_rand_button = gr.Button(
-                    value="🎲",
-                    # tooltip="Random Seed",
-                    variant="secondary",
-                )
             # 感觉这个没必要设置...
             use_decoder_input = gr.Checkbox(
                 value=True, label="Use Decoder", visible=False
-            )
-
-            infer_seed_rand_button.click(
-                lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
-                inputs=[infer_seed_input],
-                outputs=[infer_seed_input],
             )
         with gr.Column(scale=4):
             with gr.Group():
@@ -266,6 +245,27 @@ def create_tts_interface():
                     maximum=12,
                     step=0.1,
                 )
+
+            with gr.Group():
+                gr.Markdown("💃Inference Seed")
+                infer_seed_input = gr.Number(
+                    value=42,
+                    label="Inference Seed",
+                    show_label=False,
+                    minimum=-1,
+                    maximum=2**32 - 1,
+                )
+                infer_seed_rand_button = gr.Button(
+                    value="🎲",
+                    # tooltip="Random Seed",
+                    variant="secondary",
+                )
+
+            infer_seed_rand_button.click(
+                lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
+                inputs=[infer_seed_input],
+                outputs=[infer_seed_input],
+            )
 
             with gr.Group():
                 gr.Markdown("🔊Generate")

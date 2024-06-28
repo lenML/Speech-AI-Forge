@@ -166,7 +166,9 @@ def replace_unk_tokens(text):
     return output_text
 
 
-homo_replacer = HomophonesReplacer(map_file_path="./data/homophones_map.json")
+homo_replacer = HomophonesReplacer(
+    map_file_path="./modules/ChatTTS/ChatTTS/res/homophones_map.json"
+)
 
 
 @post_normalize()

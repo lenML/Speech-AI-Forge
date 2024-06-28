@@ -12,7 +12,7 @@ from modules.utils.SeedContext import SeedContext
 def create_speaker_from_seed(seed):
     chat_tts = models.load_chat_tts()
     with SeedContext(seed, True):
-        emb = chat_tts.sample_random_speaker()
+        emb = chat_tts._sample_random_speaker()
     return emb
 
 

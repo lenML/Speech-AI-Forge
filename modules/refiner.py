@@ -4,6 +4,7 @@ import numpy as np
 import torch
 
 from modules import config, models
+from modules.ChatTTSInfer import ChatTTSInfer
 from modules.utils.SeedContext import SeedContext
 
 
@@ -21,17 +22,15 @@ def refine_text(
     chat_tts = models.load_chat_tts()
 
     with SeedContext(seed):
-        refined_text = chat_tts.refiner_prompt(
-            text,
-            {
-                "prompt": prompt,
-                "top_K": top_K,
-                "top_P": top_P,
-                "temperature": temperature,
-                "repetition_penalty": repetition_penalty,
-                "max_new_token": max_new_token,
-                "disable_tqdm": config.runtime_env_vars.off_tqdm,
-            },
+        infer = ChatTTSInfer(chat_tts)
+        refined_text = infer.refine_text(
+            text=text,
+            prompt=prompt,
+            top_P=top_P,
+            top_K=top_K,
+            temperature=temperature,
+            repetition_penalty=repetition_penalty,
+            max_new_token=max_new_token,
         )
         if isinstance(refined_text, Generator):
             raise NotImplementedError(

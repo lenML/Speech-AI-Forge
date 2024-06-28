@@ -12,6 +12,8 @@ from modules.repos_static.resemble_enhance.enhancer.enhancer import Enhancer
 from modules.repos_static.resemble_enhance.enhancer.hparams import HParams
 from modules.repos_static.resemble_enhance.inference import inference
 from modules.utils.constants import MODELS_DIR
+from modules.utils.monkey_tqdm import disable_tqdm
+from modules import config
 
 logger = logging.getLogger(__name__)
 
@@ -45,13 +47,15 @@ class ResembleEnhance:
         assert self.enhancer is not None, "Model not loaded"
         assert self.enhancer.denoiser is not None, "Denoiser not loaded"
         enhancer = self.enhancer
-        return inference(
-            model=enhancer.denoiser,
-            dwav=dwav,
-            sr=sr,
-            device=self.devicem,
-            dtype=self.dtype,
-        )
+
+        with disable_tqdm(enabled=config.runtime_env_vars.off_tqdm):
+            return inference(
+                model=enhancer.denoiser,
+                dwav=dwav,
+                sr=sr,
+                device=self.devicem,
+                dtype=self.dtype,
+            )
 
     @torch.inference_mode()
     def enhance(
@@ -74,9 +78,11 @@ class ResembleEnhance:
         assert self.enhancer is not None, "Model not loaded"
         enhancer = self.enhancer
         enhancer.configurate_(nfe=nfe, solver=solver, lambd=lambd, tau=tau)
-        return inference(
-            model=enhancer, dwav=dwav, sr=sr, device=self.device, dtype=self.dtype
-        )
+
+        with disable_tqdm(enabled=config.runtime_env_vars.off_tqdm):
+            return inference(
+                model=enhancer, dwav=dwav, sr=sr, device=self.device, dtype=self.dtype
+            )
 
 
 def load_enhancer() -> ResembleEnhance:

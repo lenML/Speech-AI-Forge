@@ -24,16 +24,16 @@ def load_chat_tts_in_thread():
     chat_tts = ChatTTS.Chat()
     device = devices.get_device_for("chattts")
     dtype = devices.dtype
-    chat_tts.load_models(
+    chat_tts.load(
         compile=config.runtime_env_vars.compile,
-        source="local",
-        local_path="./models/ChatTTS",
+        source="custom",
+        custom_path="./models/ChatTTS",
         device=device,
         dtype=dtype,
-        dtype_vocos=devices.dtype_vocos,
-        dtype_dvae=devices.dtype_dvae,
-        dtype_gpt=devices.dtype_gpt,
-        dtype_decoder=devices.dtype_decoder,
+        # dtype_vocos=devices.dtype_vocos,
+        # dtype_dvae=devices.dtype_dvae,
+        # dtype_gpt=devices.dtype_gpt,
+        # dtype_decoder=devices.dtype_decoder,
     )
 
     # 如果 device 为 cpu 同时，又是 dtype == float16 那么报 warn

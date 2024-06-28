@@ -7,6 +7,7 @@ import torch
 
 from modules import config, models
 from modules.ChatTTS import ChatTTS
+from modules.ChatTTSInfer import ChatTTSInfer
 from modules.devices import devices
 from modules.speaker import Speaker
 from modules.utils.cache import conditional_cache
@@ -45,60 +46,22 @@ def generate_audio(
     return (sample_rate, wav)
 
 
-def parse_infer_params(
-    texts: list[str],
-    chat_tts: ChatTTS.Chat,
-    temperature: float = 0.3,
-    top_P: float = 0.7,
-    top_K: float = 20,
+def parse_infer_spk_emb(
     spk: Union[int, Speaker] = -1,
-    infer_seed: int = -1,
-    prompt1: str = "",
-    prompt2: str = "",
-    prefix: str = "",
 ):
-    params_infer_code = {
-        "spk_emb": None,
-        "temperature": temperature,
-        "top_P": top_P,
-        "top_K": top_K,
-        "prompt1": prompt1 or "",
-        "prompt2": prompt2 or "",
-        "prefix": prefix or "",
-        "repetition_penalty": 1.0,
-        "disable_tqdm": config.runtime_env_vars.off_tqdm,
-    }
-
     if isinstance(spk, int):
-        with SeedContext(spk, True):
-            params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
-        logger.debug(("spk", spk))
+        logger.debug(("[spk_from_seed]", spk))
+        return Speaker.from_seed(spk).emb
     elif isinstance(spk, Speaker):
+        logger.debug(("[spk_from_file]", spk.name))
         if not isinstance(spk.emb, torch.Tensor):
             raise ValueError("spk.pt is broken, please retrain the model.")
-        params_infer_code["spk_emb"] = spk.emb
-        logger.debug(("spk", spk.name))
+        return spk.emb
     else:
         logger.warn(
             f"spk must be int or Speaker, but: <{type(spk)}> {spk}, wiil set to default voice"
         )
-        with SeedContext(2, True):
-            params_infer_code["spk_emb"] = chat_tts.sample_random_speaker()
-
-    logger.debug(
-        {
-            "text": texts,
-            "infer_seed": infer_seed,
-            "temperature": temperature,
-            "top_P": top_P,
-            "top_K": top_K,
-            "prompt1": prompt1 or "",
-            "prompt2": prompt2 or "",
-            "prefix": prefix or "",
-        }
-    )
-
-    return params_infer_code
+        return Speaker.from_seed(2).emb
 
 
 @torch.inference_mode()
@@ -115,22 +78,22 @@ def generate_audio_batch(
     prefix: str = "",
 ):
     chat_tts = models.load_chat_tts()
-    params_infer_code = parse_infer_params(
-        texts=texts,
-        chat_tts=chat_tts,
-        temperature=temperature,
-        top_P=top_P,
-        top_K=top_K,
+    spk_emb = parse_infer_spk_emb(
         spk=spk,
-        infer_seed=infer_seed,
-        prompt1=prompt1,
-        prompt2=prompt2,
-        prefix=prefix,
     )
 
     with SeedContext(infer_seed, True):
-        wavs = chat_tts.generate_audio(
-            prompt=texts, params_infer_code=params_infer_code, use_decoder=use_decoder
+        infer = ChatTTSInfer(instance=chat_tts)
+        wavs = infer.generate_audio(
+            text=texts,
+            spk_emb=spk_emb,
+            temperature=temperature,
+            top_K=top_K,
+            top_P=top_P,
+            use_decoder=use_decoder,
+            prompt1=prompt1,
+            prompt2=prompt2,
+            prefix=prefix,
         )
 
     if config.auto_gc:
@@ -156,25 +119,22 @@ def generate_audio_stream(
 ) -> Generator[tuple[int, np.ndarray], None, None]:
     chat_tts = models.load_chat_tts()
     texts = [text]
-    params_infer_code = parse_infer_params(
-        texts=texts,
-        chat_tts=chat_tts,
-        temperature=temperature,
-        top_P=top_P,
-        top_K=top_K,
+    spk_emb = parse_infer_spk_emb(
         spk=spk,
-        infer_seed=infer_seed,
-        prompt1=prompt1,
-        prompt2=prompt2,
-        prefix=prefix,
     )
 
     with SeedContext(infer_seed, True):
-        wavs_gen = chat_tts.generate_audio(
-            prompt=texts,
-            params_infer_code=params_infer_code,
+        infer = ChatTTSInfer(instance=chat_tts)
+        wavs_gen = infer.generate_audio_stream(
+            text=texts,
+            spk_emb=spk_emb,
+            temperature=temperature,
+            top_K=top_K,
+            top_P=top_P,
             use_decoder=use_decoder,
-            stream=True,
+            prompt1=prompt1,
+            prompt2=prompt2,
+            prefix=prefix,
         )
 
         for wav in wavs_gen:
