@@ -448,11 +448,11 @@ class Chat:
             start_seeks[i] = length
             chunk_data = chunk_data[start_seek:]
             decoder = self.decoder if use_decoder else self.dvae
-            mel_spec = decoder(
-                chunk_data[None]
-                .permute(0, 2, 1)
-                .to(device=self.device, dtype=self.dtype)
-            )
+            input_data = chunk_data[None].permute(0, 2, 1).to(device=self.device)
+            if use_decoder:
+                input_data = input_data.to(dtype=self.dtype)
+            mel_spec = decoder(input_data)
+            del input_data
             del chunk_data
             wavs.append(self._vocos_decode(mel_spec))
             del_all(mel_spec)
