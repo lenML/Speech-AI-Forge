@@ -1,7 +1,7 @@
-import os
 import logging
-from typing import Union
+import os
 from dataclasses import is_dataclass
+from typing import Union
 
 from .log import logger
 

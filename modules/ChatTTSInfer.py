@@ -2,9 +2,10 @@ from typing import Generator, Union
 
 import numpy as np
 import torch
+
+from modules import config
 from modules.ChatTTS.ChatTTS.core import Chat
 from modules.utils.monkey_tqdm import disable_tqdm
-from modules import config
 
 
 # 主要解决类型问题

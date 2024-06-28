@@ -1,16 +1,14 @@
 import base64
 import io
-from typing import Generator
 import wave
+from typing import Generator
 
 import numpy as np
 import soundfile as sf
+from pydub import AudioSegment
 
 from modules.api import utils as api_utils
 from modules.api.impl.model.audio_model import AudioFormat
-
-from pydub import AudioSegment
-
 from modules.utils.audio import ndarray_to_segment
 
 

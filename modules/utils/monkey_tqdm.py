@@ -73,6 +73,7 @@ def disable_tqdm(enabled=True):
 
 if __name__ == "__main__":
     import time
+
     from tqdm import tqdm
 
     with disable_tqdm():

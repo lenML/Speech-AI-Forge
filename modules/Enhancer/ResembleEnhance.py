@@ -7,13 +7,13 @@ from typing import Literal
 import numpy as np
 import torch
 
+from modules import config
 from modules.devices import devices
 from modules.repos_static.resemble_enhance.enhancer.enhancer import Enhancer
 from modules.repos_static.resemble_enhance.enhancer.hparams import HParams
 from modules.repos_static.resemble_enhance.inference import inference
 from modules.utils.constants import MODELS_DIR
 from modules.utils.monkey_tqdm import disable_tqdm
-from modules import config
 
 logger = logging.getLogger(__name__)
 

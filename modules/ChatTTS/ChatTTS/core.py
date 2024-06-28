@@ -1,31 +1,30 @@
-import os
 import logging
+import lzma
+import os
 import tempfile
 from dataclasses import dataclass
-from typing import Literal, Optional, List, Callable, Tuple, Dict, Union
 from json import load
 from pathlib import Path
-import lzma
+from typing import Callable, Dict, List, Literal, Optional, Tuple, Union
 
 import numpy as np
+import pybase16384 as b14
 import torch
 import torch.nn.functional as F
+from huggingface_hub import snapshot_download
 from omegaconf import OmegaConf
 from vocos import Vocos
-from huggingface_hub import snapshot_download
-import pybase16384 as b14
 
 from .model import DVAE, GPT, gen_logits
+from .norm import Normalizer
 from .utils import (
     check_all_assets,
-    download_all_assets,
-    select_device,
-    get_latest_modified_file,
     del_all,
+    download_all_assets,
+    get_latest_modified_file,
 )
 from .utils import logger as utils_logger
-
-from .norm import Normalizer
+from .utils import select_device
 
 
 class Chat:

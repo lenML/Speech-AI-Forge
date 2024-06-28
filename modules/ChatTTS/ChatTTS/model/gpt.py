@@ -5,9 +5,9 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
 """
 
-from dataclasses import dataclass
 import logging
-from typing import Union, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Tuple, Union
 
 import omegaconf
 import torch
@@ -16,13 +16,12 @@ import torch.nn.functional as F
 import torch.nn.utils.parametrize as P
 from torch.nn.utils.parametrizations import weight_norm
 from tqdm import tqdm
-from transformers import LlamaModel, LlamaConfig, LogitsWarper
+from transformers import LlamaConfig, LlamaModel, LogitsWarper
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import BaseModelOutputWithPast
 
-from .processors import CustomRepetitionPenaltyLogitsProcessorRepeat
 from ..utils import del_all
-
+from .processors import CustomRepetitionPenaltyLogitsProcessorRepeat
 
 """class LlamaMLP(nn.Module):
     def __init__(self, hidden_size, intermediate_size):
