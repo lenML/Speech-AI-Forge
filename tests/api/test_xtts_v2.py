@@ -29,6 +29,25 @@ def test_synthesize_tts_to_audio(client: TestClient):
 
 
 @pytest.mark.xtts_v2
+def test_synthesize_tts_to_audio_stream(client: TestClient):
+    response = client.get(
+        "/v1/xtts_v2/tts_stream",
+        params=default_tts_params,
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "audio/mpeg"
+
+    with open(
+        os.path.join(
+            tests.conftest.test_outputs_dir,
+            f"xtts_v2_api_stream_success.mp3",
+        ),
+        "wb",
+    ) as f:
+        f.write(response.content)
+
+
+@pytest.mark.xtts_v2
 def test_set_tts_settings(client: TestClient):
     tts_settings = {
         "stream_chunk_size": 100,
