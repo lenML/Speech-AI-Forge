@@ -190,10 +190,44 @@ def create_tts_interface():
         with gr.Column(scale=1):
             with gr.Group():
                 gr.Markdown("🎶Refiner")
-                refine_prompt_input = gr.Textbox(
-                    label="Refine Prompt",
-                    value="[oral_2][laugh_0][break_6]",
+                # refine_prompt_input = gr.Textbox(
+                #     label="Refine Prompt",
+                #     value="[oral_2][laugh_0][break_6]",
+                # )
+                # oral 0 - 9
+                # speed 0 - 9
+                # break 0 - 7
+                # laugh 0 - 2
+                # -1 表示不使用这个标签
+                rf_oral_input = gr.Slider(
+                    label="Oral",
+                    value=2,
+                    minimum=-1,
+                    maximum=9,
+                    step=1,
                 )
+                rf_speed_input = gr.Slider(
+                    label="Speed",
+                    value=2,
+                    minimum=-1,
+                    maximum=9,
+                    step=1,
+                )
+                rf_break_input = gr.Slider(
+                    label="Break",
+                    value=2,
+                    minimum=-1,
+                    maximum=7,
+                    step=1,
+                )
+                rf_laugh_input = gr.Slider(
+                    label="Laugh",
+                    value=0,
+                    minimum=-1,
+                    maximum=2,
+                    step=1,
+                )
+
                 refine_button = gr.Button("✍️Refine Text")
 
             # 由于使用不是很方便，所以列为实验性功能
@@ -288,7 +322,13 @@ def create_tts_interface():
 
     refine_button.click(
         refine_text,
-        inputs=[text_input, refine_prompt_input],
+        inputs=[
+            text_input,
+            rf_oral_input,
+            rf_speed_input,
+            rf_break_input,
+            rf_laugh_input,
+        ],
         outputs=[text_input],
     )
 

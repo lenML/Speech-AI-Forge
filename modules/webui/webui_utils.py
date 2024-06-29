@@ -267,11 +267,27 @@ def tts_generate(
 @spaces.GPU(duration=120)
 def refine_text(
     text: str,
-    prompt: str,
+    oral: int = -1,
+    speed: int = -1,
+    rf_break: int = -1,
+    laugh: int = -1,
+    # TODO 这个还没ui
+    spliter_threshold: int = 300,
     progress=gr.Progress(track_tqdm=True),
 ):
     text = text_normalize(text)
-    return refiner.refine_text(text, prompt=prompt)
+    prompt = []
+    if oral != -1:
+        prompt.append(f"[oral_{oral}]")
+    if speed != -1:
+        prompt.append(f"[speed_{speed}]")
+    if rf_break != -1:
+        prompt.append(f"[break_{rf_break}]")
+    if laugh != -1:
+        prompt.append(f"[laugh_{laugh}]")
+    return refiner.refine_text(
+        text, prompt="".join(prompt), spliter_threshold=spliter_threshold
+    )
 
 
 @torch.inference_mode()

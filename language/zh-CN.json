@@ -88,6 +88,9 @@
   "Pitch": "音调",
   "Volume Gain": "音量增益",
   "🎛️Adjuster": "🎛️调节器",
+  "Oral": "口语化",
+  "Break": "停顿",
+  "Laugh": "笑声",
   "TTS_STYLE_GUIDE": ["后缀为 _p 表示带prompt，效果更强但是影响质量"],
   "SSML_SPLITER_GUIDE": [
     "- 如果尾字吞字不读，可以试试结尾加上 `[lbreak]`",

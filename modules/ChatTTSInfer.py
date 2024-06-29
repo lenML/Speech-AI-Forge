@@ -92,7 +92,7 @@ class ChatTTSInfer:
         with torch.no_grad(), self.infer_lock:
 
             if not skip_refine_text:
-                refined = self._refine_text(
+                refined = self.instance._refine_text(
                     text,
                     self.instance.device,
                     params_refine_text,

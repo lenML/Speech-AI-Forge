@@ -17,6 +17,7 @@ class RefineTextRequest(BaseModel):
     repetition_penalty: float = 1.0
     max_new_token: int = 384
     normalize: bool = True
+    spliter_threshold: int = 300
 
 
 async def refiner_prompt_post(request: RefineTextRequest):
@@ -38,6 +39,7 @@ async def refiner_prompt_post(request: RefineTextRequest):
             temperature=request.temperature,
             repetition_penalty=request.repetition_penalty,
             max_new_token=request.max_new_token,
+            spliter_threshold=request.spliter_threshold,
         )
         return {"message": "ok", "data": refined_text}
 
