@@ -4,10 +4,8 @@ import wave
 from typing import Generator
 
 import numpy as np
-import soundfile as sf
 from pydub import AudioSegment
 
-from modules.api import utils as api_utils
 from modules.api.impl.model.audio_model import AudioFormat
 from modules.utils.audio import ndarray_to_segment
 
@@ -33,6 +31,21 @@ def read_to_wav(audio_data: np.ndarray, buffer: io.BytesIO):
     return buffer
 
 
+def align_audio(audio_data: np.ndarray, channels=1) -> np.ndarray:
+    samples_per_frame = channels
+    total_samples = len(audio_data)
+    aligned_samples = total_samples - (total_samples % samples_per_frame)
+    return audio_data[:aligned_samples]
+
+
+def pad_audio_frame(audio_data: np.ndarray, frame_size=1152, channels=1) -> np.ndarray:
+    samples_per_frame = frame_size * channels
+    padding_needed = (
+        samples_per_frame - len(audio_data) % samples_per_frame
+    ) % samples_per_frame
+    return np.pad(audio_data, (0, padding_needed), mode="constant")
+
+
 class AudioHandler:
     def enqueue(self) -> tuple[np.ndarray, int]:
         raise NotImplementedError("Method 'enqueue' must be implemented by subclass")
@@ -46,6 +59,10 @@ class AudioHandler:
         self, audio_data: np.ndarray, sample_rate: int, format: AudioFormat
     ) -> io.BytesIO:
         buffer = io.BytesIO()
+
+        audio_data = audio_data / np.max(np.abs(audio_data))
+        audio_data = (audio_data * 32767).astype(np.int16)
+
         audio_segment: AudioSegment = ndarray_to_segment(
             audio_data, frame_rate=sample_rate
         )
@@ -57,13 +74,38 @@ class AudioHandler:
             audio_segment.export(buffer, format="wav")
             buffer.seek(len(wav_header))
         elif format == AudioFormat.ogg:
-            # FIXME: 有 bug，会莫名其妙中断输出...
+            # FIXME: 流式输出有 bug，会莫名其妙中断输出...
             audio_segment.export(buffer, format="ogg")
             buffer.seek(0)
         else:
             raise ValueError(f"Invalid audio format: {format}")
 
         return buffer
+
+    def enqueue_to_stream(self, format: AudioFormat) -> Generator[bytes, None, None]:
+        if format == AudioFormat.wav:
+            yield wav_header
+
+        # FIXME: 临时方案... 解决拼接爆音问题，具体原因待查
+        chunk_buffer = []
+        chunk_buffer_size = 4
+
+        def read_buffer(chunk_buffer):
+            audio_data = np.concatenate(chunk_buffer)
+            buffer = self.encode_audio(audio_data, sample_rate, format)
+            return buffer.read()
+
+        for audio_data, sample_rate in self.enqueue_stream():
+            chunk_buffer.append(audio_data)
+            if len(chunk_buffer) < chunk_buffer_size:
+                continue
+            yield read_buffer(chunk_buffer)
+            chunk_buffer = []
+
+        if len(chunk_buffer):
+            yield read_buffer(chunk_buffer)
+
+        # print("AudioHandler: enqueue_to_stream done")
 
     # just for test
     def enqueue_to_stream_join(
@@ -77,16 +119,6 @@ class AudioHandler:
             data = audio_data if data is None else np.concatenate((data, audio_data))
         buffer = self.encode_audio(data, sample_rate, format)
         yield buffer.read()
-
-    def enqueue_to_stream(self, format: AudioFormat) -> Generator[bytes, None, None]:
-        if format == AudioFormat.wav:
-            yield wav_header
-
-        for audio_data, sample_rate in self.enqueue_stream():
-            buffer = self.encode_audio(audio_data, sample_rate, format)
-            yield buffer.read()
-
-        # print("AudioHandler: enqueue_to_stream done")
 
     def enqueue_to_buffer(self, format: AudioFormat) -> io.BytesIO:
         audio_data, sample_rate = self.enqueue()

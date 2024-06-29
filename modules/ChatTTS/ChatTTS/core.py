@@ -442,8 +442,8 @@ class Chat:
                 use_decoder,
                 params_infer_code,
             ):
-                wav = self._decode_to_wavs(result, length, use_decoder)
-                yield wav
+                wavs = self._decode_to_wavs(result, length, use_decoder)
+                yield wavs
 
     def _decode_to_wavs(
         self, result: GPT.GenerationOutputs, start_seeks: List[int], use_decoder: bool

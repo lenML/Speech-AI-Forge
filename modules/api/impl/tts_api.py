@@ -1,3 +1,4 @@
+import io
 import logging
 
 from fastapi import Depends, HTTPException, Query
@@ -150,6 +151,9 @@ async def synthesize_tts(params: TTSParams = Depends()):
                 )
 
             buffer_gen = handler.enqueue_to_stream(format=AudioFormat(params.format))
+            # buffer_gen = handler.enqueue_to_stream_join(
+            #     format=AudioFormat(params.format)
+            # )
             return StreamingResponse(buffer_gen, media_type=media_type)
         else:
             buffer = handler.enqueue_to_buffer(format=AudioFormat(params.format))
