@@ -11,6 +11,9 @@ from modules.utils import env
 def setup_model_args(parser: argparse.ArgumentParser):
     parser.add_argument("--compile", action="store_true", help="Enable model compile")
     parser.add_argument(
+        "--flash_attn", action="store_true", help="Enable flash attention"
+    )
+    parser.add_argument(
         "--no_half",
         action="store_true",
         help="Disalbe half precision for model inference",
@@ -55,6 +58,7 @@ def setup_model_args(parser: argparse.ArgumentParser):
 def process_model_args(args: argparse.Namespace):
     lru_size = env.get_and_update_env(args, "lru_size", 64, int)
     compile = env.get_and_update_env(args, "compile", False, bool)
+    flash_attn = env.get_and_update_env(args, "flash_attn", False, bool)
     device_id = env.get_and_update_env(args, "device_id", None, str)
     use_cpu = env.get_and_update_env(args, "use_cpu", [], list)
     no_half = env.get_and_update_env(args, "no_half", False, bool)
