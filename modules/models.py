@@ -26,6 +26,7 @@ def load_chat_tts_in_thread():
     dtype = devices.dtype
     chat_tts.load(
         compile=config.runtime_env_vars.compile,
+        use_flash_attn=config.runtime_env_vars.flash_attn,
         source="custom",
         custom_path="./models/ChatTTS",
         device=device,
