@@ -364,6 +364,7 @@ class GPT(nn.Module):
         stream=False,
         show_tqdm=True,
         ensure_non_empty=True,
+        stream_chunk_size=128,
         context=Context(),
     ):
 
@@ -572,7 +573,7 @@ class GPT(nn.Module):
                 if stream:
                     if (
                         end_idx.all()
-                        and end_idx.fmod(24).eq(0).any()
+                        and end_idx.fmod(stream_chunk_size).eq(0).any()
                         and minus_prev_end_index.add_(end_idx).any()
                     ):
                         self.logger.debug("yield stream result, end: %d", end_idx)

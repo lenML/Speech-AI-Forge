@@ -86,24 +86,8 @@ class AudioHandler:
         if format == AudioFormat.wav:
             yield wav_header
 
-        # FIXME: 临时方案... 解决拼接爆音问题，具体原因待查
-        chunk_buffer = []
-        chunk_buffer_size = 4
-
-        def read_buffer(chunk_buffer):
-            audio_data = np.concatenate(chunk_buffer)
-            buffer = self.encode_audio(audio_data, sample_rate, format)
-            return buffer.read()
-
         for audio_data, sample_rate in self.enqueue_stream():
-            chunk_buffer.append(audio_data)
-            if len(chunk_buffer) < chunk_buffer_size:
-                continue
-            yield read_buffer(chunk_buffer)
-            chunk_buffer = []
-
-        if len(chunk_buffer):
-            yield read_buffer(chunk_buffer)
+            yield self.encode_audio(audio_data, sample_rate, format).read()
 
         # print("AudioHandler: enqueue_to_stream done")
 

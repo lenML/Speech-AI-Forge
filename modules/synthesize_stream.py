@@ -102,18 +102,19 @@ def synthesize_stream(
             prefix=prefix,
         )
 
-        # for sr, wav in wav_gen:
-        #     yield sr, wav
-
-        # NOTE: 作用很微妙对质量有一点改善
         for sr, wav in wav_gen:
             total_wavs.append((sr, wav))
-            wav_gen = (
-                wav if wav_gen_prev is None else np.concatenate([wav_gen_prev, wav])
-            )
-            wav_chunk, wav_gen_prev, wav_overlap = handle_chunks(
-                wav_gen, wav_gen_prev, wav_overlap, overlap_wav_len
-            )
-            yield sr, wav_chunk
+            yield sr, wav
+
+        # NOTE: 作用很微妙对质量有一点改善
+        # for sr, wav in wav_gen:
+        #     total_wavs.append((sr, wav))
+        #     wav_gen = (
+        #         wav if wav_gen_prev is None else np.concatenate([wav_gen_prev, wav])
+        #     )
+        #     wav_chunk, wav_gen_prev, wav_overlap = handle_chunks(
+        #         wav_gen, wav_gen_prev, wav_overlap, overlap_wav_len
+        #     )
+        #     yield sr, wav_chunk
 
     cache[cachekey] = [(sr, np.concatenate([wav for sr, wav in total_wavs]))]

@@ -213,6 +213,8 @@ class Chat:
         repetition_penalty: float = 1.05
         max_new_token: int = 2048
 
+        stream_chunk_size: int = 128
+
         prompt1: str = ""
         prompt2: str = ""
         prefix: str = ""
@@ -644,6 +646,7 @@ class Chat:
             return_hidden=return_hidden,
             stream=stream,
             context=self.context,
+            stream_chunk_size=params.stream_chunk_size,
         )
 
         del emb, input_ids
