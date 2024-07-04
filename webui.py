@@ -30,6 +30,9 @@ from modules.webui.app import create_interface, webui_init
 dcls_patch()
 ignore_useless_warnings()
 
+if sys.platform == "darwin":
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+
 
 def setup_webui_args(parser: argparse.ArgumentParser):
     parser.add_argument("--server_name", type=str, help="server name")
