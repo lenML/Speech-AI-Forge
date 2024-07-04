@@ -47,29 +47,32 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-## 2. <a name='GPUMemoryRequirements'></a>GPU Memory Requirements
+## 2. GPU Memory Requirements
 
-### 2.1. <a name='ModelLoadingMemoryRequirements'></a>Model Loading Memory Requirements
+### 2.1. Model Loading Memory Requirements
 
-| Data Type | Load ChatTTS Model | Load Enhancer Model |
-| --------- | ------------------ | ------------------- |
-| float32   | 2GB                | 3GB                 |
-| half      | 1GB                | 1.5GB               |
+| Precision | ChatTTS Model | Enhancer Model |
+| --------- | ------------- | -------------- |
+| Full      | 2GB           | 3GB            |
+| Half      | 1GB           | 1.5GB          |
 
-### 2.2. <a name='BatchSizeMemoryRequirements'></a>Batch Size Memory Requirements
+Note: Half precision is the default setting. Full precision can be enabled using the `--no_half` parameter.
 
-| Data Type | Batch Size | Without Enhancer | With Enhancer |
+### 2.2. Inference Process Memory Requirements
+
+| Precision | Batch Size | Without Enhancer | With Enhancer |
 | --------- | ---------- | ---------------- | ------------- |
-| float32   | ≤ 4        | 2GB              | 4GB           |
-| float32   | 8          | 8~10GB           | 8~14GB        |
-| half      | ≤ 4        | 2GB              | 4GB           |
-| half      | 8          | 2~6GB            | 4~8GB         |
+| Full      | ≤ 4        | 2GB              | 4GB           |
+| Full      | 8          | 4-10GB           | 6-14GB        |
+| Half      | ≤ 4        | 1GB              | 2GB           |
+| Half      | 8          | 2-6GB            | 4-8GB         |
 
-**Notes:**
+Important notes:
 
-- For Batch Size ≤ 4, 2GB of memory is sufficient for inference.
-- For Batch Size = 8, 8~14GB of memory is required.
-- Half Batch Size means half of the above-mentioned Batch Size, and the memory requirements are also halved accordingly.
+1. Memory requirements are context-dependent, hence presented as a range.
+2. Half precision (default) typically requires about half the memory of full precision.
+3. For Batch Size ≤ 4, 4GB of VRAM is usually sufficient for inference.
+4. For Batch Size 8, 6-14GB of VRAM may be needed, depending on precision and Enhancer usage.
 
 ## 3. <a name='InstallationandRunning'></a> Installation and Running
 

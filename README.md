@@ -48,29 +48,32 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现�
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-## 2. <a name='GPU'></a>GPU 显存要求
+## 2. GPU 显存要求
 
-### 2.1. <a name=''></a>加载模型显存要求
+### 2.1. 模型加载显存需求
 
-| 数据类型 | 加载 ChatTTS 模型 | 加载 Enhancer 模型 |
-| -------- | ----------------- | ------------------ |
-| float32  | 2GB               | 3GB                |
-| half     | 1GB               | 1.5GB              |
+| 精度   | ChatTTS 模型 | Enhancer 模型 |
+| ------ | ------------ | ------------- |
+| 全精度 | 2GB          | 3GB           |
+| 半精度 | 1GB          | 1.5GB         |
 
-### 2.2. <a name='BatchSize'></a>Batch Size 显存要求
+注：半精度为默认设置，全精度可通过 `--no_half` 参数启用。
 
-| 数据类型 | Batch Size | 不开启 Enhancer | 开启 Enhancer |
-| -------- | ---------- | --------------- | ------------- |
-| float32  | ≤ 4        | 2GB             | 4GB           |
-| float32  | 8          | 4~10GB          | 6~14GB        |
-| half     | ≤ 4        | 2GB             | 4GB           |
-| half     | 8          | 2~6GB           | 4~8GB         |
+### 2.2. 推理过程显存需求
 
-**注释：**
+| 精度   | Batch Size | 不使用 Enhancer | 使用 Enhancer |
+| ------ | ---------- | --------------- | ------------- |
+| 全精度 | ≤ 4        | 2GB             | 4GB           |
+| 全精度 | 8          | 4-10GB          | 6-14GB        |
+| 半精度 | ≤ 4        | 1GB             | 2GB           |
+| 半精度 | 8          | 2-6GB           | 4-8GB         |
 
-- Batch Size 为 4 以内时，4GB 显存足够进行推理。
-- Batch Size 为 8 时，需 6~14GB 显存。
-- Half Batch Size 为上表中的 Batch Size 的一半，显存要求也相应减半。
+注意事项：
+
+1. 显存需求与上下文长度相关，因此呈现为一个范围。
+2. 半精度（默认）的显存需求约为全精度的一半。
+3. 对于 Batch Size ≤ 4，4GB 显存通常足够进行推理。
+4. Batch Size 为 8 时，可能需要 6-14GB 显存，具体取决于精度和是否使用 Enhancer。
 
 ## 3. <a name='InstallationandRunning'></a> Installation and Running
 
