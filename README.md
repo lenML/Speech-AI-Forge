@@ -255,7 +255,7 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 ## 8. <a name='-1'></a>离线整合包
 
 感谢 @Phrixus2023 提供的整合包：
-https://pan.baidu.com/s/1ZBv6rC9A2P1OwQ2VPDpdzw?pwd=8xvw
+https://pan.baidu.com/s/1Q1vQV5Gs0VhU5J76dZBK4Q?pwd=d7xu
 
 相关讨论：
 https://github.com/lenML/ChatTTS-Forge/discussions/65
