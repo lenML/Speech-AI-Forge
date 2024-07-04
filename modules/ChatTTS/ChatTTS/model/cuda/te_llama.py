@@ -6,25 +6,21 @@
 #
 # Edited by fumiama.
 
+import gc
 import os
 import re
-import gc
 from contextlib import contextmanager
 
 import transformer_engine as te
+import transformers
 from transformer_engine.pytorch.attention import RotaryPositionEmbedding
 from transformer_engine.pytorch.fp8 import fp8_model_init
-
-import transformers
-from transformers.models.llama.modeling_llama import (
-    LlamaModel,
-    LlamaConfig,
-)
 from transformers.modeling_utils import (
     _add_variant,
-    load_state_dict,
     _load_state_dict_into_model,
+    load_state_dict,
 )
+from transformers.models.llama.modeling_llama import LlamaConfig, LlamaModel
 from transformers.utils import WEIGHTS_INDEX_NAME
 from transformers.utils.hub import get_checkpoint_shard_files
 

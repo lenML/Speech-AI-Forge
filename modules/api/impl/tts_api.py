@@ -1,7 +1,7 @@
 import io
 import logging
 
-from fastapi import Depends, HTTPException, Query
+from fastapi import Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
@@ -52,7 +52,7 @@ class TTSParams(BaseModel):
     stream: bool = Query(False, description="Stream the audio")
 
 
-async def synthesize_tts(params: TTSParams = Depends()):
+async def synthesize_tts(request: Request, params: TTSParams = Depends()):
     try:
         # Validate text
         if not params.text.strip():
@@ -150,11 +150,10 @@ async def synthesize_tts(params: TTSParams = Depends()):
                     f"Batch size {infer_config.batch_size} is not supported in streaming mode, will set to 1"
                 )
 
-            buffer_gen = handler.enqueue_to_stream(format=AudioFormat(params.format))
-            # buffer_gen = handler.enqueue_to_stream_join(
-            #     format=AudioFormat(params.format)
-            # )
-            return StreamingResponse(buffer_gen, media_type=media_type)
+            gen = handler.enqueue_to_stream_with_request(
+                request=request, format=AudioFormat(params.format)
+            )
+            return StreamingResponse(gen, media_type=media_type)
         else:
             buffer = handler.enqueue_to_buffer(format=AudioFormat(params.format))
             return StreamingResponse(buffer, media_type=media_type)

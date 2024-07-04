@@ -183,15 +183,11 @@ def setup(app: APIManager):
             enhancer_config=enhancer_config,
         )
 
-        async def generator():
-            for chunk in handler.enqueue_to_stream(AudioFormat.mp3):
-                disconnected = await request.is_disconnected()
-                if disconnected:
-                    break
+        gen = handler.enqueue_to_stream_with_request(
+            request=request, format=AudioFormat.mp3
+        )
 
-                yield chunk
-
-        return StreamingResponse(generator(), media_type="audio/mpeg")
+        return StreamingResponse(gen, media_type="audio/mpeg")
 
     @app.post("/v1/xtts_v2/set_tts_settings")
     async def set_tts_settings(request: TTSSettingsRequest):

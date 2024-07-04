@@ -1,13 +1,14 @@
-import os, platform
+import os
+import platform
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 """
 https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
 """
 
-from dataclasses import dataclass
 import logging
-from typing import Union, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Tuple, Union
 
 import omegaconf
 import torch
@@ -16,13 +17,13 @@ import torch.nn.functional as F
 import torch.nn.utils.parametrize as P
 from torch.nn.utils.parametrizations import weight_norm
 from tqdm import tqdm
-from transformers import LlamaModel, LlamaConfig, LogitsWarper
+from transformers import LlamaConfig, LlamaModel, LogitsWarper
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import BaseModelOutputWithPast
 from transformers.utils import is_flash_attn_2_available
 
-from .processors import CustomRepetitionPenaltyLogitsProcessorRepeat
 from ..utils import del_all
+from .processors import CustomRepetitionPenaltyLogitsProcessorRepeat
 
 
 class GPT(nn.Module):
@@ -364,7 +365,7 @@ class GPT(nn.Module):
         stream=False,
         show_tqdm=True,
         ensure_non_empty=True,
-        stream_chunk_size=128,
+        stream_chunk_size=96,
         context=Context(),
     ):
 

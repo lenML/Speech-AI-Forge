@@ -38,6 +38,8 @@ class AudioSpeechRequest(BaseModel):
     enhance: bool = False
     denoise: bool = False
 
+    stream: bool = False
+
 
 async def openai_speech_api(
     request: AudioSpeechRequest = Body(
@@ -50,6 +52,7 @@ async def openai_speech_api(
     style = request.style
     eos = request.eos
     seed = request.seed
+    stream = request.stream
 
     response_format = request.response_format
     if not isinstance(response_format, AudioFormat) and isinstance(
@@ -105,12 +108,19 @@ async def openai_speech_api(
             enhancer_config=enhancer_config,
         )
 
-        buffer = handler.enqueue_to_buffer(response_format)
-
         mime_type = f"audio/{response_format.value}"
         if response_format == AudioFormat.mp3:
             mime_type = "audio/mpeg"
-        return StreamingResponse(buffer, media_type=mime_type)
+
+        if stream:
+            gen = handler.enqueue_to_stream_with_request(
+                request=request,
+                format=response_format,
+            )
+            return StreamingResponse(gen, media_type=mime_type)
+        else:
+            buffer = handler.enqueue_to_buffer(response_format)
+            return StreamingResponse(buffer, media_type=mime_type)
 
     except Exception as e:
         import logging

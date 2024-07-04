@@ -1,6 +1,6 @@
-import threading
+import logging
 from dataclasses import dataclass, is_dataclass
-from typing import Generator, List, Optional, Union
+from typing import Generator, List, Union
 
 import numpy as np
 import torch
@@ -38,13 +38,23 @@ def del_all(d: Union[dict, list]):
 
 
 class ChatTTSInfer:
-    infer_lock = threading.Lock()
+    logger = logging.getLogger(__name__)
+
+    current_infer = None
 
     def __init__(self, instance: Chat) -> None:
         self.instance = instance
+        ChatTTSInfer.current_infer = self
 
     def get_tokenizer(self) -> LlamaTokenizer:
         return self.instance.pretrain_models["tokenizer"]
+
+    @classmethod
+    def interrupt(cls):
+        # FIXME: 目前没法立即停止，会等到下一个chunk？好像得改 `gpt.py`
+        if cls.current_infer:
+            cls.current_infer.instance.interrupt()
+            cls.logger.info("Interrupted current infer")
 
     def infer(
         self,
@@ -85,11 +95,12 @@ class ChatTTSInfer:
         if not isinstance(text, list):
             text = [text]
 
-        # NOTE: 有点问题，感觉能提升，但是其实没有任何提升...所以暂时关闭
+        # NOTE: 作用就是尽量不让 vocos 处理短序列 (但是可能导致略微性能降低)
+        # 但是效果不太好...暂时关闭
         # smooth_decoding = stream
         smooth_decoding = False
 
-        with torch.no_grad(), self.infer_lock:
+        with torch.no_grad():
 
             if not skip_refine_text:
                 refined = self.instance._refine_text(

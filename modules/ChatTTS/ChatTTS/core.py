@@ -213,7 +213,7 @@ class Chat:
         repetition_penalty: float = 1.05
         max_new_token: int = 2048
 
-        stream_chunk_size: int = 128
+        stream_chunk_size: int = 96
 
         prompt1: str = ""
         prompt2: str = ""

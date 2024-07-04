@@ -1,3 +1,5 @@
+from typing import Generator
+
 import numpy as np
 from fastapi import HTTPException
 
@@ -97,3 +99,7 @@ class SSMLHandler(AudioHandler):
             )
 
         return audio_data, sample_rate
+
+    def enqueue_stream(self) -> Generator[tuple[np.ndarray, int], None, None]:
+        # TODO: 应该很好支持stream...
+        raise NotImplementedError("Stream is not supported for SSMLHandler.")

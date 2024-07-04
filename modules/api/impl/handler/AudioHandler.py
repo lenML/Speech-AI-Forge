@@ -1,12 +1,14 @@
 import base64
 import io
 import wave
-from typing import Generator
+from typing import AsyncGenerator, Generator
 
 import numpy as np
+from fastapi import Request
 from pydub import AudioSegment
 
 from modules.api.impl.model.audio_model import AudioFormat
+from modules.ChatTTSInfer import ChatTTSInfer
 from modules.utils.audio import ndarray_to_segment
 
 
@@ -90,6 +92,18 @@ class AudioHandler:
             yield self.encode_audio(audio_data, sample_rate, format).read()
 
         # print("AudioHandler: enqueue_to_stream done")
+
+    async def enqueue_to_stream_with_request(
+        self, request: Request, format: AudioFormat
+    ) -> AsyncGenerator[bytes, None]:
+        buffer_gen = self.enqueue_to_stream(format=AudioFormat(format))
+        for chunk in buffer_gen:
+            disconnected = await request.is_disconnected()
+            if disconnected:
+                ChatTTSInfer.interrupt()
+                break
+
+            yield chunk
 
     # just for test
     def enqueue_to_stream_join(
