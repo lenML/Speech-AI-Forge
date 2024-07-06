@@ -9,7 +9,7 @@ attrs==23.2.0
 audio-denoiser==0.1.1
 audioread==3.0.1
 celluloid==0.2.0
-certifi==2024.2.2
+certifi==2024.7.4
 cffi==1.16.0
 charset-normalizer==3.3.2
 click==8.1.7
