@@ -32,6 +32,30 @@ body:
       options:
         - label: 我已经确认问题发生在最新代码或稳定版本中
           required: true
+  - type: checkboxes
+    id: api-check
+    attributes:
+      label: 请确认是否与 API 无关？
+      description: 如果与 API 有关，请提交 API Report.
+      options:
+        - label: 我已经确认问题与 API 无关
+          required: true
+  - type: checkboxes
+    id: webui-check
+    attributes:
+      label: 请确认是否与 WebUI 无关？
+      description: 如果与 WebUI 有关，请提交 WebUI Report.
+      options:
+        - label: 我已经确认问题与 WebUI 无关
+          required: true
+  - type: checkboxes
+    id: ft-check
+    attributes:
+      label: 请确认是否与 Fintune 无关？
+      description: 如果与 Fintune 有关，请提交 Fintune Report.
+      options:
+        - label: 我已经确认问题与 Fintune 无关
+          required: true
   - type: textarea
     id: text
     attributes:
