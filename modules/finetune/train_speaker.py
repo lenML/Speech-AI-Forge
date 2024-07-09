@@ -18,7 +18,8 @@ def train_speaker_embeddings(
     gpt,
     batch_size=16,
     epochs=10,
-    train_text=True,
+    train_text=False,
+    train_mse=False,
     speaker_embeds=None,
 ):
     tokenizer = chat.pretrain_models["tokenizer"]
@@ -180,15 +181,16 @@ def train_speaker_embeddings(
                 audio_hidden_states[:, :-1].transpose(1, 2)
             ).transpose(1, 2)
             mse_loss = torch.nn.functional.mse_loss(gpt_gen_mel_specs, audio_mel_specs)
-            loss += 0.01 * mse_loss
 
             optimizer.zero_grad()
 
+            if train_mse:
+                loss += 0.01 * mse_loss
+
             if train_text:
-                # just for test
-                text_loss.backward()
-            else:
-                loss.backward()
+                loss += 0.01 * text_loss
+
+            loss.backward()
             torch.nn.utils.clip_grad_norm_(speaker_embeds.values(), 1.0)
             optimizer.step()
             logger.meters["loss"].update(loss.item(), n=batch_size)
@@ -220,6 +222,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--train_text", action="store_true", help="train text loss")
+    parser.add_argument("--train_mse", action="store_true", help="train mse loss")
     # 初始化 speaker
     parser.add_argument("--init_speaker", type=str)
     parser.add_argument(
@@ -239,6 +242,7 @@ if __name__ == "__main__":
     tar_path: str | None = args.tar_path
     tar_in_memory: bool = args.tar_in_memory
     train_text: bool = args.train_text
+    train_mse: bool = args.train_mse
     # gpt_lora: bool = args.gpt_lora
     # gpt_kbit: int = args.gpt_kbit
     save_folder: str = args.save_folder
@@ -301,6 +305,5 @@ python -m modules.finetune.train_speaker \
     --save_folder ./data \
     --init_speaker ./data/speakers/Bob.pt \
     --epochs 100 \
-    --batch_size 6 \
-    --train_text
+    --batch_size 6
 """
