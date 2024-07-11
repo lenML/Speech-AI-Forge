@@ -58,7 +58,7 @@ class ChatTTSInfer:
 
     def infer(
         self,
-        text: str,
+        text: Union[str, list[str]],
         stream=False,
         skip_refine_text=False,
         refine_text_only=False,
@@ -84,7 +84,7 @@ class ChatTTSInfer:
     @torch.inference_mode()
     def _infer(
         self,
-        text: str,
+        text: Union[str, list[str]],
         stream=False,
         skip_refine_text=False,
         refine_text_only=False,
@@ -251,7 +251,7 @@ class ChatTTSInfer:
 
     def _generate_audio(
         self,
-        text: str,
+        text: Union[str, list[str]],
         spk_emb: Union[None, torch.Tensor] = None,
         top_P=0.7,
         top_K=20,
@@ -261,6 +261,7 @@ class ChatTTSInfer:
         prompt1="",
         prompt2="",
         prefix="",
+        stream_chunk_size=96,
         use_decoder=True,
         stream=False,
     ):
@@ -275,6 +276,7 @@ class ChatTTSInfer:
             prompt1=prompt1,
             prompt2=prompt2,
             prefix=prefix,
+            stream_chunk_size=stream_chunk_size,
         )
         return self.infer(
             text=text,
@@ -286,7 +288,7 @@ class ChatTTSInfer:
 
     def generate_audio(
         self,
-        text: str,
+        text: Union[str, list[str]],
         spk_emb: Union[None, torch.Tensor] = None,
         top_P=0.7,
         top_K=20,
@@ -316,7 +318,7 @@ class ChatTTSInfer:
 
     def generate_audio_stream(
         self,
-        text: str,
+        text: Union[str, list[str]],
         spk_emb=None,
         top_P=0.7,
         top_K=20,
@@ -326,6 +328,7 @@ class ChatTTSInfer:
         prompt1="",
         prompt2="",
         prefix="",
+        stream_chunk_size=96,
         use_decoder=True,
     ) -> Generator[list[np.ndarray], None, None]:
         gen = self._generate_audio(
@@ -340,6 +343,7 @@ class ChatTTSInfer:
             prompt2=prompt2,
             prefix=prefix,
             use_decoder=use_decoder,
+            stream_chunk_size=stream_chunk_size,
             stream=True,
         )
 
@@ -352,7 +356,7 @@ class ChatTTSInfer:
 
     def _refine_text(
         self,
-        text: str,
+        text: Union[str, list[str]],
         top_P=0.7,
         top_K=20,
         temperature=0.7,
@@ -381,7 +385,7 @@ class ChatTTSInfer:
 
     def refine_text(
         self,
-        text: str,
+        text: Union[str, list[str]],
         top_P=0.7,
         top_K=20,
         temperature=0.7,
@@ -402,7 +406,7 @@ class ChatTTSInfer:
 
     def refine_text_stream(
         self,
-        text: str,
+        text: Union[str, list[str]],
         top_P=0.7,
         top_K=20,
         temperature=0.7,

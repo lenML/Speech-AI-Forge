@@ -1,8 +1,8 @@
 import gradio as gr
 
+from modules.core.speaker import speaker_mgr
 from modules.Enhancer.ResembleEnhance import unload_enhancer
 from modules.models import unload_chat_tts
-from modules.speaker import speaker_mgr
 from modules.webui import webui_config
 from modules.webui.webui_utils import get_speaker_names
 

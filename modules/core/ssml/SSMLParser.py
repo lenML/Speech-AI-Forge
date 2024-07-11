@@ -55,10 +55,11 @@ class SSMLParser:
 
         return decorator
 
-    def parse(self, ssml: str) -> List[Union[SSMLSegment, SSMLBreak]]:
+    def parse(
+        self, ssml: str, root_ctx=SSMLContext()
+    ) -> List[Union[SSMLSegment, SSMLBreak]]:
         root = etree.fromstring(ssml)
 
-        root_ctx = SSMLContext()
         segments: List[Union[SSMLSegment, SSMLBreak]] = []
         self.resolve(root, root_ctx, segments)
 
@@ -76,7 +77,7 @@ class SSMLParser:
         resolver(element, context, segments, self)
 
 
-def create_ssml_parser():
+def create_ssml_v01_parser():
     parser = SSMLParser()
 
     @parser.resolver("speak")
@@ -173,7 +174,7 @@ def create_ssml_parser():
 
 
 if __name__ == "__main__":
-    parser = create_ssml_parser()
+    parser = create_ssml_v01_parser()
 
     ssml = """
     <speak version="0.1">

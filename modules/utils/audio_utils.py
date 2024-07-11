@@ -120,6 +120,13 @@ def apply_normalize(
     return pydub_to_np(segment)
 
 
+def silence_np(
+    duration_s: float,
+) -> tuple[int, np.ndarray]:
+    silence = AudioSegment.silent(duration=duration_s * 1000)
+    return pydub_to_np(silence)
+
+
 if __name__ == "__main__":
     input_file = sys.argv[1]
 

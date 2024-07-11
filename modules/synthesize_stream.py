@@ -7,8 +7,8 @@ from cachetools import LRUCache
 from cachetools import keys as cache_keys
 
 from modules import generate_audio as generate
-from modules.SentenceSplitter import SentenceSplitter
-from modules.speaker import Speaker
+from modules.core.speaker import Speaker
+from modules.core.tools.SentenceSplitter import SentenceSplitter
 
 
 def handle_chunks(

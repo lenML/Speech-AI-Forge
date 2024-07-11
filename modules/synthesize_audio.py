@@ -1,10 +1,9 @@
 from typing import Union
 
-from modules.SentenceSplitter import SentenceSplitter
-from modules.speaker import Speaker
-from modules.ssml_parser.SSMLParser import SSMLSegment
-from modules.SynthesizeSegments import SynthesizeSegments, combine_audio_segments
-from modules.utils import audio
+from modules.core.speaker import Speaker
+from modules.core.ssml.SSMLParser import SSMLSegment
+from modules.core.ssml.SynthesizeSSML import SynthesizeSSML
+from modules.core.tools.SentenceSplitter import SentenceSplitter
 
 
 def synthesize_audio(
@@ -42,11 +41,7 @@ def synthesize_audio(
         )
         for s in sentences
     ]
-    synthesizer = SynthesizeSegments(
+    synthesizer = SynthesizeSSML(
         batch_size=batch_size, eos=end_of_sentence, spliter_thr=spliter_threshold
     )
-    audio_segments = synthesizer.synthesize_segments(text_segments)
-
-    combined_audio = combine_audio_segments(audio_segments)
-
-    return audio.pydub_to_np(combined_audio)
+    return synthesizer.synthesize_combine_np(text_segments)

@@ -147,6 +147,8 @@ def insert_spaces_between_uppercase(s):
 def replace_unk_tokens(text):
     """
     把不在字典里的字符替换为 " , "
+
+    FIXME: 总感觉不太好...但是没有遇到问题的话暂时留着...
     """
     if DISABLE_UNK_TOKEN_CHECK:
         return text

@@ -6,19 +6,19 @@ import torch
 import torch.profiler
 
 from modules import refiner
-from modules.api.impl.handler.SSMLHandler import SSMLHandler
-from modules.api.impl.handler.TTSHandler import TTSHandler
-from modules.api.impl.model.audio_model import AdjustConfig
-from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
-from modules.api.impl.model.enhancer_model import EnhancerConfig
 from modules.api.utils import calc_spk_style
+from modules.core.handler.datacls.audio_model import AdjustConfig
+from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.SSMLHandler import SSMLHandler
+from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.speaker import Speaker, speaker_mgr
+from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.data import styles_mgr
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
 from modules.normalization import text_normalize
-from modules.SentenceSplitter import SentenceSplitter
-from modules.speaker import Speaker, speaker_mgr
-from modules.ssml_parser.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_parser
-from modules.utils import audio
+from modules.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_parser
+from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
 
@@ -146,7 +146,7 @@ def synthesize_ssml(
     audio_data, sr = handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
-    audio_data = audio.audio_to_int16(audio_data)
+    audio_data = audio_utils.audio_to_int16(audio_data)
 
     return sr, audio_data
 
@@ -259,7 +259,7 @@ def tts_generate(
     audio_data, sample_rate = handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
-    audio_data = audio.audio_to_int16(audio_data)
+    audio_data = audio_utils.audio_to_int16(audio_data)
     return sample_rate, audio_data
 
 
@@ -298,6 +298,6 @@ def split_long_text(long_text_input, spliter_threshold=100, eos=""):
     sentences = [text_normalize(s) + eos for s in sentences]
     data = []
     for i, text in enumerate(sentences):
-        token_length = spliter.count_tokens(text)
+        token_length = spliter.len(text)
         data.append([i, text, token_length])
     return data

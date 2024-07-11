@@ -75,7 +75,10 @@ def get_target_device_id_or_memory_available_gpu():
 
 
 def get_optimal_device_name():
-    if config.runtime_env_vars.use_cpu == "all":
+    if config.runtime_env_vars.use_cpu is None:
+        config.runtime_env_vars.use_cpu = []
+
+    if "all" in config.runtime_env_vars.use_cpu:
         return "cpu"
 
     if torch.cuda.is_available():
@@ -92,6 +95,9 @@ def get_optimal_device():
 
 
 def get_device_for(task):
+    if config.runtime_env_vars.use_cpu is None:
+        config.runtime_env_vars.use_cpu = []
+
     if (
         task in config.runtime_env_vars.use_cpu
         or "all" in config.runtime_env_vars.use_cpu

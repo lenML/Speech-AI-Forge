@@ -1,11 +1,10 @@
 from typing import Generator
 
-import numpy as np
 import torch
 
-from modules import config, models
-from modules.ChatTTSInfer import ChatTTSInfer
-from modules.SentenceSplitter import SentenceSplitter
+from modules import models
+from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
+from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.utils.SeedContext import SeedContext
 
 

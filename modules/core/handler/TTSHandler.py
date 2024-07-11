@@ -3,16 +3,16 @@ from typing import Generator
 
 import numpy as np
 
-from modules.api.impl.handler.AudioHandler import AudioHandler
-from modules.api.impl.model.audio_model import AdjustConfig
-from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
-from modules.api.impl.model.enhancer_model import EnhancerConfig
+from modules.core.handler.AudioHandler import AudioHandler
+from modules.core.handler.datacls.audio_model import AdjustConfig
+from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.speaker import Speaker
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
 from modules.normalization import text_normalize
-from modules.speaker import Speaker
 from modules.synthesize_audio import synthesize_audio
 from modules.synthesize_stream import synthesize_stream
-from modules.utils.audio import apply_normalize, apply_prosody_to_audio_data
+from modules.utils.audio_utils import apply_normalize, apply_prosody_to_audio_data
 
 logger = logging.getLogger(__name__)
 

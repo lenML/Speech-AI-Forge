@@ -209,9 +209,9 @@ if __name__ == "__main__":
     import numpy as np
 
     from modules import config
+    from modules.core.speaker import Speaker
     from modules.devices import devices
     from modules.models import load_chat_tts
-    from modules.speaker import Speaker
 
     config.runtime_env_vars.no_half = True
     config.runtime_env_vars.use_cpu = []

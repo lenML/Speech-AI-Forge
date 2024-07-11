@@ -12,12 +12,12 @@ from scipy.io import wavfile
 
 from modules import generate_audio
 from modules.api.utils import calc_spk_style
+from modules.core.speaker import Speaker
+from modules.core.ssml.SSMLParser import SSMLBreak, SSMLContext, SSMLSegment
+from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.normalization import text_normalize
-from modules.SentenceSplitter import SentenceSplitter
-from modules.speaker import Speaker
-from modules.ssml_parser.SSMLParser import SSMLBreak, SSMLContext, SSMLSegment
 from modules.utils import rng
-from modules.utils.audio import apply_prosody_to_audio_segment
+from modules.utils.audio_utils import apply_prosody_to_audio_segment, pydub_to_np
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,7 @@ class TTSAudioSegment(Box):
         self.prefix = kwargs.get("prefix", "")
 
 
-class SynthesizeSegments:
+class SynthesizeSSML:
     def __init__(self, batch_size: int = 8, eos="", spliter_thr=100):
         self.batch_size = batch_size
         self.batch_default_spk_seed = rng.np_rng()
@@ -288,7 +288,7 @@ class SynthesizeSegments:
 
         return ret_segments
 
-    def synthesize_segments(
+    def synthesize(
         self, segments: List[Union[SSMLSegment, SSMLBreak]]
     ) -> List[AudioSegment]:
         segments = self.split_segments(segments)
@@ -304,6 +304,19 @@ class SynthesizeSegments:
             self.process_voice_segments(segments, bucket, audio_segments)
 
         return audio_segments
+
+    def synthesize_combine(
+        self, segments: List[Union[SSMLSegment, SSMLBreak]]
+    ) -> AudioSegment:
+        audio_segments = self.synthesize(segments)
+        return combine_audio_segments(audio_segments)
+
+    def synthesize_combine_np(
+        self, segments: List[Union[SSMLSegment, SSMLBreak]]
+    ) -> tuple[int, np.ndarray]:
+        combined_audio = self.synthesize_combine(segments)
+        sample_rate, audio_data = pydub_to_np(combined_audio)
+        return sample_rate, audio_data
 
 
 # 示例使用
@@ -323,8 +336,8 @@ if __name__ == "__main__":
         SSMLSegment(text="大🍊，一个大🍊，嘿，你的感觉真的很奇妙", attrs=ctx2.copy()),
     ]
 
-    synthesizer = SynthesizeSegments(batch_size=2)
-    audio_segments = synthesizer.synthesize_segments(ssml_segments)
+    synthesizer = SynthesizeSSML(batch_size=2)
+    audio_segments = synthesizer.synthesize(ssml_segments)
     print(audio_segments)
     combined_audio = combine_audio_segments(audio_segments)
     combined_audio.export("output.wav", format="wav")

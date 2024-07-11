@@ -161,3 +161,5 @@ ftfy==6.2.0
 pyrubberband==0.3.0
 pybase16384==0.3.7
 cachetools==5.3.3
+langdetect==1.0.9
+WeTextProcessing==1.0.3

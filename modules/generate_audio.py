@@ -7,9 +7,9 @@ import torch
 
 from modules import config, models
 from modules.ChatTTS import ChatTTS
-from modules.ChatTTSInfer import ChatTTSInfer
+from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
+from modules.core.speaker import Speaker
 from modules.devices import devices
-from modules.speaker import Speaker
 from modules.utils.cache import conditional_cache
 from modules.utils.SeedContext import SeedContext
 

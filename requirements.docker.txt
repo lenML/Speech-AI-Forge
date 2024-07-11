@@ -30,3 +30,5 @@ librosa
 pyrubberband
 pybase16384
 cachetools
+langdetect
+WeTextProcessing

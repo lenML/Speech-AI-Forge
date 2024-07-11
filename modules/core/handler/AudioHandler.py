@@ -7,9 +7,9 @@ import numpy as np
 from fastapi import Request
 from pydub import AudioSegment
 
-from modules.api.impl.model.audio_model import AudioFormat
-from modules.ChatTTSInfer import ChatTTSInfer
-from modules.utils.audio import ndarray_to_segment
+from modules.core.handler.datacls.audio_model import AudioFormat
+from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
+from modules.utils.audio_utils import ndarray_to_segment
 
 
 def wave_header_chunk(frame_input=b"", channels=1, sample_width=2, sample_rate=24000):

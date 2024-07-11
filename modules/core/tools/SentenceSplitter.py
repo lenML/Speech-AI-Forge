@@ -9,6 +9,7 @@ from modules.utils.detect_lang import guess_lang
 # 解析文本 并根据停止符号分割成句子
 # 可以设置最大阈值，即如果分割片段小于这个阈值会与下一段合并
 class SentenceSplitter:
+    # 分隔符 用于连接句子 sentence1 + SEP_TOKEN + sentence2
     SEP_TOKEN = " "
 
     def __init__(self, threshold=100):
@@ -19,7 +20,10 @@ class SentenceSplitter:
         self.sentence_threshold = threshold
         self.tokenizer = get_tokenizer()
 
-    def count_tokens(self, text: str):
+    def len(self, text: str):
+        """
+        Get the length of tokenized text.
+        """
         return len(self.tokenizer.tokenize(text))
 
     def parse(self, text: str):
@@ -37,7 +41,7 @@ class SentenceSplitter:
         merged_sentences: list[str] = []
         temp_sentence = ""
         for sentence in setences:
-            if len(temp_sentence) + len(sentence) < self.sentence_threshold:
+            if self.len(temp_sentence) + self.len(sentence) < self.sentence_threshold:
                 temp_sentence += SentenceSplitter.SEP_TOKEN + sentence
             else:
                 merged_sentences.append(temp_sentence)
