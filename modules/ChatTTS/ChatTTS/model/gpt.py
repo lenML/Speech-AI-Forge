@@ -448,7 +448,7 @@ class GPT(nn.Module):
                 del_all(model_input)
                 attentions.append(outputs.attentions)
                 hidden_states = outputs.last_hidden_state.to(
-                    self.device, dtype=torch.float
+                    self.device, dtype=self.gpt.dtype
                 )  # 🐻
                 past_key_values = outputs.past_key_values
                 del_all(outputs)
@@ -465,7 +465,7 @@ class GPT(nn.Module):
                             hidden_states.size(1),
                             self.num_audio_tokens,
                             self.num_vq,
-                            dtype=torch.float,
+                            dtype=self.gpt.dtype,
                             device=self.device,
                         )
                         for num_vq_iter in range(self.num_vq):
@@ -474,7 +474,7 @@ class GPT(nn.Module):
                             del x
 
                 # logits = logits[:, -1].float()
-                logits = logits.narrow(1, -1, 1).squeeze_(1).float()
+                logits = logits.narrow(1, -1, 1).squeeze_(1).to(dtype=self.gpt.dtype)
 
                 if not infer_text:
                     # logits = rearrange(logits, "b c n -> (b n) c")
