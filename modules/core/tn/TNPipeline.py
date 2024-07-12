@@ -42,6 +42,8 @@ class TNText(BaseModel):
 class TNPipeline:
     """文本归一化管道类"""
 
+    SEP_CHAR = "\n"
+
     def __init__(self):
         self.blocks: list[TNBlock] = []
         self.freeze_strs: list[str] = []
@@ -95,9 +97,9 @@ class TNPipeline:
                 result += self._normalize(tn_text.text, config)
             else:
                 result += tn_text.text
-            result += " "
+            result += self.SEP_CHAR
 
-        return result
+        return result.strip()
 
     def guess_langs(self, text: str):
         zh_or_en = guess_lang(text)
@@ -124,6 +126,10 @@ class TNPipeline:
 
             if not enabled:
                 continue
+            # print(text)
+            # print("---", block.name)
             text = block.process(text=text, guess_lang=guess)
+            # print("---")
+            # print(text)
 
         return text

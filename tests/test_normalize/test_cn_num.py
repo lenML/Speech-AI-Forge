@@ -28,4 +28,4 @@ ChatTtsTN.DISABLE_UNK_TOKEN_CHECK = True
 )
 @pytest.mark.normalize
 def test_text_normalize(input_text, expected_output):
-    assert ChatTtsTN.normalize(input_text) == expected_output
+    assert ChatTtsTN.ChatTtsTN.normalize(input_text) == expected_output

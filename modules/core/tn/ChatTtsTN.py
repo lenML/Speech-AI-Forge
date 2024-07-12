@@ -179,12 +179,17 @@ def replace_quotes(text: str, guess_lang: GuessLang):
 
 @ChatTtsTN.block(name="tx_zh", enabled=True)
 def tx_normalize(text: str, guss_lang: GuessLang):
-    if guss_lang.zh_or_en == "zh":
-        # NOTE: 这个是魔改过的 TextNormalizer 来自 PaddlePaddle
-        tx = TextNormalizer()
-        texts = tx.normalize(text)
-        return " ".join(texts)
-    return text
+    if guss_lang.zh_or_en != "zh":
+        return text
+    # NOTE: 这个是魔改过的 TextNormalizer 来自 PaddlePaddle
+    tx = TextNormalizer()
+    # NOTE: 为什么要分行？因为我们需要保留 "\n" 作为 chunker 的分割信号
+    lines = [line for line in text.split("\n") if line.strip() != ""]
+    texts: list[str] = []
+    for line in lines:
+        ts = tx.normalize(line)
+        texts.append("".join(ts))
+    return "\n".join(texts)
 
 
 @ChatTtsTN.block(name="wetext_en", enabled=True)
@@ -262,6 +267,8 @@ def replace_homophones(text: str, guess_lang: GuessLang):
 
 if __name__ == "__main__":
     from modules.devices import devices
+
+    DISABLE_UNK_TOKEN_CHECK = True
 
     devices.reset_device()
     test_cases = [
