@@ -48,8 +48,7 @@ def do_load_chat_tts():
 
 def load_chat_tts():
     with lock:
-        if chat_tts is None:
-            do_load_chat_tts()
+        do_load_chat_tts()
     if chat_tts is None:
         raise Exception("Failed to load ChatTTS models")
     return chat_tts

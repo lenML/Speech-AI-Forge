@@ -2,7 +2,7 @@ import re
 
 import zhon
 
-from modules.models import get_tokenizer
+from modules.core.models import zoo
 from modules.utils.detect_lang import guess_lang
 
 
@@ -18,7 +18,7 @@ class SentenceSplitter:
         ), "Threshold must be greater than 0."
 
         self.sentence_threshold = threshold
-        self.tokenizer = get_tokenizer()
+        self.tokenizer = zoo.ChatTTS.get_tokenizer()
 
     def len(self, text: str):
         """

@@ -5,8 +5,8 @@ from typing import Generator, Union
 import numpy as np
 import torch
 
-from modules import config, models
-from modules.ChatTTS import ChatTTS
+from modules import config
+from modules.core.models import zoo
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
 from modules.core.speaker import Speaker
 from modules.devices import devices
@@ -77,7 +77,7 @@ def generate_audio_batch(
     prompt2: str = "",
     prefix: str = "",
 ):
-    chat_tts = models.load_chat_tts()
+    chat_tts = zoo.ChatTTS.load_chat_tts()
     spk_emb = parse_infer_spk_emb(
         spk=spk,
     )
@@ -134,7 +134,7 @@ def generate_audio_stream(
     prompt2: str = "",
     prefix: str = "",
 ) -> Generator[tuple[int, np.ndarray], None, None]:
-    chat_tts = models.load_chat_tts()
+    chat_tts = zoo.ChatTTS.load_chat_tts()
     texts = [text]
     spk_emb = parse_infer_spk_emb(
         spk=spk,

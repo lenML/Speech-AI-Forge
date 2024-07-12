@@ -6,7 +6,7 @@ import ftfy
 from pywrapfst import FstOpError
 from tn.english.normalizer import Normalizer as EnNormalizer
 
-from modules import models
+from modules.core.models import zoo
 from modules.core.tn.TNPipeline import GuessLang, TNPipeline
 from modules.repos_static.zh_normalization.text_normlization import TextNormalizer
 from modules.utils.HomophonesReplacer import HomophonesReplacer
@@ -232,12 +232,12 @@ def replace_unk_tokens(text: str, guess_lang: GuessLang):
     """
     if DISABLE_UNK_TOKEN_CHECK:
         return text
-    chat_tts = models.load_chat_tts()
+    chat_tts = zoo.ChatTTS.load_chat_tts()
     if "tokenizer" not in chat_tts.pretrain_models:
         # 这个地方只有在 huggingface spaces 中才会触发
         # 因为 hugggingface 自动处理模型卸载加载，所以如果拿不到就算了...
         return text
-    tokenizer = chat_tts.pretrain_models["tokenizer"]
+    tokenizer = zoo.ChatTTS.get_tokenizer()
     vocab = tokenizer.get_vocab()
     vocab_set = set(vocab.keys())
     # 添加所有英语字符

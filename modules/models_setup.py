@@ -2,9 +2,9 @@ import argparse
 import logging
 
 from modules import generate_audio
+from modules.core.models import zoo
 from modules.devices import devices
 from modules.Enhancer.ResembleEnhance import load_enhancer
-from modules.models import load_chat_tts
 from modules.utils import env
 
 
@@ -74,5 +74,8 @@ def process_model_args(args: argparse.Namespace):
         generate_audio.logger.setLevel(logging.DEBUG)
 
     if preload_models:
-        load_chat_tts()
+        """
+        TODO: 需要增强 zoo
+        """
+        zoo.ChatTTS.load_chat_tts()
         load_enhancer()
