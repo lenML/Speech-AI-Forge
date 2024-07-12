@@ -111,6 +111,7 @@ def setup(app: APIManager):
             spliter_threshold=XTTSV2.spliter_threshold,
             eos=XTTSV2.eos,
             seed=XTTSV2.infer_seed,
+            stream=False,
         )
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,
@@ -164,6 +165,7 @@ def setup(app: APIManager):
             spliter_threshold=XTTSV2.spliter_threshold,
             eos=XTTSV2.eos,
             seed=XTTSV2.infer_seed,
+            stream=True,
         )
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,

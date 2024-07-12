@@ -102,6 +102,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         prompt1 = params.prompt1 or calc_params.get("prompt1", params.prompt1)
         prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
         eos = params.eos or ""
+        stream = params.stream
 
         batch_size = int(params.bs)
         threshold = int(params.thr)
@@ -120,6 +121,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             spliter_threshold=threshold,
             eos=eos,
             seed=seed,
+            stream=stream,
         )
         adjust_config = AdjustConfig(
             pitch=params.pitch,
@@ -143,13 +145,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         if params.format == "mp3":
             media_type = "audio/mpeg"
 
-        if params.stream:
-            if infer_config.batch_size != 1:
-                # 流式生成下仅支持 batch size 为 1，当前请求参数将被忽略
-                logger.warning(
-                    f"Batch size {infer_config.batch_size} is not supported in streaming mode, will set to 1"
-                )
-
+        if stream:
             gen = handler.enqueue_to_stream_with_request(
                 request=request, format=AudioFormat(params.format)
             )

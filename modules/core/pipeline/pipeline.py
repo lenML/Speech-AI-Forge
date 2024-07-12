@@ -32,6 +32,9 @@ class TTSPipeline:
     def create_synth(self):
         chunker = TTSChunker(context=self.context)
         segments = chunker.segments()
+        # 其实这个在 chunker 之前调用好点...但是有副作用所以放在后面
+        segments = [self.process_text(seg) for seg in segments]
+
         synth = BatchSynth(
             input_segments=segments, context=self.context, model=self.model
         )
@@ -41,7 +44,8 @@ class TTSPipeline:
         synth = self.create_synth()
         synth.start_generate()
         synth.wait_done()
-        return synth.sr(), synth.read()
+        audio = synth.sr(), synth.read()
+        return self.process_np_audio(audio)
 
     def generate_stream(self) -> Generator[NP_AUDIO, None, None]:
         synth = self.create_synth()
@@ -49,12 +53,18 @@ class TTSPipeline:
         while not synth.is_done():
             data = synth.read()
             if data.size > 0:
-                yield synth.sr(), data
+                audio = synth.sr(), data
+                yield self.process_np_audio(audio)
             # TODO: replace with threading.Event
             sleep(0.1)
         data = synth.read()
         if data.size > 0:
-            yield synth.sr(), data
+            audio = synth.sr(), data
+            yield self.process_np_audio(audio)
+
+    def process_np_audio(self, audio: NP_AUDIO) -> NP_AUDIO:
+        audio = self.process_audio(audio)
+        return self.ensure_audio_type(audio, "ndarray")
 
     def ensure_audio_type(
         self, audio: AUDIO, output_type: Literal["ndarray", "segment"]
@@ -80,14 +90,14 @@ class TTSPipeline:
             return sr, audio
         return audio
 
-    def process_text(self, text: TTSSegment):
+    def process_text(self, seg: TTSSegment):
         for module in self.modules:
             if isinstance(module, TextProcessor):
-                text = module.process(text)
-        return text
+                seg = module.process(segment=seg, context=self.context)
+        return seg
 
     def process_audio(self, audio: AUDIO):
         for module in self.modules:
             if isinstance(module, AudioProcessor):
-                audio = module.process(audio)
+                audio = module.process(audio=audio, context=self.context)
         return audio

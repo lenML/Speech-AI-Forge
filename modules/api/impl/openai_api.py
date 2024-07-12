@@ -92,6 +92,7 @@ async def openai_speech_api(
         spliter_threshold=spliter_threshold,
         eos=eos,
         seed=seed,
+        stream=stream,
     )
     adjust_config = AdjustConfig(speaking_rate=speed)
     enhancer_config = EnhancerConfig(

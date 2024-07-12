@@ -114,14 +114,20 @@ class TNPipeline:
         guess = GuessLang(zh_or_en=zh_or_en, detected=detected)
         return guess
 
-    def _normalize(self, text: str, config: Optional[TNConfig] = None):
+    def _normalize(self, text: str, config: Optional[TNConfig] = TNConfig()):
+        if config is None:
+            config = TNConfig()
+        enabled_block = config.enabled if config.enabled else []
+        disabled_block = config.disabled if config.disabled else []
+
         guess = self.guess_langs(text)
 
         for block in self.blocks:
             enabled = block.enabled
-            if config is not None and block.name in config.enabled:
+
+            if block.name in enabled_block:
                 enabled = True
-            if config is not None and block.name in config.disabled:
+            if block.name in disabled_block:
                 enabled = False
 
             if not enabled:

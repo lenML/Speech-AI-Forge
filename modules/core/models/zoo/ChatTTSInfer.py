@@ -336,7 +336,7 @@ class ChatTTSInfer:
         stream_chunk_size=96,
         use_decoder=True,
     ) -> Generator[list[np.ndarray], None, None]:
-        gen = self._generate_audio(
+        gen: Generator[list[np.ndarray], None, None] = self._generate_audio(
             text=text,
             spk_emb=spk_emb,
             top_P=top_P,
@@ -354,9 +354,11 @@ class ChatTTSInfer:
 
         def _generator():
             with disable_tqdm(enabled=config.runtime_env_vars.off_tqdm):
-                for audio in gen:
-                    if audio is not None:
-                        yield audio
+                for audio_arr in gen:
+                    # 如果为空就用空 array 填充
+                    # NOTE: 因为长度不一定，所以某个位置可能是 None
+                    audio_arr = [np.empty(0) if i is None else i for i in audio_arr]
+                    yield audio_arr
 
         return _generator()
 

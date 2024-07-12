@@ -69,7 +69,7 @@ class BatchGenerate:
         ):
             for audio, result in zip(batch.segments, results):
                 sr, data = result
-                if len(data) == 0:
+                if data.size == 0:
                     audio.done = True
                     continue
                 audio.data = np.concatenate([audio.data, data], axis=0)

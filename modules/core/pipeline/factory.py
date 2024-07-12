@@ -27,6 +27,7 @@ class EnhancerProcessor(AudioProcessor):
         lambd = enhancer_config.lambd
         tau = enhancer_config.tau
 
+        sample_rate, audio_data = audio
         audio_data, sample_rate = apply_audio_enhance_full(
             audio_data=audio_data,
             sr=sample_rate,
@@ -36,12 +37,12 @@ class EnhancerProcessor(AudioProcessor):
             tau=tau,
         )
 
-        return audio_data, sample_rate
+        return sample_rate, audio_data
 
 
 class AdjusterProcessor(AudioProcessor):
     def _process_array(self, audio: NP_AUDIO, context: TTSPipelineContext) -> NP_AUDIO:
-        sr, audio_data = audio
+        sample_rate, audio_data = audio
         adjust_config = context.adjust_config
 
         audio_data = audio_utils.apply_prosody_to_audio_data(
@@ -49,9 +50,9 @@ class AdjusterProcessor(AudioProcessor):
             rate=adjust_config.speed_rate,
             pitch=adjust_config.pitch,
             volume=adjust_config.volume_gain_db,
-            sr=sr,
+            sr=sample_rate,
         )
-        return sr, audio_data
+        return sample_rate, audio_data
 
 
 class AudioNormalizer(AudioProcessor):
@@ -68,7 +69,7 @@ class AudioNormalizer(AudioProcessor):
 
 class ChatTtsTNProcessor(TextProcessor):
     def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
-        segment.text = ChatTtsTN.normalize(segment.text, context.tts_config)
+        segment.text = ChatTtsTN.normalize(text=segment.text, config=context.tn_config)
         return segment
 
 

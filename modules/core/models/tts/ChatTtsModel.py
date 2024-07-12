@@ -137,7 +137,11 @@ class ChatTTSModel(TTSModel):
                     prompt2=prompt2,
                     prefix=prefix,
                 )
-                audio_arr: list[NP_AUDIO] = [(sr, data[0]) for data in results]
+                audio_arr: list[NP_AUDIO] = [
+                    # NOTE: data[0] 的意思是 立体声 => mono audio
+                    (sr, np.empty(0)) if data is None else (sr, data[0])
+                    for data in results
+                ]
 
                 self.set_cache(segments=segments, context=context, value=audio_arr)
                 return audio_arr
@@ -157,7 +161,17 @@ class ChatTTSModel(TTSModel):
                         prefix=prefix,
                         stream_chunk_size=chunk_size,
                     ):
-                        audio_arr: list[NP_AUDIO] = [(sr, data[0]) for data in results]
+                        results = [
+                            (
+                                np.empty(0)
+                                # None 应该是生成失败, size === 0 是生成结束
+                                if data is None or data.size == 0
+                                # NOTE: data[0] 的意思是 立体声 => mono audio
+                                else data[0]
+                            )
+                            for data in results
+                        ]
+                        audio_arr: list[NP_AUDIO] = [(sr, data) for data in results]
                         yield audio_arr
 
                         if audio_arr_buff is None:
@@ -165,8 +179,8 @@ class ChatTTSModel(TTSModel):
                         else:
                             for i, data in enumerate(results):
                                 sr1, before = audio_arr_buff[i]
-                                buff = np.concatenate([before, data[0]], axis=0)
+                                buff = np.concatenate([before, data], axis=0)
                                 audio_arr_buff[i] = (sr1, buff)
                 self.set_cache(segments=segments, context=context, value=audio_arr_buff)
 
-            return _gen(infer)
+            return _gen()

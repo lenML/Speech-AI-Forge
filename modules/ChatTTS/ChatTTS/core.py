@@ -647,6 +647,7 @@ class Chat:
             stream=stream,
             context=self.context,
             stream_chunk_size=params.stream_chunk_size,
+            ensure_non_empty=params.ensure_non_empty,
         )
 
         del emb, input_ids

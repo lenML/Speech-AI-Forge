@@ -24,6 +24,8 @@ class SSMLRequest(BaseModel):
     enhancer: EnhancerConfig = EnhancerConfig()
     adjuster: AdjustConfig = AdjustConfig()
 
+    stream: bool = False
+
 
 async def synthesize_ssml_api(
     request: SSMLRequest = Body(
@@ -35,6 +37,7 @@ async def synthesize_ssml_api(
         format = request.format.lower()
         batch_size = request.batch_size
         eos = request.eos
+        stream = request.stream
         spliter_thr = request.spliter_thr
         enhancer = request.enhancer
         adjuster = request.adjuster
@@ -58,9 +61,7 @@ async def synthesize_ssml_api(
             )
 
         infer_config = InferConfig(
-            batch_size=batch_size,
-            spliter_threshold=spliter_thr,
-            eos=eos,
+            batch_size=batch_size, spliter_threshold=spliter_thr, eos=eos, stream=stream
         )
         adjust_config = adjuster
         enhancer_config = enhancer
@@ -72,12 +73,18 @@ async def synthesize_ssml_api(
             enhancer_config=enhancer_config,
         )
 
-        buffer = handler.enqueue_to_buffer(format=request.format)
-
-        mime_type = f"audio/{format}"
+        media_type = f"audio/{format}"
         if format == AudioFormat.mp3:
-            mime_type = "audio/mpeg"
-        return StreamingResponse(buffer, media_type=mime_type)
+            media_type = "audio/mpeg"
+
+        if stream:
+            gen = handler.enqueue_to_stream_with_request(
+                request=request, format=AudioFormat(format)
+            )
+            return StreamingResponse(gen, media_type=media_type)
+        else:
+            buffer = handler.enqueue_to_buffer(format=AudioFormat(format))
+            return StreamingResponse(buffer, media_type=media_type)
 
     except Exception as e:
         import logging

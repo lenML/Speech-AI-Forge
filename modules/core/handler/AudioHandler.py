@@ -97,8 +97,7 @@ class AudioHandler:
     async def enqueue_to_stream_with_request(
         self, request: Request, format: AudioFormat
     ) -> AsyncGenerator[bytes, None]:
-        buffer_gen = self.enqueue_to_stream(format=AudioFormat(format))
-        for chunk in buffer_gen:
+        for chunk in self.enqueue_to_stream(format=AudioFormat(format)):
             disconnected = await request.is_disconnected()
             if disconnected:
                 ChatTTSInfer.interrupt()

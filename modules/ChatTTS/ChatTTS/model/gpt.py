@@ -506,6 +506,10 @@ class GPT(nn.Module):
 
                 del logits
 
+                if i == 0:
+                    # when i == 0, we want to ensure that the first token is not eos_token
+                    scores[:, eos_token] = 0
+
                 idx_next = torch.multinomial(scores, num_samples=1).to(finish.device)
 
                 if not infer_text:
@@ -541,27 +545,39 @@ class GPT(nn.Module):
                         if show_tqdm:
                             pbar.close()
                         self.logger.warn("regenerate in order to ensure non-empty")
+                        del_all(attentions)
+                        del_all(hiddens)
+                        del (
+                            start_idx,
+                            end_idx,
+                            finish,
+                            temperature,
+                            attention_mask_cache,
+                            past_key_values,
+                            idx_next,
+                            inputs_ids_tmp,
+                        )
                         new_gen = self.generate(
-                            emb,
-                            inputs_ids,
-                            old_temperature,
-                            eos_token,
-                            attention_mask,
-                            max_new_token,
-                            min_new_token,
-                            logits_warpers,
-                            logits_processors,
-                            infer_text,
-                            return_attn,
-                            return_hidden,
-                            stream,
-                            show_tqdm,
-                            ensure_non_empty,
-                            context,
+                            emb=emb,
+                            inputs_ids=inputs_ids,
+                            old_temperature=old_temperature,
+                            eos_token=eos_token,
+                            attention_mask=attention_mask,
+                            max_new_token=max_new_token,
+                            min_new_token=min_new_token,
+                            logits_warpers=logits_warpers,
+                            logits_processors=logits_processors,
+                            infer_text=infer_text,
+                            return_attn=return_attn,
+                            return_hidden=return_hidden,
+                            stream=stream,
+                            show_tqdm=show_tqdm,
+                            ensure_non_empty=ensure_non_empty,
+                            context=context,
                         )
                         for result in new_gen:
                             yield result
-                    return
+                        return
 
                 del inputs_ids
                 inputs_ids = inputs_ids_tmp
