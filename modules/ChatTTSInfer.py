@@ -275,6 +275,7 @@ class ChatTTSInfer:
             prompt1=prompt1,
             prompt2=prompt2,
             prefix=prefix,
+            ensure_non_empty=False,
         )
         return self.infer(
             text=text,
@@ -299,7 +300,7 @@ class ChatTTSInfer:
         use_decoder=True,
     ) -> list[np.ndarray]:
         with disable_tqdm(enabled=config.runtime_env_vars.off_tqdm):
-            return self._generate_audio(
+            data = self._generate_audio(
                 text=text,
                 spk_emb=spk_emb,
                 top_P=top_P,
@@ -313,6 +314,7 @@ class ChatTTSInfer:
                 use_decoder=use_decoder,
                 stream=False,
             )
+            return [i for i in data if i is not None]
 
     def generate_audio_stream(
         self,
@@ -346,7 +348,8 @@ class ChatTTSInfer:
         def _generator():
             with disable_tqdm(enabled=config.runtime_env_vars.off_tqdm):
                 for audio in gen:
-                    yield audio
+                    if audio is not None:
+                        yield audio
 
         return _generator()
 
