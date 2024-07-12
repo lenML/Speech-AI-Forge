@@ -506,6 +506,10 @@ class GPT(nn.Module):
 
                 del logits
 
+                if i == 0:
+                    # when i == 0, we want to ensure that the first token is not eos_token
+                    scores[:, eos_token] = 0
+
                 idx_next = torch.multinomial(scores, num_samples=1).to(finish.device)
 
                 if not infer_text:
@@ -561,7 +565,7 @@ class GPT(nn.Module):
                         )
                         for result in new_gen:
                             yield result
-                    return
+                        return
 
                 del inputs_ids
                 inputs_ids = inputs_ids_tmp
