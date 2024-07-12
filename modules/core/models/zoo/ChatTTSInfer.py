@@ -38,6 +38,8 @@ def del_all(d: Union[dict, list]):
 
 
 class ChatTTSInfer:
+    model_id = "chat-tts"
+
     logger = logging.getLogger(__name__)
 
     current_infer = None
@@ -316,7 +318,8 @@ class ChatTTSInfer:
                 use_decoder=use_decoder,
                 stream=False,
             )
-            return [i for i in data if i is not None]
+            data = [i for i in data if i is not None]
+            return data
 
     def generate_audio_stream(
         self,
