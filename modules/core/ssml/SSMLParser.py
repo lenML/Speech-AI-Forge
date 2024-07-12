@@ -1,5 +1,5 @@
 import logging
-from typing import List, Union
+from typing import List, Literal, Union
 
 from box import Box
 from lxml import etree
@@ -42,6 +42,10 @@ class SSMLBreak:
 
 
 class SSMLParser:
+    """
+    基础类，在其他模块中不应该手动创建
+    用法看 create_ssml_v01_parser
+    """
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -171,6 +175,12 @@ def create_ssml_v01_parser():
             segments.append(SSMLSegment(element.text.strip(), ctx))
 
     return parser
+
+
+def get_ssml_parser_for(version: Literal["0.1"]):
+    if version == "0.1":
+        return create_ssml_v01_parser()
+    raise ValueError(f"Unsupported SSML version {version}")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from typing import List
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.ssml_normalizer import SsmlNormalizer
-from modules.core.ssml.SSMLParser import SSMLContext, SSMLParser
+from modules.core.ssml.SSMLParser import SSMLContext, SSMLParser, get_ssml_parser_for
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 
 
@@ -81,9 +81,9 @@ class TTSChunker:
         eos = self.context.infer_config.eos
         thr = self.context.infer_config.spliter_threshold
 
-        parser = SSMLParser()
-        ctx = self.create_ssml_ctx()
-        segments = parser.parse(ssml=ssml, root_ctx=ctx)
-        normalizer = SsmlNormalizer(eos=eos, spliter_thr=thr)
+        parser = get_ssml_parser_for("0.1")
+        parser_ctx = self.create_ssml_ctx()
+        segments = parser.parse(ssml=ssml, root_ctx=parser_ctx)
+        normalizer = SsmlNormalizer(context=self.context, eos=eos, spliter_thr=thr)
         segments = normalizer.normalize(segments)
         return segments

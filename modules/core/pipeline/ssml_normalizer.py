@@ -2,7 +2,7 @@ import copy
 import re
 from typing import List, Union
 from modules.api.utils import calc_spk_style, to_number
-from modules.core.pipeline.dcls import TTSSegment
+from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.utils import rng
@@ -17,11 +17,12 @@ class SsmlNormalizer:
     and split the text in SSMLSegment into multiple segments if the text is too long
     """
 
-    def __init__(self, eos="", spliter_thr=100):
+    def __init__(self, context: TTSPipelineContext, eos="", spliter_thr=100):
         self.batch_default_spk_seed = rng.np_rng()
         self.batch_default_infer_seed = rng.np_rng()
         self.eos = eos
         self.spliter_thr = spliter_thr
+        self.context = context
 
     def append_eos(self, text: str):
         text = text.strip()
@@ -87,7 +88,7 @@ class SsmlNormalizer:
             _type="voice",
             text=text,
             temperature=temp or tts_config.temperature,
-            top_P=top_p or tts_config.top_p,
+            top_p=top_p or tts_config.top_p,
             top_k=top_k or tts_config.top_k,
             spk=spk,
             infer_seed=seed,
