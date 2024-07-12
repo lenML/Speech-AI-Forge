@@ -76,6 +76,10 @@ class ChatTTSModel(TTSModel):
     def get_cache(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> list[NP_AUDIO]:
+        no_cache = context.infer_config.no_cache
+        if no_cache:
+            return None
+
         kwargs = self.get_cache_kwargs(segments=segments, context=context)
 
         if InferCache.get_cache_val(model_id=self.model_id, **kwargs):
@@ -89,6 +93,10 @@ class ChatTTSModel(TTSModel):
         context: TTSPipelineContext,
         value: list[NP_AUDIO],
     ):
+        no_cache = context.infer_config.no_cache
+        if no_cache:
+            return
+
         kwargs = self.get_cache_kwargs(segments=segments, context=context)
         InferCache.set_cache_val(model_id=self.model_id, value=value, **kwargs)
 

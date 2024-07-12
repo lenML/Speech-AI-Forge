@@ -11,7 +11,7 @@ from modules.core.pipeline.processor import (
     AUDIO,
     NP_AUDIO,
     AudioProcessor,
-    TextProcessor,
+    PreProcessor,
     TTSPipelineContext,
 )
 from modules.utils import audio_utils
@@ -19,7 +19,7 @@ from modules.utils import audio_utils
 
 class TTSPipeline:
     def __init__(self, context: TTSPipelineContext):
-        self.modules: list[Union[AudioProcessor, TextProcessor]] = []
+        self.modules: list[Union[AudioProcessor, PreProcessor]] = []
         self.model: TTSModel = None
         self.context = context
 
@@ -33,7 +33,7 @@ class TTSPipeline:
         chunker = TTSChunker(context=self.context)
         segments = chunker.segments()
         # 其实这个在 chunker 之前调用好点...但是有副作用所以放在后面
-        segments = [self.process_text(seg) for seg in segments]
+        segments = [self.process_pre(seg) for seg in segments]
 
         synth = BatchSynth(
             input_segments=segments, context=self.context, model=self.model
@@ -90,9 +90,9 @@ class TTSPipeline:
             return sr, audio
         return audio
 
-    def process_text(self, seg: TTSSegment):
+    def process_pre(self, seg: TTSSegment):
         for module in self.modules:
-            if isinstance(module, TextProcessor):
+            if isinstance(module, PreProcessor):
                 seg = module.process(segment=seg, context=self.context)
         return seg
 

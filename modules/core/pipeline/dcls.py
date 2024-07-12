@@ -17,12 +17,13 @@ class TTSSegment:
     temperature: float = 0.3
     top_p: float = 0.9
     top_k: int = 20
-    spk: Speaker = None
     infer_seed: int = 42
     prompt: str = ""
     prompt1: str = ""
     prompt2: str = ""
     prefix: str = ""
+
+    spk: Speaker = None
 
 
 @dataclass

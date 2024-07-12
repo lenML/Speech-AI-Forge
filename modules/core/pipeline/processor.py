@@ -10,7 +10,7 @@ NP_AUDIO = tuple[int, np.ndarray]
 AUDIO = Union[NP_AUDIO, AudioSegment]
 
 
-class TextProcessor:
+class PreProcessor:
     def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
         raise NotImplementedError
 

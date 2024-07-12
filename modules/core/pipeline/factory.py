@@ -7,11 +7,16 @@ from modules.core.pipeline.processor import (
     NP_AUDIO,
     AudioProcessor,
     TTSPipelineContext,
-    TextProcessor,
+    PreProcessor,
 )
-from modules.core.ssml.SSMLParser import SSMLSegment
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.utils import audio_utils
+from modules.data import styles_mgr
+from modules.core.speaker import Speaker, speaker_mgr
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class EnhancerProcessor(AudioProcessor):
@@ -67,9 +72,52 @@ class AudioNormalizer(AudioProcessor):
         return sample_rate, audio_data
 
 
-class ChatTtsTNProcessor(TextProcessor):
+class ChatTtsTNProcessor(PreProcessor):
     def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
         segment.text = ChatTtsTN.normalize(text=segment.text, config=context.tn_config)
+        return segment
+
+
+class ChatTtsStyleProcessor(PreProcessor):
+    """
+    计算合并 style/spk
+    """
+
+    def get_style_params(self, context: TTSPipelineContext):
+        style = context.tts_config.style
+        if not style:
+            return {}
+        params = styles_mgr.find_params_by_name(style)
+        return params
+
+    def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
+        params = self.get_style_params(context)
+        segment.prompt = (
+            segment.prompt or context.tts_config.prompt or params.get("prompt", "")
+        )
+        segment.prompt1 = (
+            segment.prompt1 or context.tts_config.prompt1 or params.get("prompt1", "")
+        )
+        segment.prompt2 = (
+            segment.prompt2 or context.tts_config.prompt2 or params.get("prompt2", "")
+        )
+        segment.prefix = (
+            segment.prefix or context.tts_config.prefix or params.get("prefix", "")
+        )
+
+        spk = segment.spk or context.spk
+
+        if isinstance(spk, str):
+            if spk == "":
+                spk = None
+            else:
+                spk = speaker_mgr.get_speaker(spk)
+        if spk and not isinstance(spk, Speaker):
+            spk = None
+            logger.warn(f"Invalid spk: {spk}")
+
+        segment.spk = spk
+
         return segment
 
 
@@ -90,5 +138,6 @@ class PipelineFactory:
         pipeline.add_module(EnhancerProcessor())
         pipeline.add_module(AdjusterProcessor())
         pipeline.add_module(AudioNormalizer())
+        pipeline.add_module(ChatTtsStyleProcessor())
         pipeline.set_model(ChatTTSModel())
         return pipeline

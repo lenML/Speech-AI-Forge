@@ -24,3 +24,5 @@ class InferConfig(BaseModel):
 
     stream: bool = False
     stream_chunk_size: int = 96
+
+    no_cache: bool = False

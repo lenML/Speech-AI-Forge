@@ -70,6 +70,7 @@ class SsmlNormalizer:
         spk = attrs.spk
         style = attrs.style
 
+        # FIXME: 这个逻辑有点...emmm 最好干掉
         ss_params = calc_spk_style(spk, style)
 
         if "spk" in ss_params:

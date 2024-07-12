@@ -1,7 +1,7 @@
 from typing import List
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
-from modules.core.pipeline.ssml_normalizer import SsmlNormalizer
-from modules.core.ssml.SSMLParser import SSMLContext, SSMLParser, get_ssml_parser_for
+from modules.core.pipeline.generate.SsmlNormalizer import SsmlNormalizer
+from modules.core.ssml.SSMLParser import SSMLContext, get_ssml_parser_for
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 
 
