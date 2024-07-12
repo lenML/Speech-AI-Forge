@@ -1,18 +1,15 @@
 import logging
 from typing import Generator
 
-import numpy as np
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.pipeline.dcls import TTSPipelineContext
+from modules.core.pipeline.factory import PipelineFactory
+from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.speaker import Speaker
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
-from modules.normalization import text_normalize
-from modules.synthesize_audio import synthesize_audio
-from modules.synthesize_stream import synthesize_stream
-from modules.utils.audio_utils import apply_normalize, apply_prosody_to_audio_data
 
 logger = logging.getLogger(__name__)
 
@@ -55,102 +52,29 @@ class TTSHandler(AudioHandler):
         # TODO params checker
         pass
 
-    def enqueue(self) -> tuple[np.ndarray, int]:
-        text = text_normalize(self.text_content)
-        tts_config = self.tts_config
+    def create_pipeline(self):
+        text_content = self.text_content
         infer_config = self.infer_config
+        tts_config = self.tts_config
         adjust_config = self.adjest_config
         enhancer_config = self.enhancer_config
+        spk = self.spk
 
-        sample_rate, audio_data = synthesize_audio(
-            text,
-            spk=self.spk,
-            temperature=tts_config.temperature,
-            top_P=tts_config.top_p,
-            top_K=tts_config.top_k,
-            prompt1=tts_config.prompt1,
-            prompt2=tts_config.prompt2,
-            prefix=tts_config.prefix,
-            infer_seed=infer_config.seed,
-            batch_size=infer_config.batch_size,
-            spliter_threshold=infer_config.spliter_threshold,
-            end_of_sentence=infer_config.eos,
+        ctx = TTSPipelineContext(
+            text=text_content,
+            spk=spk,
+            tts_config=tts_config,
+            infer_config=infer_config,
+            adjust_config=adjust_config,
+            enhancer_config=enhancer_config,
         )
+        pipeline = PipelineFactory.create(ctx)
+        return pipeline
 
-        if enhancer_config.enabled:
-            nfe = enhancer_config.nfe
-            solver = enhancer_config.solver
-            lambd = enhancer_config.lambd
-            tau = enhancer_config.tau
+    def enqueue(self) -> NP_AUDIO:
+        pipeline = self.create_pipeline()
+        return pipeline.generate()
 
-            audio_data, sample_rate = apply_audio_enhance_full(
-                audio_data=audio_data,
-                sr=sample_rate,
-                nfe=nfe,
-                solver=solver,
-                lambd=lambd,
-                tau=tau,
-            )
-
-        audio_data = apply_prosody_to_audio_data(
-            audio_data=audio_data,
-            rate=adjust_config.speed_rate,
-            pitch=adjust_config.pitch,
-            volume=adjust_config.volume_gain_db,
-            sr=sample_rate,
-        )
-
-        if adjust_config.normalize:
-            sample_rate, audio_data = apply_normalize(
-                audio_data=audio_data,
-                headroom=adjust_config.headroom,
-                sr=sample_rate,
-            )
-
-        return audio_data, sample_rate
-
-    def enqueue_stream(self) -> Generator[tuple[np.ndarray, int], None, None]:
-        text = text_normalize(self.text_content)
-        tts_config = self.tts_config
-        infer_config = self.infer_config
-        adjust_config = self.adjest_config
-        enhancer_config = self.enhancer_config
-
-        if enhancer_config.enabled:
-            logger.warning(
-                "enhancer_config is enabled, but it is not supported in stream mode"
-            )
-
-        gen = synthesize_stream(
-            text,
-            spk=self.spk,
-            temperature=tts_config.temperature,
-            top_P=tts_config.top_p,
-            top_K=tts_config.top_k,
-            prompt1=tts_config.prompt1,
-            prompt2=tts_config.prompt2,
-            prefix=tts_config.prefix,
-            infer_seed=infer_config.seed,
-            spliter_threshold=infer_config.spliter_threshold,
-            end_of_sentence=infer_config.eos,
-        )
-
-        # FIXME: 很奇怪，合并出来的音频每个 chunk 之前会有一段异常，暂时没有查出来是哪里的问题，可能是解码时候切割漏了？或者多了？
-        for sr, wav in gen:
-
-            wav = apply_prosody_to_audio_data(
-                audio_data=wav,
-                rate=adjust_config.speed_rate,
-                pitch=adjust_config.pitch,
-                volume=adjust_config.volume_gain_db,
-                sr=sr,
-            )
-
-            if adjust_config.normalize:
-                sr, wav = apply_normalize(
-                    audio_data=wav,
-                    headroom=adjust_config.headroom,
-                    sr=sr,
-                )
-
-            yield wav, sr
+    def enqueue_stream(self) -> Generator[NP_AUDIO, None, None]:
+        pipeline = self.create_pipeline()
+        return pipeline.generate_stream()

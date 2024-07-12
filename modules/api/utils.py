@@ -1,5 +1,6 @@
 from typing import Any, Dict, Union
 
+import numpy as np
 from pydantic import BaseModel
 from pydub import AudioSegment
 

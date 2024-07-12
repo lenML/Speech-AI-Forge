@@ -1,20 +1,12 @@
 from typing import Generator
 
-import numpy as np
-from fastapi import HTTPException
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.pipeline.factory import PipelineFactory
-from modules.core.pipeline.pipeline import TTSPipeline
-from modules.core.pipeline.processor import TTSPipelineContext
-from modules.core.ssml.SSMLParser import create_ssml_v01_parser
-from modules.core.ssml.SynthesizeSSML import SynthesizeSSML
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
-from modules.normalization import text_normalize
-from modules.utils import audio_utils
+from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
 
 
 class SSMLHandler(AudioHandler):
@@ -63,15 +55,10 @@ class SSMLHandler(AudioHandler):
         pipeline = PipelineFactory.create(ctx)
         return pipeline
 
-    def enqueue(self) -> tuple[np.ndarray, int]:
+    def enqueue(self) -> NP_AUDIO:
         pipeline = self.create_pipeline()
-        results = pipeline.generate()
+        return pipeline.generate()
 
-        sample_rate = results[0][0]
-        audio_data = np.concatenate([r[1] for r in results], axis=0)
-
-        return audio_data, sample_rate
-
-    def enqueue_stream(self) -> Generator[tuple[np.ndarray, int], None, None]:
+    def enqueue_stream(self) -> Generator[NP_AUDIO, None, None]:
         pipeline = self.create_pipeline()
-        # TODO
+        return pipeline.generate_stream()

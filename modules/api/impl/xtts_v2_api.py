@@ -5,9 +5,9 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from modules.api.Api import APIManager
+from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
-from modules.core.handler.datacls.tacls.audio_model import AdjustConfig, AudioFormat
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.speaker import speaker_mgr
 

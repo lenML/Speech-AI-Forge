@@ -9,6 +9,7 @@ from pydub import AudioSegment
 
 from modules.core.handler.datacls.audio_model import AudioFormat
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
+from modules.core.pipeline.processor import NP_AUDIO
 from modules.utils.audio_utils import ndarray_to_segment
 
 
@@ -49,10 +50,10 @@ def pad_audio_frame(audio_data: np.ndarray, frame_size=1152, channels=1) -> np.n
 
 
 class AudioHandler:
-    def enqueue(self) -> tuple[np.ndarray, int]:
+    def enqueue(self) -> NP_AUDIO:
         raise NotImplementedError("Method 'enqueue' must be implemented by subclass")
 
-    def enqueue_stream(self) -> Generator[tuple[np.ndarray, int], None, None]:
+    def enqueue_stream(self) -> Generator[NP_AUDIO, None, None]:
         raise NotImplementedError(
             "Method 'enqueue_stream' must be implemented by subclass"
         )
@@ -88,7 +89,7 @@ class AudioHandler:
         if format == AudioFormat.wav:
             yield wav_header
 
-        for audio_data, sample_rate in self.enqueue_stream():
+        for sample_rate, audio_data in self.enqueue_stream():
             yield self.encode_audio(audio_data, sample_rate, format).read()
 
         # print("AudioHandler: enqueue_to_stream done")
@@ -113,13 +114,13 @@ class AudioHandler:
             yield wav_header
 
         data = None
-        for audio_data, sample_rate in self.enqueue_stream():
+        for sample_rate, audio_data in self.enqueue_stream():
             data = audio_data if data is None else np.concatenate((data, audio_data))
         buffer = self.encode_audio(data, sample_rate, format)
         yield buffer.read()
 
     def enqueue_to_buffer(self, format: AudioFormat) -> io.BytesIO:
-        audio_data, sample_rate = self.enqueue()
+        sample_rate, audio_data = self.enqueue()
         buffer = self.encode_audio(audio_data, sample_rate, format)
         if format == AudioFormat.wav:
             buffer = io.BytesIO(wav_header + buffer.read())
