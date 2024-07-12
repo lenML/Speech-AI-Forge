@@ -1,3 +1,9 @@
+"""
+NOTE: 当前版本无法使用本脚本
+
+TODO: 适配新版本
+"""
+
 import csv
 import logging
 import os
