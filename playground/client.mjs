@@ -43,6 +43,7 @@ class APIClient {
     prefix = "",
     bs = 8,
     thr = 100,
+    no_cache = false,
     stream = false,
   }) {
     const params = new URLSearchParams({
@@ -59,6 +60,7 @@ class APIClient {
       prefix,
       bs,
       thr,
+      no_cache,
       stream,
     });
     // return `${this.client.defaults.baseURL}v1/tts?${params.toString()}`;

@@ -1,5 +1,6 @@
 import io
 import logging
+from typing import Literal, Union
 
 from fastapi import Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
@@ -50,6 +51,10 @@ class TTSParams(BaseModel):
     volume_gain: float = Query(0, description="Volume gain of the audio")
 
     stream: bool = Query(False, description="Stream the audio")
+
+    no_cache: Union[bool, Literal["on", "off"]] = Query(
+        False, description="Disable cache"
+    )
 
 
 async def synthesize_tts(request: Request, params: TTSParams = Depends()):
@@ -103,6 +108,11 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
         eos = params.eos or ""
         stream = params.stream
+        no_cache = (
+            params.no_cache
+            if isinstance(params.no_cache, bool)
+            else params.no_cache == "on"
+        )
 
         batch_size = int(params.bs)
         threshold = int(params.thr)
@@ -122,6 +132,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             eos=eos,
             seed=seed,
             stream=stream,
+            no_cache=no_cache,
         )
         adjust_config = AdjustConfig(
             pitch=params.pitch,

@@ -7,6 +7,8 @@ class AudioFormat(str, Enum):
     mp3 = "mp3"
     wav = "wav"
     ogg = "ogg"
+    acc = "acc"
+    flac = "flac"
 
 
 class AdjustConfig(BaseModel):

@@ -99,6 +99,7 @@ const useStore = create((set, get) => ({
     top_k: 20,
     seed: 42,
     format: "mp3",
+    no_cache: false,
   },
   setParams: (params) =>
     set({
@@ -125,8 +126,17 @@ const StreamForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { text, spk, style, temperature, top_p, top_k, seed, format } =
-      params;
+    const {
+      text,
+      spk,
+      style,
+      temperature,
+      top_p,
+      top_k,
+      seed,
+      format,
+      no_cache,
+    } = params;
     const audio_url = client.synthesizeTTSUrl({
       text,
       spk,
@@ -136,6 +146,7 @@ const StreamForm = () => {
       top_k,
       seed,
       format,
+      no_cache,
       stream: true,
     });
     setAudioUrl(audio_url);
@@ -213,8 +224,19 @@ const StreamForm = () => {
           <select name="format" value=${params.format} onChange=${handleChange}>
             <option value="mp3">mp3</option>
             <option value="wav">wav</option>
+            <option value="flac">flac</option>
+            <option value="acc">acc</option>
             <option value="ogg">ogg</option>
           </select>
+        </label>
+        <label>
+          No cache
+          <input
+            type="checkbox"
+            name="no_cache"
+            checked=${params.no_cache}
+            onChange=${handleChange}
+          />
         </label>
         <button type="submit">Synthesize</button>
       </form>
