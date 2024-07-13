@@ -24,6 +24,7 @@ class BatchSynth:
         self.generator = BatchGenerate(
             buckets=self.buckets, context=context, model=model
         )
+        self.context = context
 
         self.thread1 = None
 
@@ -40,9 +41,19 @@ class BatchSynth:
         return self.streamer.read()
 
     def start_generate(self):
+        sync_gen = self.context.infer_config.sync_gen
+        if sync_gen:
+            self.start_generate_sync()
+        else:
+            self.start_generate_async()
+
+    def start_generate_async(self):
         if self.thread1 is not None:
             return
         gen_t1 = threading.Thread(target=self.generator.generate, args=(), daemon=True)
         gen_t1.start()
         self.thread1 = gen_t1
         return gen_t1
+
+    def start_generate_sync(self):
+        self.generator.generate()

@@ -31,7 +31,7 @@ class TTSPipelineContext:
     text: Optional[str] = None
     ssml: Optional[str] = None
 
-    spk: Speaker = None
+    spk: Optional[Speaker] = None
     tts_config: ChatTTSConfig = ChatTTSConfig()
     infer_config: InferConfig = InferConfig()
     adjust_config: AdjustConfig = AdjustConfig()

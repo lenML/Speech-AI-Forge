@@ -1,7 +1,6 @@
 import argparse
 import logging
 
-from modules import generate_audio
 from modules.core.models import zoo
 from modules.devices import devices
 from modules.Enhancer.ResembleEnhance import load_enhancer
@@ -37,6 +36,7 @@ def setup_model_args(parser: argparse.ArgumentParser):
         type=str.lower,
         choices=["all", "chattts", "enhancer", "trainer"],
     )
+    # TODO: tts_pipeline 引入之后还不支持从这里配置
     parser.add_argument(
         "--lru_size",
         type=int,
@@ -66,12 +66,12 @@ def process_model_args(args: argparse.Namespace):
     debug_generate = env.get_and_update_env(args, "debug_generate", False, bool)
     preload_models = env.get_and_update_env(args, "preload_models", False, bool)
 
-    generate_audio.setup_lru_cache()
+    # TODO: 需要等 zoo 模块实现
+    # generate_audio.setup_lru_cache()
     devices.reset_device()
     devices.first_time_calculation()
 
-    if debug_generate:
-        generate_audio.logger.setLevel(logging.DEBUG)
+    zoo.zoo_config.debug_generate = debug_generate
 
     if preload_models:
         """

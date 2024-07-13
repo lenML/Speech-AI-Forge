@@ -1,11 +1,11 @@
-from typing import Any, Generator
+from typing import Any, Generator, Union
 
 import numpy as np
 
 from modules.core.models.TTSModel import TTSModel
 from modules.core.models.zoo.ChatTTS import ChatTTS, load_chat_tts, unload_chat_tts
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
-from modules.core.models.zoo.InerCache import InferCache
+from modules.core.models.tts.InerCache import InferCache
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
@@ -16,7 +16,7 @@ class ChatTTSModel(TTSModel):
     model_id = "chat-tts"
 
     def __init__(self) -> None:
-        super().__init__("chat-tts-4w")
+        super().__init__("chat-tts")
         self.chat: ChatTTS = None
 
     def load(self, context: TTSPipelineContext) -> ChatTTS:
@@ -75,9 +75,13 @@ class ChatTTSModel(TTSModel):
 
     def get_cache(
         self, segments: list[TTSSegment], context: TTSPipelineContext
-    ) -> list[NP_AUDIO]:
+    ) -> Union[list[NP_AUDIO], None]:
         no_cache = context.infer_config.no_cache
         if no_cache:
+            return None
+
+        is_random_generate = context.infer_config.seed == -1
+        if is_random_generate:
             return None
 
         kwargs = self.get_cache_kwargs(segments=segments, context=context)
@@ -102,7 +106,7 @@ class ChatTTSModel(TTSModel):
 
     def generate_batch_base(
         self, segments: list[TTSSegment], context: TTSPipelineContext, stream=False
-    ) -> list[NP_AUDIO] | Generator[list[NP_AUDIO], Any, None]:
+    ) -> Union[list[NP_AUDIO], Generator[list[NP_AUDIO], Any, None]]:
         cached = self.get_cache(segments=segments, context=context)
         if cached is not None:
             if not stream:

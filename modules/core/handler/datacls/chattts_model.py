@@ -26,3 +26,6 @@ class InferConfig(BaseModel):
     stream_chunk_size: int = 96
 
     no_cache: bool = False
+
+    # 开启同步生成 （主要是给gradio用）
+    sync_gen: bool = False

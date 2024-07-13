@@ -13,14 +13,16 @@ from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.speaker import Speaker, speaker_mgr
+from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment
+from modules.core.tn import ChatTtsTN
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.data import styles_mgr
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
-from modules.normalization import text_normalize
-from modules.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_parser
 from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
+
+from modules.core.ssml.SSMLParser import create_ssml_v01_parser
 
 
 def get_speakers():
@@ -109,7 +111,7 @@ def synthesize_ssml(
     if ssml == "":
         raise gr.Error("SSML is empty, please input some SSML")
 
-    parser = create_ssml_parser()
+    parser = create_ssml_v01_parser()
     segments = parser.parse(ssml)
     max_len = webui_config.ssml_max
     segments = segments_length_limit(segments, max_len)
@@ -123,6 +125,8 @@ def synthesize_ssml(
         eos=eos,
         # NOTE: SSML not support `infer_seed` contorl
         # seed=42,
+        # NOTE: 开启以支持 track_tqdm
+        sync_gen=True,
     )
     adjust_config = AdjustConfig(
         pitch=pitch,
@@ -143,12 +147,12 @@ def synthesize_ssml(
         enhancer_config=enhancer_config,
     )
 
-    audio_data, sr = handler.enqueue()
+    sample_rate, audio_data = handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio_utils.audio_to_int16(audio_data)
 
-    return sr, audio_data
+    return sample_rate, audio_data
 
 
 # @torch.inference_mode()
@@ -234,6 +238,8 @@ def tts_generate(
         spliter_threshold=spliter_thr,
         eos=eos,
         seed=infer_seed,
+        # NOTE: 开启以支持 track_tqdm
+        sync_gen=True,
     )
     adjust_config = AdjustConfig(
         pitch=pitch,
@@ -256,11 +262,15 @@ def tts_generate(
         enhancer_config=enhancer_config,
     )
 
-    audio_data, sample_rate = handler.enqueue()
+    sample_rate, audio_data = handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio_utils.audio_to_int16(audio_data)
     return sample_rate, audio_data
+
+
+def text_normalize(text: str) -> str:
+    return ChatTtsTN.ChatTtsTN.normalize(text)
 
 
 @torch.inference_mode()

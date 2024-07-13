@@ -9,6 +9,7 @@ from transformers import LlamaTokenizer
 from modules import config
 from modules.ChatTTS.ChatTTS.core import Chat
 from modules.ChatTTS.ChatTTS.model import GPT
+from modules.core.models import zoo
 from modules.utils.monkey_tqdm import disable_tqdm
 
 
@@ -47,6 +48,9 @@ class ChatTTSInfer:
     def __init__(self, instance: Chat) -> None:
         self.instance = instance
         ChatTTSInfer.current_infer = self
+
+        if zoo.zoo_config.debug_generate:
+            self.logger.setLevel(logging.DEBUG)
 
     def get_tokenizer(self) -> LlamaTokenizer:
         return self.instance.pretrain_models["tokenizer"]
@@ -102,6 +106,14 @@ class ChatTTSInfer:
         # smooth_decoding = stream
         smooth_decoding = False
 
+        self.logger.debug(
+            f"Start infer: stream={stream}, skip_refine_text={skip_refine_text}, refine_text_only={refine_text_only}, use_decoder={use_decoder}, smooth_decoding={smooth_decoding}"
+        )
+        self.logger.debug(
+            f"params_refine_text={params_refine_text}, params_infer_code={params_infer_code}"
+        )
+        self.logger.debug(f"Text: {text}")
+
         with torch.no_grad():
 
             if not skip_refine_text:
@@ -131,6 +143,7 @@ class ChatTTSInfer:
                     wavs = self._decode_to_wavs(result, length, use_decoder)
                     yield wavs
             else:
+                # NOTE: 貌似没什么用...?
                 # smooth_decoding 即使用了滑动窗口的解码，每次都保留上一段的隐藏状态一起解码，并且保留上一段的音频长度用于截取
                 @dataclass(repr=False, eq=False)
                 class WavWindow:

@@ -4,7 +4,6 @@ import gradio as gr
 import torch
 
 from modules.core.speaker import Speaker
-from modules.models import load_chat_tts
 from modules.utils.hf import spaces
 from modules.utils.rng import np_rng
 from modules.utils.SeedContext import SeedContext

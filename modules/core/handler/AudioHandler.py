@@ -1,12 +1,10 @@
 import base64
 import io
-import struct
 import wave
 from typing import AsyncGenerator, Generator
 
 import numpy as np
 from fastapi import Request
-from pydub import AudioSegment
 
 from modules.core.handler.encoder.StreamEncoder import StreamEncoder
 from modules.core.handler.encoder.WavFile import WAVFileBytes
