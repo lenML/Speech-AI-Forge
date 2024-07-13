@@ -1,5 +1,6 @@
 import io
 import logging
+from typing import Literal, Union
 
 from fastapi import Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
@@ -7,11 +8,11 @@ from pydantic import BaseModel
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.api.impl.handler.TTSHandler import TTSHandler
-from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
-from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
-from modules.api.impl.model.enhancer_model import EnhancerConfig
-from modules.speaker import Speaker
+from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.speaker import Speaker
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +51,10 @@ class TTSParams(BaseModel):
     volume_gain: float = Query(0, description="Volume gain of the audio")
 
     stream: bool = Query(False, description="Stream the audio")
+
+    no_cache: Union[bool, Literal["on", "off"]] = Query(
+        False, description="Disable cache"
+    )
 
 
 async def synthesize_tts(request: Request, params: TTSParams = Depends()):
@@ -102,6 +107,12 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         prompt1 = params.prompt1 or calc_params.get("prompt1", params.prompt1)
         prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
         eos = params.eos or ""
+        stream = params.stream
+        no_cache = (
+            params.no_cache
+            if isinstance(params.no_cache, bool)
+            else params.no_cache == "on"
+        )
 
         batch_size = int(params.bs)
         threshold = int(params.thr)
@@ -120,6 +131,8 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             spliter_threshold=threshold,
             eos=eos,
             seed=seed,
+            stream=stream,
+            no_cache=no_cache,
         )
         adjust_config = AdjustConfig(
             pitch=params.pitch,
@@ -143,13 +156,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         if params.format == "mp3":
             media_type = "audio/mpeg"
 
-        if params.stream:
-            if infer_config.batch_size != 1:
-                # 流式生成下仅支持 batch size 为 1，当前请求参数将被忽略
-                logger.warning(
-                    f"Batch size {infer_config.batch_size} is not supported in streaming mode, will set to 1"
-                )
-
+        if stream:
             gen = handler.enqueue_to_stream_with_request(
                 request=request, format=AudioFormat(params.format)
             )

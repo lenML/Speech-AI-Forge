@@ -46,6 +46,7 @@ def test_openai_speech_api_with_invalid_style(client):
     assert "Invalid style" in response.json().get("detail", "")
 
 
+# NOTE: 下面是 asr 相关的，现在还不支持，后面支持了需要测 （貌似可以用 tts 生成然后用 asr 回写来一起测...）
 # @pytest.mark.openai_api
 # def test_transcribe_not_implemented(client):
 #     file = {"file": ("test.wav", b"test audio data")}

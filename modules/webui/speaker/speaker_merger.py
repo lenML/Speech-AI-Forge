@@ -1,37 +1,36 @@
-import io
 import tempfile
 
 import gradio as gr
 import torch
 
-from modules.speaker import Speaker, speaker_mgr
+from modules.core.speaker import Speaker, speaker_mgr
 from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
-from modules.webui.webui_utils import get_speakers, tts_generate
+from modules.webui.webui_utils import tts_generate
 
 
-def spk_to_tensor(spk):
+def spk_to_tensor(spk: str):
     spk = spk.split(" : ")[1].strip() if " : " in spk else spk
     if spk == "None" or spk == "":
         return None
     return speaker_mgr.get_speaker(spk).emb
 
 
-def get_speaker_show_name(spk):
+def get_speaker_show_name(spk: str):
     if spk.gender == "*" or spk.gender == "":
         return spk.name
     return f"{spk.gender} : {spk.name}"
 
 
 def merge_spk(
-    spk_a,
-    spk_a_w,
-    spk_b,
-    spk_b_w,
-    spk_c,
-    spk_c_w,
-    spk_d,
-    spk_d_w,
+    spk_a: str,
+    spk_a_w: float,
+    spk_b: str,
+    spk_b_w: float,
+    spk_c: str,
+    spk_c_w: float,
+    spk_d: str,
+    spk_d_w: float,
 ):
     tensor_a = spk_to_tensor(spk_a)
     tensor_b = spk_to_tensor(spk_b)

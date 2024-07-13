@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.speaker import speaker_mgr
+from modules.core.speaker import speaker_mgr
 
 
 class CreateSpeaker(BaseModel):

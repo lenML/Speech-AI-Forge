@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from modules import refiner
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.normalization import text_normalize
+from modules.core.tn.ChatTtsTN import ChatTtsTN
 
 
 class RefineTextRequest(BaseModel):
@@ -16,8 +16,8 @@ class RefineTextRequest(BaseModel):
     temperature: float = 0.7
     repetition_penalty: float = 1.0
     max_new_token: int = 384
-    normalize: bool = True
     spliter_threshold: int = 300
+    normalize: bool = True
 
 
 async def refiner_prompt_post(request: RefineTextRequest):
@@ -28,8 +28,8 @@ async def refiner_prompt_post(request: RefineTextRequest):
     try:
         text = request.text
         if request.normalize:
-            text = text_normalize(request.text)
-        # TODO 其实这里可以做 spliter 和 batch 处理
+            text = ChatTtsTN.normalize(request.text)
+        # TODO 需要迁移使用 refiner model
         refined_text = refiner.refine_text(
             text=text,
             prompt=request.prompt,

@@ -1,11 +1,10 @@
 from typing import Generator
 
-import numpy as np
 import torch
 
-from modules import config, models
-from modules.ChatTTSInfer import ChatTTSInfer
-from modules.SentenceSplitter import SentenceSplitter
+from modules.core.models import zoo
+from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
+from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.utils.SeedContext import SeedContext
 
 
@@ -21,7 +20,7 @@ def refine_text(
     max_new_token=384,
     spliter_threshold=300,
 ) -> str:
-    chat_tts = models.load_chat_tts()
+    chat_tts = zoo.ChatTTS.load_chat_tts()
 
     spliter = SentenceSplitter(spliter_threshold)
     sentences = spliter.parse(text)

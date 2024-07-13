@@ -2,7 +2,6 @@ import gradio as gr
 import pandas as pd
 import torch
 
-from modules.normalization import text_normalize
 from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
 
@@ -19,7 +18,7 @@ def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
         spk = row.get("speaker")
         style = row.get("style")
 
-        text = text_normalize(text)
+        text = webui_utils.text_normalize(text)
 
         if text.strip() == "":
             continue

@@ -1,3 +1,9 @@
+"""
+NOTE: 当前版本无法使用本脚本
+
+TODO: 适配新版本
+"""
+
 import csv
 import logging
 import os
@@ -12,7 +18,7 @@ from modules import config
 from modules.devices import devices
 from modules.generate_audio import generate_audio_batch
 from modules.models import reload_chat_tts, unload_chat_tts
-from modules.utils import audio
+from modules.utils import audio_utils
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +121,7 @@ def test_tts(
 
     unload_chat_tts()
 
-    segment = audio.ndarray_to_segment(audio_data, sr)
+    segment = audio_utils.ndarray_to_segment(audio_data, sr)
     duration = segment.duration_seconds * batch_size
 
     pt = end_time - start_time

@@ -1,17 +1,12 @@
 import pytest
 from lxml import etree
 
-from modules.ssml_parser.SSMLParser import (
-    SSMLBreak,
-    SSMLContext,
-    SSMLSegment,
-    create_ssml_parser,
-)
+from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
 
 
 @pytest.fixture
 def parser():
-    return create_ssml_parser()
+    return create_ssml_v01_parser()
 
 
 @pytest.mark.ssml_parser

@@ -1,6 +1,6 @@
 import json
 
-from modules.speaker import speaker_mgr
+from modules.core.speaker import speaker_mgr
 
 # 出处: https://github.com/2noise/ChatTTS/issues/238
 data = json.load(open("./data/slct_voice_240605.json", "r"))

@@ -180,7 +180,11 @@ const SSMLHistory = () => {
                 <td>
                   <textarea
                     readonly
-                    style="width: 100%; height: 5rem; resize: none;"
+                    style=${{
+                      with: "100%",
+                      height: "5rem",
+                      resize: "none",
+                    }}
                   >
                     ${item.params.ssml}
                   </textarea

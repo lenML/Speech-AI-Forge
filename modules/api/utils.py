@@ -1,11 +1,11 @@
-from typing import Any, Union
+from typing import Any, Dict, Union
 
+import numpy as np
 from pydantic import BaseModel
 from pydub import AudioSegment
 
+from modules.core.speaker import speaker_mgr
 from modules.data import styles_mgr
-from modules.speaker import speaker_mgr
-from modules.ssml import merge_prompt
 
 
 class ParamsTypeError(Exception):
@@ -34,6 +34,27 @@ def to_number(value, t, default=0):
         return number
     except (ValueError, TypeError) as e:
         return default
+
+
+def merge_prompt(attrs: dict, elem: Dict[str, Any]):
+
+    def attr_num(attrs: Dict[str, Any], k: str, min_value: int, max_value: int):
+        val = elem.get(k, attrs.get(k, ""))
+        if val == "":
+            return
+        if val == "max":
+            val = max_value
+        if val == "min":
+            val = min_value
+        val = np.clip(int(val), min_value, max_value)
+        if "prefix" not in attrs or attrs["prefix"] == None:
+            attrs["prefix"] = ""
+        attrs["prefix"] += " " + f"[{k}_{val}]"
+
+    attr_num(attrs, "oral", 0, 9)
+    attr_num(attrs, "speed", 0, 9)
+    attr_num(attrs, "laugh", 0, 2)
+    attr_num(attrs, "break", 0, 7)
 
 
 def calc_spk_style(spk: Union[str, int], style: Union[str, int]):

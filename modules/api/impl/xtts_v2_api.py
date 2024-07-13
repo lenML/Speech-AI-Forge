@@ -5,11 +5,11 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from modules.api.Api import APIManager
-from modules.api.impl.handler.TTSHandler import TTSHandler
-from modules.api.impl.model.audio_model import AdjustConfig, AudioFormat
-from modules.api.impl.model.chattts_model import ChatTTSConfig, InferConfig
-from modules.api.impl.model.enhancer_model import EnhancerConfig
-from modules.speaker import speaker_mgr
+from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.speaker import speaker_mgr
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +111,7 @@ def setup(app: APIManager):
             spliter_threshold=XTTSV2.spliter_threshold,
             eos=XTTSV2.eos,
             seed=XTTSV2.infer_seed,
+            stream=False,
         )
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,
@@ -164,6 +165,7 @@ def setup(app: APIManager):
             spliter_threshold=XTTSV2.spliter_threshold,
             eos=XTTSV2.eos,
             seed=XTTSV2.infer_seed,
+            stream=True,
         )
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,

@@ -1,9 +1,8 @@
 import pytest
 
-from modules import normalization
-from modules.normalization import text_normalize
+from modules.core.tn import ChatTtsTN
 
-normalization.DISABLE_UNK_TOKEN_CHECK = True
+ChatTtsTN.DISABLE_UNK_TOKEN_CHECK = True
 
 
 @pytest.mark.parametrize(
@@ -59,4 +58,4 @@ console.log('1')
 )
 @pytest.mark.normalize
 def test_text_normalize(input_text, expected_output):
-    assert text_normalize(input_text) == expected_output
+    assert ChatTtsTN.ChatTtsTN.normalize(input_text) == expected_output
