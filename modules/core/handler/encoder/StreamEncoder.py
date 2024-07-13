@@ -1,9 +1,10 @@
-import pydub
-import pydub.utils
+import io
+import queue
 import subprocess
 import threading
-import queue
-import io
+
+import pydub
+import pydub.utils
 
 
 class StreamEncoder:

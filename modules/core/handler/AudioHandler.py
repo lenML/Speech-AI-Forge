@@ -6,8 +6,6 @@ from typing import AsyncGenerator, Generator
 import numpy as np
 from fastapi import Request
 
-from modules.core.handler.encoder.StreamEncoder import StreamEncoder
-from modules.core.handler.encoder.WavFile import WAVFileBytes
 from modules.core.handler.datacls.audio_model import AudioFormat
 from modules.core.handler.encoder.encoders import (
     AacEncoder,
@@ -16,6 +14,8 @@ from modules.core.handler.encoder.encoders import (
     OggEncoder,
     WavEncoder,
 )
+from modules.core.handler.encoder.StreamEncoder import StreamEncoder
+from modules.core.handler.encoder.WavFile import WAVFileBytes
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
 from modules.core.pipeline.processor import NP_AUDIO
 

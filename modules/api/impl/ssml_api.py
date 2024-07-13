@@ -5,8 +5,8 @@ from pydantic import BaseModel
 from modules.api.Api import APIManager
 from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
 from modules.core.handler.datacls.chattts_model import InferConfig
-from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.SSMLHandler import SSMLHandler
 
 
 class SSMLRequest(BaseModel):

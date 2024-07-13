@@ -1,6 +1,6 @@
-import struct
 import io
 import logging
+import struct
 
 
 class WAVFileBytes:

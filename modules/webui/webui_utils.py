@@ -13,7 +13,7 @@ from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.speaker import Speaker, speaker_mgr
-from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment
+from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
 from modules.core.tn import ChatTtsTN
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.data import styles_mgr
@@ -21,8 +21,6 @@ from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio
 from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
-
-from modules.core.ssml.SSMLParser import create_ssml_v01_parser
 
 
 def get_speakers():

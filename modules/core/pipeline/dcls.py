@@ -1,5 +1,5 @@
-from typing import Literal, Optional
 from dataclasses import dataclass
+from typing import Literal, Optional
 
 from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig

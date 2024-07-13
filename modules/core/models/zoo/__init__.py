@@ -1,2 +1,1 @@
-from . import ChatTTS
-from . import zoo_config
+from . import ChatTTS, zoo_config

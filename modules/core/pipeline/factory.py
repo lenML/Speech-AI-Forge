@@ -1,20 +1,21 @@
+import logging
+
 from numpy import ndarray
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
+
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.pipeline import TTSPipeline
 from modules.core.pipeline.processor import (
     NP_AUDIO,
     AudioProcessor,
-    TTSPipelineContext,
     PreProcessor,
+    TTSPipelineContext,
 )
-from modules.core.tn.ChatTtsTN import ChatTtsTN
-from modules.utils import audio_utils
-from modules.data import styles_mgr
 from modules.core.speaker import Speaker, speaker_mgr
-
-import logging
+from modules.core.tn.ChatTtsTN import ChatTtsTN
+from modules.data import styles_mgr
+from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
+from modules.utils import audio_utils
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,7 @@
 from typing import Dict
-from cachetools import LRUCache
+
 import torch
+from cachetools import LRUCache
 from cachetools import keys as cache_keys
 
 from modules.core.speaker import Speaker

@@ -1,7 +1,7 @@
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.Enhancer.ResembleEnhance import reload_enhancer, unload_enhancer
 from modules.core.models import zoo
+from modules.Enhancer.ResembleEnhance import reload_enhancer, unload_enhancer
 
 
 def setup(app: APIManager):

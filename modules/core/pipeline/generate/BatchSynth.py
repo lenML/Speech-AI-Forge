@@ -1,11 +1,12 @@
 import threading
 from typing import Union
+
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.generate.BatchGenerate import BatchGenerate
 from modules.core.pipeline.generate.Bucketizer import Bucketizer
-from modules.core.pipeline.generate.SynthSteamer import SynthStreamer
 from modules.core.pipeline.generate.dcls import SynthAudio
+from modules.core.pipeline.generate.SynthSteamer import SynthStreamer
 
 
 class BatchSynth:

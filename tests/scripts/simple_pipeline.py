@@ -1,3 +1,5 @@
+import soundfile as sf
+
 from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
@@ -5,8 +7,6 @@ from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import TTSPipelineContext
 from modules.core.speaker import speaker_mgr
-
-import soundfile as sf
 
 context = TTSPipelineContext(
     ssml="""

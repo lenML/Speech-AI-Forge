@@ -1,4 +1,5 @@
 import numpy as np
+
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.generate.dcls import SynthAudio
