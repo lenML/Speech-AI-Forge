@@ -3,11 +3,10 @@ import tempfile
 import gradio as gr
 import torch
 
+from modules.core.spk import TTSSpeaker, spk_mgr
 from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
 from modules.webui.webui_utils import tts_generate
-
-from modules.core.spk import spk_mgr, TTSSpeaker
 
 
 def spk_to_tensor(spk: str):

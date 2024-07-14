@@ -1,4 +1,5 @@
 import html
+import os
 import re
 
 import emojiswitch
@@ -11,8 +12,6 @@ from modules.repos_static.zh_normalization.text_normlization import TextNormaliz
 from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.html import remove_html_tags as _remove_html_tags
 from modules.utils.markdown import markdown_to_text
-
-import os
 
 DISABLE_UNK_TOKEN_CHECK = False
 

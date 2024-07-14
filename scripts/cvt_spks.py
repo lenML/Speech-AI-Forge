@@ -3,9 +3,10 @@
 """
 
 import os
+
 from modules.core.speaker import speaker_mgr
-from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 for fp, spk in speaker_mgr.speakers.items():
     print(fp)

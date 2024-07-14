@@ -11,8 +11,8 @@ from modules.core.pipeline.processor import (
     PreProcessor,
     TTSPipelineContext,
 )
-from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.data import styles_mgr
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full

@@ -1,3 +1,4 @@
+import logging
 from typing import Union
 
 import gradio as gr
@@ -12,6 +13,7 @@ from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfi
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.spk import TTSSpeaker, spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
 from modules.core.tn import ChatTtsTN
@@ -21,10 +23,6 @@ from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio
 from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
-
-from modules.core.spk import spk_mgr, TTSSpeaker
-
-import logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,11 +1,11 @@
 import json
-import torch
+import logging
 from typing import Union
+
+import torch
 
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.tools.FolderDatabase import FolderDatabase
-
-import logging
 
 
 class SpeakerManager(FolderDatabase):

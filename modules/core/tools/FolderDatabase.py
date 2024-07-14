@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Any, Callable
+from typing import Any, Callable, Dict, List
 
 
 class FolderDatabase:

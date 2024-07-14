@@ -2,8 +2,8 @@ import base64
 import copy
 import dataclasses
 import json
-from typing import Any, Optional
 import uuid
+from typing import Any, Optional
 
 import numpy as np
 import torch
@@ -12,10 +12,10 @@ from modules.core.spk.dcls import (
     DcSpk,
     DcSpkInferConfig,
     DcSpkMeta,
-    DcSpkVoiceToken,
-    DcSpkTrainInfo,
-    DcSpkSample,
     DcSpkReference,
+    DcSpkSample,
+    DcSpkTrainInfo,
+    DcSpkVoiceToken,
 )
 
 dclses = [

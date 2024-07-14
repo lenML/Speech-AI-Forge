@@ -1,14 +1,13 @@
 import gradio as gr
 
 from modules.core.models import zoo
+from modules.core.spk import TTSSpeaker, spk_mgr
 from modules.Enhancer.ResembleEnhance import unload_enhancer
 from modules.webui import webui_config
 from modules.webui.webui_utils import get_speaker_names
 
 from .ft_ui_utils import get_datasets_listfile, run_speaker_ft
 from .ProcessMonitor import ProcessMonitor
-
-from modules.core.spk import spk_mgr, TTSSpeaker
 
 
 class SpeakerFt:
