@@ -32,7 +32,7 @@ def test_create_speaker(client):
     assert "message" in response.json()
     assert response.json()["message"] == "ok"
 
-    filepath = os.path.join(constants.SPEAKERS_DIR, "测试发言人.pt")
+    filepath = os.path.join(constants.SPEAKERS_DIR, "测试发言人.spkv1.json")
 
     assert os.path.exists(filepath)
     os.remove(filepath)

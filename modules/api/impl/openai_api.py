@@ -11,7 +11,8 @@ from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
-from modules.core.speaker import Speaker, speaker_mgr
+from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.data import styles_mgr
 
 
@@ -67,7 +68,7 @@ async def openai_speech_api(
 
     if not input_text:
         raise HTTPException(status_code=400, detail="Input text is required.")
-    if speaker_mgr.get_speaker(voice) is None:
+    if spk_mgr.get_speaker(voice) is None:
         raise HTTPException(status_code=400, detail="Invalid voice.")
     try:
         if style:
@@ -78,7 +79,7 @@ async def openai_speech_api(
     ctx_params = api_utils.calc_spk_style(spk=voice, style=style)
 
     speaker = ctx_params.get("spk")
-    if not isinstance(speaker, Speaker):
+    if not isinstance(speaker, TTSSpeaker):
         raise HTTPException(status_code=400, detail="Invalid voice.")
 
     tts_config = ChatTTSConfig(

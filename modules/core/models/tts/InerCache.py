@@ -4,7 +4,7 @@ import torch
 from cachetools import LRUCache
 from cachetools import keys as cache_keys
 
-from modules.core.speaker import Speaker
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 
 def hash_tensor(tensor: torch.Tensor):
@@ -30,13 +30,13 @@ class InferCache:
     @classmethod
     def get_hash_key(cls, *args, **kwargs):
         for i, arg in enumerate(args):
-            if isinstance(arg, Speaker):
+            if isinstance(arg, TTSSpeaker):
                 args[i] = str(arg.id)
             if isinstance(arg, torch.Tensor):
                 args[i] = hash_tensor(arg)
 
         for key, value in kwargs.items():
-            if isinstance(value, Speaker):
+            if isinstance(value, TTSSpeaker):
                 kwargs[key] = str(value.id)
             if isinstance(value, torch.Tensor):
                 kwargs[key] = hash_tensor(value)

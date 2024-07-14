@@ -1,13 +1,14 @@
 import gradio as gr
 
 from modules.core.models import zoo
-from modules.core.speaker import speaker_mgr
 from modules.Enhancer.ResembleEnhance import unload_enhancer
 from modules.webui import webui_config
 from modules.webui.webui_utils import get_speaker_names
 
 from .ft_ui_utils import get_datasets_listfile, run_speaker_ft
 from .ProcessMonitor import ProcessMonitor
+
+from modules.core.spk import spk_mgr, TTSSpeaker
 
 
 class SpeakerFt:
@@ -34,10 +35,10 @@ class SpeakerFt:
         spk_path = None
         if select_speaker != "" and select_speaker != "none":
             select_speaker = select_speaker.split(" : ")[1].strip()
-            spk = speaker_mgr.get_speaker(select_speaker)
+            spk = spk_mgr.get_speaker(select_speaker)
             if spk is None:
                 return ["Speaker not found"]
-            spk_filename = speaker_mgr.get_speaker_filename(spk.id)
+            spk_filename = spk_mgr.get_item_path(lambda x: x.id == spk.id)
             spk_path = f"./data/speakers/{spk_filename}"
 
         command = ["python3", "-m", "modules.finetune.train_speaker"]

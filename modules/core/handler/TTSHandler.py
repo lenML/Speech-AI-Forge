@@ -8,7 +8,7 @@ from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import NP_AUDIO
-from modules.core.speaker import Speaker
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +17,14 @@ class TTSHandler(AudioHandler):
     def __init__(
         self,
         text_content: str,
-        spk: Speaker,
+        spk: TTSSpeaker,
         tts_config: ChatTTSConfig,
         infer_config: InferConfig,
         adjust_config: AdjustConfig,
         enhancer_config: EnhancerConfig,
     ):
         assert isinstance(text_content, str), "text_content should be str"
-        assert isinstance(spk, Speaker), "spk should be Speaker"
+        assert isinstance(spk, TTSSpeaker), "spk should be Speaker"
         assert isinstance(
             tts_config, ChatTTSConfig
         ), "tts_config should be ChatTTSConfig"

@@ -4,8 +4,8 @@ import numpy as np
 from pydantic import BaseModel
 from pydub import AudioSegment
 
-from modules.core.speaker import speaker_mgr
 from modules.data import styles_mgr
+from modules.core.spk.SpkMgr import spk_mgr
 
 
 class ParamsTypeError(Exception):
@@ -73,7 +73,7 @@ def calc_spk_style(spk: Union[str, int], style: Union[str, int]):
         if spk.isdigit():
             voice_attrs["spk"] = int(spk)
         else:
-            spker = speaker_mgr.get_speaker(spk)
+            spker = spk_mgr.get_speaker(spk)
             if spker:
                 voice_attrs["spk"] = spker
 

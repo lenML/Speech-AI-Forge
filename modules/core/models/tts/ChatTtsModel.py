@@ -9,17 +9,28 @@ from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.SeedContext import SeedContext
 
 
 class ChatTTSModel(TTSModel):
     model_id = "chat-tts"
 
+    @staticmethod
+    def create_speaker_from_seed(seed: int):
+        chat = load_chat_tts()
+        with SeedContext(seed):
+            token = chat._sample_random_speaker()
+            spk = TTSSpeaker.empty()
+            spk.set_token(tokens=[token], model_id=ChatTTSModel.model_id)
+            spk.set_name(f"spk[seed={seed}]")
+            return spk
+
     def __init__(self) -> None:
         super().__init__("chat-tts")
-        self.chat: ChatTTS = None
+        self.chat: ChatTTS.Chat = None
 
-    def load(self, context: TTSPipelineContext) -> ChatTTS:
+    def load(self, context: TTSPipelineContext) -> "ChatTTS.Chat":
         self.chat = load_chat_tts()
         return self.chat
 
@@ -40,11 +51,19 @@ class ChatTTSModel(TTSModel):
     def get_infer(self, context: TTSPipelineContext):
         return ChatTTSInfer(self.load(context=context))
 
+    def get_spk_emb(self, segment: TTSSegment, context: TTSPipelineContext):
+        if segment.spk is None:
+            return None
+        token = segment.spk.get_token("chat-tts")
+        if token is None:
+            return None
+        return token.tokens[0]
+
     def get_cache_kwargs(self, segments: list[TTSSegment], context: TTSPipelineContext):
         texts = [segment.text for segment in segments]
 
         seg0 = segments[0]
-        spk_emb = seg0.spk.emb if seg0.spk else None
+        spk_emb = self.get_spk_emb(segment=seg0, context=context) if seg0.spk else None
         top_P = seg0.top_p
         top_K = seg0.top_k
         temperature = seg0.temperature
@@ -122,7 +141,7 @@ class ChatTTSModel(TTSModel):
         texts = [segment.text for segment in segments]
 
         seg0 = segments[0]
-        spk_emb = seg0.spk.emb if seg0.spk else None
+        spk_emb = self.get_spk_emb(segment=seg0, context=context) if seg0.spk else None
         top_P = seg0.top_p
         top_K = seg0.top_k
         temperature = seg0.temperature

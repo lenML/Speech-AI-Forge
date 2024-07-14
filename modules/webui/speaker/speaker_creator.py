@@ -3,12 +3,11 @@ import tempfile
 import gradio as gr
 import torch
 
-from modules.core.speaker import Speaker
+from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.utils.hf import spaces
 from modules.utils.rng import np_rng
-from modules.utils.SeedContext import SeedContext
 from modules.webui import webui_config
-from modules.webui.webui_utils import get_speakers, tts_generate
+from modules.webui.webui_utils import tts_generate
 
 names_list = [
     "Alice",
@@ -61,13 +60,13 @@ def create_spk_from_seed(
     gender: str,
     desc: str,
 ):
-    spk = Speaker.from_seed(seed)
-    spk.name = name
-    spk.gender = gender
-    spk.describe = desc
+    spk = ChatTTSModel.create_speaker_from_seed(seed)
+    spk.set_name(name=name)
+    spk.set_desc(desc=desc)
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp_file:
-        torch.save(spk, tmp_file)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".spkv1.json") as tmp_file:
+        json_str = spk.to_json_str()
+        tmp_file.write(json_str.encode("utf-8"))
         tmp_file_path = tmp_file.name
 
     return tmp_file_path
@@ -80,7 +79,7 @@ def test_spk_voice(
     text: str,
     progress=gr.Progress(track_tqdm=True),
 ):
-    spk = Speaker.from_seed(seed)
+    spk = ChatTTSModel.create_speaker_from_seed(seed)
     return tts_generate(spk=spk, text=text, progress=progress)
 
 

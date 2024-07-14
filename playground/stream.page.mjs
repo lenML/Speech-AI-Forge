@@ -165,8 +165,11 @@ const StreamForm = () => {
           <select name="spk" value=${params.spk} onChange=${handleChange}>
             ${speakers.map(
               (spk) =>
-                html`<option key=${spk.index} value=${spk.name}>
-                  ${spk.name}
+                html`<option
+                  key=${spk.data.id}
+                  value=${spk.data.meta.data.name}
+                >
+                  ${spk.data.meta.data.name}
                 </option>`
             )}
           </select>

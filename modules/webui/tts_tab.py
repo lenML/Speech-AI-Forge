@@ -1,8 +1,10 @@
 import gradio as gr
 import torch
 
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.webui import webui_config
 from modules.webui.webui_utils import (
+    SPK_FILE_EXTS,
     get_speakers,
     get_styles,
     load_spk_info,
@@ -14,7 +16,7 @@ from modules.webui.webui_utils import (
 def create_tts_interface():
     speakers = get_speakers()
 
-    def get_speaker_show_name(spk):
+    def get_speaker_show_name(spk: TTSSpeaker):
         if spk.gender == "*" or spk.gender == "":
             return spk.name
         return f"{spk.gender} : {spk.name}"
@@ -67,7 +69,8 @@ def create_tts_interface():
 
                         with gr.Tab(label="Upload"):
                             spk_file_upload = gr.File(
-                                label="Speaker (Upload)", file_types=[".pt"]
+                                label="Speaker (Upload)",
+                                file_types=SPK_FILE_EXTS,
                             )
 
                             gr.Markdown("📝Speaker info")

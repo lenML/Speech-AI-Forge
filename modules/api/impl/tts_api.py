@@ -12,7 +12,9 @@ from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
-from modules.core.speaker import Speaker
+
+from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +97,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         calc_params = api_utils.calc_spk_style(spk=params.spk, style=params.style)
 
         spk = calc_params.get("spk", params.spk)
-        if not isinstance(spk, Speaker):
+        if not isinstance(spk, TTSSpeaker):
             raise HTTPException(status_code=422, detail="Invalid speaker")
 
         style = calc_params.get("style", params.style)

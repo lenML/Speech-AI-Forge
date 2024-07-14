@@ -12,7 +12,7 @@ from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfi
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
-from modules.core.speaker import Speaker, speaker_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
 from modules.core.tn import ChatTtsTN
 from modules.core.tools.SentenceSplitter import SentenceSplitter
@@ -22,15 +22,28 @@ from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
 
+from modules.core.spk import spk_mgr, TTSSpeaker
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+SPK_FILE_EXTS = [
+    # ".spkv1.json",
+    # ".spkv1.png",
+    ".json",
+    ".png",
+]
+
 
 def get_speakers():
-    return speaker_mgr.list_speakers()
+    return spk_mgr.list_speakers()
 
 
-def get_speaker_names() -> tuple[list[Speaker], list[str]]:
+def get_speaker_names() -> tuple[list[TTSSpeaker], list[str]]:
     speakers = get_speakers()
 
-    def get_speaker_show_name(spk):
+    def get_speaker_show_name(spk: TTSSpeaker):
         if spk.gender == "*" or spk.gender == "":
             return spk.name
         return f"{spk.gender} : {spk.name}"
@@ -50,14 +63,14 @@ def load_spk_info(file):
         return "empty"
     try:
 
-        spk: Speaker = Speaker.from_file(file)
-        infos = spk.to_json()
+        spk: TTSSpeaker = TTSSpeaker.from_file(file)
         return f"""
-- name: {infos.name}
-- gender: {infos.gender}
-- describe: {infos.describe}
+- name: {spk.name}
+- gender: {spk.gender}
+- describe: {spk.desc}
     """.strip()
-    except:
+    except Exception as e:
+        logger.error(f"load spk info failed: {e}")
         return "load failed"
 
 
@@ -211,11 +224,11 @@ def tts_generate(
     infer_seed = int(infer_seed)
 
     if isinstance(spk, int):
-        spk = Speaker.from_seed(spk)
+        spk = TTSSpeaker.from_seed(spk)
 
     if spk_file:
         try:
-            spk: Speaker = Speaker.from_file(spk_file)
+            spk: TTSSpeaker = TTSSpeaker.from_file(spk_file)
         except Exception:
             raise gr.Error("Failed to load speaker file")
 

@@ -3,7 +3,7 @@ import json
 from typing import Dict, List
 
 from modules.core.pipeline.generate.dcls import SynthAudio, TTSBucket
-from modules.core.speaker import Speaker
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 
 class Bucketizer:
@@ -13,7 +13,7 @@ class Bucketizer:
     def seg_hash(self, audio: SynthAudio):
         seg = audio.seg
         temp_seg = copy.deepcopy(seg)
-        if isinstance(temp_seg.spk, Speaker):
+        if isinstance(temp_seg.spk, TTSSpeaker):
             temp_seg.spk = str(temp_seg.spk.id)
 
         json_data = temp_seg.__dict__

@@ -5,10 +5,10 @@ from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
-from modules.core.speaker import Speaker
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 
-@dataclass
+@dataclass(repr=False, eq=False)
 class TTSSegment:
     _type: Literal["break", "audio"]
     duration_s: int = 0
@@ -23,15 +23,15 @@ class TTSSegment:
     prompt2: str = ""
     prefix: str = ""
 
-    spk: Speaker = None
+    spk: TTSSpeaker = None
 
 
-@dataclass
+@dataclass(repr=False, eq=False)
 class TTSPipelineContext:
     text: Optional[str] = None
     ssml: Optional[str] = None
 
-    spk: Optional[Speaker] = None
+    spk: Optional[TTSSpeaker] = None
     tts_config: ChatTTSConfig = ChatTTSConfig()
     infer_config: InferConfig = InferConfig()
     adjust_config: AdjustConfig = AdjustConfig()

@@ -9,7 +9,8 @@ from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
-from modules.core.speaker import speaker_mgr
+from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ def setup(app: APIManager):
 
     @app.get("/v1/xtts_v2/speakers")
     async def speakers():
-        spks = speaker_mgr.list_speakers()
+        spks = spk_mgr.list_speakers()
         return [
             {
                 "name": spk.name,
@@ -91,9 +92,7 @@ def setup(app: APIManager):
         voice_id = request.speaker_wav
         language = request.language
 
-        spk = speaker_mgr.get_speaker_by_id(voice_id) or speaker_mgr.get_speaker(
-            voice_id
-        )
+        spk = spk_mgr.get_speaker_by_id(voice_id) or spk_mgr.get_speaker(voice_id)
         if spk is None:
             raise HTTPException(status_code=400, detail="Invalid speaker id")
 
@@ -145,9 +144,7 @@ def setup(app: APIManager):
         # speaker_wav 就是 speaker id 。。。
         voice_id = speaker_wav
 
-        spk = speaker_mgr.get_speaker_by_id(voice_id) or speaker_mgr.get_speaker(
-            voice_id
-        )
+        spk = spk_mgr.get_speaker_by_id(voice_id) or spk_mgr.get_speaker(voice_id)
         if spk is None:
             raise HTTPException(status_code=400, detail="Invalid speaker id")
 

@@ -10,7 +10,8 @@ from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfi
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
-from modules.core.speaker import Speaker, speaker_mgr
+from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 
 class SynthesisInput(BaseModel):
@@ -85,12 +86,12 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     params = api_utils.calc_spk_style(spk=voice.name, style=voice.style)
 
     # 虽然 calc_spk_style 可以解析 seed 形式，但是这个接口只准备支持 speakers list 中存在的 speaker
-    if speaker_mgr.get_speaker(voice_name) is None:
+    if spk_mgr.get_speaker(voice_name) is None:
         raise HTTPException(
             status_code=422, detail="The specified voice name is not supported."
         )
 
-    if not isinstance(params.get("spk"), Speaker):
+    if not isinstance(params.get("spk"), TTSSpeaker):
         raise HTTPException(
             status_code=422, detail="The specified voice name is not supported."
         )

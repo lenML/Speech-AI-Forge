@@ -11,7 +11,8 @@ from modules.core.pipeline.processor import (
     PreProcessor,
     TTSPipelineContext,
 )
-from modules.core.speaker import Speaker, speaker_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
+from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.data import styles_mgr
 from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
@@ -112,8 +113,8 @@ class ChatTtsStyleProcessor(PreProcessor):
             if spk == "":
                 spk = None
             else:
-                spk = speaker_mgr.get_speaker(spk)
-        if spk and not isinstance(spk, Speaker):
+                spk = spk_mgr.get_speaker(spk)
+        if spk and not isinstance(spk, TTSSpeaker):
             spk = None
             logger.warn(f"Invalid spk: {spk}")
 

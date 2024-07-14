@@ -1,8 +1,5 @@
 import os
 import subprocess
-from typing import IO, Union
-
-from modules.core.speaker import Speaker, speaker_mgr
 
 
 def get_datasets_dir():

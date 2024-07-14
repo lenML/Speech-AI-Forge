@@ -1,12 +1,16 @@
+import json
 import tempfile
 
 import gradio as gr
 import torch
 
-from modules.core.speaker import Speaker
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.hf import spaces
 from modules.webui import webui_config
-from modules.webui.webui_utils import tts_generate
+from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate
+
+
+# TODO: 增加 png 编辑
 
 
 @torch.inference_mode()
@@ -18,19 +22,21 @@ def test_spk_voice(
 ):
     if spk_file == "" or spk_file is None:
         return None
-    spk = Speaker.from_file(spk_file)
+    spk = TTSSpeaker.from_file(spk_file)
     return tts_generate(spk=spk, text=text, progress=progress)
 
 
 def speaker_editor_ui():
-    def on_generate(spk_file, name, gender, desc):
-        spk: Speaker = Speaker.from_file(spk_file)
-        spk.name = name
-        spk.gender = gender
-        spk.describe = desc
+    def on_generate(spk_file, name: str, gender: str, desc: str):
+        spk: TTSSpeaker = TTSSpeaker.from_file(spk_file)
+        spk.set_name(name=name)
+        spk.set_desc(desc=desc)
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp_file:
-            torch.save(spk, tmp_file)
+        with tempfile.NamedTemporaryFile(
+            delete=False, suffix=".spkv1.json"
+        ) as tmp_file:
+            json_str = spk.to_json_str()
+            tmp_file.write(json_str.encode("utf-8"))
             tmp_file_path = tmp_file.name
 
         return tmp_file_path
@@ -70,7 +76,7 @@ def speaker_editor_ui():
         with gr.Column(scale=2):
             with gr.Group():
                 gr.Markdown("💼Speaker file")
-                spk_file = gr.File(label="*.pt file", file_types=[".pt"])
+                spk_file = gr.File(label="*.pt file", file_types=SPK_FILE_EXTS)
 
             with gr.Group():
                 gr.Markdown("ℹ️Speaker info")
@@ -108,6 +114,7 @@ def speaker_editor_ui():
         outputs=[output_file],
     )
 
+    # TODO: 这些全部都需要改
     def spk_file_change(spk_file):
         empty = spk_file is None or spk_file == ""
         if empty:
@@ -121,11 +128,11 @@ def speaker_editor_ui():
                 gr.Button(interactive=False),
                 gr.Button(interactive=False),
             ]
-        spk: Speaker = Speaker.from_file(spk_file)
+        spk: TTSSpeaker = TTSSpeaker.from_file(spk_file)
         return [
             gr.Textbox(value=spk.name, interactive=True),
             gr.Textbox(value=spk.gender, interactive=True),
-            gr.Textbox(value=spk.describe, interactive=True),
+            gr.Textbox(value=spk.desc, interactive=True),
             gr.Button(interactive=True),
             gr.Button(interactive=True),
             gr.Button(interactive=True),

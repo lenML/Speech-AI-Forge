@@ -3,20 +3,21 @@ import tempfile
 import gradio as gr
 import torch
 
-from modules.core.speaker import Speaker, speaker_mgr
 from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
 from modules.webui.webui_utils import tts_generate
+
+from modules.core.spk import spk_mgr, TTSSpeaker
 
 
 def spk_to_tensor(spk: str):
     spk = spk.split(" : ")[1].strip() if " : " in spk else spk
     if spk == "None" or spk == "":
         return None
-    return speaker_mgr.get_speaker(spk).emb
+    return spk_mgr.get_speaker(spk).emb
 
 
-def get_speaker_show_name(spk: str):
+def get_speaker_show_name(spk: TTSSpeaker):
     if spk.gender == "*" or spk.gender == "":
         return spk.name
     return f"{spk.gender} : {spk.name}"
@@ -67,7 +68,7 @@ def merge_spk(
     if total_weight > 0:
         merge_tensor /= total_weight
 
-    merged_spk = Speaker.from_tensor(merge_tensor)
+    merged_spk = TTSSpeaker.from_token(tokens=[merge_tensor], model_id="chat-tts")
     merged_spk.name = "<MIX>"
 
     return merged_spk
@@ -118,11 +119,11 @@ def merge_spk_to_file(
     merged_spk = merge_spk(
         spk_a, spk_a_w, spk_b, spk_b_w, spk_c, spk_c_w, spk_d, spk_d_w
     )
-    merged_spk.name = speaker_name
-    merged_spk.gender = speaker_gender
-    merged_spk.desc = speaker_desc
+    merged_spk.set_name(speaker_name)
+    merged_spk.set_gender(speaker_gender)
+    merged_spk.set_desc(speaker_desc)
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as tmp_file:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".spkv1.json") as tmp_file:
         torch.save(merged_spk, tmp_file)
         tmp_file_path = tmp_file.name
 
@@ -146,7 +147,7 @@ def create_speaker_merger():
             refresh_a_btn = gr.Button("🔄", variant="secondary")
 
         def refresh_a():
-            speaker_mgr.refresh_speakers()
+            spk_mgr.refresh()
             speaker_names = get_spk_choices()
             return gr.update(choices=speaker_names)
 
