@@ -2,9 +2,21 @@ import io
 import queue
 import subprocess
 import threading
+import wave
 
 import pydub
 import pydub.utils
+
+
+def wave_header_chunk(frame_input=b"", channels=1, sample_width=2, sample_rate=24000):
+    wav_buf = io.BytesIO()
+    with wave.open(wav_buf, "wb") as vfout:
+        vfout.setnchannels(channels)
+        vfout.setsampwidth(sample_width)
+        vfout.setframerate(sample_rate)
+        vfout.writeframes(frame_input)
+    wav_buf.seek(0)
+    return wav_buf.read()
 
 
 class StreamEncoder:
@@ -14,6 +26,18 @@ class StreamEncoder:
         self.output_queue = queue.Queue()
         self.read_thread = None
         self.chunk_size = 1024
+        self.header = None
+
+    def set_header(
+        self, *, frame_input=b"", channels=1, sample_width=2, sample_rate=24000
+    ):
+        if self.header:
+            return
+        header_bytes = wave_header_chunk(
+            frame_input, channels, sample_width, sample_rate
+        )
+        self.header = header_bytes
+        self.write(header_bytes)
 
     def open(
         self, format: str = "mp3", acodec: str = "libmp3lame", bitrate: str = "320k"

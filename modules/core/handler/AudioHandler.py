@@ -1,6 +1,5 @@
 import base64
 import io
-import wave
 from typing import AsyncGenerator, Generator
 
 import numpy as np
@@ -18,21 +17,6 @@ from modules.core.handler.encoder.StreamEncoder import StreamEncoder
 from modules.core.handler.encoder.WavFile import WAVFileBytes
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
 from modules.core.pipeline.processor import NP_AUDIO
-
-
-def wave_header_chunk(frame_input=b"", channels=1, sample_width=2, sample_rate=24000):
-    wav_buf = io.BytesIO()
-    with wave.open(wav_buf, "wb") as vfout:
-        vfout.setnchannels(channels)
-        vfout.setsampwidth(sample_width)
-        vfout.setframerate(sample_rate)
-        vfout.writeframes(frame_input)
-    wav_buf.seek(0)
-    return wav_buf.read()
-
-
-# NOTE: 这个可能只适合 chattts
-wav_header = wave_header_chunk()
 
 
 def remove_wav_bytes_header(wav_bytes: bytes):
@@ -74,7 +58,6 @@ class AudioHandler:
         else:
             raise ValueError(f"Unsupported audio format: {format}")
         encoder.open()
-        encoder.write(wav_header)
 
         return encoder
 
@@ -83,6 +66,7 @@ class AudioHandler:
         chunk_data = bytes()
         # NOTE sample_rate 写在文件头里了所以用不到
         for sample_rate, audio_data in self.enqueue_stream():
+            encoder.set_header(sample_rate=sample_rate)
             audio_bytes = read_np_to_wav(audio_data=audio_data)
             encoder.write(audio_bytes)
             chunk_data = encoder.read()
@@ -113,6 +97,7 @@ class AudioHandler:
         encoder = self.get_encoder(format)
         chunk_data = bytes()
         for sample_rate, audio_data in self.enqueue_stream():
+            encoder.set_header(sample_rate=sample_rate)
             audio_bytes = read_np_to_wav(audio_data=audio_data)
             encoder.write(audio_bytes)
             chunk_data = encoder.read()
@@ -126,6 +111,7 @@ class AudioHandler:
         encoder = self.get_encoder(format)
         sample_rate, audio_data = self.enqueue()
         audio_bytes = read_np_to_wav(audio_data=audio_data)
+        encoder.set_header(sample_rate=sample_rate)
         encoder.write(audio_bytes)
         encoder.close()
         return encoder.read_all()
