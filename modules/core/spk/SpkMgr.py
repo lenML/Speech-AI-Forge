@@ -19,7 +19,7 @@ class SpeakerManager(FolderDatabase):
 
     def load_item(self, file_path: str) -> Union[TTSSpeaker, None]:
         if file_path.endswith(".spkv1.json"):
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 try:
                     data = json.load(f)
                     return TTSSpeaker.from_json(data)
@@ -33,7 +33,7 @@ class SpeakerManager(FolderDatabase):
 
     def save_item(self, item: TTSSpeaker, file_path: str):
         if file_path.endswith(".spkv1.json"):
-            with open(file_path, "w") as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 json_str = item.to_json_str()
                 f.write(json_str)
         elif file_path.endswith(".spkv1.png"):
