@@ -1,0 +1,34 @@
+numpy==1.26.4
+scipy
+lxml
+pydub
+fastapi
+soundfile
+omegaconf
+pypinyin
+vocos
+pandas
+vector_quantize_pytorch
+einops
+transformers~=4.41.1
+omegaconf~=2.3.0
+tqdm
+# torch
+# torchvision
+# torchaudio
+gradio
+emojiswitch
+python-dotenv
+zhon
+mistune==3.0.2
+cn2an
+# audio_denoiser
+python-box
+ftfy
+librosa
+pyrubberband
+pybase16384
+cachetools
+langdetect
+# NOTE: wetext 依赖 pynini 无法在 Windows 上安装
+# WeTextProcessing

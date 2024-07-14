@@ -4,7 +4,6 @@ import re
 import emojiswitch
 import ftfy
 from pywrapfst import FstOpError
-from tn.english.normalizer import Normalizer as EnNormalizer
 
 from modules.core.models import zoo
 from modules.core.tn.TNPipeline import GuessLang, TNPipeline
@@ -12,6 +11,8 @@ from modules.repos_static.zh_normalization.text_normlization import TextNormaliz
 from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.html import remove_html_tags as _remove_html_tags
 from modules.utils.markdown import markdown_to_text
+
+import os
 
 DISABLE_UNK_TOKEN_CHECK = False
 
@@ -194,7 +195,12 @@ def tx_normalize(text: str, guss_lang: GuessLang):
 
 @ChatTtsTN.block(name="wetext_en", enabled=True)
 def wetext_normalize(text: str, guss_lang: GuessLang):
+    # NOTE: wetext 依赖 pynini 无法在 windows 上安装，所以这里只在 linux 上启用
+    if os.name == "nt":
+        return text
     if guss_lang.zh_or_en == "en":
+        from tn.english.normalizer import Normalizer as EnNormalizer
+
         en_tn_model = EnNormalizer(overwrite_cache=False)
         try:
             return en_tn_model.normalize(text)
