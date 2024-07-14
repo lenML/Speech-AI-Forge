@@ -4,7 +4,6 @@ import re
 
 import emojiswitch
 import ftfy
-from pywrapfst import FstOpError
 
 from modules.core.models import zoo
 from modules.core.tn.TNPipeline import GuessLang, TNPipeline
@@ -198,6 +197,7 @@ def wetext_normalize(text: str, guss_lang: GuessLang):
     if os.name == "nt":
         return text
     if guss_lang.zh_or_en == "en":
+        from pywrapfst import FstOpError
         from tn.english.normalizer import Normalizer as EnNormalizer
 
         en_tn_model = EnNormalizer(overwrite_cache=False)
