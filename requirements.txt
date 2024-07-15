@@ -31,3 +31,11 @@ pybase16384
 cachetools
 langdetect
 WeTextProcessing
+
+#### fish-speech
+hydra-core
+loguru
+lightning
+natsort
+pyrootutils
+loralib

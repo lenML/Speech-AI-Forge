@@ -32,3 +32,11 @@ cachetools
 langdetect
 # NOTE: wetext 依赖 pynini 无法在 Windows 上安装
 # WeTextProcessing
+
+#### fish-speech
+hydra-core
+loguru
+lightning
+natsort
+pyrootutils
+loralib
