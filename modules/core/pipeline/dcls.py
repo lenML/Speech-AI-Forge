@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 from modules.core.handler.datacls.audio_model import AdjustConfig
@@ -32,11 +32,11 @@ class TTSPipelineContext:
     ssml: Optional[str] = None
 
     spk: Optional[TTSSpeaker] = None
-    tts_config: ChatTTSConfig = ChatTTSConfig()
-    infer_config: InferConfig = InferConfig()
-    adjust_config: AdjustConfig = AdjustConfig()
-    enhancer_config: EnhancerConfig = EnhancerConfig()
+    tts_config: ChatTTSConfig = field(default_factory=ChatTTSConfig)
+    infer_config: InferConfig = field(default_factory=InferConfig)
+    adjust_config: AdjustConfig = field(default_factory=AdjustConfig)
+    enhancer_config: EnhancerConfig = field(default_factory=EnhancerConfig)
 
-    tn_config: TNConfig = TNConfig()
+    tn_config: TNConfig = field(default_factory=TNConfig)
 
     stop: bool = False
