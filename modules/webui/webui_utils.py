@@ -13,6 +13,7 @@ from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfi
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.models.tts import ChatTtsModel
 from modules.core.spk import TTSSpeaker, spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
@@ -222,7 +223,7 @@ def tts_generate(
     infer_seed = int(infer_seed)
 
     if isinstance(spk, int):
-        spk = TTSSpeaker.from_seed(spk)
+        spk = ChatTtsModel.ChatTTSModel.create_speaker_from_seed(spk)
 
     if spk_file:
         try:
