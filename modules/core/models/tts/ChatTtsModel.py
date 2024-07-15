@@ -154,6 +154,11 @@ class ChatTTSModel(TTSModel):
         seed = seg0.infer_seed
         chunk_size = context.infer_config.stream_chunk_size
 
+        if prompt2.strip():
+            prompt_prefix = "[Ptts][Ptts][Ptts] "
+            prompt_suffix = " [Stts][Ptts][Stts][Ptts][Stts]"
+            prompt2 = f"{prompt_prefix}{prompt2}{prompt_suffix}"
+
         sr = 24000
 
         if not stream:
