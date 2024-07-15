@@ -4,8 +4,10 @@ from typing import AsyncGenerator, Generator
 
 import numpy as np
 from fastapi import Request
+from fastapi.responses import StreamingResponse
 
-from modules.core.handler.datacls.audio_model import AudioFormat
+from modules.core.handler.datacls.audio_model import AudioFormat, EncoderConfig
+from modules.core.handler.datacls.chattts_model import InferConfig
 from modules.core.handler.encoder.encoders import (
     AacEncoder,
     FlacEncoder,
@@ -32,6 +34,20 @@ def read_np_to_wav(audio_data: np.ndarray) -> bytes:
 
 
 class AudioHandler:
+
+    def __init__(
+        self, encoder_config: EncoderConfig, infer_config: InferConfig
+    ) -> None:
+        assert isinstance(
+            infer_config, InferConfig
+        ), "infer_config should be InferConfig"
+        assert isinstance(
+            encoder_config, EncoderConfig
+        ), "encoder_config should be EncoderConfig"
+
+        self.encoder_config = encoder_config
+        self.infer_config = infer_config
+
     def enqueue(self) -> NP_AUDIO:
         raise NotImplementedError("Method 'enqueue' must be implemented by subclass")
 
@@ -40,8 +56,12 @@ class AudioHandler:
             "Method 'enqueue_stream' must be implemented by subclass"
         )
 
-    def get_encoder(self, format: AudioFormat) -> StreamEncoder:
-        # TODO 这里可以增加 编码器配置
+    def get_encoder(self) -> StreamEncoder:
+        encoder_config = self.encoder_config
+        format = encoder_config.format
+        bitrate = encoder_config.bitrate or None
+        acodec = encoder_config.acodec or None
+
         if format == AudioFormat.wav:
             encoder = WavEncoder()
         elif format == AudioFormat.mp3:
@@ -57,14 +77,14 @@ class AudioHandler:
             encoder = OggEncoder()
         else:
             raise ValueError(f"Unsupported audio format: {format}")
-        encoder.open()
+
+        encoder.open(bitrate=bitrate, acodec=acodec)
 
         return encoder
 
-    def enqueue_to_stream(self, format: AudioFormat) -> Generator[bytes, None, None]:
-        encoder = self.get_encoder(format)
+    def enqueue_to_stream(self) -> Generator[bytes, None, None]:
+        encoder = self.get_encoder()
         chunk_data = bytes()
-        # NOTE sample_rate 写在文件头里了所以用不到
         for sample_rate, audio_data in self.enqueue_stream():
             encoder.set_header(sample_rate=sample_rate)
             audio_bytes = read_np_to_wav(audio_data=audio_data)
@@ -80,9 +100,9 @@ class AudioHandler:
             chunk_data = encoder.read()
 
     async def enqueue_to_stream_with_request(
-        self, request: Request, format: AudioFormat
+        self, request: Request
     ) -> AsyncGenerator[bytes, None]:
-        for chunk in self.enqueue_to_stream(format=AudioFormat(format)):
+        for chunk in self.enqueue_to_stream():
             disconnected = await request.is_disconnected()
             if disconnected:
                 # TODO: 这个逻辑应该传递给 zoo
@@ -91,10 +111,8 @@ class AudioHandler:
             yield chunk
 
     # just for test
-    def enqueue_to_stream_join(
-        self, format: AudioFormat
-    ) -> Generator[bytes, None, None]:
-        encoder = self.get_encoder(format)
+    def enqueue_to_stream_join(self) -> Generator[bytes, None, None]:
+        encoder = self.get_encoder()
         chunk_data = bytes()
         for sample_rate, audio_data in self.enqueue_stream():
             encoder.set_header(sample_rate=sample_rate)
@@ -107,8 +125,8 @@ class AudioHandler:
             yield chunk_data
             chunk_data = encoder.read()
 
-    def enqueue_to_bytes(self, format: AudioFormat) -> bytes:
-        encoder = self.get_encoder(format)
+    def enqueue_to_bytes(self) -> bytes:
+        encoder = self.get_encoder()
         sample_rate, audio_data = self.enqueue()
         audio_bytes = read_np_to_wav(audio_data=audio_data)
         encoder.set_header(sample_rate=sample_rate)
@@ -116,14 +134,34 @@ class AudioHandler:
         encoder.close()
         return encoder.read_all()
 
-    def enqueue_to_buffer(self, format: AudioFormat) -> io.BytesIO:
-        audio_bytes = self.enqueue_to_bytes(format=format)
+    def enqueue_to_buffer(self) -> io.BytesIO:
+        audio_bytes = self.enqueue_to_bytes()
         return io.BytesIO(audio_bytes)
 
-    def enqueue_to_base64(self, format: AudioFormat) -> str:
-        binary = self.enqueue_to_bytes(format=format)
+    def enqueue_to_base64(self) -> str:
+        binary = self.enqueue_to_bytes()
 
         base64_encoded = base64.b64encode(binary)
         base64_string = base64_encoded.decode("utf-8")
 
         return base64_string
+
+    def get_media_type(self) -> str:
+        encoder_config = self.encoder_config
+
+        media_type = f"audio/{encoder_config.format}"
+        if encoder_config.format == AudioFormat.mp3:
+            media_type = "audio/mpeg"
+
+        return media_type
+
+    def enqueue_to_response(self, request: Request) -> StreamingResponse:
+        infer_config = self.infer_config
+        media_type = self.get_media_type()
+
+        if infer_config.stream:
+            gen = self.enqueue_to_stream_with_request(request=request)
+            return StreamingResponse(gen, media_type=media_type)
+        else:
+            buffer = self.enqueue_to_buffer()
+            return StreamingResponse(buffer, media_type=media_type)

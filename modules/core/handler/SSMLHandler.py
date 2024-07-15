@@ -1,7 +1,7 @@
 from typing import Generator
 
 from modules.core.handler.AudioHandler import AudioHandler
-from modules.core.handler.datacls.audio_model import AdjustConfig
+from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.pipeline.factory import PipelineFactory
@@ -15,6 +15,7 @@ class SSMLHandler(AudioHandler):
         infer_config: InferConfig,
         adjust_config: AdjustConfig,
         enhancer_config: EnhancerConfig,
+        encoder_config: EncoderConfig,
     ) -> None:
         assert isinstance(ssml_content, str), "ssml_content must be a string."
         assert isinstance(
@@ -31,6 +32,8 @@ class SSMLHandler(AudioHandler):
         self.infer_config = infer_config
         self.adjest_config = adjust_config
         self.enhancer_config = enhancer_config
+
+        super().__init__(encoder_config=encoder_config, infer_config=infer_config)
 
         self.validate()
 

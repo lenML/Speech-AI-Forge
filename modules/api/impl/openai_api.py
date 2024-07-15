@@ -7,7 +7,11 @@ from pydantic import BaseModel, Field
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.audio_model import (
+    AdjustConfig,
+    AudioFormat,
+    EncoderConfig,
+)
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
@@ -100,6 +104,10 @@ async def openai_speech_api(
         enabled=request.enhance or request.denoise or False,
         lambd=0.9 if request.denoise else 0.1,
     )
+    encoder_config = EncoderConfig(
+        format=response_format,
+        bitrate="64k",
+    )
     try:
         handler = TTSHandler(
             text_content=input_text,
@@ -108,21 +116,10 @@ async def openai_speech_api(
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
+            encoder_config=encoder_config,
         )
 
-        mime_type = f"audio/{response_format.value}"
-        if response_format == AudioFormat.mp3:
-            mime_type = "audio/mpeg"
-
-        if stream:
-            gen = handler.enqueue_to_stream_with_request(
-                request=request,
-                format=response_format,
-            )
-            return StreamingResponse(gen, media_type=mime_type)
-        else:
-            buffer = handler.enqueue_to_buffer(response_format)
-            return StreamingResponse(buffer, media_type=mime_type)
+        return handler.enqueue_to_response(request=request)
 
     except Exception as e:
         import logging

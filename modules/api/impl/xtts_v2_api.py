@@ -5,7 +5,11 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from modules.api.Api import APIManager
-from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.audio_model import (
+    AdjustConfig,
+    AudioFormat,
+    EncoderConfig,
+)
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
@@ -120,6 +124,10 @@ def setup(app: APIManager):
             # enabled=params.enhance or params.denoise or False,
             # lambd=0.9 if params.denoise else 0.1,
         )
+        encoder_config = EncoderConfig(
+            format=AudioFormat.mp3,
+            bitrate="64k",
+        )
 
         handler = TTSHandler(
             text_content=text,
@@ -128,11 +136,10 @@ def setup(app: APIManager):
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
+            encoder_config=encoder_config,
         )
 
-        buffer = handler.enqueue_to_buffer(AudioFormat.mp3)
-
-        return StreamingResponse(buffer, media_type="audio/mpeg")
+        return handler.enqueue_to_response(request=request)
 
     @app.get("/v1/xtts_v2/tts_stream")
     async def tts_stream(
@@ -172,6 +179,10 @@ def setup(app: APIManager):
             # enabled=params.enhance or params.denoise or False,
             # lambd=0.9 if params.denoise else 0.1,
         )
+        encoder_config = EncoderConfig(
+            format=AudioFormat.mp3,
+            bitrate="64k",
+        )
 
         handler = TTSHandler(
             text_content=text,
@@ -180,13 +191,10 @@ def setup(app: APIManager):
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
+            encoder_config=encoder_config,
         )
 
-        gen = handler.enqueue_to_stream_with_request(
-            request=request, format=AudioFormat.mp3
-        )
-
-        return StreamingResponse(gen, media_type="audio/mpeg")
+        return handler.enqueue_to_response(request=request)
 
     @app.post("/v1/xtts_v2/set_tts_settings")
     async def set_tts_settings(request: TTSSettingsRequest):

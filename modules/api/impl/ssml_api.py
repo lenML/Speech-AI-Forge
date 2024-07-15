@@ -3,7 +3,11 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
 from modules.api.Api import APIManager
-from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.audio_model import (
+    AdjustConfig,
+    AudioFormat,
+    EncoderConfig,
+)
 from modules.core.handler.datacls.chattts_model import InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
@@ -65,26 +69,20 @@ async def synthesize_ssml_api(
         )
         adjust_config = adjuster
         enhancer_config = enhancer
+        encoder_config = EncoderConfig(
+            format=AudioFormat(format),
+            bitrate="64k",
+        )
 
         handler = SSMLHandler(
             ssml_content=ssml,
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
+            encoder_config=encoder_config,
         )
 
-        media_type = f"audio/{format}"
-        if format == AudioFormat.mp3:
-            media_type = "audio/mpeg"
-
-        if stream:
-            gen = handler.enqueue_to_stream_with_request(
-                request=request, format=AudioFormat(format)
-            )
-            return StreamingResponse(gen, media_type=media_type)
-        else:
-            buffer = handler.enqueue_to_buffer(format=AudioFormat(format))
-            return StreamingResponse(buffer, media_type=media_type)
+        return handler.enqueue_to_response(request=request)
 
     except Exception as e:
         import logging

@@ -8,7 +8,11 @@ import torch.profiler
 
 from modules import refiner
 from modules.api.utils import calc_spk_style
-from modules.core.handler.datacls.audio_model import AdjustConfig
+from modules.core.handler.datacls.audio_model import (
+    AdjustConfig,
+    AudioFormat,
+    EncoderConfig,
+)
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
@@ -149,12 +153,17 @@ def synthesize_ssml(
         enabled=enable_denoise or enable_enhance or False,
         lambd=0.9 if enable_denoise else 0.1,
     )
+    encoder_config = EncoderConfig(
+        format=AudioFormat.mp3,
+        bitrate="64k",
+    )
 
     handler = SSMLHandler(
         ssml_content=ssml,
         infer_config=infer_config,
         adjust_config=adjust_config,
         enhancer_config=enhancer_config,
+        encoder_config=encoder_config,
     )
 
     sample_rate, audio_data = handler.enqueue()
@@ -262,6 +271,10 @@ def tts_generate(
         enabled=enable_denoise or enable_enhance or False,
         lambd=0.9 if enable_denoise else 0.1,
     )
+    encoder_config = EncoderConfig(
+        format=AudioFormat.mp3,
+        bitrate="64k",
+    )
 
     handler = TTSHandler(
         text_content=text,
@@ -270,6 +283,7 @@ def tts_generate(
         infer_config=infer_config,
         adjust_config=adjust_config,
         enhancer_config=enhancer_config,
+        encoder_config=encoder_config,
     )
 
     sample_rate, audio_data = handler.enqueue()

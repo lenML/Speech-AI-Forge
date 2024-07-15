@@ -5,7 +5,11 @@ from pydantic import BaseModel
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.audio_model import (
+    AdjustConfig,
+    AudioFormat,
+    EncoderConfig,
+)
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
@@ -115,10 +119,11 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
         volume_gain_db=volume_gain_db,
     )
     enhancer_config = enhancerConfig
+    encoder_config = EncoderConfig(
+        format=audio_format,
+        bitrate="64k",
+    )
 
-    mime_type = f"audio/{audio_format.value}"
-    if audio_format == AudioFormat.mp3:
-        mime_type = "audio/mpeg"
     try:
         if input.text:
             text_content = input.text
@@ -130,10 +135,12 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
                 infer_config=infer_config,
                 adjust_config=adjust_config,
                 enhancer_config=enhancer_config,
+                encoder_config=encoder_config,
             )
+            media_type = handler.get_media_type()
 
-            base64_string = handler.enqueue_to_base64(format=audio_format)
-            return {"audioContent": f"data:{mime_type};base64,{base64_string}"}
+            base64_string = handler.enqueue_to_base64()
+            return {"audioContent": f"data:{media_type};base64,{base64_string}"}
 
         elif input.ssml:
             ssml_content = input.ssml
@@ -143,11 +150,13 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
                 infer_config=infer_config,
                 adjust_config=adjust_config,
                 enhancer_config=enhancer_config,
+                encoder_config=encoder_config,
             )
+            media_type = handler.get_media_type()
 
-            base64_string = handler.enqueue_to_base64(format=audio_format)
+            base64_string = handler.enqueue_to_base64()
 
-            return {"audioContent": f"data:{mime_type};base64,{base64_string}"}
+            return {"audioContent": f"data:{media_type};base64,{base64_string}"}
 
         else:
             raise HTTPException(

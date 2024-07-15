@@ -8,7 +8,11 @@ from pydantic import BaseModel
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
-from modules.core.handler.datacls.audio_model import AdjustConfig, AudioFormat
+from modules.core.handler.datacls.audio_model import (
+    AdjustConfig,
+    AudioFormat,
+    EncoderConfig,
+)
 from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
@@ -86,8 +90,9 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
                 status_code=422, detail="top_k must be less than or equal to 100"
             )
 
+        format = params.format
         # Validate format
-        if params.format not in AudioFormat.__members__:
+        if format not in AudioFormat.__members__:
             raise HTTPException(
                 status_code=422,
                 detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
@@ -144,6 +149,10 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             enabled=params.enhance or params.denoise or False,
             lambd=0.9 if params.denoise else 0.1,
         )
+        encoder_config = EncoderConfig(
+            format=AudioFormat(format),
+            bitrate="64k",
+        )
 
         handler = TTSHandler(
             text_content=params.text,
@@ -152,19 +161,10 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
+            encoder_config=encoder_config,
         )
-        media_type = f"audio/{params.format}"
-        if params.format == "mp3":
-            media_type = "audio/mpeg"
 
-        if stream:
-            gen = handler.enqueue_to_stream_with_request(
-                request=request, format=AudioFormat(params.format)
-            )
-            return StreamingResponse(gen, media_type=media_type)
-        else:
-            buffer = handler.enqueue_to_buffer(format=AudioFormat(params.format))
-            return StreamingResponse(buffer, media_type=media_type)
+        return handler.enqueue_to_response(request=request)
     except Exception as e:
         import logging
 
