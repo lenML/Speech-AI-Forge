@@ -2,6 +2,9 @@ import requests
 from tqdm import tqdm
 
 from scripts.ModelDownloader import ModelDownloader
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ResembleEnhanceDownloader(ModelDownloader):
@@ -18,14 +21,14 @@ class ResembleEnhanceDownloader(ModelDownloader):
     def from_modelscope(self):
         url = "https://modelscope.cn/api/v1/studio/insummer/ResembleEnhance/repo?Revision=master&FilePath=resemble_enhance%2Fmodel_repo%2Fenhancer_stage2%2Fds%2FG%2Fdefault%2Fmp_rank_00_model_states.pt"
         self._download_file(url, self.model_dir / "mp_rank_00_model_states.pt")
-        print(
+        logger.info(
             f"Model downloaded from ModelScope successfully, saved at: {self.model_dir}"
         )
 
     def from_huggingface(self):
         url = "https://huggingface.co/ResembleAI/resemble-enhance/resolve/main/enhancer_stage2/ds/G/default/mp_rank_00_model_states.pt?download=true"
         self._download_file(url, self.model_dir / "mp_rank_00_model_states.pt")
-        print(
+        logger.info(
             f"Model downloaded from HuggingFace successfully, saved at: {self.model_dir}"
         )
 

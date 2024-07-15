@@ -168,8 +168,14 @@ cython_debug/
 
 # models
 /models/**/*.pt
+/models/**/*.pth
+/models/**/*.md
 /models/**/*.bin
 /models/**/*.json
+/models/cache
+/models/**/.huggingface
+/models/**/.gitattributes
+/models/**/.gitignore
 
 /*.pt
 

@@ -1,9 +1,16 @@
 import argparse
 import time
+import logging
+
+try:
+    logging.basicConfig(level=logging.INFO)
+except:
+    pass
 
 from scripts.dl_chattts import ChatTTSDownloader
 from scripts.dl_enhance import ResembleEnhanceDownloader
 from scripts.ModelDownloader import ModelDownloader
+from scripts.dl_fishspeech import FishSpeechDownloader
 
 
 def main():
@@ -21,6 +28,7 @@ def main():
     downloaders: list[ModelDownloader] = []
     downloaders.append(ChatTTSDownloader())
     downloaders.append(ResembleEnhanceDownloader())
+    downloaders.append(FishSpeechDownloader())
 
     for downloader in downloaders:
         if downloader.check_exist():
