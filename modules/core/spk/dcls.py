@@ -28,6 +28,7 @@ class DcSpkVoiceToken:
 class DcSpkSample:
     wav: bytes
     text: str
+    wav_sr: int
 
 
 @dataclass(repr=False, eq=False)

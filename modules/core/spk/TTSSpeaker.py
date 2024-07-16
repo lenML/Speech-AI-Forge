@@ -212,6 +212,16 @@ class TTSSpeaker:
                 return
         self._data.token.append(token)
 
+    def add_ref(self, *, ref: DcSpkReference) -> None:
+        if self._data.refs is None:
+            self._data.refs = []
+        self._data.refs.append(ref)
+
+    def add_sample(self, *, sample: DcSpkSample) -> None:
+        if self._data.samples is None:
+            self._data.samples = []
+        self._data.samples.append(sample)
+
     @property
     def id(self) -> str:
         return self._data.id
