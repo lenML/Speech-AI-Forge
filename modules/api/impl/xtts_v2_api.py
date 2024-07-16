@@ -14,7 +14,6 @@ from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfi
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
-from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +69,9 @@ class TTSSettingsRequest(BaseModel):
 class SynthesisRequest(BaseModel):
     text: str
     speaker_wav: str
-    language: str
+
+    # xtts 接口这个是必填的，但是我们这里不需要所以可以为空
+    language: str = "cn"
 
 
 def setup(app: APIManager):

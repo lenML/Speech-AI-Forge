@@ -18,17 +18,21 @@ def test_synthesize_tts_to_audio(client: TestClient):
     assert response.status_code == 200
     assert response.headers["content-type"] == "audio/mpeg"
 
+    output_file = os.path.join(
+        tests.conftest.test_outputs_dir,
+        f"xtts_v2_api_success.mp3",
+    )
     with open(
-        os.path.join(
-            tests.conftest.test_outputs_dir,
-            f"xtts_v2_api_success.mp3",
-        ),
+        output_file,
         "wb",
     ) as f:
         f.write(response.content)
 
+    assert os.path.getsize(output_file) > 0, "Stream output file is empty"
+
 
 @pytest.mark.xtts_v2
+@pytest.mark.stream_api
 def test_synthesize_tts_to_audio_stream(client: TestClient):
     response = client.get(
         "/v1/xtts_v2/tts_stream",
@@ -37,14 +41,17 @@ def test_synthesize_tts_to_audio_stream(client: TestClient):
     assert response.status_code == 200
     assert response.headers["content-type"] == "audio/mpeg"
 
+    output_file = os.path.join(
+        tests.conftest.test_outputs_dir,
+        f"xtts_v2_api_stream_success.mp3",
+    )
     with open(
-        os.path.join(
-            tests.conftest.test_outputs_dir,
-            f"xtts_v2_api_stream_success.mp3",
-        ),
+        output_file,
         "wb",
     ) as f:
         f.write(response.content)
+
+    assert os.path.getsize(output_file) > 0, "Stream output file is empty"
 
 
 @pytest.mark.xtts_v2

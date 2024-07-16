@@ -2,6 +2,7 @@ import io
 import queue
 import subprocess
 import threading
+from time import sleep
 import wave
 
 import pydub
@@ -70,7 +71,8 @@ class StreamEncoder:
         while self.p:
             data = self.p.stdout.read(self.chunk_size)
             if not data:
-                break
+                sleep(0.1)
+                continue
             self.output_queue.put(data)
 
     def write(self, data: bytes):
@@ -101,7 +103,10 @@ class StreamEncoder:
     def close(self):
         if self.p is None:
             return
-        self.p.stdin.close()
+        if not self.p.stdin.closed:
+            self.p.stdin.close()
         self.p.wait()
-        if self.read_thread:
-            self.read_thread.join()
+
+    def __del__(self):
+        self.p.terminate()
+        self.p = None

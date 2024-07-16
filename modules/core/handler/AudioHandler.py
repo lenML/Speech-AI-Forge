@@ -95,9 +95,13 @@ class AudioHandler:
                 chunk_data = encoder.read()
 
         encoder.close()
+
+        chunk_data = encoder.read()
         while len(chunk_data) > 0:
             yield chunk_data
             chunk_data = encoder.read()
+
+        del encoder
 
     async def enqueue_to_stream_with_request(
         self, request: Request
@@ -118,12 +122,11 @@ class AudioHandler:
             encoder.set_header(sample_rate=sample_rate)
             audio_bytes = read_np_to_wav(audio_data=audio_data)
             encoder.write(audio_bytes)
-            chunk_data = encoder.read()
 
         encoder.close()
-        while len(chunk_data) > 0:
+        chunk_data = encoder.read_all()
+        if len(chunk_data) > 0:
             yield chunk_data
-            chunk_data = encoder.read()
 
     def enqueue_to_bytes(self) -> bytes:
         encoder = self.get_encoder()

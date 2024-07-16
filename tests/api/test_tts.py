@@ -18,11 +18,15 @@ def test_synthesize_tts(client):
     assert response.status_code == 200
     assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
 
+    output_file = os.path.join(tests.conftest.test_outputs_dir, "tts_api_success.mp3")
+
     with open(
-        os.path.join(tests.conftest.test_outputs_dir, "tts_api_success.mp3"),
+        output_file,
         "wb",
     ) as f:
         f.write(response.content)
+
+    assert os.path.getsize(output_file) > 0, "Stream output file is empty"
 
 
 @pytest.mark.tts_api
@@ -103,6 +107,7 @@ def test_adjust_tts_generate(client):
 
 
 @pytest.mark.tts_api
+@pytest.mark.stream_api
 def test_stream_tts_generate(client):
     tts_params = default_tts_params.model_copy()
     tts_params.text = "Hello, world! I am a test case."
@@ -112,8 +117,13 @@ def test_stream_tts_generate(client):
     assert response.status_code == 200
     assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
 
+    output_file = os.path.join(
+        tests.conftest.test_outputs_dir, "tts_api_stream_success.mp3"
+    )
     with open(
-        os.path.join(tests.conftest.test_outputs_dir, "tts_api_stream_success.mp3"),
+        output_file,
         "wb",
     ) as f:
         f.write(response.content)
+
+    assert os.path.getsize(output_file) > 0, "Stream output file is empty"
