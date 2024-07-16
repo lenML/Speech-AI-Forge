@@ -1,6 +1,7 @@
 import logging
 
 from scripts.dl_base import BaseModelDownloader
+from scripts.download_models import parser_args
 
 logger = logging.getLogger(__name__)
 
@@ -28,3 +29,8 @@ class ChatTTSDownloader(BaseModelDownloader):
         )
 
         self.logger = logger
+
+
+if __name__ == "__main__":
+    args = parser_args()
+    ChatTTSDownloader()(source=args.source)

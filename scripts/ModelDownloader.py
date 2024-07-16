@@ -1,4 +1,5 @@
 from pathlib import Path
+import time
 
 MODEL_DIR = Path("models")
 
@@ -19,3 +20,30 @@ class ModelDownloader:
 
     def gc(self):
         raise NotImplementedError()
+
+    def __call__(self, source: str):
+        self.execate(downloader=self, source=source)
+
+    @staticmethod
+    def execate(*, downloader: "ModelDownloader", source: str):
+        if downloader.check_exist():
+            print(f"Model {downloader.model_name} already exists.")
+            return
+
+        if source == "modelscope":
+            downloader.from_modelscope()
+        elif source == "huggingface":
+            downloader.from_huggingface()
+        else:
+            raise ValueError("Invalid source")
+
+        # after check
+        times = 5
+        for i in range(times):
+            if downloader.check_exist():
+                break
+            time.sleep(5)
+            if i == times - 1:
+                raise TimeoutError("Download timeout")
+
+        downloader.gc()

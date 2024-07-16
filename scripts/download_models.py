@@ -13,7 +13,7 @@ from scripts.ModelDownloader import ModelDownloader
 from scripts.dl_fishspeech import FishSpeechDownloader
 
 
-def main():
+def parser_args():
     parser = argparse.ArgumentParser(
         description="Download model to the specified folder"
     )
@@ -24,34 +24,19 @@ def main():
         help="Choose the source to download the model from",
     )
     args = parser.parse_args()
+    return args
+
+
+def main():
+    args = parser_args()
 
     downloaders: list[ModelDownloader] = []
     downloaders.append(ChatTTSDownloader())
     downloaders.append(ResembleEnhanceDownloader())
-    downloaders.append(FishSpeechDownloader())
+    # downloaders.append(FishSpeechDownloader())
 
     for downloader in downloaders:
-        if downloader.check_exist():
-            print(f"Model {downloader.model_name} already exists.")
-            continue
-
-        if args.source == "modelscope":
-            downloader.from_modelscope()
-        elif args.source == "huggingface":
-            downloader.from_huggingface()
-        else:
-            raise ValueError("Invalid source")
-
-        # after check
-        times = 5
-        for i in range(times):
-            if downloader.check_exist():
-                break
-            time.sleep(5)
-            if i == times - 1:
-                raise TimeoutError("Download timeout")
-
-        downloader.gc()
+        downloader(source=args.source)
 
 
 if __name__ == "__main__":
