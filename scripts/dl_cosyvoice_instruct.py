@@ -1,6 +1,5 @@
 import logging
 from scripts.dl_base import BaseModelDownloader
-from scripts.download_models import parser_args
 
 logger = logging.getLogger(__name__)
 
@@ -27,5 +26,7 @@ class CosyVoiceInstructDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
+    from scripts.dl_args import parser_args
+
     args = parser_args()
     CosyVoiceInstructDownloader()(source=args.source)

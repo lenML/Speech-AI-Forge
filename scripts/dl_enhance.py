@@ -4,8 +4,6 @@ from tqdm import tqdm
 from scripts.ModelDownloader import ModelDownloader
 import logging
 
-from scripts.download_models import parser_args
-
 logger = logging.getLogger(__name__)
 
 
@@ -57,5 +55,7 @@ class ResembleEnhanceDownloader(ModelDownloader):
 
 
 if __name__ == "__main__":
+    from scripts.dl_args import parser_args
+
     args = parser_args()
     ResembleEnhanceDownloader()(source=args.source)
