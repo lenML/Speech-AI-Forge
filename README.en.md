@@ -2,7 +2,7 @@
 
 # 🍦 ChatTTS-Forge
 
-ChatTTS-Forge is a project developed around the TTS generation model ChatTTS, implementing an API Server and a Gradio-based WebUI.
+ChatTTS-Forge is a project developed around TTS generation model, implementing an API Server and a Gradio-based WebUI.
 
 ![banner](./docs/banner.png)
 
@@ -264,4 +264,9 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - ChatTTS: https://github.com/2noise/ChatTTS
 - PaddleSpeech: https://github.com/PaddlePaddle/PaddleSpeech
 - resemble-enhance: https://github.com/resemble-ai/resemble-enhance
-- 默认说话人: https://github.com/2noise/ChatTTS/issues/238
+- OpenVoice: https://github.com/myshell-ai/OpenVoice
+- FishSpeech: https://github.com/fishaudio/fish-speech
+- SenseVoice: https://github.com/FunAudioLLM/SenseVoice
+- Whisper: https://github.com/openai/whisper
+
+- ChatTTS 默认说话人: https://github.com/2noise/ChatTTS/issues/238
