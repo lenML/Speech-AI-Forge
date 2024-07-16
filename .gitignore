@@ -172,10 +172,12 @@ cython_debug/
 /models/**/*.md
 /models/**/*.bin
 /models/**/*.json
+/models/**/*.onnx
 /models/cache
 /models/**/.huggingface
 /models/**/.gitattributes
 /models/**/.gitignore
+/models/CosyVoice_*/**/*
 
 /*.pt
 
