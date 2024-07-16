@@ -35,6 +35,7 @@ class TTSChunker:
         prompt1 = self.context.tts_config.prompt1
         prompt2 = self.context.tts_config.prompt2
         prefix = self.context.tts_config.prefix
+        emotion = self.context.tts_config.emotion
 
         eos = self.context.infer_config.eos
 
@@ -53,6 +54,7 @@ class TTSChunker:
                 prompt1=prompt1,
                 prompt2=prompt2,
                 prefix=prefix,
+                emotion=emotion,
             )
             for s in sentences
         ]

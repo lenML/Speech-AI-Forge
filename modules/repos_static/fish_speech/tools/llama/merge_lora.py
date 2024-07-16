@@ -9,8 +9,12 @@ from hydra import compose, initialize
 from hydra.utils import instantiate
 from loguru import logger
 
-from fish_speech.models.text2semantic.llama import BaseTransformer
-from fish_speech.models.text2semantic.lora import get_merged_state_dict
+from modules.repos_static.fish_speech.fish_speech.models.text2semantic.llama import (
+    BaseTransformer,
+)
+from modules.repos_static.fish_speech.fish_speech.models.text2semantic.lora import (
+    get_merged_state_dict,
+)
 
 
 @click.command()

@@ -17,7 +17,7 @@ trainer:
   devices: auto
   strategy:
     _target_: lightning.pytorch.strategies.DDPStrategy
-    process_group_backend: nccl  # This should be override when training on windows
+    process_group_backend: nccl # This should be override when training on windows
 
   precision: bf16-mixed
 
@@ -53,7 +53,7 @@ callbacks:
     log_momentum: false
 
   grad_norm_monitor:
-    _target_: fish_speech.callbacks.GradNormMonitor
+    _target_: modules.repos_static.fish_speech.fish_speech.callbacks.GradNormMonitor
     norm_type: 2
     logging_interval: step
 
@@ -81,7 +81,7 @@ logger:
   #   group: ""
   #   tags: ["vq", "hq", "finetune"]
   #   job_type: ""
-    
+
 # Loop
 train: true
 test: false

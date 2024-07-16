@@ -17,7 +17,11 @@ from lightning import LightningModule
 from loguru import logger
 from omegaconf import OmegaConf
 
-from fish_speech.utils.file import AUDIO_EXTENSIONS, list_files, load_filelist
+from modules.repos_static.fish_speech.fish_speech.utils.file import (
+    AUDIO_EXTENSIONS,
+    list_files,
+    load_filelist,
+)
 
 # register eval resolver
 OmegaConf.register_new_resolver("eval", eval)

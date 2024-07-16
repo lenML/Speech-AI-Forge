@@ -1,7 +1,7 @@
 import re
 import string
 
-from fish_speech.text.clean import clean_text
+from modules.repos_static.fish_speech.fish_speech.text.clean import clean_text
 
 
 def utf_8_len(text):

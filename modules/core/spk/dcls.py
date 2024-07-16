@@ -32,8 +32,13 @@ class DcSpkSample:
 
 @dataclass(repr=False, eq=False)
 class DcSpkReference:
-    text: Optional[str]
-    wav: Optional[bytes]
+    text: Optional[str] = None
+
+    wav: Optional[bytes] = None
+    wav_sr: Optional[int] = None
+
+    # 标注情绪
+    emotion: Optional[str] = None
 
 
 @dataclass(repr=False, eq=False)

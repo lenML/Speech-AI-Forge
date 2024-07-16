@@ -23,6 +23,8 @@ class TTSSegment:
     prompt2: str = ""
     prefix: str = ""
 
+    emotion: str = ""
+
     spk: TTSSpeaker = None
 
 

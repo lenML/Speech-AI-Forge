@@ -30,8 +30,10 @@ from pydantic import BaseModel, Field
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-# from fish_speech.models.vqgan.lit_module import VQGAN
-from fish_speech.models.vqgan.modules.firefly import FireflyArchitecture
+# from modules.repos_static.fish_speech.fish_speech.models.vqgan.lit_module import VQGAN
+from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.firefly import (
+    FireflyArchitecture,
+)
 from tools.llama.generate import (
     GenerateRequest,
     GenerateResponse,

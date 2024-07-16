@@ -39,3 +39,4 @@ lightning
 natsort
 pyrootutils
 loralib
+wandb

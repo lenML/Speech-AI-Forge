@@ -13,6 +13,7 @@ class ChatTTSConfig(BaseModel):
     prompt1: str = ""
     prompt2: str = ""
     prefix: str = ""
+    emotion: str = ""
 
 
 class InferConfig(BaseModel):

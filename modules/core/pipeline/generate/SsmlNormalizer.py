@@ -63,6 +63,7 @@ class SsmlNormalizer:
                 prompt1=params.get("prompt1", ""),
                 prompt2=params.get("prompt2", ""),
                 prefix=params.get("prefix", ""),
+                emotion=params.get("emotion", ""),
             )
 
         text = str(text).strip()
@@ -70,6 +71,7 @@ class SsmlNormalizer:
         attrs = segment.attrs
         spk = attrs.spk
         style = attrs.style
+        emotion = attrs.emotion
 
         # FIXME: 这个逻辑有点...emmm 最好干掉
         ss_params = calc_spk_style(spk, style)
@@ -97,6 +99,7 @@ class SsmlNormalizer:
             prompt1=prompt1,
             prompt2=prompt2,
             prefix=prefix,
+            emotion=emotion or style,
         )
 
         # NOTE 每个batch的默认seed保证前后一致即使是没设置spk的情况

@@ -23,6 +23,7 @@ class SSMLContext(Box):
         self.prompt1 = None
         self.prompt2 = None
         self.prefix = None
+        self.emotion = None
 
         super().__init__(*args, **kwargs)
 
@@ -124,6 +125,7 @@ def create_ssml_v01_parser():
         ctx.prompt1 = element.get("prompt1", ctx.prompt1)
         ctx.prompt2 = element.get("prompt2", ctx.prompt2)
         ctx.prefix = element.get("prefix", ctx.prefix)
+        ctx.emotion = element.get("emotion", ctx.emotion)
 
         # 处理 voice 开头的文本
         if element.text and element.text.strip():
@@ -170,6 +172,7 @@ def create_ssml_v01_parser():
         ctx.prompt1 = element.get("prompt1", ctx.prompt1)
         ctx.prompt2 = element.get("prompt2", ctx.prompt2)
         ctx.prefix = element.get("prefix", ctx.prefix)
+        ctx.emotion = element.get("emotion", ctx.emotion)
 
         if element.text and element.text.strip():
             segments.append(SSMLSegment(element.text.strip(), ctx))

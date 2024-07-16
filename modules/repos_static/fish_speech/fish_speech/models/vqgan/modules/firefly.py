@@ -14,7 +14,9 @@ from torch.nn.utils.parametrizations import weight_norm
 from torch.nn.utils.parametrize import remove_parametrizations
 from torch.utils.checkpoint import checkpoint
 
-from fish_speech.models.vqgan.utils import sequence_mask
+from modules.repos_static.fish_speech.fish_speech.models.vqgan.utils import (
+    sequence_mask,
+)
 
 
 def init_weights(m, mean=0.0, std=0.01):

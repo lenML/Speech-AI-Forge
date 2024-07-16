@@ -7,7 +7,11 @@ from loguru import logger
 from pydub import AudioSegment
 from tqdm import tqdm
 
-from fish_speech.utils.file import AUDIO_EXTENSIONS, list_files, load_filelist
+from modules.repos_static.fish_speech.fish_speech.utils.file import (
+    AUDIO_EXTENSIONS,
+    list_files,
+    load_filelist,
+)
 
 
 @click.command()

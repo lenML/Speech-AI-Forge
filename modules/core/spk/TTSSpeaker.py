@@ -3,7 +3,7 @@ import copy
 import dataclasses
 import json
 import uuid
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import numpy as np
 import torch
@@ -160,15 +160,25 @@ class TTSSpeaker:
         # raise ValueError(f"speaker {self._data.meta.name} not support model {model_id}")
         return None
 
-    def get_ref_wav(self) -> Optional[bytes]:
-        if self._data.refs:
-            return self._data.refs[0].wav
-        return None
+    def get_ref(
+        self, get_func: Optional[Callable[[DcSpkReference], bool]] = None
+    ) -> Optional[DcSpkReference]:
+        if self._data.refs is None:
+            return None
+        if len(self._data.refs) == 0:
+            return None
+        ref0 = self._data.refs[0]
+        if len(self._data.refs) == 1 or get_func is None:
+            return ref0
 
-    def get_ref_text(self) -> Optional[str]:
-        if self._data.refs:
-            return self._data.refs[0].text
-        return None
+        found_ref = None
+        for ref in self._data.refs:
+            if get_func(ref):
+                found_ref = ref
+                break
+        if found_ref is not None:
+            return found_ref
+        return ref0
 
     def get_recommend_config(self) -> Optional[DcSpkInferConfig]:
         if self._data.recommend_config:

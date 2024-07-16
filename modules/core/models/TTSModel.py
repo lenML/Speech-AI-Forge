@@ -1,6 +1,7 @@
 from typing import Generator, Optional
 
 import numpy as np
+import torch
 
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
@@ -13,6 +14,12 @@ class TTSModel:
         self.name = name
         self.hash = ""
         self.tn: Optional[TNPipeline] = None
+
+    def reset(self) -> None:
+        """
+        重置推理上下文
+        """
+        pass
 
     def load(self, context: TTSPipelineContext) -> None:
         pass

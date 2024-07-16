@@ -33,6 +33,7 @@ class BatchGenerate:
         return batches
 
     def generate(self):
+        self.model.reset()
         stream = self.context.infer_config.stream
         for batch in self.batches:
             is_break = batch.segments[0].seg._type == "break"

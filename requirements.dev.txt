@@ -171,3 +171,4 @@ lightning==2.3.3
 natsort==8.4.0
 pyrootutils==1.0.4
 loralib==0.1.2
+wandb==0.17.4
