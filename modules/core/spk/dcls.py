@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
 
+import torch
+
 
 @dataclass(repr=False, eq=False)
 class DcSpkMeta:
@@ -16,12 +18,16 @@ class DcSpkMeta:
 @dataclass(repr=False, eq=False)
 class DcSpkVoiceToken:
     model_id: str
-    model_hash: str
+    model_hash: str = ""
 
     # 可以填入特殊 token 或者 tensor
     # 一般都是 tensor
     # egs: ["<EMOTION_START>","xxx","<EMOTION_END>", [...<torch.Tensor>...]]
-    tokens: list[Union[str, list]]
+    tokens: list[Union[str, list]] = field(default_factory=list)
+
+    # cosyvoice 特有的属性
+    embedding: Optional[list[torch.Tensor]] = None
+    feat: Optional[list[torch.Tensor]] = None
 
 
 @dataclass(repr=False, eq=False)

@@ -206,6 +206,9 @@ class TTSSpeaker:
             model_hash=model_hash,
             tokens=tokens,
         )
+        self.set_token_obj(token=token)
+
+    def set_token_obj(self, *, token: DcSpkVoiceToken):
         for i, t in enumerate(self._data.token):
             if t.model_id == token.model_id:
                 self._data.token[i] = token

@@ -40,7 +40,11 @@ SPK_FILE_EXTS = [
 
 
 def get_speakers():
-    return spk_mgr.list_speakers()
+    spks = spk_mgr.list_speakers()
+    # TODO webui 暂时只支持chat-tts
+    spks = [spk for spk in spks if spk.get_token("chat-tts") is not None]
+
+    return spks
 
 
 def get_speaker_names() -> tuple[list[TTSSpeaker], list[str]]:
