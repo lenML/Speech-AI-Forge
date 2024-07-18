@@ -6,8 +6,8 @@ body:
   - type: checkboxes
     id: ensure
     attributes:
-      label: verify
-      description: 在提交之前，请确认完成以下选项
+      label: 确认清单
+      description: 请确认以下所有选项：
       options:
         - label: 我已经仔细阅读[项目文档](https://github.com/lenML/ChatTTS-Forge/blob/master/README.md)，确认现有功能无法解决我的需求
           required: true

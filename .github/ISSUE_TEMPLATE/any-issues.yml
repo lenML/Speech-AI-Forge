@@ -9,52 +9,22 @@ body:
         在提交问题之前，请搜索现有的 issues 和 discussions 以避免重复。
         如果您的问题是关于使用公共服务，请先联系服务提供者。
   - type: checkboxes
-    id: readme-check
+    id: issue-check
     attributes:
-      label: 阅读 README.md 和 dependencies.md
-      description: 提交前请确认您已经阅读过 README.md 和 dependencies.md 文件。
+      label: 确认清单
+      description: 请确认以下所有选项：
       options:
         - label: 我已经阅读过 README.md 和 dependencies.md 文件
           required: true
-  - type: checkboxes
-    id: issue-check
-    attributes:
-      label: 检索 issue 和 discussion
-      description: 对于您遇到的 BUG，是否已经确认之前没有其他 issue 或 discussion 涉及？
-      options:
         - label: 我已经确认之前没有 issue 或 discussion 涉及此 BUG
           required: true
-  - type: checkboxes
-    id: latest-check
-    attributes:
-      label: 检查 Forge 版本
-      description: 是否使用当前最新代码或稳定版本（[Tags](https://github.com/lenML/ChatTTS-Forge/tags)中标注的稳定 coomit 版本）？
-      options:
         - label: 我已经确认问题发生在最新代码或稳定版本中
           required: true
-  - type: checkboxes
-    id: api-check
-    attributes:
-      label: 请确认是否与 API 无关？
-      description: 如果与 API 有关，请提交 API Report.
-      options:
         - label: 我已经确认问题与 API 无关
           required: true
-  - type: checkboxes
-    id: webui-check
-    attributes:
-      label: 请确认是否与 WebUI 无关？
-      description: 如果与 WebUI 有关，请提交 WebUI Report.
-      options:
         - label: 我已经确认问题与 WebUI 无关
           required: true
-  - type: checkboxes
-    id: ft-check
-    attributes:
-      label: 请确认是否与 Fintune 无关？
-      description: 如果与 Fintune 有关，请提交 Fintune Report.
-      options:
-        - label: 我已经确认问题与 Fintune 无关
+        - label: 我已经确认问题与 Finetune 无关
           required: true
   - type: textarea
     id: text
