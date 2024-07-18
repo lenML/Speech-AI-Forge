@@ -147,7 +147,9 @@ def setup(app: APIManager):
         request: Request,
         text: str = Query(),
         speaker_wav: str = Query(),
-        language: str = Query(),
+        language: str = Query("cn"),
+        # just for test
+        no_cache: bool = Query(False),
     ):
         # speaker_wav 就是 speaker id 。。。
         voice_id = speaker_wav
@@ -171,6 +173,8 @@ def setup(app: APIManager):
             eos=XTTSV2.eos,
             seed=XTTSV2.infer_seed,
             stream=True,
+            stream_chunk_size=64,
+            no_cache=no_cache,
         )
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,
