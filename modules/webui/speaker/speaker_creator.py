@@ -77,7 +77,7 @@ def create_spk_from_seed(
 def test_spk_voice(
     seed: int,
     text: str,
-    progress=gr.Progress(track_tqdm=True),
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     spk = ChatTTSModel.create_speaker_from_seed(seed)
     return tts_generate(spk=spk, text=text, progress=progress)

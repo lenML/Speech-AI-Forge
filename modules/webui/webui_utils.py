@@ -117,7 +117,7 @@ def synthesize_ssml(
     volume_gain_db: float = 0,
     normalize: bool = True,
     headroom: float = 1,
-    progress=gr.Progress(track_tqdm=True),
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     try:
         batch_size = int(batch_size)
@@ -204,7 +204,7 @@ def tts_generate(
     volume_gain_db: float = 0,
     normalize: bool = True,
     headroom: float = 1,
-    progress=gr.Progress(track_tqdm=True),
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     try:
         batch_size = int(batch_size)
@@ -311,7 +311,7 @@ def refine_text(
     laugh: int = -1,
     # TODO 这个还没ui
     spliter_threshold: int = 300,
-    progress=gr.Progress(track_tqdm=True),
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     text = text_normalize(text)
     prompt = []

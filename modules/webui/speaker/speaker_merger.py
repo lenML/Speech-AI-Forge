@@ -85,7 +85,7 @@ def merge_and_test_spk_voice(
     spk_d,
     spk_d_w,
     test_text,
-    progress=gr.Progress(track_tqdm=True),
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     merged_spk = merge_spk(
         spk_a,

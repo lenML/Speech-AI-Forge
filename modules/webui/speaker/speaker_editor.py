@@ -17,7 +17,7 @@ from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate
 def test_spk_voice(
     spk_file,
     text: str,
-    progress=gr.Progress(track_tqdm=True),
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     if spk_file == "" or spk_file is None:
         return None
@@ -98,8 +98,8 @@ def speaker_editor_ui():
                     interactive=False,
                 )
             with gr.Group():
-                gr.Markdown("🔊Generate speaker.pt")
-                generate_button = gr.Button("Save .pt file", interactive=False)
+                gr.Markdown("🔊Generate speaker.json")
+                generate_button = gr.Button("Save .json file", interactive=False)
                 output_file = gr.File(label="Save to File")
         with gr.Column(scale=5):
             btn1 = create_test_voice_card(spk_file=spk_file)

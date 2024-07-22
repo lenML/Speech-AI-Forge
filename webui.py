@@ -3,8 +3,13 @@ import os
 import sys
 
 from modules.ffmpeg_env import setup_ffmpeg_path
+from modules.webui import webui_config
 
 try:
+    # 由于 gradio 的设计，要关闭 track 需要在所有模块之前
+    if "--off_track_tqdm" in sys.argv:
+        webui_config.off_track_tqdm = True
+
     setup_ffmpeg_path()
     # NOTE: 因为 logger 都是在模块中初始化，所以这个 config 必须在最前面
     logging.basicConfig(
@@ -24,7 +29,6 @@ from modules.models_setup import process_model_args, setup_model_args
 from modules.utils.env import get_and_update_env
 from modules.utils.ignore_warn import ignore_useless_warnings
 from modules.utils.torch_opt import configure_torch_optimizations
-from modules.webui import webui_config
 from modules.webui.app import create_interface, webui_init
 
 dcls_patch()
@@ -73,6 +77,11 @@ def setup_webui_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="use api=True to launch the API together with the webui (run launch.py for only API server)",
     )
+    parser.add_argument(
+        "--off_track_tqdm",
+        action="store_true",
+        help="turn off track_tqdm",
+    )
 
 
 def process_webui_args(args):
@@ -84,6 +93,9 @@ def process_webui_args(args):
     language = get_and_update_env(args, "language", "zh-CN", str)
     api = get_and_update_env(args, "api", False, bool)
 
+    webui_config.off_track_tqdm = get_and_update_env(
+        args, "off_track_tqdm", False, bool
+    )
     webui_config.experimental = get_and_update_env(
         args, "webui_experimental", False, bool
     )
