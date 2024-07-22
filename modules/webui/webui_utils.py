@@ -235,6 +235,11 @@ def tts_generate(
     infer_seed = np.clip(infer_seed, -1, 2**32 - 1, out=None, dtype=np.float64)
     infer_seed = int(infer_seed)
 
+    # ref: https://github.com/2noise/ChatTTS/issues/123#issue-2326908144
+    min_n = 0.000000001
+    if temperature == 0.1:
+        temperature = min_n
+
     if isinstance(spk, int):
         spk = ChatTtsModel.ChatTTSModel.create_speaker_from_seed(spk)
 
