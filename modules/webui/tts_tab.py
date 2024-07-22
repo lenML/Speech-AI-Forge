@@ -13,6 +13,20 @@ from modules.webui.webui_utils import (
 )
 
 
+def tts_generate_with_history(
+    audio_history: list,
+    *args,
+    **kwargs,
+):
+    audio = tts_generate(*args, **kwargs)
+
+    mp3_1 = audio
+    mp3_2 = audio_history[-1] if len(audio_history) > 0 else None
+    mp3_3 = audio_history[-2] if len(audio_history) > 1 else None
+
+    return mp3_1, mp3_2, mp3_3, [mp3_3, mp3_2, mp3_1]
+
+
 def create_tts_interface():
     speakers = get_speakers()
 
@@ -27,8 +41,6 @@ def create_tts_interface():
     speaker_names.sort(key=lambda x: x.startswith("*") and "-1" or x)
 
     styles = ["*auto"] + [s.get("name") for s in get_styles()]
-
-    history = []
 
     with gr.Row():
         with gr.Column(scale=1):
@@ -189,7 +201,12 @@ def create_tts_interface():
 
             with gr.Group():
                 gr.Markdown("🎨Output")
-                tts_output = gr.Audio(label="Generated Audio", format="mp3")
+
+                audio_history = gr.State([])
+                tts_output1 = gr.Audio(label="Generated Audio", format="mp3")
+                tts_output2 = gr.Audio(label="History -1", format="mp3")
+                tts_output3 = gr.Audio(label="History -2", format="mp3")
+
         with gr.Column(scale=1):
             with gr.Group():
                 gr.Markdown("🎶Refiner")
@@ -336,8 +353,9 @@ def create_tts_interface():
     )
 
     tts_button.click(
-        tts_generate,
+        tts_generate_with_history,
         inputs=[
+            audio_history,
             text_input,
             temperature_input,
             top_p_input,
@@ -362,5 +380,5 @@ def create_tts_interface():
             enable_loudness_normalization,
             headroom_input,
         ],
-        outputs=tts_output,
+        outputs=[tts_output1, tts_output2, tts_output3, audio_history],
     )
