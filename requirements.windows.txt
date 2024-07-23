@@ -41,3 +41,10 @@ natsort
 pyrootutils
 loralib
 wandb
+
+### cosyvoice
+hyperpyyaml
+openai-whisper
+onnxruntime
+inflect
+matcha-tts

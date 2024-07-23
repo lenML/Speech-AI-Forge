@@ -172,3 +172,10 @@ natsort==8.4.0
 pyrootutils==1.0.4
 loralib==0.1.2
 wandb==0.17.4
+
+### cosyvoice
+hyperpyyaml==1.2.2
+openai-whisper==20231117
+onnxruntime==1.18.1
+inflect==7.3.1
+matcha-tts==0.0.6
