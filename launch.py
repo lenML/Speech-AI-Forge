@@ -1,9 +1,11 @@
 import logging
 import os
 
+from modules.repos_static.sys_paths import setup_repos_paths
 from modules.ffmpeg_env import setup_ffmpeg_path
 
 try:
+    setup_repos_paths()
     setup_ffmpeg_path()
     # NOTE: 因为 logger 都是在模块中初始化，所以这个 config 必须在最前面
     logging.basicConfig(

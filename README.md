@@ -276,6 +276,7 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - OpenVoice: https://github.com/myshell-ai/OpenVoice
 - FishSpeech: https://github.com/fishaudio/fish-speech
 - SenseVoice: https://github.com/FunAudioLLM/SenseVoice
+- CosyVoice: https://github.com/FunAudioLLM/CosyVoice
 - Whisper: https://github.com/openai/whisper
 
 - ChatTTS 默认说话人: https://github.com/2noise/ChatTTS/issues/238

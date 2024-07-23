@@ -123,19 +123,11 @@ def torch_gc():
 cpu: torch.device = torch.device("cpu")
 device: torch.device = None
 dtype: torch.dtype = torch.float32
-dtype_dvae: torch.dtype = torch.float32
-dtype_vocos: torch.dtype = torch.float32
-dtype_gpt: torch.dtype = torch.float32
-dtype_decoder: torch.dtype = torch.float32
 
 
 def reset_device():
     global device
     global dtype
-    global dtype_dvae
-    global dtype_vocos
-    global dtype_gpt
-    global dtype_decoder
 
     if config.runtime_env_vars.use_cpu is None:
         config.runtime_env_vars.use_cpu = []
@@ -148,19 +140,9 @@ def reset_device():
 
     if not config.runtime_env_vars.no_half:
         dtype = torch.float16
-        dtype_dvae = torch.float16
-        dtype_vocos = torch.float16
-        dtype_gpt = torch.float16
-        dtype_decoder = torch.float16
-
         logger.info("Using half precision: torch.float16")
     else:
         dtype = torch.float32
-        dtype_dvae = torch.float32
-        dtype_vocos = torch.float32
-        dtype_gpt = torch.float32
-        dtype_decoder = torch.float32
-
         logger.info("Using full precision: torch.float32")
 
     if "all" in config.runtime_env_vars.use_cpu:

@@ -173,7 +173,7 @@ def setup(app: APIManager):
             eos=XTTSV2.eos,
             seed=XTTSV2.infer_seed,
             stream=True,
-            stream_chunk_size=64,
+            # stream_chunk_size=64,
             no_cache=no_cache,
         )
         adjust_config = AdjustConfig(

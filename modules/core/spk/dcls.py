@@ -47,6 +47,9 @@ class DcSpkReference:
     # 标注情绪
     emotion: Optional[str] = None
 
+    # 标记语言
+    lang: Optional[str] = None
+
 
 @dataclass(repr=False, eq=False)
 class DcSpkTrainInfo:

@@ -2,6 +2,7 @@ import logging
 import os
 import sys
 
+from modules.repos_static.sys_paths import setup_repos_paths
 from modules.ffmpeg_env import setup_ffmpeg_path
 from modules.webui import webui_config
 
@@ -10,6 +11,7 @@ try:
     if "--off_track_tqdm" in sys.argv:
         webui_config.off_track_tqdm = True
 
+    setup_repos_paths()
     setup_ffmpeg_path()
     # NOTE: 因为 logger 都是在模块中初始化，所以这个 config 必须在最前面
     logging.basicConfig(
