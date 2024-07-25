@@ -30,7 +30,9 @@ def javascript_html():
         return s(read_file(fp))
 
     head = ""
-    head += src("https://jsd.onmicrosoft.cn/npm/marked@12.0.2")
+    # NOTE: cdn 老是掉...还是直接自己托管算了
+    # head += src("https://jsd.onmicrosoft.cn/npm/marked@12.0.2")
+    head += sf("js/marked.js")
     head += s(localization_js(config.runtime_env_vars.language))
     head += sf("js/index.js")
     head += sf("js/localization.js")
