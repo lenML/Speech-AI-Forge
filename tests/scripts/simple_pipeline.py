@@ -1,7 +1,7 @@
 import soundfile as sf
 
 from modules.core.handler.datacls.audio_model import AdjustConfig
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.pipeline.factory import PipelineFactory
@@ -24,7 +24,7 @@ context = TTSPipelineContext(
     </speak>
     """,
     spk=speaker_mgr.get_speaker("Bob_ft10"),
-    tts_config=ChatTTSConfig(),
+    tts_config=TTSConfig(),
     infer_config=InferConfig(no_cache=True),
     adjust_config=AdjustConfig(),
     enhancer_config=EnhancerConfig(),

@@ -13,13 +13,15 @@ from modules.core.handler.datacls.audio_model import (
     AudioFormat,
     EncoderConfig,
 )
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 logger = logging.getLogger(__name__)
+
+model_ids = ["chat-tts", "fish-speech", "cosy-voice"]
 
 
 class TTSParams(BaseModel):
@@ -61,6 +63,12 @@ class TTSParams(BaseModel):
         False, description="Disable cache"
     )
 
+    model: str = Query(
+        "chat-tts",
+        description="Model ID",
+        examples=model_ids,
+    )
+
 
 async def synthesize_tts(request: Request, params: TTSParams = Depends()):
     try:
@@ -98,6 +106,12 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
                 detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
             )
 
+        if params.model not in model_ids:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Invalid model_id. Supported model_ids are {model_ids}",
+            )
+
         calc_params = api_utils.calc_spk_style(spk=params.spk, style=params.style)
 
         spk = calc_params.get("spk", params.spk)
@@ -120,10 +134,13 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             else params.no_cache == "on"
         )
 
+        if eos == "[uv_break]" and params.model != "chat-tts":
+            eos = " "
+
         batch_size = int(params.bs)
         threshold = int(params.thr)
 
-        tts_config = ChatTTSConfig(
+        tts_config = TTSConfig(
             style=style,
             temperature=temperature,
             top_k=params.top_k,
@@ -131,6 +148,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             prefix=prefix,
             prompt1=prompt1,
             prompt2=prompt2,
+            mid=params.model,
         )
         infer_config = InferConfig(
             batch_size=batch_size,

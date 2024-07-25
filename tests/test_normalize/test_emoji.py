@@ -2,7 +2,7 @@ import pytest
 
 from modules.core.tn import ChatTtsTN
 
-ChatTtsTN.DISABLE_UNK_TOKEN_CHECK = True
+ChatTtsTN.ChatTtsTN.remove_block("replace_unk_tokens")
 
 
 @pytest.mark.parametrize(

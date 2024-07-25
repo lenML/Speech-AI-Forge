@@ -34,13 +34,13 @@ class FishSpeechModel(TTSModel):
     lock = threading.Lock()
 
     def __init__(self) -> None:
-        super().__init__("fish_speech")
+        super().__init__("fish-speech")
 
         self.model: FISH_SPEECH_LLAMA = None
         self.token_decoder: callable = None
         self.vqgan: FireflyArchitecture = None
 
-        self.device = devices.get_device_for("fish_speech")
+        self.device = devices.get_device_for("fish-speech")
         self.dtype = devices.dtype
 
         self.encoded_prefix = []
@@ -49,7 +49,7 @@ class FishSpeechModel(TTSModel):
         self.encoded_prefix = []
 
     def load(
-        self, context: TTSPipelineContext
+        self, context: TTSPipelineContext = None
     ) -> tuple[FISH_SPEECH_LLAMA, FireflyArchitecture]:
         llama = self.load_llama()
         vqgan = self.load_vqgan()
@@ -100,7 +100,7 @@ class FishSpeechModel(TTSModel):
             self.vqgan = model
             return model
 
-    def unload(self, context: TTSPipelineContext) -> None:
+    def unload(self, context: TTSPipelineContext = None) -> None:
         with self.lock:
             del self.model
             del self.token_decoder
@@ -109,6 +109,20 @@ class FishSpeechModel(TTSModel):
             self.token_decoder = None
             self.vqgan = None
             devices.torch_gc()
+
+    def encode(self, text: str) -> list[int]:
+        self.load()
+        from transformers import PreTrainedTokenizer
+
+        tokenizer: PreTrainedTokenizer = self.model.tokenizer
+        return tokenizer.encode(text)
+
+    def decode(self, ids: list[int]) -> str:
+        self.load()
+        from transformers import PreTrainedTokenizer
+
+        tokenizer: PreTrainedTokenizer = self.model.tokenizer
+        return tokenizer.decode(ids)
 
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
@@ -120,7 +134,13 @@ class FishSpeechModel(TTSModel):
     def generate_batch_stream(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> Generator[list[NP_AUDIO], None, None]:
+        cached = self.get_cache(segments=segments, context=context)
+        if cached is not None:
+            yield cached
+            return
+
         self.load(context=context)
+
         infer = FishSpeechInfer(
             llama=self.model,
             vqgan=self.vqgan,
@@ -136,6 +156,9 @@ class FishSpeechModel(TTSModel):
         sr = infer.sample_rate
         ret = []
         for segment in segments:
+            if context.stop:
+                break
+
             with SeedContext(seed=infer_seed):
                 decoded, generated = infer.infer(
                     text=segment.text,
@@ -148,6 +171,7 @@ class FishSpeechModel(TTSModel):
 
             self.encoded_prefix.append(decoded)
             ret.append((sr, generated))
+        self.set_cache(segments=segments, context=context, value=ret)
         yield ret
 
 

@@ -10,7 +10,7 @@ from modules.core.handler.datacls.audio_model import (
     AudioFormat,
     EncoderConfig,
 )
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
@@ -101,7 +101,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
         )
 
     speaker = params.get("spk")
-    tts_config = ChatTTSConfig(
+    tts_config = TTSConfig(
         style=params.get("style", ""),
         temperature=voice.temperature,
         top_k=voice.topK,

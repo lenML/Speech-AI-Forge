@@ -1,7 +1,9 @@
+from dataclasses import dataclass
 import logging
 import sys
 from functools import lru_cache
 
+import psutil
 import torch
 
 from modules import config
@@ -121,6 +123,9 @@ def torch_gc():
 
 
 cpu: torch.device = torch.device("cpu")
+cuda: torch.device = torch.device("cuda")
+mps: torch.device = torch.device("mps")
+
 device: torch.device = None
 dtype: torch.dtype = torch.float32
 
@@ -167,3 +172,53 @@ def first_time_calculation():
     x = torch.zeros((1, 1, 3, 3)).to(device, dtype)
     conv2d = torch.nn.Conv2d(1, 1, (3, 3)).to(device, dtype)
     conv2d(x)
+
+
+@dataclass(repr=False, eq=False)
+class MemUsage:
+    device: torch.device
+    total_mb: float
+    used_mb: float
+    free_mb: float
+
+
+def get_cpu_memory():
+    mem = psutil.virtual_memory()
+    total_mem = mem.total / 1024 / 1024  # in MB
+    used_mem = mem.used / 1024 / 1024  # in MB
+    free_mem = mem.available / 1024 / 1024  # in MB
+    return MemUsage(device=cpu, total_mb=total_mem, used_mb=used_mem, free_mb=free_mem)
+
+
+def get_gpu_memory():
+    total_memory = torch.cuda.get_device_properties(0).total_memory
+    reserved_memory = torch.cuda.memory_reserved(0)
+    allocated_memory = torch.cuda.memory_allocated(0)
+    free_memory = total_memory - reserved_memory
+    return MemUsage(
+        device=cuda,
+        total_mb=total_memory / 1024 / 1024,  # in MB
+        used_mb=allocated_memory / 1024 / 1024,  # in MB
+        free_mb=free_memory / 1024 / 1024,  # in MB
+    )
+
+
+def get_memory_usage():
+    if device.type == "cuda":
+        return get_gpu_memory()
+    elif device.type == "cpu":
+        return get_cpu_memory()
+    else:
+        # just placeholder
+        return MemUsage(
+            device=device,
+            total_mb=2**23,
+            used_mb=0,
+            free_mb=2**23,
+        )
+
+
+if __name__ == "__main__":
+    reset_device()
+    print(get_gpu_memory().__dict__)
+    print(get_cpu_memory().__dict__)

@@ -2,8 +2,11 @@ import re
 
 import zhon
 
-from modules.core.models import zoo
 from modules.utils.detect_lang import guess_lang
+
+
+def char_tokenizer(text: str):
+    return [ord(char) for char in text.split("")]
 
 
 # 解析文本 并根据停止符号分割成句子
@@ -12,19 +15,19 @@ class SentenceSplitter:
     # 分隔符 用于连接句子 sentence1 + SEP_TOKEN + sentence2
     SEP_TOKEN = " "
 
-    def __init__(self, threshold=100):
+    def __init__(self, threshold=100, tokenizer=char_tokenizer):
         assert (
             isinstance(threshold, int) and threshold > 0
         ), "Threshold must be greater than 0."
 
         self.sentence_threshold = threshold
-        self.tokenizer = zoo.ChatTTS.get_tokenizer()
+        self.tokenizer = tokenizer
 
     def len(self, text: str):
         """
         Get the length of tokenized text.
         """
-        return len(self.tokenizer.tokenize(text))
+        return len(self.tokenizer(text))
 
     def parse(self, text: str):
         sentences = self.split_paragraph(text)

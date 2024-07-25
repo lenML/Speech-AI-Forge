@@ -40,15 +40,22 @@ def postprocess(speech: np.ndarray, top_db=60, hop_length=220, win_length=440):
 class CosyVoiceTTSModel(TTSModel):
     logger = logging.getLogger(__name__)
 
-    lock = threading.Lock()
     load_lock = threading.Lock()
 
-    model_id = "cosyvoice"
-
     def __init__(self) -> None:
-        super().__init__("cosyvoice")
+        super().__init__("cosy-voice")
 
-        self.model_dir = Path("./models/CosyVoice_300M_Instruct")
+        paths = [
+            Path("./models/CosyVoice_300M"),
+            Path("./models/CosyVoice_300M_Instruct"),
+            Path("./models/CosyVoice_300M_SFT"),
+        ]
+        paths = [p for p in paths if p.exists()]
+        if len(paths) == 0:
+            raise ValueError("No CosyVoice model found")
+        self.logger.info(f"Found CosyVoice model: {paths}")
+
+        self.model_dir = paths[0]
         self.model: CosyVoiceModel = None
         self.frontend: CosyVoiceFrontEnd = None
 
@@ -59,7 +66,7 @@ class CosyVoiceTTSModel(TTSModel):
         return super().reset()
 
     def load(
-        self, context: TTSPipelineContext
+        self, context: TTSPipelineContext = None
     ) -> tuple[CosyVoiceModel, CosyVoiceFrontEnd]:
         with self.load_lock:
             if self.model is not None:
@@ -103,7 +110,7 @@ class CosyVoiceTTSModel(TTSModel):
 
             return model, frontend
 
-    def unload(self, context: TTSPipelineContext) -> None:
+    def unload(self, context: TTSPipelineContext = None) -> None:
         with self.load_lock:
             if self.model is None:
                 return
@@ -112,6 +119,20 @@ class CosyVoiceTTSModel(TTSModel):
             self.model = None
             self.frontend = None
             devices.torch_gc()
+
+    def encode(self, text: str) -> list[int]:
+        from whisper.tokenizer import Tokenizer
+
+        self.load()
+        tokenizer: Tokenizer = self.frontend.tokenizer
+        return tokenizer.encode(text)
+
+    def decode(self, ids: list[int]) -> str:
+        from whisper.tokenizer import Tokenizer
+
+        self.load()
+        tokenizer: Tokenizer = self.frontend.tokenizer
+        return tokenizer.decode(ids)
 
     def inference_sft(self, tts_texts: list[str], spk_embedding: torch.Tensor):
         tts_speeches = []
@@ -194,7 +215,14 @@ class CosyVoiceTTSModel(TTSModel):
     def generate_batch_stream(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> Generator[list[NP_AUDIO], None, None]:
+        cached = self.get_cache(segments=segments, context=context)
+        if cached is not None:
+            yield cached
+            return
+
         # NOTE: 因为不支持流式，所以是同步的
+
+        self.load(context=context)
 
         seg0 = segments[0]
         spk = seg0.spk
@@ -249,11 +277,15 @@ class CosyVoiceTTSModel(TTSModel):
 
         results: list[NP_AUDIO] = []
         for seg in segments:
+            if context.stop:
+                break
+
             with SeedContext(infer_seed):
                 result = infer_func(tts_texts=[seg.text])
             wav = result["tts_speech"].float().cpu().numpy().squeeze()
             results.append((sr, wav))
 
+        self.set_cache(segments=segments, context=context, value=results)
         yield results
 
 
@@ -262,6 +294,7 @@ if __name__ == "__main__":
     from modules.core.spk import spk_mgr
     import soundfile as sf
     import tqdm
+    from whisper.tokenizer import Tokenizer
 
     model = CosyVoiceTTSModel()
     model.logger.setLevel(logging.DEBUG)

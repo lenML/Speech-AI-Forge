@@ -7,7 +7,7 @@ from fastapi import Request
 from fastapi.responses import StreamingResponse
 
 from modules.core.handler.datacls.audio_model import AudioFormat, EncoderConfig
-from modules.core.handler.datacls.chattts_model import InferConfig
+from modules.core.handler.datacls.tts_model import InferConfig
 from modules.core.handler.encoder.encoders import (
     AacEncoder,
     FlacEncoder,
@@ -17,7 +17,6 @@ from modules.core.handler.encoder.encoders import (
 )
 from modules.core.handler.encoder.StreamEncoder import StreamEncoder
 from modules.core.handler.encoder.WavFile import WAVFileBytes
-from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
 from modules.core.pipeline.processor import NP_AUDIO
 
 
@@ -84,24 +83,29 @@ class AudioHandler:
 
     def enqueue_to_stream(self) -> Generator[bytes, None, None]:
         encoder = self.get_encoder()
-        chunk_data = bytes()
-        for sample_rate, audio_data in self.enqueue_stream():
-            encoder.set_header(sample_rate=sample_rate)
-            audio_bytes = read_np_to_wav(audio_data=audio_data)
-            encoder.write(audio_bytes)
+        try:
+            chunk_data = bytes()
+            for sample_rate, audio_data in self.enqueue_stream():
+                encoder.set_header(sample_rate=sample_rate)
+                audio_bytes = read_np_to_wav(audio_data=audio_data)
+                encoder.write(audio_bytes)
+                chunk_data = encoder.read()
+                while len(chunk_data) > 0:
+                    yield chunk_data
+                    chunk_data = encoder.read()
+
+            encoder.close()
+
             chunk_data = encoder.read()
             while len(chunk_data) > 0:
                 yield chunk_data
                 chunk_data = encoder.read()
+        finally:
+            encoder.terminate()
 
-        encoder.close()
-
-        chunk_data = encoder.read()
-        while len(chunk_data) > 0:
-            yield chunk_data
-            chunk_data = encoder.read()
-
-        del encoder
+    def interrupt(self):
+        # called to interrupt inference
+        pass
 
     async def enqueue_to_stream_with_request(
         self, request: Request
@@ -109,8 +113,7 @@ class AudioHandler:
         for chunk in self.enqueue_to_stream():
             disconnected = await request.is_disconnected()
             if disconnected:
-                # TODO: 这个逻辑应该传递给 zoo
-                ChatTTSInfer.interrupt()
+                self.interrupt()
                 break
             yield chunk
 
@@ -128,14 +131,22 @@ class AudioHandler:
         if len(chunk_data) > 0:
             yield chunk_data
 
+        encoder.terminate()
+
     def enqueue_to_bytes(self) -> bytes:
         encoder = self.get_encoder()
-        sample_rate, audio_data = self.enqueue()
-        audio_bytes = read_np_to_wav(audio_data=audio_data)
-        encoder.set_header(sample_rate=sample_rate)
-        encoder.write(audio_bytes)
-        encoder.close()
-        return encoder.read_all()
+
+        try:
+            sample_rate, audio_data = self.enqueue()
+            audio_bytes = read_np_to_wav(audio_data=audio_data)
+            encoder.set_header(sample_rate=sample_rate)
+            encoder.write(audio_bytes)
+            encoder.close()
+            buffer = encoder.read_all()
+        finally:
+            encoder.terminate()
+
+        return buffer
 
     def enqueue_to_buffer(self) -> io.BytesIO:
         audio_bytes = self.enqueue_to_bytes()

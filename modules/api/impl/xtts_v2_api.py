@@ -10,7 +10,7 @@ from modules.core.handler.datacls.audio_model import (
     AudioFormat,
     EncoderConfig,
 )
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
@@ -101,7 +101,7 @@ def setup(app: APIManager):
         if spk is None:
             raise HTTPException(status_code=400, detail="Invalid speaker id")
 
-        tts_config = ChatTTSConfig(
+        tts_config = TTSConfig(
             style=XTTSV2.style,
             temperature=XTTSV2.temperature,
             top_k=XTTSV2.top_k,
@@ -158,7 +158,7 @@ def setup(app: APIManager):
         if spk is None:
             raise HTTPException(status_code=400, detail="Invalid speaker id")
 
-        tts_config = ChatTTSConfig(
+        tts_config = TTSConfig(
             style=XTTSV2.style,
             temperature=XTTSV2.temperature,
             top_k=XTTSV2.top_k,

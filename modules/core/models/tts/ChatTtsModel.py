@@ -12,6 +12,8 @@ from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.SeedContext import SeedContext
 
+from transformers import PreTrainedTokenizer
+
 
 class ChatTTSModel(TTSModel):
     model_id = "chat-tts"
@@ -30,13 +32,23 @@ class ChatTTSModel(TTSModel):
         super().__init__("chat-tts")
         self.chat: ChatTTS.Chat = None
 
-    def load(self, context: TTSPipelineContext) -> "ChatTTS.Chat":
+    def load(self, context: TTSPipelineContext = None) -> "ChatTTS.Chat":
         self.chat = load_chat_tts()
         return self.chat
 
-    def unload(self, context: TTSPipelineContext) -> None:
+    def unload(self, context: TTSPipelineContext = None) -> None:
         unload_chat_tts(self.chat)
         self.chat = None
+
+    def encode(self, text: str) -> list[int]:
+        self.load()
+        tokenizer: PreTrainedTokenizer = self.chat.pretrain_models["tokenizer"]
+        return tokenizer.encode(text)
+
+    def decode(self, ids: list[int]) -> str:
+        self.load()
+        tokenizer: PreTrainedTokenizer = self.chat.pretrain_models["tokenizer"]
+        return tokenizer.decode(ids)
 
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
@@ -51,77 +63,10 @@ class ChatTTSModel(TTSModel):
     def get_infer(self, context: TTSPipelineContext):
         return ChatTTSInfer(self.load(context=context))
 
-    def get_spk_emb(self, segment: TTSSegment, context: TTSPipelineContext):
-        if segment.spk is None:
-            return None
-        token = segment.spk.get_token("chat-tts")
-        if token is None:
-            return None
-        return token.tokens[0]
+    current_infer: ChatTTSInfer = None
 
-    def get_cache_kwargs(self, segments: list[TTSSegment], context: TTSPipelineContext):
-        texts = [segment.text for segment in segments]
-
-        seg0 = segments[0]
-        spk_emb = self.get_spk_emb(segment=seg0, context=context) if seg0.spk else None
-        top_P = seg0.top_p
-        top_K = seg0.top_k
-        temperature = seg0.temperature
-        # repetition_penalty = seg0.repetition_penalty
-        # max_new_token = seg0.max_new_token
-        prompt1 = seg0.prompt1
-        prompt2 = seg0.prompt2
-        prefix = seg0.prefix
-        # use_decoder = seg0.use_decoder
-        seed = seg0.infer_seed
-        chunk_size = context.infer_config.stream_chunk_size
-
-        kwargs = dict(
-            text="|".join(texts),
-            spk_emb=spk_emb,
-            top_P=top_P,
-            top_K=top_K,
-            temperature=temperature,
-            repetition_penalty=None,
-            max_new_token=None,
-            prompt1=prompt1,
-            prompt2=prompt2,
-            prefix=prefix,
-            stream_chunk_size=chunk_size,
-            seed=seed,
-        )
-        return kwargs
-
-    def get_cache(
-        self, segments: list[TTSSegment], context: TTSPipelineContext
-    ) -> Union[list[NP_AUDIO], None]:
-        no_cache = context.infer_config.no_cache
-        if no_cache:
-            return None
-
-        is_random_generate = context.infer_config.seed == -1
-        if is_random_generate:
-            return None
-
-        kwargs = self.get_cache_kwargs(segments=segments, context=context)
-
-        if InferCache.get_cache_val(model_id=self.model_id, **kwargs):
-            return InferCache.get_cache_val(model_id=self.model_id, **kwargs)
-
-        return None
-
-    def set_cache(
-        self,
-        segments: list[TTSSegment],
-        context: TTSPipelineContext,
-        value: list[NP_AUDIO],
-    ):
-        no_cache = context.infer_config.no_cache
-        if no_cache:
-            return
-
-        kwargs = self.get_cache_kwargs(segments=segments, context=context)
-        InferCache.set_cache_val(model_id=self.model_id, value=value, **kwargs)
+    def interrupt(self, context: TTSPipelineContext = None) -> None:
+        self.current_infer.interrupt()
 
     def generate_batch_base(
         self, segments: list[TTSSegment], context: TTSPipelineContext, stream=False
@@ -137,6 +82,7 @@ class ChatTTSModel(TTSModel):
             return _gen()
 
         infer = self.get_infer(context)
+        self.current_infer = infer
 
         texts = [segment.text for segment in segments]
 

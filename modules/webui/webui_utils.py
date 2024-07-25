@@ -13,7 +13,7 @@ from modules.core.handler.datacls.audio_model import (
     AudioFormat,
     EncoderConfig,
 )
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
@@ -252,7 +252,7 @@ def tts_generate(
         if not isinstance(spk.emb, torch.Tensor):
             raise gr.Error("Speaker file is not supported")
 
-    tts_config = ChatTTSConfig(
+    tts_config = TTSConfig(
         style=style,
         temperature=temperature,
         top_k=top_k,
@@ -336,6 +336,7 @@ def refine_text(
 @torch.inference_mode()
 @spaces.GPU(duration=120)
 def split_long_text(long_text_input, spliter_threshold=100, eos=""):
+    # TODO 传入 tokenizer
     spliter = SentenceSplitter(threshold=spliter_threshold)
     sentences = spliter.parse(long_text_input)
     sentences = [text_normalize(s) + eos for s in sentences]

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 from modules.core.handler.datacls.audio_model import AdjustConfig
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.spk.TTSSpeaker import TTSSpeaker
@@ -34,11 +34,12 @@ class TTSPipelineContext:
     ssml: Optional[str] = None
 
     spk: Optional[TTSSpeaker] = None
-    tts_config: ChatTTSConfig = field(default_factory=ChatTTSConfig)
+    tts_config: TTSConfig = field(default_factory=TTSConfig)
     infer_config: InferConfig = field(default_factory=InferConfig)
     adjust_config: AdjustConfig = field(default_factory=AdjustConfig)
     enhancer_config: EnhancerConfig = field(default_factory=EnhancerConfig)
 
     tn_config: TNConfig = field(default_factory=TNConfig)
 
+    # 当调用 interrupt 时，此变量会被设置为 True
     stop: bool = False

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ChatTTSConfig(BaseModel):
+class TTSConfig(BaseModel):
     # model id
     mid: str = "chat-tts"
 

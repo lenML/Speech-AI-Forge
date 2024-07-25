@@ -1,3 +1,4 @@
+import copy
 from typing import Callable, Dict, Literal, Optional
 
 from langdetect import LangDetectException, detect_langs
@@ -46,7 +47,7 @@ class TNPipeline:
 
     def __init__(self):
         self.blocks: list[TNBlock] = []
-        self.freeze_strs: list[str] = []
+        self.freeze_tokens: list[str] = []
 
     def block(self, name: str = None, enabled: bool = True):
         block = TNBlockFn(name=name, fn=None)
@@ -60,6 +61,18 @@ class TNPipeline:
             return fn
 
         return decorator
+
+    def append_block(self, fn: TNBlockFnType, enabled: bool = True):
+        name = fn.__name__
+        block = TNBlockFn(name=name, fn=fn)
+        block.enabled = enabled
+        self.blocks.append(block)
+
+    def remove_block(self, name: str):
+        self.blocks = [b for b in self.blocks if b.name != name]
+
+    def clone(self):
+        return copy.deepcopy(self)
 
     def split_string_with_freeze(
         self, text: str, freeze_strs: list[str]
@@ -88,7 +101,7 @@ class TNPipeline:
         return result
 
     def normalize(self, text: str, config: Optional[TNConfig] = None) -> str:
-        texts: list[TNText] = self.split_string_with_freeze(text, self.freeze_strs)
+        texts: list[TNText] = self.split_string_with_freeze(text, self.freeze_tokens)
 
         result = ""
 

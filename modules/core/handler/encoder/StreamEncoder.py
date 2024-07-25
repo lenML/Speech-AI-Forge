@@ -107,6 +107,13 @@ class StreamEncoder:
             self.p.stdin.close()
         self.p.wait()
 
-    def __del__(self):
+    def terminate(self):
+        if self.p is None:
+            return
         self.p.terminate()
         self.p = None
+
+    # NOTE: 貌似因为多线程导致这个函数不会触发，所以需要手动调用 terminate
+    def __del__(self):
+        self.close()
+        self.terminate()

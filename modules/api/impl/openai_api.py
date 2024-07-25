@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from fastapi import Body, File, Form, HTTPException, UploadFile
-from fastapi.responses import StreamingResponse
 from numpy import clip
 from pydantic import BaseModel, Field
 
@@ -12,7 +11,7 @@ from modules.core.handler.datacls.audio_model import (
     AudioFormat,
     EncoderConfig,
 )
-from modules.core.handler.datacls.chattts_model import ChatTTSConfig, InferConfig
+from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
@@ -22,7 +21,7 @@ from modules.data import styles_mgr
 
 class AudioSpeechRequest(BaseModel):
     input: str  # 需要合成的文本
-    model: str = "chattts-4w"
+    model: str = "chat-tts"
     voice: str = "female2"
     response_format: AudioFormat = "mp3"
     speed: float = Field(1, ge=0.1, le=10, description="Speed of the audio")
@@ -86,11 +85,12 @@ async def openai_speech_api(
     if not isinstance(speaker, TTSSpeaker):
         raise HTTPException(status_code=400, detail="Invalid voice.")
 
-    tts_config = ChatTTSConfig(
+    tts_config = TTSConfig(
         style=style,
         temperature=request.temperature,
         top_k=request.top_k,
         top_p=request.top_p,
+        mid=model,
     )
     infer_config = InferConfig(
         batch_size=batch_size,

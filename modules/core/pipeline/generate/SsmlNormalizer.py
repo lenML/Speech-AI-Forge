@@ -3,6 +3,7 @@ import re
 from typing import List, Union
 
 from modules.api.utils import calc_spk_style, to_number
+from modules.core.models import zoo
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment
 from modules.core.tools.SentenceSplitter import SentenceSplitter
@@ -36,6 +37,10 @@ class SsmlNormalizer:
         if not has_eos:
             text += self.eos
         return text
+
+    def tokenize(self, text: str) -> list[int]:
+        model = zoo.model_zoo.get_model(self.context.tts_config.mid)
+        return model.encode(text)
 
     def convert_ssml_seg(self, segment: Union[SSMLSegment, SSMLBreak]) -> TTSSegment:
         if isinstance(segment, SSMLBreak):
@@ -115,7 +120,7 @@ class SsmlNormalizer:
         将 segments 中的 text 经过 spliter 处理成多个 segments
         """
         spliter_threshold = self.context.infer_config.spliter_threshold
-        spliter = SentenceSplitter(threshold=spliter_threshold)
+        spliter = SentenceSplitter(threshold=spliter_threshold, tokenizer=self.tokenize)
         ret_segments: List[Union[SSMLSegment, SSMLBreak]] = []
 
         for segment in segments:

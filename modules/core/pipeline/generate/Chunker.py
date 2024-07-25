@@ -1,5 +1,6 @@
 from typing import List
 
+from modules.core.models import zoo
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.generate.SsmlNormalizer import SsmlNormalizer
 from modules.core.ssml.SSMLParser import SSMLContext, get_ssml_parser_for
@@ -20,6 +21,10 @@ class TTSChunker:
             return self.ssml_segments()
         raise ValueError("No input text or ssml")
 
+    def tokenize(self, text: str) -> list[int]:
+        model = zoo.model_zoo.get_model(self.context.tts_config.mid)
+        return model.encode(text)
+
     def text_segments(self):
         spliter_threshold = self.context.infer_config.spliter_threshold
         text = self.context.text
@@ -39,7 +44,7 @@ class TTSChunker:
 
         eos = self.context.infer_config.eos
 
-        spliter = SentenceSplitter(spliter_threshold)
+        spliter = SentenceSplitter(threshold=spliter_threshold, tokenizer=self.tokenize)
         sentences = spliter.parse(text)
 
         text_segments = [
