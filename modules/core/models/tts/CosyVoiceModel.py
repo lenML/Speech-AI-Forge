@@ -52,8 +52,10 @@ class CosyVoiceTTSModel(TTSModel):
         ]
         paths = [p for p in paths if p.exists()]
         if len(paths) == 0:
-            raise ValueError("No CosyVoice model found")
-        self.logger.info(f"Found CosyVoice model: {paths}")
+            paths = [Path("./models/CosyVoice_300M")]
+            self.logger.info("No CosyVoice model found")
+        else:
+            self.logger.info(f"Found CosyVoice model: {paths}")
 
         self.model_dir = paths[0]
         self.model: CosyVoiceModel = None
