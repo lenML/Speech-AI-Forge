@@ -110,12 +110,17 @@ class AudioHandler:
     async def enqueue_to_stream_with_request(
         self, request: Request
     ) -> AsyncGenerator[bytes, None]:
-        for chunk in self.enqueue_to_stream():
+        gen1 = self.enqueue_to_stream()
+        for chunk in gen1:
             disconnected = await request.is_disconnected()
             if disconnected:
                 self.interrupt()
                 break
             yield chunk
+        try:
+            gen1.close()
+        except GeneratorExit:
+            pass
 
     # just for test
     def enqueue_to_stream_join(self) -> Generator[bytes, None, None]:

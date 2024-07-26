@@ -652,7 +652,20 @@ class Chat:
 
         del emb, input_ids
 
-        return result
+        def _gen():
+            def gc():
+                del_all(logits_warpers)
+                del_all(logits_processors)
+
+            try:
+                for i in result:
+                    yield i
+            except GeneratorExit:
+                gc()
+            finally:
+                gc()
+
+        return _gen()
 
     def _refine_text(
         self,
