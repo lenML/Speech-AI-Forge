@@ -50,7 +50,7 @@ class DcSpkEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, torch.Tensor):
             # token 会触发这里
-            arr_bytes = obj.cpu().detach().numpy().tobytes()
+            arr_bytes = obj.cpu().float().detach().numpy().tobytes()
             return {
                 "_type": "torch.Tensor",
                 "data": base64.b64encode(arr_bytes).decode("utf-8"),
