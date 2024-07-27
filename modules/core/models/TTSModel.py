@@ -38,7 +38,7 @@ class TTSModel:
         pass
 
     def encode(self, text: str) -> list[int]:
-        return [ord(char) for char in text.split("")]
+        return [ord(char) for char in text]
 
     def decode(self, ids: list[int]) -> str:
         return "".join([chr(id) for id in ids])

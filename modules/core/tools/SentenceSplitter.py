@@ -6,7 +6,7 @@ from modules.utils.detect_lang import guess_lang
 
 
 def char_tokenizer(text: str):
-    return [ord(char) for char in text.split("")]
+    return [ord(char) for char in text]
 
 
 # 解析文本 并根据停止符号分割成句子
