@@ -24,3 +24,26 @@ def test_refine_success(client):
     assert data["message"] == "ok"
     assert "data" in data
     assert isinstance(data["data"], str)
+
+
+@mark.parametrize(
+    "text, pipe_id, status_code",
+    [
+        ("你好 123456789", "chat-tts", 200),
+        ("你好 123456789", "cosy-voice", 200),
+        ("你好 123456789", "fish-speech", 200),
+    ],
+)
+@mark.normalize_api
+def test_normalize_success(client, text, pipe_id, status_code):
+    response = client.post(
+        "/v1/text/normalize",
+        json={"text": text, "pipe_id": pipe_id},
+    )
+    data = response.json()
+    assert response.status_code == status_code
+    if status_code == 200:
+        assert "message" in data
+        assert data["message"] == "ok"
+        assert "data" in data
+        assert isinstance(data["data"], str)
