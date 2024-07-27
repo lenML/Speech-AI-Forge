@@ -55,27 +55,31 @@ def setup(app: APIManager):
         spk_mgr.refresh()
         return api_utils.success_response(None)
 
-    # TODO 需要适配新版本 speaker
     @app.post("/v1/speakers/update", response_model=api_utils.BaseResponse)
     async def update_speakers(request: SpeakersUpdate):
         for config in request.speakers:
             config: dict = config
-            spk = spk_mgr.get_speaker_by_id(config["id"])
+            cfg_spk = TTSSpeaker.from_json(config)
+            spk = spk_mgr.get_speaker_by_id(cfg_spk.id)
             if spk is None:
                 raise HTTPException(
                     status_code=404, detail=f"Speaker not found: {config['id']}"
                 )
-            spk.set_name(config.get("name", spk.name))
-            spk.set_gender(config.get("gender", spk.gender))
-            spk.set_desc(config.get("describe", spk.desc))
-            if (
-                config.get("tensor")
-                and isinstance(config["tensor"], list)
-                and len(config["tensor"]) > 0
-            ):
-                # number array => Tensor
-                token = torch.tensor(config["tensor"])
-                spk.set_token(tokens=[token], model_id="chat-tts")
+            spk.set_name(cfg_spk.name)
+            spk.set_gender(cfg_spk.gender)
+            spk.set_desc(cfg_spk.desc)
+            spk.set_version(cfg_spk.version)
+            spk.set_author(cfg_spk.author)
+
+            # TODO: 支持更新其他属性
+            # if (
+            #     config.get("tensor")
+            #     and isinstance(config["tensor"], list)
+            #     and len(config["tensor"]) > 0
+            # ):
+            #     # number array => Tensor
+            #     token = torch.tensor(config["tensor"])
+            #     spk.set_token(tokens=[token], model_id="chat-tts")
         spk_mgr.save_all()
 
         return api_utils.success_response(None)
