@@ -13,6 +13,8 @@ import {
 import * as React from "react";
 import { deepEqual } from "fast-equals";
 
+import { default as _ } from "lodash";
+
 /**
  * 管理 speaker
  *
@@ -129,12 +131,25 @@ const defaultColumn = {
 
 const columnHelper = createColumnHelper();
 const columns = [
-  columnHelper.accessor("id", {
+  columnHelper.accessor("data.id", {
+    header: "ID",
     cell: (info) => html`<div className="td-id">${info.getValue()}</div>`,
   }),
-  columnHelper.accessor("name", {}),
-  columnHelper.accessor("gender", {}),
-  columnHelper.accessor("describe", {}),
+  columnHelper.accessor("data.meta.data.name", {
+    header: "Name",
+  }),
+  columnHelper.accessor("data.meta.data.gender", {
+    header: "Gender",
+  }),
+  columnHelper.accessor("data.meta.data.desc", {
+    header: "Describe",
+  }),
+  columnHelper.accessor("data.meta.data.author", {
+    header: "Author",
+  }),
+  columnHelper.accessor("data.meta.data.version", {
+    header: "Version",
+  }),
 ];
 
 function Filter({ column, table }) {
@@ -238,10 +253,9 @@ const SpeakerTable = () => {
         setTempSpeakers(
           old.map((row, index) => {
             if (index === rowIndex) {
-              return {
-                ...row,
-                [columnId]: value,
-              };
+              row = _.cloneDeep(row);
+              _.set(row, columnId.replace("data_", "data."), value);
+              return row;
             }
             return row;
           })

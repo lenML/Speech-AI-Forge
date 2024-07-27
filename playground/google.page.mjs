@@ -187,8 +187,13 @@ export const GooglePage = () => {
               onChange=${(e) => setPayload({ voice: { name: e.target.value } })}
             >
               ${speakers.map(
-                (speaker) =>
-                  html` <option value=${speaker.name}>${speaker.name}</option> `
+                (spk) =>
+                  html` <option
+                    key=${spk.data.id}
+                    value=${spk.data.meta.data.name}
+                  >
+                    ${spk.data.meta.data.name}
+                  </option>`
               )}
             </select>
           </label>
@@ -200,9 +205,14 @@ export const GooglePage = () => {
               onChange=${(e) =>
                 setPayload({ voice: { style: e.target.value } })}
             >
+              <option value="">*auto</option>
               ${styles.map(
                 (style) =>
-                  html` <option value=${style.name}>${style.name}</option> `
+                  html`
+                    <option key=${style.id} value=${style.name}>
+                      ${style.name}
+                    </option>
+                  `
               )}
             </select>
           </label>
