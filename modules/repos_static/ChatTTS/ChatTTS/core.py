@@ -653,6 +653,10 @@ class Chat:
         del emb, input_ids
 
         def _gen():
+            """
+            https://github.com/lenML/ChatTTS-Forge/pull/115
+            """
+
             def gc():
                 del_all(logits_warpers)
                 del_all(logits_processors)

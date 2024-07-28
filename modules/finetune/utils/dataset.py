@@ -12,7 +12,7 @@ import torchaudio
 import transformers
 import vocos
 
-from modules.ChatTTS.ChatTTS.norm import Normalizer
+from modules.repos_static.ChatTTS.ChatTTS.norm import Normalizer
 
 normalizer = Normalizer(
     os.path.join(

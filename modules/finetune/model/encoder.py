@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from modules.ChatTTS.ChatTTS.model.dvae import ConvNeXtBlock, DVAEDecoder
+from modules.repos_static.ChatTTS.ChatTTS.model.dvae import ConvNeXtBlock, DVAEDecoder
 
 from .wavenet import WaveNet
 

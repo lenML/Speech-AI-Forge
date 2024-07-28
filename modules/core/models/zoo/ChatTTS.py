@@ -6,7 +6,7 @@ import torch
 from transformers import LlamaTokenizer
 
 from modules import config
-from modules.ChatTTS import ChatTTS
+from modules.repos_static.ChatTTS import ChatTTS
 from modules.devices import devices
 
 logger = logging.getLogger(__name__)
