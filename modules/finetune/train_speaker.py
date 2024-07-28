@@ -22,6 +22,9 @@ def train_speaker_embeddings(
     train_mse=False,
     speaker_embeds=None,
 ):
+    # NOTE: 新的实现需要改下面的代码 因为 pretrain_models 已经移除
+    raise NotImplementedError("train_speaker_embeddings")
+
     tokenizer = chat.pretrain_models["tokenizer"]
 
     decoder_decoder = chat.pretrain_models["decoder"]

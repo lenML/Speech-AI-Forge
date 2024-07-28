@@ -1,9 +1,7 @@
 from typing import Any, Generator, Union
 
 import numpy as np
-import torch
 
-from modules.core.models.tts.InerCache import InferCache
 from modules.core.models.TTSModel import TTSModel
 from modules.core.models.zoo.ChatTTS import ChatTTS, load_chat_tts, unload_chat_tts
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
@@ -12,8 +10,6 @@ from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.SeedContext import SeedContext
-
-from transformers import PreTrainedTokenizer
 
 
 class ChatTTSModel(TTSModel):
@@ -43,12 +39,12 @@ class ChatTTSModel(TTSModel):
 
     def encode(self, text: str) -> list[int]:
         self.load()
-        tokenizer: PreTrainedTokenizer = self.chat.pretrain_models["tokenizer"]
+        tokenizer = self.chat.tokenizer._tokenizer
         return tokenizer.encode(text)
 
     def decode(self, ids: list[int]) -> str:
         self.load()
-        tokenizer: PreTrainedTokenizer = self.chat.pretrain_models["tokenizer"]
+        tokenizer = self.chat.tokenizer._tokenizer
         return tokenizer.decode(ids)
 
     def generate_batch(

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import gc
 import logging
 import sys
 from functools import lru_cache
@@ -216,6 +217,31 @@ def get_memory_usage():
             used_mb=0,
             free_mb=2**23,
         )
+
+
+def do_gc():
+    torch_gc()
+    gc.collect()
+
+
+def after_gc(before=False):
+    """
+    Run a function after garbage collection
+    """
+
+    def _wrapper(func):
+        def wrapper(*args, **kwargs):
+            if before:
+                do_gc()
+            try:
+                ret = func(*args, **kwargs)
+                return ret
+            finally:
+                do_gc()
+
+        return wrapper
+
+    return _wrapper
 
 
 if __name__ == "__main__":

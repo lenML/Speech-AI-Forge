@@ -3,7 +3,6 @@ import logging
 import threading
 
 import torch
-from transformers import LlamaTokenizer
 
 from modules import config
 from modules.repos_static.ChatTTS import ChatTTS
@@ -46,6 +45,7 @@ def do_load_chat_tts():
     logger.info("ChatTTS models loaded")
 
 
+@devices.after_gc()
 def load_chat_tts():
     with lock:
         do_load_chat_tts()
@@ -54,21 +54,18 @@ def load_chat_tts():
     return chat_tts
 
 
+@devices.after_gc()
 def unload_chat_tts():
     logging.info("Unloading ChatTTS models")
     global chat_tts
 
     if chat_tts:
-        for model_name, model in chat_tts.pretrain_models.items():
-            if isinstance(model, torch.nn.Module):
-                model.cpu()
-                del model
+        chat_tts.unload()
     chat_tts = None
-    devices.torch_gc()
-    gc.collect()
     logger.info("ChatTTS models unloaded")
 
 
+@devices.after_gc()
 def reload_chat_tts():
     logging.info("Reloading ChatTTS models")
     unload_chat_tts()
@@ -77,9 +74,9 @@ def reload_chat_tts():
     return instance
 
 
-def get_tokenizer() -> LlamaTokenizer:
+def get_tokenizer():
     chat_tts = load_chat_tts()
-    tokenizer = chat_tts.pretrain_models["tokenizer"]
+    tokenizer = chat_tts.tokenizer._tokenizer
     if not tokenizer:
         raise Exception("Failed to load tokenizer")
     return tokenizer

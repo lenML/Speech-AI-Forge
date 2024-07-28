@@ -4,7 +4,6 @@ from typing import Generator, List, Union
 
 import numpy as np
 import torch
-from transformers import LlamaTokenizer
 
 from modules import config
 from modules.repos_static.ChatTTS.ChatTTS.core import Chat
@@ -52,8 +51,8 @@ class ChatTTSInfer:
         if zoo.zoo_config.debug_generate:
             self.logger.setLevel(logging.DEBUG)
 
-    def get_tokenizer(self) -> LlamaTokenizer:
-        return self.instance.pretrain_models["tokenizer"]
+    def get_tokenizer(self):
+        return self.instance.tokenizer._tokenizer
 
     @classmethod
     def interrupt(cls):
@@ -124,7 +123,7 @@ class ChatTTSInfer:
                 )
                 text_tokens = refined.ids
                 text_tokens = [
-                    i[i.less(self.instance.tokenizer_break_0_ids)] for i in text_tokens
+                    i[i.less(self.instance.tokenizer.break_0_ids)] for i in text_tokens
                 ]
                 text = self.get_tokenizer().batch_decode(text_tokens)
                 refined.destroy()
@@ -291,7 +290,7 @@ class ChatTTSInfer:
             prompt1=prompt1,
             prompt2=prompt2,
             prefix=prefix,
-            stream_chunk_size=stream_chunk_size,
+            stream_batch=stream_chunk_size,
             ensure_non_empty=False,
         )
         return self.infer(

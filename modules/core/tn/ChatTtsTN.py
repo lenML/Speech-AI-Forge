@@ -65,7 +65,7 @@ def replace_unk_tokens(text: str, guess_lang: GuessLang):
     FIXME: 总感觉不太好...但是没有遇到问题的话暂时留着...
     """
     chat_tts = zoo.ChatTTS.load_chat_tts()
-    if "tokenizer" not in chat_tts.pretrain_models:
+    if chat_tts.tokenizer._tokenizer is None:
         # 这个地方只有在 huggingface spaces 中才会触发
         # 因为 hugggingface 自动处理模型卸载加载，所以如果拿不到就算了...
         return text

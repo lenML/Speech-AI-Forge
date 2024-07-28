@@ -194,13 +194,6 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
     ) -> torch.Tensor:
         text = normalizer(text)
 
-        # if not skip_refine_text:
-        #     text_tokens = refine_text(self.pretrain_models, text, **params_refine_text)['ids']
-        #     text_tokens = [i[i < self.pretrain_models['tokenizer'].convert_tokens_to_ids('[break_0]')] for i in text_tokens]
-        #     text = self.pretrain_models['tokenizer'].batch_decode(text_tokens)
-        #     if refine_text_only:
-        #         return text
-
         text = f"[Stts][spk_emb]{text}[Ptts]"
         # text = f'[Stts][empty_spk]{text}[Ptts]'
 
