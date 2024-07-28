@@ -9,6 +9,7 @@ class ChatTTSDownloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
             "asset/DVAE.pt",
+            "asset/DVAE_full.pt",
             "asset/Decoder.pt",
             "asset/GPT.pt",
             "asset/Vocos.pt",
