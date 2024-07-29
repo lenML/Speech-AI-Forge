@@ -249,9 +249,6 @@ def tts_generate(
         except Exception:
             raise gr.Error("Failed to load speaker file")
 
-        if not isinstance(spk.emb, torch.Tensor):
-            raise gr.Error("Speaker file is not supported")
-
     tts_config = TTSConfig(
         style=style,
         temperature=temperature,
