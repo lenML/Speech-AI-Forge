@@ -82,6 +82,6 @@ def process_api_args(args: argparse.Namespace, app: FastAPI):
     if compile:
         logger.info("Model compile is enabled")
 
-    threading.excepthook = lambda exctype, value, tb: logger.exception(
-        "Uncaught exception", exc_info=(exctype, value, tb)
+    threading.excepthook = lambda exctype: logger.exception(
+        "Uncaught exception", exc_info=(exctype)
     )
