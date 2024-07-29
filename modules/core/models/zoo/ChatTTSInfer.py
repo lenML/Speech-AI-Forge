@@ -142,7 +142,7 @@ class ChatTTSInfer:
                 text_tokens = [
                     i[i.less(self.instance.tokenizer.break_0_ids)] for i in text_tokens
                 ]
-                text = self.get_tokenizer().batch_decode(text_tokens)
+                text = self.instance.tokenizer.decode(text_tokens)
                 refined.destroy()
                 if refine_text_only:
                     yield text
@@ -157,6 +157,7 @@ class ChatTTSInfer:
                     params_infer_code,
                 ):
                     wavs = self._decode_to_wavs(result, length, use_decoder)
+                    result.destroy()
                     yield wavs
             else:
                 # NOTE: 貌似没什么用...?
