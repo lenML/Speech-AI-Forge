@@ -70,6 +70,8 @@ class ChatTTSModel(TTSModel):
 
     def get_ref_wav(self, segment: TTSSegment):
         spk = segment.spk
+        if spk is None:
+            return None, None
         emotion = segment.emotion
         ref_data = spk.get_ref(lambda x: x.emotion == emotion)
         if ref_data is None:
