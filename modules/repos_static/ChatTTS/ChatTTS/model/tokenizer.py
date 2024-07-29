@@ -171,6 +171,8 @@ class Tokenizer:
     @staticmethod
     @torch.no_grad()
     def _decode_prompt(prompt: str) -> torch.Tensor:
+        if isinstance(prompt, torch.Tensor):
+            return prompt
         dec = b14.decode_from_string(prompt)
         shp = np.frombuffer(dec[:4], dtype="<u2")
         p = np.frombuffer(

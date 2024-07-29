@@ -21,6 +21,7 @@ from hyperpyyaml import load_hyperpyyaml
 from modules.core.spk import TTSSpeaker
 from modules.devices import devices
 from modules.repos_static.cosyvoice.cosyvoice.cli.model import CosyVoiceModel
+from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
 
 max_val = 0.8
@@ -204,7 +205,7 @@ class CosyVoiceTTSModel(TTSModel):
         ref_data = spk.get_ref(lambda x: x.emotion == emotion)
         if ref_data is None:
             return None, None
-        wav = ref_data.wav
+        wav = audio_utils.bytes_to_librosa_array(ref_data.wav)
         # 调整采样率到 16kHz
         wav = librosa.resample(wav, orig_sr=ref_data.wav_sr, target_sr=target_sr)
         return wav, ref_data.text

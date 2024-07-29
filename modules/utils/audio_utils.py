@@ -2,11 +2,24 @@ import sys
 from io import BytesIO
 
 import numpy as np
+import numpy.typing as npt
 import pyrubberband as pyrb
 import soundfile as sf
 from pydub import AudioSegment, effects
+import scipy.io.wavfile as wavfile
+import io
 
 INT16_MAX = np.iinfo(np.int16).max
+
+
+def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:
+    audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
+    byte_io = io.BytesIO()
+    wavfile.write(byte_io, sample_rate, audio_np)
+    byte_io.seek(0)
+    _, audio_data = wavfile.read(byte_io)
+    audio_float = audio_data.astype(np.float32) / np.iinfo(np.int16).max
+    return audio_float
 
 
 def audio_to_int16(audio_data: np.ndarray) -> np.ndarray:

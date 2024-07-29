@@ -46,6 +46,8 @@ class ChatTTSInfer:
 
     def __init__(self, instance: Chat) -> None:
         self.instance = instance
+        self.device = instance.device
+        self.dtype = instance.dtype
         ChatTTSInfer.current_infer = self
 
         if zoo.zoo_config.debug_generate:
@@ -60,6 +62,21 @@ class ChatTTSInfer:
         if cls.current_infer:
             cls.current_infer.instance.interrupt()
             cls.logger.info("Interrupted current infer")
+
+    @torch.inference_mode()
+    def _sample_audio_speaker(
+        self, wav: Union[np.ndarray, torch.Tensor]
+    ) -> torch.Tensor:
+        if isinstance(wav, np.ndarray):
+            wav = torch.from_numpy(wav)
+        wav = wav.to(device=self.device, dtype=self.dtype)
+        # TODO: 最好不要 autocast ，但是得改 dvae 的代码
+        with torch.autocast(device_type=self.device.type, dtype=self.dtype):
+            return (
+                self.instance.dvae(wav, "encode")
+                .squeeze_(0)
+                .to(device=self.device, dtype=self.dtype)
+            )
 
     def infer(
         self,
@@ -267,6 +284,8 @@ class ChatTTSInfer:
         self,
         text: Union[str, list[str]],
         spk_emb: Union[None, torch.Tensor] = None,
+        spk_smp: Union[None, torch.Tensor] = None,
+        txt_smp: Union[None, str] = None,
         top_P=0.7,
         top_K=20,
         temperature=0.3,
@@ -282,6 +301,8 @@ class ChatTTSInfer:
         params = Chat.InferCodeParams(
             prompt="",
             spk_emb=spk_emb,
+            spk_smp=spk_smp,
+            txt_smp=txt_smp,
             top_P=top_P,
             top_K=top_K,
             temperature=temperature,
@@ -305,6 +326,8 @@ class ChatTTSInfer:
         self,
         text: Union[str, list[str]],
         spk_emb: Union[None, torch.Tensor] = None,
+        spk_smp: Union[None, torch.Tensor] = None,
+        txt_smp: Union[None, str] = None,
         top_P=0.7,
         top_K=20,
         temperature=0.3,
@@ -319,6 +342,8 @@ class ChatTTSInfer:
             data = self._generate_audio(
                 text=text,
                 spk_emb=spk_emb,
+                spk_smp=spk_smp,
+                txt_smp=txt_smp,
                 top_P=top_P,
                 top_K=top_K,
                 temperature=temperature,

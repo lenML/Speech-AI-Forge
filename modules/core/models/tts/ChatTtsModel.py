@@ -1,5 +1,7 @@
+import threading
 from typing import Any, Generator, Union
 
+import librosa
 import numpy as np
 
 from modules.core.models.TTSModel import TTSModel
@@ -9,6 +11,7 @@ from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk.TTSSpeaker import TTSSpeaker
+from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
 
 
@@ -65,6 +68,20 @@ class ChatTTSModel(TTSModel):
     def interrupt(self, context: TTSPipelineContext = None) -> None:
         self.current_infer.interrupt()
 
+    def get_ref_wav(self, segment: TTSSegment):
+        spk = segment.spk
+        emotion = segment.emotion
+        ref_data = spk.get_ref(lambda x: x.emotion == emotion)
+        if ref_data is None:
+            return None, None
+        wav = audio_utils.bytes_to_librosa_array(
+            audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
+        )
+        text = ref_data.text
+        # 调整采样率到 24kHz
+        wav = librosa.resample(wav, orig_sr=ref_data.wav_sr, target_sr=24000)
+        return wav, text
+
     def generate_batch_base(
         self, segments: list[TTSSegment], context: TTSPipelineContext, stream=False
     ) -> Union[list[NP_AUDIO], Generator[list[NP_AUDIO], Any, None]]:
@@ -85,6 +102,8 @@ class ChatTTSModel(TTSModel):
 
         seg0 = segments[0]
         spk_emb = self.get_spk_emb(segment=seg0, context=context) if seg0.spk else None
+        spk_wav, txt_smp = self.get_ref_wav(seg0)
+        spk_smp = infer._sample_audio_speaker(spk_wav) if spk_wav is not None else None
         top_P = seg0.top_p
         top_K = seg0.top_k
         temperature = seg0.temperature
@@ -108,7 +127,9 @@ class ChatTTSModel(TTSModel):
             with SeedContext(seed, cudnn_deterministic=False):
                 results = infer.generate_audio(
                     text=texts,
-                    spk_emb=spk_emb,
+                    spk_emb=spk_emb if spk_smp is None else None,
+                    spk_smp=spk_smp,
+                    txt_smp=txt_smp,
                     top_P=top_P,
                     top_K=top_K,
                     temperature=temperature,
@@ -131,7 +152,9 @@ class ChatTTSModel(TTSModel):
                 with SeedContext(seed, cudnn_deterministic=False):
                     for results in infer.generate_audio_stream(
                         text=texts,
-                        spk_emb=spk_emb,
+                        spk_emb=spk_emb if spk_smp is None else None,
+                        spk_smp=spk_smp,
+                        txt_smp=txt_smp,
                         top_P=top_P,
                         top_K=top_K,
                         temperature=temperature,
