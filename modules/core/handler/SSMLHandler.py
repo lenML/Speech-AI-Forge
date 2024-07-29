@@ -2,7 +2,7 @@ from typing import Generator
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
-from modules.core.handler.datacls.tts_model import InferConfig
+from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
@@ -12,6 +12,7 @@ class SSMLHandler(AudioHandler):
     def __init__(
         self,
         ssml_content: str,
+        tts_config: TTSConfig,
         infer_config: InferConfig,
         adjust_config: AdjustConfig,
         enhancer_config: EnhancerConfig,
@@ -27,11 +28,15 @@ class SSMLHandler(AudioHandler):
         assert isinstance(
             enhancer_config, EnhancerConfig
         ), "enhancer_config must be an EnhancerConfig object."
+        assert isinstance(
+            tts_config, TTSConfig
+        ), "tts_config must be a TTSConfig object."
 
         self.ssml_content = ssml_content
         self.infer_config = infer_config
         self.adjest_config = adjust_config
         self.enhancer_config = enhancer_config
+        self.tts_config = tts_config
 
         super().__init__(encoder_config=encoder_config, infer_config=infer_config)
 
@@ -49,9 +54,11 @@ class SSMLHandler(AudioHandler):
         infer_config = self.infer_config
         adjust_config = self.adjest_config
         enhancer_config = self.enhancer_config
+        tts_config = self.tts_config
 
         ctx = TTSPipelineContext(
             ssml=ssml_content,
+            tts_config=tts_config,
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,

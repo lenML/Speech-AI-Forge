@@ -161,9 +161,11 @@ def synthesize_ssml(
         format=AudioFormat.mp3,
         bitrate="64k",
     )
+    tts_config = TTSConfig(mid="chat-tts")
 
     handler = SSMLHandler(
         ssml_content=ssml,
+        tts_config=tts_config,
         infer_config=infer_config,
         adjust_config=adjust_config,
         enhancer_config=enhancer_config,

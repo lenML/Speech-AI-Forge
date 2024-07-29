@@ -8,7 +8,7 @@ from modules.core.handler.datacls.audio_model import (
     AudioFormat,
     EncoderConfig,
 )
-from modules.core.handler.datacls.tts_model import InferConfig
+from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 
@@ -22,6 +22,8 @@ class SSMLRequest(BaseModel):
 
     # end of sentence
     eos: str = "[uv_break]"
+
+    model: str = "chat-tts"
 
     spliter_thr: int = 100
 
@@ -45,6 +47,7 @@ async def synthesize_ssml_api(
         spliter_thr = request.spliter_thr
         enhancer = request.enhancer
         adjuster = request.adjuster
+        model = request.model
 
         if batch_size < 1:
             raise HTTPException(
@@ -73,9 +76,12 @@ async def synthesize_ssml_api(
             format=AudioFormat(format),
             bitrate="64k",
         )
+        # TODO: 作为 SSML 默认值
+        tts_config = TTSConfig(mid=model)
 
         handler = SSMLHandler(
             ssml_content=ssml,
+            tts_config=tts_config,
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,

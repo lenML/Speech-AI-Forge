@@ -36,6 +36,8 @@ class VoiceSelectionParams(BaseModel):
     # end_of_sentence
     eos: str = "[uv_break]"
 
+    model: str = "chat-tts"
+
 
 class AudioConfig(BaseModel):
     audioEncoding: AudioFormat = AudioFormat.mp3
@@ -69,6 +71,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     # TODO 这个也许应该传给 normalizer
     language_code = voice.languageCode
     voice_name = voice.name
+    voice_model = voice.model
     infer_seed = voice.seed or 42
     eos = voice.eos or "[uv_break]"
     audio_format = audioConfig.audioEncoding
@@ -106,6 +109,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
         temperature=voice.temperature,
         top_k=voice.topK,
         top_p=voice.topP,
+        mid=voice_model,
     )
     infer_config = InferConfig(
         batch_size=batch_size,
@@ -147,6 +151,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
 
             handler = SSMLHandler(
                 ssml_content=ssml_content,
+                tts_config=tts_config,
                 infer_config=infer_config,
                 adjust_config=adjust_config,
                 enhancer_config=enhancer_config,
