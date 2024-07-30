@@ -476,7 +476,7 @@ class GPT(nn.Module):
                         del x
 
             # logits = logits[:, -1].float()
-            logits = logits.narrow(1, -1, 1).squeeze_(1).to(dtype=self.gpt.dtype)
+            logits = logits.narrow(1, -1, 1).squeeze_(1).float()
 
             if not infer_text:
                 # logits = rearrange(logits, "b c n -> (b n) c")
