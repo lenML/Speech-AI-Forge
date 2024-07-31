@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Tuple
+
 import torch.nn as nn
-from torch.nn import functional as F
 from cosyvoice.utils.mask import make_pad_mask
+from torch.nn import functional as F
 
 
 class InterpolateRegulator(nn.Module):
     def __init__(
-            self,
-            channels: int,
-            sampling_ratios: Tuple,
-            out_channels: int = None,
-            groups: int = 1,
+        self,
+        channels: int,
+        sampling_ratios: Tuple,
+        out_channels: int = None,
+        groups: int = 1,
     ):
         super().__init__()
         self.sampling_ratios = sampling_ratios
@@ -35,15 +36,15 @@ class InterpolateRegulator(nn.Module):
                 norm = nn.GroupNorm(groups, channels)
                 act = nn.Mish()
                 model.extend([module, norm, act])
-        model.append(
-            nn.Conv1d(channels, out_channels, 1, 1)
-        )
+        model.append(nn.Conv1d(channels, out_channels, 1, 1))
         self.model = nn.Sequential(*model)
 
     def forward(self, x, ylens=None):
         # x in (B, T, D)
         mask = (~make_pad_mask(ylens)).to(x).unsqueeze(-1)
-        x = F.interpolate(x.transpose(1, 2).contiguous(), size=ylens.max(), mode='nearest')
+        x = F.interpolate(
+            x.transpose(1, 2).contiguous(), size=ylens.max(), mode="nearest"
+        )
         out = self.model(x).transpose(1, 2).contiguous()
         olens = ylens
         return out * mask, olens

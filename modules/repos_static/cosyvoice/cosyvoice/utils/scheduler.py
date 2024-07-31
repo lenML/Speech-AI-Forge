@@ -16,10 +16,10 @@
 # Modified from ESPnet(https://github.com/espnet/espnet)
 #               NeMo(https://github.com/NVIDIA/NeMo)
 
-from typing import Union
-
 import math
 import warnings
+from typing import Union
+
 import torch
 from torch.optim.lr_scheduler import _LRScheduler
 
@@ -62,8 +62,9 @@ class WarmupLR(_LRScheduler):
             return [lr * step_num**-0.5 for lr in self.base_lrs]
         else:
             return [
-                lr * self.warmup_steps**0.5 *
-                min(step_num**-0.5, step_num * self.warmup_steps**-1.5)
+                lr
+                * self.warmup_steps**0.5
+                * min(step_num**-0.5, step_num * self.warmup_steps**-1.5)
                 for lr in self.base_lrs
             ]
 
@@ -81,18 +82,22 @@ class WarmupPolicy(_LRScheduler):
             infinite training
     """
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 warmup_steps=None,
-                 warmup_ratio=None,
-                 max_steps=None,
-                 min_lr=0.0,
-                 last_epoch=-1):
-        assert not (warmup_steps is not None and warmup_ratio is not None),\
-            "Either use particular number of step or ratio"
-        assert warmup_ratio is None or max_steps is not None, \
-            "If there is a ratio, there should be a total steps"
+    def __init__(
+        self,
+        optimizer,
+        *,
+        warmup_steps=None,
+        warmup_ratio=None,
+        max_steps=None,
+        min_lr=0.0,
+        last_epoch=-1,
+    ):
+        assert not (
+            warmup_steps is not None and warmup_ratio is not None
+        ), "Either use particular number of step or ratio"
+        assert (
+            warmup_ratio is None or max_steps is not None
+        ), "If there is a ratio, there should be a total steps"
 
         # It is necessary to assign all attributes *before* __init__,
         # as class is wrapped by an inner class.
@@ -113,7 +118,8 @@ class WarmupPolicy(_LRScheduler):
                 "To get the last learning rate computed "
                 "by the scheduler, please use `get_last_lr()`.",
                 UserWarning,
-                stacklevel=2)
+                stacklevel=2,
+            )
 
         step = self.last_epoch
 
@@ -144,19 +150,22 @@ class SquareRootConstantPolicy(_LRScheduler):
             infinite training
     """
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 constant_steps=None,
-                 constant_ratio=None,
-                 max_steps=None,
-                 min_lr=0.0,
-                 last_epoch=-1):
-        assert not (constant_steps is not None
-                    and constant_ratio is not None), \
-            "Either use particular number of step or ratio"
-        assert constant_ratio is None or max_steps is not None, \
-            "If there is a ratio, there should be a total steps"
+    def __init__(
+        self,
+        optimizer,
+        *,
+        constant_steps=None,
+        constant_ratio=None,
+        max_steps=None,
+        min_lr=0.0,
+        last_epoch=-1,
+    ):
+        assert not (
+            constant_steps is not None and constant_ratio is not None
+        ), "Either use particular number of step or ratio"
+        assert (
+            constant_ratio is None or max_steps is not None
+        ), "If there is a ratio, there should be a total steps"
 
         # It is necessary to assign all attributes *before* __init__,
         # as class is wrapped by an inner class.
@@ -178,7 +187,8 @@ class SquareRootConstantPolicy(_LRScheduler):
                 "To get the last learning rate computed "
                 "by the scheduler, please use `get_last_lr()`.",
                 UserWarning,
-                stacklevel=2)
+                stacklevel=2,
+            )
 
         step = self.last_epoch
 
@@ -221,10 +231,12 @@ class WarmupHoldPolicy(WarmupPolicy):
         min_lr=0.0,
         last_epoch=-1,
     ):
-        assert not (hold_steps is not None and hold_ratio is not None), \
-            "Either use particular number of step or ratio"
-        assert hold_ratio is None or max_steps is not None, \
-            "If there is a ratio, there should be a total steps"
+        assert not (
+            hold_steps is not None and hold_ratio is not None
+        ), "Either use particular number of step or ratio"
+        assert (
+            hold_ratio is None or max_steps is not None
+        ), "If there is a ratio, there should be a total steps"
 
         self.min_lr = min_lr
         self._last_warmup_lr = 0.0
@@ -261,7 +273,8 @@ class WarmupHoldPolicy(WarmupPolicy):
                 " "
                 "please use `get_last_lr()`.",
                 UserWarning,
-                stacklevel=2)
+                stacklevel=2,
+            )
 
         step = self.last_epoch
 
@@ -304,14 +317,15 @@ class WarmupAnnealHoldPolicy(_LRScheduler):
         min_lr=0.0,
         last_epoch=-1,
     ):
-        assert not (warmup_steps is not None
-                    and warmup_ratio is not None), \
-            "Either use particular number of step or ratio"
-        assert not (constant_steps is not None
-                    and constant_ratio is not None), \
-            "Either use constant_steps or constant_ratio"
-        assert warmup_ratio is None or max_steps is not None, \
-            "If there is a ratio, there should be a total steps"
+        assert not (
+            warmup_steps is not None and warmup_ratio is not None
+        ), "Either use particular number of step or ratio"
+        assert not (
+            constant_steps is not None and constant_ratio is not None
+        ), "Either use constant_steps or constant_ratio"
+        assert (
+            warmup_ratio is None or max_steps is not None
+        ), "If there is a ratio, there should be a total steps"
 
         # It is necessary to assign all attributes *before* __init__,
         # as class is wrapped by an inner class.
@@ -331,8 +345,7 @@ class WarmupAnnealHoldPolicy(_LRScheduler):
         else:
             self.constant_steps = 0
 
-        self.decay_steps = max_steps - (self.constant_steps +
-                                        self.warmup_steps)
+        self.decay_steps = max_steps - (self.constant_steps + self.warmup_steps)
 
         self.min_lr = min_lr
         super().__init__(optimizer, last_epoch)
@@ -343,7 +356,8 @@ class WarmupAnnealHoldPolicy(_LRScheduler):
                 "To get the last learning rate computed "
                 "by the scheduler, please use `get_last_lr()`.",
                 UserWarning,
-                stacklevel=2)
+                stacklevel=2,
+            )
 
         step = self.last_epoch
 
@@ -352,8 +366,10 @@ class WarmupAnnealHoldPolicy(_LRScheduler):
             return self._get_warmup_lr(step)
 
         # Constant steps after warmup and decay
-        if self.constant_steps > 0 and (
-                self.warmup_steps + self.decay_steps) < step <= self.max_steps:
+        if (
+            self.constant_steps > 0
+            and (self.warmup_steps + self.decay_steps) < step <= self.max_steps
+        ):
             return self._get_constant_lr(step)
 
         # Min lr after max steps of updates
@@ -375,14 +391,14 @@ class WarmupAnnealHoldPolicy(_LRScheduler):
 
 
 def _squareroot_annealing(initial_lr, step, max_steps, min_lr):
-    mult = ((max_steps - step) / max_steps)**0.5
+    mult = ((max_steps - step) / max_steps) ** 0.5
     out_lr = initial_lr * mult
     out_lr = max(out_lr, min_lr)
     return out_lr
 
 
 def _square_annealing(initial_lr, step, max_steps, min_lr):
-    mult = ((max_steps - step) / max_steps)**2
+    mult = ((max_steps - step) / max_steps) ** 2
     out_lr = initial_lr * mult
     out_lr = max(out_lr, min_lr)
     return out_lr
@@ -394,8 +410,9 @@ def _cosine_annealing(initial_lr, step, max_steps, min_lr):
     return out_lr
 
 
-def _linear_warmup_with_cosine_annealing(max_lr, warmup_steps, step,
-                                         decay_steps, min_lr):
+def _linear_warmup_with_cosine_annealing(
+    max_lr, warmup_steps, step, decay_steps, min_lr
+):
     assert max_lr > min_lr
     # Use linear warmup for the initial part.
     if warmup_steps > 0 and step <= warmup_steps:
@@ -430,12 +447,13 @@ def _poly_decay(initial_lr, step, decay_steps, power, min_lr, cycle):
     return lr
 
 
-def _noam_hold_annealing(initial_lr, step, warmup_steps, hold_steps,
-                         decay_rate, min_lr):
+def _noam_hold_annealing(
+    initial_lr, step, warmup_steps, hold_steps, decay_rate, min_lr
+):
     # hold_steps = total number of steps
     # to hold the LR, not the warmup + hold steps.
     T_warmup_decay = max(1, warmup_steps**decay_rate)
-    T_hold_decay = max(1, (step - hold_steps)**decay_rate)
+    T_hold_decay = max(1, (step - hold_steps) ** decay_rate)
     lr = (initial_lr * T_warmup_decay) / T_hold_decay
     lr = max(lr, min_lr)
     return lr
@@ -443,18 +461,14 @@ def _noam_hold_annealing(initial_lr, step, warmup_steps, hold_steps,
 
 class SquareAnnealing(WarmupPolicy):
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 max_steps,
-                 min_lr=1e-5,
-                 last_epoch=-1,
-                 **kwargs):
-        super().__init__(optimizer=optimizer,
-                         max_steps=max_steps,
-                         last_epoch=last_epoch,
-                         min_lr=min_lr,
-                         **kwargs)
+    def __init__(self, optimizer, *, max_steps, min_lr=1e-5, last_epoch=-1, **kwargs):
+        super().__init__(
+            optimizer=optimizer,
+            max_steps=max_steps,
+            last_epoch=last_epoch,
+            min_lr=min_lr,
+            **kwargs,
+        )
 
     def _get_lr(self, step):
         new_lrs = [
@@ -463,32 +477,31 @@ class SquareAnnealing(WarmupPolicy):
                 step=step - self.warmup_steps,
                 max_steps=self.max_steps - self.warmup_steps,
                 min_lr=self.min_lr,
-            ) for initial_lr in self.base_lrs
+            )
+            for initial_lr in self.base_lrs
         ]
         return new_lrs
 
 
 class SquareRootAnnealing(WarmupPolicy):
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 max_steps,
-                 min_lr=0,
-                 last_epoch=-1,
-                 **kwargs):
-        super().__init__(optimizer=optimizer,
-                         max_steps=max_steps,
-                         last_epoch=last_epoch,
-                         min_lr=min_lr,
-                         **kwargs)
+    def __init__(self, optimizer, *, max_steps, min_lr=0, last_epoch=-1, **kwargs):
+        super().__init__(
+            optimizer=optimizer,
+            max_steps=max_steps,
+            last_epoch=last_epoch,
+            min_lr=min_lr,
+            **kwargs,
+        )
 
     def _get_lr(self, step):
         new_lrs = [
-            _squareroot_annealing(initial_lr=initial_lr,
-                                  step=step,
-                                  max_steps=self.max_steps,
-                                  min_lr=self.min_lr)
+            _squareroot_annealing(
+                initial_lr=initial_lr,
+                step=step,
+                max_steps=self.max_steps,
+                min_lr=self.min_lr,
+            )
             for initial_lr in self.base_lrs
         ]
         return new_lrs
@@ -496,25 +509,22 @@ class SquareRootAnnealing(WarmupPolicy):
 
 class CosineAnnealing(WarmupAnnealHoldPolicy):
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 max_steps,
-                 min_lr=0,
-                 last_epoch=-1,
-                 **kwargs):
-        super().__init__(optimizer=optimizer,
-                         max_steps=max_steps,
-                         last_epoch=last_epoch,
-                         min_lr=min_lr,
-                         **kwargs)
+    def __init__(self, optimizer, *, max_steps, min_lr=0, last_epoch=-1, **kwargs):
+        super().__init__(
+            optimizer=optimizer,
+            max_steps=max_steps,
+            last_epoch=last_epoch,
+            min_lr=min_lr,
+            **kwargs,
+        )
 
     def _get_lr(self, step):
         for initial_lr in self.base_lrs:
             if initial_lr < self.min_lr:
                 raise ValueError(
                     f"{self} received an initial learning rate "
-                    f"that was lower than the minimum learning rate.")
+                    f"that was lower than the minimum learning rate."
+                )
 
         if self.constant_steps is None or self.constant_steps == 0:
             new_lrs = [
@@ -523,7 +533,8 @@ class CosineAnnealing(WarmupAnnealHoldPolicy):
                     step=step - self.warmup_steps,
                     max_steps=self.max_steps - self.warmup_steps,
                     min_lr=self.min_lr,
-                ) for initial_lr in self.base_lrs
+                )
+                for initial_lr in self.base_lrs
             ]
         else:
             new_lrs = self._get_linear_warmup_with_cosine_annealing_lr(step)
@@ -550,28 +561,32 @@ class CosineAnnealing(WarmupAnnealHoldPolicy):
                 step=step,
                 decay_steps=self.decay_steps,
                 min_lr=self.min_lr,
-            ) for _ in self.base_lrs
+            )
+            for _ in self.base_lrs
         ]
         return new_lrs
 
 
 class NoamAnnealing(_LRScheduler):
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 d_model,
-                 warmup_steps=None,
-                 warmup_ratio=None,
-                 max_steps=None,
-                 min_lr=0.0,
-                 last_epoch=-1):
-        self._normalize = d_model**(-0.5)
-        assert not (warmup_steps is not None
-                    and warmup_ratio is not None), \
-            "Either use particular number of step or ratio"
-        assert warmup_ratio is None or max_steps is not None, \
-            "If there is a ratio, there should be a total steps"
+    def __init__(
+        self,
+        optimizer,
+        *,
+        d_model,
+        warmup_steps=None,
+        warmup_ratio=None,
+        max_steps=None,
+        min_lr=0.0,
+        last_epoch=-1,
+    ):
+        self._normalize = d_model ** (-0.5)
+        assert not (
+            warmup_steps is not None and warmup_ratio is not None
+        ), "Either use particular number of step or ratio"
+        assert (
+            warmup_ratio is None or max_steps is not None
+        ), "If there is a ratio, there should be a total steps"
 
         # It is necessary to assign all attributes *before* __init__,
         # as class is wrapped by an inner class.
@@ -592,7 +607,8 @@ class NoamAnnealing(_LRScheduler):
                 "To get the last learning rate computed "
                 "by the scheduler, please use `get_last_lr()`.",
                 UserWarning,
-                stacklevel=2)
+                stacklevel=2,
+            )
 
         step = max(1, self.last_epoch)
 
@@ -600,7 +616,8 @@ class NoamAnnealing(_LRScheduler):
             if initial_lr < self.min_lr:
                 raise ValueError(
                     f"{self} received an initial learning rate "
-                    f"that was lower than the minimum learning rate.")
+                    f"that was lower than the minimum learning rate."
+                )
 
         new_lrs = [
             self._noam_annealing(initial_lr=initial_lr, step=step)
@@ -610,10 +627,11 @@ class NoamAnnealing(_LRScheduler):
 
     def _noam_annealing(self, initial_lr, step):
         if self.warmup_steps > 0:
-            mult = self._normalize * min(step**(-0.5),
-                                         step * (self.warmup_steps**(-1.5)))
+            mult = self._normalize * min(
+                step ** (-0.5), step * (self.warmup_steps ** (-1.5))
+            )
         else:
-            mult = self._normalize * step**(-0.5)
+            mult = self._normalize * step ** (-0.5)
 
         out_lr = initial_lr * mult
         if step > self.warmup_steps:
@@ -623,14 +641,16 @@ class NoamAnnealing(_LRScheduler):
 
 class NoamHoldAnnealing(WarmupHoldPolicy):
 
-    def __init__(self,
-                 optimizer,
-                 *,
-                 max_steps,
-                 decay_rate=0.5,
-                 min_lr=0.0,
-                 last_epoch=-1,
-                 **kwargs):
+    def __init__(
+        self,
+        optimizer,
+        *,
+        max_steps,
+        decay_rate=0.5,
+        min_lr=0.0,
+        last_epoch=-1,
+        **kwargs,
+    ):
         """
         From Nemo:
         Implementation of the Noam Hold Annealing policy
@@ -685,16 +705,17 @@ class NoamHoldAnnealing(WarmupHoldPolicy):
             min_lr: Minimum learning rate.
         """
         self.decay_rate = decay_rate
-        super().__init__(optimizer=optimizer,
-                         max_steps=max_steps,
-                         last_epoch=last_epoch,
-                         min_lr=min_lr,
-                         **kwargs)
+        super().__init__(
+            optimizer=optimizer,
+            max_steps=max_steps,
+            last_epoch=last_epoch,
+            min_lr=min_lr,
+            **kwargs,
+        )
 
     def _get_lr(self, step):
         if self.warmup_steps is None or self.warmup_steps == 0:
-            raise ValueError(
-                "Noam scheduler cannot be used without warmup steps")
+            raise ValueError("Noam scheduler cannot be used without warmup steps")
 
         if self.hold_steps > 0:
             hold_steps = self.hold_steps - self.warmup_steps
@@ -709,7 +730,8 @@ class NoamHoldAnnealing(WarmupHoldPolicy):
                 hold_steps=hold_steps,
                 decay_rate=self.decay_rate,
                 min_lr=self.min_lr,
-            ) for initial_lr in self.base_lrs
+            )
+            for initial_lr in self.base_lrs
         ]
         return new_lrs
 

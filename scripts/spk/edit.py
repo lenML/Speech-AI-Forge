@@ -1,11 +1,10 @@
 import argparse
 import os
 
-from modules.core.spk.TTSSpeaker import TTSSpeaker
-from modules.core.spk.dcls import DcSpkReference, DcSpkSample
-
 from pydub import AudioSegment
 
+from modules.core.spk.dcls import DcSpkReference, DcSpkSample
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.audio_utils import pydub_to_np
 
 

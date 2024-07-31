@@ -2,8 +2,10 @@ import io
 import logging
 from typing import Optional, Union
 
+import librosa
 import numpy as np
 import torch
+from transformers import LlamaTokenizer
 
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.devices import devices
@@ -14,20 +16,15 @@ from modules.repos_static.fish_speech.fish_speech.models.text2semantic.llama imp
     DualARTransformer,
     NaiveTransformer,
 )
-import librosa
-
 from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.firefly import (
     FireflyArchitecture,
 )
 from modules.repos_static.fish_speech.fish_speech.text.clean import clean_text
-from transformers import LlamaTokenizer
-
 from modules.repos_static.fish_speech.tools.llama.generate import (
     decode_n_tokens,
     decode_one_token_ar,
     decode_one_token_naive,
 )
-
 
 FISH_SPEECH_LLAMA = Union[NaiveTransformer, DualARTransformer]
 

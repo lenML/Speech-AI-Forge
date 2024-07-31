@@ -19,19 +19,19 @@ from typing import Tuple
 
 import torch
 import torch.utils.checkpoint as ckpt
-
 from cosyvoice.transformer.convolution import ConvolutionModule
-from cosyvoice.transformer.encoder_layer import TransformerEncoderLayer
-from cosyvoice.transformer.encoder_layer import ConformerEncoderLayer
+from cosyvoice.transformer.encoder_layer import (
+    ConformerEncoderLayer,
+    TransformerEncoderLayer,
+)
 from cosyvoice.transformer.positionwise_feed_forward import PositionwiseFeedForward
 from cosyvoice.utils.class_utils import (
+    COSYVOICE_ACTIVATION_CLASSES,
+    COSYVOICE_ATTENTION_CLASSES,
     COSYVOICE_EMB_CLASSES,
     COSYVOICE_SUBSAMPLE_CLASSES,
-    COSYVOICE_ATTENTION_CLASSES,
-    COSYVOICE_ACTIVATION_CLASSES,
 )
-from cosyvoice.utils.mask import make_pad_mask
-from cosyvoice.utils.mask import add_optional_chunk_mask
+from cosyvoice.utils.mask import add_optional_chunk_mask, make_pad_mask
 
 
 class BaseEncoder(torch.nn.Module):
@@ -94,8 +94,9 @@ class BaseEncoder(torch.nn.Module):
             input_size,
             output_size,
             dropout_rate,
-            COSYVOICE_EMB_CLASSES[pos_enc_layer_type](output_size,
-                                                      positional_dropout_rate),
+            COSYVOICE_EMB_CLASSES[pos_enc_layer_type](
+                output_size, positional_dropout_rate
+            ),
         )
 
         self.normalize_before = normalize_before
@@ -144,15 +145,17 @@ class BaseEncoder(torch.nn.Module):
             xs = self.global_cmvn(xs)
         xs, pos_emb, masks = self.embed(xs, masks)
         mask_pad = masks  # (B, 1, T/subsample_rate)
-        chunk_masks = add_optional_chunk_mask(xs, masks,
-                                              self.use_dynamic_chunk,
-                                              self.use_dynamic_left_chunk,
-                                              decoding_chunk_size,
-                                              self.static_chunk_size,
-                                              num_decoding_left_chunks)
+        chunk_masks = add_optional_chunk_mask(
+            xs,
+            masks,
+            self.use_dynamic_chunk,
+            self.use_dynamic_left_chunk,
+            decoding_chunk_size,
+            self.static_chunk_size,
+            num_decoding_left_chunks,
+        )
         if self.gradient_checkpointing and self.training:
-            xs = self.forward_layers_checkpointed(xs, chunk_masks, pos_emb,
-                                                  mask_pad)
+            xs = self.forward_layers_checkpointed(xs, chunk_masks, pos_emb, mask_pad)
         else:
             xs = self.forward_layers(xs, chunk_masks, pos_emb, mask_pad)
         if self.normalize_before:
@@ -162,22 +165,29 @@ class BaseEncoder(torch.nn.Module):
         # for cross attention with decoder later
         return xs, masks
 
-    def forward_layers(self, xs: torch.Tensor, chunk_masks: torch.Tensor,
-                       pos_emb: torch.Tensor,
-                       mask_pad: torch.Tensor) -> torch.Tensor:
+    def forward_layers(
+        self,
+        xs: torch.Tensor,
+        chunk_masks: torch.Tensor,
+        pos_emb: torch.Tensor,
+        mask_pad: torch.Tensor,
+    ) -> torch.Tensor:
         for layer in self.encoders:
             xs, chunk_masks, _, _ = layer(xs, chunk_masks, pos_emb, mask_pad)
         return xs
 
     @torch.jit.ignore(drop=True)
-    def forward_layers_checkpointed(self, xs: torch.Tensor,
-                                    chunk_masks: torch.Tensor,
-                                    pos_emb: torch.Tensor,
-                                    mask_pad: torch.Tensor) -> torch.Tensor:
+    def forward_layers_checkpointed(
+        self,
+        xs: torch.Tensor,
+        chunk_masks: torch.Tensor,
+        pos_emb: torch.Tensor,
+        mask_pad: torch.Tensor,
+    ) -> torch.Tensor:
         for layer in self.encoders:
-            xs, chunk_masks, _, _ = ckpt.checkpoint(layer.__call__, xs,
-                                                    chunk_masks, pos_emb,
-                                                    mask_pad)
+            xs, chunk_masks, _, _ = ckpt.checkpoint(
+                layer.__call__, xs, chunk_masks, pos_emb, mask_pad
+            )
         return xs
 
     def forward_chunk(
@@ -221,10 +231,7 @@ class BaseEncoder(torch.nn.Module):
         """
         assert xs.size(0) == 1
         # tmp_masks is just for interface compatibility
-        tmp_masks = torch.ones(1,
-                               xs.size(1),
-                               device=xs.device,
-                               dtype=torch.bool)
+        tmp_masks = torch.ones(1, xs.size(1), device=xs.device, dtype=torch.bool)
         tmp_masks = tmp_masks.unsqueeze(1)
         if self.global_cmvn is not None:
             xs = self.global_cmvn(xs)
@@ -234,8 +241,9 @@ class BaseEncoder(torch.nn.Module):
         elayers, cache_t1 = att_cache.size(0), att_cache.size(2)
         chunk_size = xs.size(1)
         attention_key_size = cache_t1 + chunk_size
-        pos_emb = self.embed.position_encoding(offset=offset - cache_t1,
-                                               size=attention_key_size)
+        pos_emb = self.embed.position_encoding(
+            offset=offset - cache_t1, size=attention_key_size
+        )
         if required_cache_size < 0:
             next_cache_start = 0
         elif required_cache_size == 0:
@@ -252,8 +260,9 @@ class BaseEncoder(torch.nn.Module):
                 xs,
                 att_mask,
                 pos_emb,
-                att_cache=att_cache[i:i + 1] if elayers > 0 else att_cache,
-                cnn_cache=cnn_cache[i] if cnn_cache.size(0) > 0 else cnn_cache)
+                att_cache=att_cache[i : i + 1] if elayers > 0 else att_cache,
+                cnn_cache=cnn_cache[i] if cnn_cache.size(0) > 0 else cnn_cache,
+            )
             # NOTE(xcsong): After layer.forward
             #   shape(new_att_cache) is (1, head, attention_key_size, d_k * 2),
             #   shape(new_cnn_cache) is (b=1, hidden-dim, cache_t2)
@@ -276,7 +285,7 @@ class BaseEncoder(torch.nn.Module):
         decoding_chunk_size: int,
         num_decoding_left_chunks: int = -1,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """ Forward input chunk by chunk with chunk_size like a streaming
+        """Forward input chunk by chunk with chunk_size like a streaming
             fashion
 
         Here we should pay special attention to computation cache in the
@@ -320,16 +329,13 @@ class BaseEncoder(torch.nn.Module):
         for cur in range(0, num_frames - context + 1, stride):
             end = min(cur + decoding_window, num_frames)
             chunk_xs = xs[:, cur:end, :]
-            (y, att_cache,
-             cnn_cache) = self.forward_chunk(chunk_xs, offset,
-                                             required_cache_size, att_cache,
-                                             cnn_cache)
+            (y, att_cache, cnn_cache) = self.forward_chunk(
+                chunk_xs, offset, required_cache_size, att_cache, cnn_cache
+            )
             outputs.append(y)
             offset += y.size(1)
         ys = torch.cat(outputs, 1)
-        masks = torch.ones((1, 1, ys.size(1)),
-                           device=ys.device,
-                           dtype=torch.bool)
+        masks = torch.ones((1, 1, ys.size(1)), device=ys.device, dtype=torch.bool)
         return ys, masks
 
 
@@ -358,28 +364,45 @@ class TransformerEncoder(BaseEncoder):
         activation_type: str = "relu",
         gradient_checkpointing: bool = False,
     ):
-        """ Construct TransformerEncoder
+        """Construct TransformerEncoder
 
         See Encoder for the meaning of each parameter.
         """
-        super().__init__(input_size, output_size, attention_heads,
-                         linear_units, num_blocks, dropout_rate,
-                         positional_dropout_rate, attention_dropout_rate,
-                         input_layer, pos_enc_layer_type, normalize_before,
-                         static_chunk_size, use_dynamic_chunk, global_cmvn,
-                         use_dynamic_left_chunk, gradient_checkpointing)
+        super().__init__(
+            input_size,
+            output_size,
+            attention_heads,
+            linear_units,
+            num_blocks,
+            dropout_rate,
+            positional_dropout_rate,
+            attention_dropout_rate,
+            input_layer,
+            pos_enc_layer_type,
+            normalize_before,
+            static_chunk_size,
+            use_dynamic_chunk,
+            global_cmvn,
+            use_dynamic_left_chunk,
+            gradient_checkpointing,
+        )
         activation = COSYVOICE_ACTIVATION_CLASSES[activation_type]()
-        self.encoders = torch.nn.ModuleList([
-            TransformerEncoderLayer(
-                output_size,
-                COSYVOICE_ATTENTION_CLASSES[selfattention_layer_type](attention_heads,
-                                                                      output_size,
-                                                                      attention_dropout_rate,
-                                                                      key_bias),
-                PositionwiseFeedForward(output_size, linear_units,
-                                        dropout_rate, activation),
-                dropout_rate, normalize_before) for _ in range(num_blocks)
-        ])
+        self.encoders = torch.nn.ModuleList(
+            [
+                TransformerEncoderLayer(
+                    output_size,
+                    COSYVOICE_ATTENTION_CLASSES[selfattention_layer_type](
+                        attention_heads, output_size, attention_dropout_rate, key_bias
+                    ),
+                    PositionwiseFeedForward(
+                        output_size, linear_units, dropout_rate, activation
+                    ),
+                    dropout_rate,
+                    normalize_before,
+                )
+                for _ in range(num_blocks)
+            ]
+        )
 
 
 class ConformerEncoder(BaseEncoder):
@@ -430,12 +453,24 @@ class ConformerEncoder(BaseEncoder):
             causal (bool): whether to use causal convolution or not.
             key_bias: whether use bias in attention.linear_k, False for whisper models.
         """
-        super().__init__(input_size, output_size, attention_heads,
-                         linear_units, num_blocks, dropout_rate,
-                         positional_dropout_rate, attention_dropout_rate,
-                         input_layer, pos_enc_layer_type, normalize_before,
-                         static_chunk_size, use_dynamic_chunk, global_cmvn,
-                         use_dynamic_left_chunk, gradient_checkpointing)
+        super().__init__(
+            input_size,
+            output_size,
+            attention_heads,
+            linear_units,
+            num_blocks,
+            dropout_rate,
+            positional_dropout_rate,
+            attention_dropout_rate,
+            input_layer,
+            pos_enc_layer_type,
+            normalize_before,
+            static_chunk_size,
+            use_dynamic_chunk,
+            global_cmvn,
+            use_dynamic_left_chunk,
+            gradient_checkpointing,
+        )
         activation = COSYVOICE_ACTIVATION_CLASSES[activation_type]()
 
         # self-attention module definition
@@ -453,20 +488,35 @@ class ConformerEncoder(BaseEncoder):
             activation,
         )
         # convolution module definition
-        convolution_layer_args = (output_size, cnn_module_kernel, activation,
-                                  cnn_module_norm, causal)
+        convolution_layer_args = (
+            output_size,
+            cnn_module_kernel,
+            activation,
+            cnn_module_norm,
+            causal,
+        )
 
-        self.encoders = torch.nn.ModuleList([
-            ConformerEncoderLayer(
-                output_size,
-                COSYVOICE_ATTENTION_CLASSES[selfattention_layer_type](
-                    *encoder_selfattn_layer_args),
-                PositionwiseFeedForward(*positionwise_layer_args),
-                PositionwiseFeedForward(
-                    *positionwise_layer_args) if macaron_style else None,
-                ConvolutionModule(
-                    *convolution_layer_args) if use_cnn_module else None,
-                dropout_rate,
-                normalize_before,
-            ) for _ in range(num_blocks)
-        ])
+        self.encoders = torch.nn.ModuleList(
+            [
+                ConformerEncoderLayer(
+                    output_size,
+                    COSYVOICE_ATTENTION_CLASSES[selfattention_layer_type](
+                        *encoder_selfattn_layer_args
+                    ),
+                    PositionwiseFeedForward(*positionwise_layer_args),
+                    (
+                        PositionwiseFeedForward(*positionwise_layer_args)
+                        if macaron_style
+                        else None
+                    ),
+                    (
+                        ConvolutionModule(*convolution_layer_args)
+                        if use_cnn_module
+                        else None
+                    ),
+                    dropout_rate,
+                    normalize_before,
+                )
+                for _ in range(num_blocks)
+            ]
+        )

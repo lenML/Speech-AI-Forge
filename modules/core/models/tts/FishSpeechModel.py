@@ -1,11 +1,12 @@
+import logging
 import threading
 from typing import Generator, Union
+
 from modules import config
-from modules.core.models.TTSModel import TTSModel
 from modules.core.models.tts.FishSpeechInfer import FishSpeechInfer
+from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
-
 from modules.devices import devices
 from modules.repos_static.fish_speech.fish_speech.models.text2semantic.llama import (
     DualARTransformer,
@@ -20,9 +21,6 @@ from modules.repos_static.fish_speech.tools.llama.generate import (
 from modules.repos_static.fish_speech.tools.vqgan.inference import (
     load_model as load_vqgan_model,
 )
-
-import logging
-
 from modules.utils.SeedContext import SeedContext
 
 FISH_SPEECH_LLAMA = Union[NaiveTransformer, DualARTransformer]

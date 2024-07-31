@@ -5,8 +5,8 @@ import threading
 import torch
 
 from modules import config
-from modules.repos_static.ChatTTS import ChatTTS
 from modules.devices import devices
+from modules.repos_static.ChatTTS import ChatTTS
 
 logger = logging.getLogger(__name__)
 

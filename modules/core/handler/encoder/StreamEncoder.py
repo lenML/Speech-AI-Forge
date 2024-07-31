@@ -2,8 +2,8 @@ import io
 import queue
 import subprocess
 import threading
-from time import sleep
 import wave
+from time import sleep
 
 import pydub
 import pydub.utils

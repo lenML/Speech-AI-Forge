@@ -2,8 +2,8 @@ from typing import Generator
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
-from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
 

@@ -8,8 +8,8 @@ except:
 from scripts.dl_args import parser_args
 from scripts.dl_chattts import ChatTTSDownloader
 from scripts.dl_enhance import ResembleEnhanceDownloader
-from scripts.ModelDownloader import ModelDownloader
 from scripts.dl_fishspeech import FishSpeechDownloader
+from scripts.ModelDownloader import ModelDownloader
 
 
 def main():

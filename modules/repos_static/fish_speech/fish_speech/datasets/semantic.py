@@ -19,8 +19,12 @@ from transformers import AutoTokenizer
 from modules.repos_static.fish_speech.fish_speech.conversation import (
     CODEBOOK_PAD_TOKEN_ID,
 )
-from modules.repos_static.fish_speech.fish_speech.datasets.protos.text_data_pb2 import SampledData
-from modules.repos_static.fish_speech.fish_speech.datasets.protos.text_data_stream import read_pb_stream
+from modules.repos_static.fish_speech.fish_speech.datasets.protos.text_data_pb2 import (
+    SampledData,
+)
+from modules.repos_static.fish_speech.fish_speech.datasets.protos.text_data_stream import (
+    read_pb_stream,
+)
 from modules.repos_static.fish_speech.fish_speech.text.clean import clean_text
 from modules.repos_static.fish_speech.fish_speech.utils import RankedLogger
 from modules.repos_static.fish_speech.fish_speech.utils.braceexpand import braceexpand

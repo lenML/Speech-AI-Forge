@@ -1,4 +1,5 @@
 import logging
+
 from scripts.dl_base import BaseModelDownloader
 
 logger = logging.getLogger(__name__)

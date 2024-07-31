@@ -1,7 +1,7 @@
-from dataclasses import dataclass
 import gc
 import logging
 import sys
+from dataclasses import dataclass
 from functools import lru_cache
 
 import psutil

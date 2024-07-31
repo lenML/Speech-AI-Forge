@@ -1,8 +1,8 @@
+import gc
+import logging
 import platform
 from dataclasses import dataclass
-import logging
-from typing import Union, List, Optional, Tuple
-import gc
+from typing import List, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -10,13 +10,13 @@ import torch.nn.functional as F
 import torch.nn.utils.parametrize as P
 from torch.nn.utils.parametrizations import weight_norm
 from tqdm import tqdm
-from transformers import LlamaModel, LlamaConfig, LogitsWarper
+from transformers import LlamaConfig, LlamaModel, LogitsWarper
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import BaseModelOutputWithPast
 from transformers.utils import is_flash_attn_2_available
 
-from .processors import CustomRepetitionPenaltyLogitsProcessorRepeat
 from ..utils import del_all
+from .processors import CustomRepetitionPenaltyLogitsProcessorRepeat
 
 
 class GPT(nn.Module):

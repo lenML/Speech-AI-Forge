@@ -30,10 +30,6 @@ from pydantic import BaseModel, Field
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-# from modules.repos_static.fish_speech.fish_speech.models.vqgan.lit_module import VQGAN
-from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.firefly import (
-    FireflyArchitecture,
-)
 from tools.llama.generate import (
     GenerateRequest,
     GenerateResponse,
@@ -41,6 +37,11 @@ from tools.llama.generate import (
     launch_thread_safe_queue,
 )
 from tools.vqgan.inference import load_model as load_decoder_model
+
+# from modules.repos_static.fish_speech.fish_speech.models.vqgan.lit_module import VQGAN
+from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.firefly import (
+    FireflyArchitecture,
+)
 
 
 def wav_chunk_header(sample_rate=44100, bit_depth=16, channels=1):

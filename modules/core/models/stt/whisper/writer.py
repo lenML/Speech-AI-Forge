@@ -3,6 +3,7 @@ import json
 import os
 import re
 from typing import Callable, List, Optional, TextIO
+
 from whisper.utils import format_timestamp
 
 

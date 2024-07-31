@@ -1,8 +1,9 @@
+import logging
+
 import requests
 from tqdm import tqdm
 
 from scripts.ModelDownloader import ModelDownloader
-import logging
 
 logger = logging.getLogger(__name__)
 

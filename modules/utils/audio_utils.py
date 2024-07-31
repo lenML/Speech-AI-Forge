@@ -1,13 +1,13 @@
+import io
 import sys
 from io import BytesIO
 
 import numpy as np
 import numpy.typing as npt
 import pyrubberband as pyrb
+import scipy.io.wavfile as wavfile
 import soundfile as sf
 from pydub import AudioSegment, effects
-import scipy.io.wavfile as wavfile
-import io
 
 INT16_MAX = np.iinfo(np.int16).max
 

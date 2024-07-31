@@ -14,7 +14,14 @@
 import torch
 import torch.nn as nn
 from einops import pack, rearrange, repeat
-from matcha.models.components.decoder import SinusoidalPosEmb, Block1D, ResnetBlock1D, Downsample1D, TimestepEmbedding, Upsample1D
+from matcha.models.components.decoder import (
+    Block1D,
+    Downsample1D,
+    ResnetBlock1D,
+    SinusoidalPosEmb,
+    TimestepEmbedding,
+    Upsample1D,
+)
 from matcha.models.components.transformer import BasicTransformerBlock
 
 
@@ -56,7 +63,9 @@ class ConditionalDecoder(nn.Module):
             input_channel = output_channel
             output_channel = channels[i]
             is_last = i == len(channels) - 1
-            resnet = ResnetBlock1D(dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim)
+            resnet = ResnetBlock1D(
+                dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim
+            )
             transformer_blocks = nn.ModuleList(
                 [
                     BasicTransformerBlock(
@@ -70,14 +79,20 @@ class ConditionalDecoder(nn.Module):
                 ]
             )
             downsample = (
-                Downsample1D(output_channel) if not is_last else nn.Conv1d(output_channel, output_channel, 3, padding=1)
+                Downsample1D(output_channel)
+                if not is_last
+                else nn.Conv1d(output_channel, output_channel, 3, padding=1)
             )
-            self.down_blocks.append(nn.ModuleList([resnet, transformer_blocks, downsample]))
+            self.down_blocks.append(
+                nn.ModuleList([resnet, transformer_blocks, downsample])
+            )
 
         for i in range(num_mid_blocks):
             input_channel = channels[-1]
             out_channels = channels[-1]
-            resnet = ResnetBlock1D(dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim)
+            resnet = ResnetBlock1D(
+                dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim
+            )
 
             transformer_blocks = nn.ModuleList(
                 [
@@ -125,7 +140,6 @@ class ConditionalDecoder(nn.Module):
         self.final_block = Block1D(channels[-1], channels[-1])
         self.final_proj = nn.Conv1d(channels[-1], self.out_channels, 1)
         self.initialize_weights()
-
 
     def initialize_weights(self):
         for m in self.modules():
@@ -205,7 +219,7 @@ class ConditionalDecoder(nn.Module):
         for resnet, transformer_blocks, upsample in self.up_blocks:
             mask_up = masks.pop()
             skip = hiddens.pop()
-            x = pack([x[:, :, :skip.shape[-1]], skip], "b * t")[0]
+            x = pack([x[:, :, : skip.shape[-1]], skip], "b * t")[0]
             x = resnet(x, mask_up, t)
             x = rearrange(x, "b c t -> b t c").contiguous()
             attn_mask = torch.matmul(mask_up.transpose(1, 2).contiguous(), mask_up)

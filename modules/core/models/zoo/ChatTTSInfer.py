@@ -6,9 +6,9 @@ import numpy as np
 import torch
 
 from modules import config
+from modules.core.models import zoo
 from modules.repos_static.ChatTTS.ChatTTS.core import Chat
 from modules.repos_static.ChatTTS.ChatTTS.model import GPT
-from modules.core.models import zoo
 from modules.utils.monkey_tqdm import disable_tqdm
 
 

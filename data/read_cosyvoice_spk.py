@@ -3,7 +3,6 @@ import torch
 from modules.core.spk import TTSSpeaker, spk_mgr
 from modules.core.spk.dcls import DcSpkVoiceToken
 
-
 spk2info: dict = torch.load(
     "./models/CosyVoice_300M_Instruct/spk2info.pt", map_location="cpu"
 )

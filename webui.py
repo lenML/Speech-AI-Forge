@@ -2,8 +2,8 @@ import logging
 import os
 import sys
 
-from modules.repos_static.sys_paths import setup_repos_paths
 from modules.ffmpeg_env import setup_ffmpeg_path
+from modules.repos_static.sys_paths import setup_repos_paths
 from modules.webui import webui_config
 
 try:

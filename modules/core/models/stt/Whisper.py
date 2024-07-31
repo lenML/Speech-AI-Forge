@@ -1,17 +1,16 @@
-from pathlib import Path
 import threading
+from pathlib import Path
 from typing import Optional
 
+import librosa
 import torch
+from whisper import Whisper, audio, load_model
+
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
-from whisper import load_model, Whisper, audio
-
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
-
-import librosa
 
 
 # typing
@@ -126,9 +125,10 @@ class WhisperModel(STTModel):
 
 
 if __name__ == "__main__":
-    from scipy.io import wavfile
     import json
+
     import numpy as np
+    from scipy.io import wavfile
 
     devices.reset_device()
 

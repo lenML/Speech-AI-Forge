@@ -1,10 +1,12 @@
 import re
+
 from modules.core.tn.TNPipeline import GuessLang
 from modules.repos_static.cosyvoice.cosyvoice.utils.frontend_utils import (
     remove_bracket,
     replace_blank,
     replace_corner_mark,
 )
+
 from .base_tn import BaseTN
 
 CosyVoiceTN = BaseTN.clone()

@@ -1,8 +1,8 @@
 import logging
 import os
 
-from modules.repos_static.sys_paths import setup_repos_paths
 from modules.ffmpeg_env import setup_ffmpeg_path
+from modules.repos_static.sys_paths import setup_repos_paths
 
 try:
     setup_repos_paths()

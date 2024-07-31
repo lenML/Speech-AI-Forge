@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 from modules.core.handler.datacls.audio_model import AdjustConfig
-from modules.core.handler.datacls.tts_model import TTSConfig, InferConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
+from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 

@@ -14,20 +14,19 @@
 # limitations under the License.
 # Modified from ESPnet(https://github.com/espnet/espnet)
 """Decoder definition."""
-from typing import Tuple, List, Optional
+import logging
+from typing import List, Optional, Tuple
 
 import torch
 import torch.utils.checkpoint as ckpt
-import logging
-
 from cosyvoice.transformer.decoder_layer import DecoderLayer
 from cosyvoice.transformer.positionwise_feed_forward import PositionwiseFeedForward
 from cosyvoice.utils.class_utils import (
-    COSYVOICE_EMB_CLASSES,
-    COSYVOICE_ATTENTION_CLASSES,
     COSYVOICE_ACTIVATION_CLASSES,
+    COSYVOICE_ATTENTION_CLASSES,
+    COSYVOICE_EMB_CLASSES,
 )
-from cosyvoice.utils.mask import (subsequent_mask, make_pad_mask)
+from cosyvoice.utils.mask import make_pad_mask, subsequent_mask
 
 
 class TransformerDecoder(torch.nn.Module):
@@ -80,10 +79,12 @@ class TransformerDecoder(torch.nn.Module):
         activation = COSYVOICE_ACTIVATION_CLASSES[activation_type]()
 
         self.embed = torch.nn.Sequential(
-            torch.nn.Identity() if input_layer == "no_pos" else
-            torch.nn.Embedding(vocab_size, attention_dim),
-            COSYVOICE_EMB_CLASSES[input_layer](attention_dim,
-                                               positional_dropout_rate),
+            (
+                torch.nn.Identity()
+                if input_layer == "no_pos"
+                else torch.nn.Embedding(vocab_size, attention_dim)
+            ),
+            COSYVOICE_EMB_CLASSES[input_layer](attention_dim, positional_dropout_rate),
         )
 
         self.normalize_before = normalize_before
@@ -94,21 +95,35 @@ class TransformerDecoder(torch.nn.Module):
         else:
             self.output_layer = torch.nn.Identity()
         self.num_blocks = num_blocks
-        self.decoders = torch.nn.ModuleList([
-            DecoderLayer(
-                attention_dim,
-                COSYVOICE_ATTENTION_CLASSES["selfattn"](
-                    attention_heads, attention_dim,
-                    self_attention_dropout_rate, key_bias),
-                COSYVOICE_ATTENTION_CLASSES["selfattn"](
-                    attention_heads, attention_dim, src_attention_dropout_rate,
-                    key_bias) if src_attention else None,
-                PositionwiseFeedForward(attention_dim, linear_units,
-                                        dropout_rate, activation),
-                dropout_rate,
-                normalize_before,
-            ) for _ in range(self.num_blocks)
-        ])
+        self.decoders = torch.nn.ModuleList(
+            [
+                DecoderLayer(
+                    attention_dim,
+                    COSYVOICE_ATTENTION_CLASSES["selfattn"](
+                        attention_heads,
+                        attention_dim,
+                        self_attention_dropout_rate,
+                        key_bias,
+                    ),
+                    (
+                        COSYVOICE_ATTENTION_CLASSES["selfattn"](
+                            attention_heads,
+                            attention_dim,
+                            src_attention_dropout_rate,
+                            key_bias,
+                        )
+                        if src_attention
+                        else None
+                    ),
+                    PositionwiseFeedForward(
+                        attention_dim, linear_units, dropout_rate, activation
+                    ),
+                    dropout_rate,
+                    normalize_before,
+                )
+                for _ in range(self.num_blocks)
+            ]
+        )
 
         self.gradient_checkpointing = gradient_checkpointing
         self.tie_word_embedding = tie_word_embedding
@@ -149,14 +164,12 @@ class TransformerDecoder(torch.nn.Module):
         tgt_mask = ~make_pad_mask(ys_in_lens, maxlen).unsqueeze(1)
         tgt_mask = tgt_mask.to(tgt.device)
         # m: (1, L, L)
-        m = subsequent_mask(tgt_mask.size(-1),
-                            device=tgt_mask.device).unsqueeze(0)
+        m = subsequent_mask(tgt_mask.size(-1), device=tgt_mask.device).unsqueeze(0)
         # tgt_mask: (B, L, L)
         tgt_mask = tgt_mask & m
         x, _ = self.embed(tgt)
         if self.gradient_checkpointing and self.training:
-            x = self.forward_layers_checkpointed(x, tgt_mask, memory,
-                                                 memory_mask)
+            x = self.forward_layers_checkpointed(x, tgt_mask, memory, memory_mask)
         else:
             x = self.forward_layers(x, tgt_mask, memory, memory_mask)
         if self.normalize_before:
@@ -166,22 +179,29 @@ class TransformerDecoder(torch.nn.Module):
         olens = tgt_mask.sum(1)
         return x, torch.tensor(0.0), olens
 
-    def forward_layers(self, x: torch.Tensor, tgt_mask: torch.Tensor,
-                       memory: torch.Tensor,
-                       memory_mask: torch.Tensor) -> torch.Tensor:
+    def forward_layers(
+        self,
+        x: torch.Tensor,
+        tgt_mask: torch.Tensor,
+        memory: torch.Tensor,
+        memory_mask: torch.Tensor,
+    ) -> torch.Tensor:
         for layer in self.decoders:
-            x, tgt_mask, memory, memory_mask = layer(x, tgt_mask, memory,
-                                                     memory_mask)
+            x, tgt_mask, memory, memory_mask = layer(x, tgt_mask, memory, memory_mask)
         return x
 
     @torch.jit.ignore(drop=True)
-    def forward_layers_checkpointed(self, x: torch.Tensor,
-                                    tgt_mask: torch.Tensor,
-                                    memory: torch.Tensor,
-                                    memory_mask: torch.Tensor) -> torch.Tensor:
+    def forward_layers_checkpointed(
+        self,
+        x: torch.Tensor,
+        tgt_mask: torch.Tensor,
+        memory: torch.Tensor,
+        memory_mask: torch.Tensor,
+    ) -> torch.Tensor:
         for layer in self.decoders:
             x, tgt_mask, memory, memory_mask = ckpt.checkpoint(
-                layer.__call__, x, tgt_mask, memory, memory_mask)
+                layer.__call__, x, tgt_mask, memory, memory_mask
+            )
         return x
 
     def forward_one_step(
@@ -213,11 +233,9 @@ class TransformerDecoder(torch.nn.Module):
                 c = None
             else:
                 c = cache[i]
-            x, tgt_mask, memory, memory_mask = decoder(x,
-                                                       tgt_mask,
-                                                       memory,
-                                                       memory_mask,
-                                                       cache=c)
+            x, tgt_mask, memory, memory_mask = decoder(
+                x, tgt_mask, memory, memory_mask, cache=c
+            )
             new_cache.append(x)
         if self.normalize_before:
             y = self.after_norm(x[:, -1])
@@ -229,13 +247,12 @@ class TransformerDecoder(torch.nn.Module):
 
     def tie_or_clone_weights(self, jit_mode: bool = True):
         """Tie or clone module weights (between word_emb and output_layer)
-            depending of whether we are using TorchScript or not"""
+        depending of whether we are using TorchScript or not"""
         if not self.use_output_layer:
             return
         if jit_mode:
             logging.info("clone emb.weight to output.weight")
-            self.output_layer.weight = torch.nn.Parameter(
-                self.embed[0].weight.clone())
+            self.output_layer.weight = torch.nn.Parameter(self.embed[0].weight.clone())
         else:
             logging.info("tie emb.weight with output.weight")
             self.output_layer.weight = self.embed[0].weight
@@ -245,8 +262,7 @@ class TransformerDecoder(torch.nn.Module):
                 self.output_layer.bias.data,
                 (
                     0,
-                    self.output_layer.weight.shape[0] -
-                    self.output_layer.bias.shape[0],
+                    self.output_layer.weight.shape[0] - self.output_layer.bias.shape[0],
                 ),
                 "constant",
                 0,
@@ -310,7 +326,8 @@ class BiTransformerDecoder(torch.nn.Module):
             normalize_before,
             key_bias=key_bias,
             gradient_checkpointing=gradient_checkpointing,
-            tie_word_embedding=tie_word_embedding)
+            tie_word_embedding=tie_word_embedding,
+        )
 
         self.right_decoder = TransformerDecoder(
             vocab_size,
@@ -327,7 +344,8 @@ class BiTransformerDecoder(torch.nn.Module):
             normalize_before,
             key_bias=key_bias,
             gradient_checkpointing=gradient_checkpointing,
-            tie_word_embedding=tie_word_embedding)
+            tie_word_embedding=tie_word_embedding,
+        )
 
     def forward(
         self,
@@ -356,12 +374,12 @@ class BiTransformerDecoder(torch.nn.Module):
                     if use_output_layer is True,
                 olens: (batch, )
         """
-        l_x, _, olens = self.left_decoder(memory, memory_mask, ys_in_pad,
-                                          ys_in_lens)
+        l_x, _, olens = self.left_decoder(memory, memory_mask, ys_in_pad, ys_in_lens)
         r_x = torch.tensor(0.0)
         if reverse_weight > 0.0:
-            r_x, _, olens = self.right_decoder(memory, memory_mask,
-                                               r_ys_in_pad, ys_in_lens)
+            r_x, _, olens = self.right_decoder(
+                memory, memory_mask, r_ys_in_pad, ys_in_lens
+            )
         return l_x, r_x, olens
 
     def forward_one_step(
@@ -386,11 +404,12 @@ class BiTransformerDecoder(torch.nn.Module):
             y, cache: NN output value and cache per `self.decoders`.
             y.shape` is (batch, maxlen_out, token)
         """
-        return self.left_decoder.forward_one_step(memory, memory_mask, tgt,
-                                                  tgt_mask, cache)
+        return self.left_decoder.forward_one_step(
+            memory, memory_mask, tgt, tgt_mask, cache
+        )
 
     def tie_or_clone_weights(self, jit_mode: bool = True):
         """Tie or clone module weights (between word_emb and output_layer)
-            depending of whether we are using TorchScript or not"""
+        depending of whether we are using TorchScript or not"""
         self.left_decoder.tie_or_clone_weights(jit_mode)
         self.right_decoder.tie_or_clone_weights(jit_mode)

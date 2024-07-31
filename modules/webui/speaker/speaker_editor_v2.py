@@ -9,8 +9,8 @@ import torchaudio
 from scipy.io import wavfile
 
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
-from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.spk.dcls import DcSpkInferConfig, DcSpkReference, DcSpkSample
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.hf import spaces
 from modules.webui import webui_config
 from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate

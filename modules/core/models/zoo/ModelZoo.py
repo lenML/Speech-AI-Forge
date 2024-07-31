@@ -1,8 +1,9 @@
 from typing import Dict, Union
-from modules.core.models.TTSModel import TTSModel
-from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
+
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
+from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.FishSpeechModel import FishSpeechModel
+from modules.core.models.TTSModel import TTSModel
 from modules.devices import devices
 
 

@@ -1,12 +1,13 @@
+import os
+from typing import Callable
+
+import inflect
+import numpy as np
 import onnxruntime
 import torch
-import numpy as np
-import whisper
-from typing import Callable
-import torchaudio.compliance.kaldi as kaldi
 import torchaudio
-import os
-import inflect
+import torchaudio.compliance.kaldi as kaldi
+import whisper
 
 
 class CosyVoiceFrontEnd:

@@ -5,8 +5,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
 """
 
-from typing import List, Tuple, Optional, Union
 import lzma
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pybase16384 as b14

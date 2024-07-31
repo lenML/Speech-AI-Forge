@@ -3,21 +3,21 @@ if __name__ == "__main__":
 
     setup_repos_paths()
 
-from functools import partial
 import logging
-from pathlib import Path
 import threading
+from functools import partial
+from pathlib import Path
 from typing import Generator
 
 import librosa
 import numpy as np
 import torch
-from modules.core.models.TTSModel import TTSModel
-from modules.core.models.tts.CosyVoiceFE import CosyVoiceFrontEnd
-from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
-from modules.core.pipeline.processor import NP_AUDIO
 from hyperpyyaml import load_hyperpyyaml
 
+from modules.core.models.tts.CosyVoiceFE import CosyVoiceFrontEnd
+from modules.core.models.TTSModel import TTSModel
+from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
+from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk import TTSSpeaker
 from modules.devices import devices
 from modules.repos_static.cosyvoice.cosyvoice.cli.model import CosyVoiceModel
@@ -293,11 +293,12 @@ class CosyVoiceTTSModel(TTSModel):
 
 
 if __name__ == "__main__":
-    from modules.core.pipeline.dcls import TTSSegment
-    from modules.core.spk import spk_mgr
     import soundfile as sf
     import tqdm
     from whisper.tokenizer import Tokenizer
+
+    from modules.core.pipeline.dcls import TTSSegment
+    from modules.core.spk import spk_mgr
 
     model = CosyVoiceTTSModel()
     model.logger.setLevel(logging.DEBUG)
