@@ -1,12 +1,9 @@
-from typing import Generator, Optional, Union
+from typing import Generator, Union
 
-import numpy as np
-import torch
 
 from modules.core.models.tts.InerCache import InferCache
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
-from modules.core.tn.TNPipeline import TNPipeline
 
 
 class TTSModel:
@@ -14,7 +11,6 @@ class TTSModel:
     def __init__(self, model_id: str) -> None:
         self.model_id = model_id
         self.hash = ""
-        self.tn: Optional[TNPipeline] = None
 
     def reset(self) -> None:
         """
