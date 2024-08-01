@@ -31,12 +31,15 @@ logger = logging.getLogger(__name__)
 class FishSpeechModel(TTSModel):
     lock = threading.Lock()
 
+    model: FISH_SPEECH_LLAMA = None
+    vqgan: FireflyArchitecture = None
+
     def __init__(self) -> None:
         super().__init__("fish-speech")
 
-        self.model: FISH_SPEECH_LLAMA = None
+        self.model: FISH_SPEECH_LLAMA = FishSpeechModel.model
+        self.vqgan: FireflyArchitecture = FishSpeechModel.vqgan
         self.token_decoder: callable = None
-        self.vqgan: FireflyArchitecture = None
 
         self.device = devices.get_device_for("fish-speech")
         self.dtype = devices.dtype
@@ -54,8 +57,8 @@ class FishSpeechModel(TTSModel):
         return llama, vqgan
 
     def load_llama(self) -> FISH_SPEECH_LLAMA:
-        if self.model:
-            return self.model
+        if FishSpeechModel.model:
+            return FishSpeechModel.model
 
         with self.lock:
             logger.info(
@@ -73,12 +76,13 @@ class FishSpeechModel(TTSModel):
 
             self.model = model
             self.token_decoder = token_decoder
+            FishSpeechModel.model = model
             devices.torch_gc()
             return model
 
     def load_vqgan(self) -> FireflyArchitecture:
-        if self.vqgan:
-            return self.vqgan
+        if FishSpeechModel.vqgan:
+            return FishSpeechModel.vqgan
 
         with self.lock:
             logger.info(
@@ -96,6 +100,7 @@ class FishSpeechModel(TTSModel):
             model = model.to(device=self.device, dtype=self.dtype)
 
             self.vqgan = model
+            FishSpeechModel.vqgan = model
             return model
 
     def unload(self, context: TTSPipelineContext = None) -> None:
@@ -106,6 +111,10 @@ class FishSpeechModel(TTSModel):
             self.model = None
             self.token_decoder = None
             self.vqgan = None
+            del FishSpeechModel.vqgan
+            del FishSpeechModel.model
+            FishSpeechModel.model = None
+            FishSpeechModel.vqgan = None
             devices.torch_gc()
 
     def encode(self, text: str) -> list[int]:

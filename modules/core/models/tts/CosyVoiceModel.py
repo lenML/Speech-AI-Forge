@@ -7,7 +7,7 @@ import logging
 import threading
 from functools import partial
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Optional
 
 import librosa
 import numpy as np
@@ -43,6 +43,9 @@ class CosyVoiceTTSModel(TTSModel):
 
     load_lock = threading.Lock()
 
+    model: Optional[CosyVoiceModel] = None
+    frontend: Optional[CosyVoiceFrontEnd] = None
+
     def __init__(self) -> None:
         super().__init__("cosy-voice")
 
@@ -59,11 +62,12 @@ class CosyVoiceTTSModel(TTSModel):
             self.logger.info(f"Found CosyVoice model: {paths}")
 
         self.model_dir = paths[0]
-        self.model: CosyVoiceModel = None
-        self.frontend: CosyVoiceFrontEnd = None
 
         self.device = devices.get_device_for(self.model_id)
         self.dtype = devices.dtype
+
+        self.model = CosyVoiceTTSModel.model
+        self.frontend = CosyVoiceTTSModel.frontend
 
     def reset(self) -> None:
         return super().reset()
@@ -72,8 +76,8 @@ class CosyVoiceTTSModel(TTSModel):
         self, context: TTSPipelineContext = None
     ) -> tuple[CosyVoiceModel, CosyVoiceFrontEnd]:
         with self.load_lock:
-            if self.model is not None:
-                return self.model, self.frontend
+            if CosyVoiceTTSModel.model is not None:
+                return CosyVoiceTTSModel.model, CosyVoiceTTSModel.frontend
             self.logger.info("Loading CosyVoice model...")
 
             device = self.device
@@ -111,16 +115,23 @@ class CosyVoiceTTSModel(TTSModel):
             devices.torch_gc()
             self.logger.info("CosyVoice model loaded.")
 
+            CosyVoiceTTSModel.model = model
+            CosyVoiceTTSModel.frontend = frontend
+
             return model, frontend
 
     def unload(self, context: TTSPipelineContext = None) -> None:
         with self.load_lock:
-            if self.model is None:
+            if CosyVoiceTTSModel.model is None:
                 return
             del self.model
             del self.frontend
             self.model = None
             self.frontend = None
+            del CosyVoiceTTSModel.model
+            del CosyVoiceTTSModel.frontend
+            CosyVoiceTTSModel.model = None
+            CosyVoiceTTSModel.frontend = None
             devices.torch_gc()
 
     def encode(self, text: str) -> list[int]:
