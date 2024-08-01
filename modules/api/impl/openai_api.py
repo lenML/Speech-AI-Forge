@@ -1,8 +1,11 @@
+import io
 from typing import List, Optional
 
+import numpy as np
 from fastapi import Body, File, Form, HTTPException, UploadFile
 from numpy import clip
 from pydantic import BaseModel, Field
+from pydub import AudioSegment
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
@@ -12,7 +15,9 @@ from modules.core.handler.datacls.audio_model import (
     EncoderConfig,
 )
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.datacls.stt_model import STTConfig, STTOutputFormat
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
+from modules.core.handler.STTHandler import STTHandler
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
@@ -153,6 +158,10 @@ class TranscriptionsVerboseResponse(BaseModel):
     segments: list[TranscribeSegment]
 
 
+class TranscriptionsResponse(BaseModel):
+    text: str
+
+
 def setup(app: APIManager):
     app.post(
         "/v1/audio/speech",
@@ -171,17 +180,52 @@ openai api document:
 
     @app.post(
         "/v1/audio/transcriptions",
-        response_model=TranscriptionsVerboseResponse,
+        # NOTE: 其实最好是不设置这个model...因为这个接口可以返回很多情况...
+        # response_model=TranscriptionsResponse,
         description="Transcribes audio into the input language.",
     )
     async def transcribe(
         file: UploadFile = File(...),
-        model: str = Form(...),
+        model: str = Form("whisper.large"),
         language: Optional[str] = Form(None),
         prompt: Optional[str] = Form(None),
-        response_format: str = Form("json"),
+        # TODO 不支持 verbose_json
+        response_format: str = Form("txt"),
         temperature: float = Form(0),
+        # TODO 这个没实现，需要重写 whisper 的 transcribe 函数
         timestamp_granularities: List[str] = Form(["segment"]),
     ):
-        # TODO: Implement transcribe
-        return api_utils.success_response("not implemented yet")
+        try:
+            response_format = STTOutputFormat(response_format)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid response format.")
+
+        audio_bytes = await file.read()
+        audio_segment: AudioSegment = AudioSegment.from_file(io.BytesIO(audio_bytes))
+
+        sample_rate = audio_segment.frame_rate
+        samples = np.array(audio_segment.get_array_of_samples())
+
+        input_audio = (sample_rate, samples)
+
+        sst_config = STTConfig(
+            mid=model,
+            prompt=prompt,
+            language=language,
+            tempperature=temperature if temperature > 0 else None,
+            format=response_format,
+        )
+
+        try:
+            handler = STTHandler(input_audio=input_audio, stt_config=sst_config)
+
+            return {"text": handler.enqueue()}
+        except Exception as e:
+            import logging
+
+            logging.exception(e)
+
+            if isinstance(e, HTTPException):
+                raise e
+            else:
+                raise HTTPException(status_code=500, detail=str(e))

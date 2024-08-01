@@ -20,14 +20,14 @@ class STTConfig(BaseModel):
     prefix: Optional[Union[str, List[int]]] = None
 
     language: Optional[str] = None
-    tempperature: float = 0.0
+    tempperature: Optional[float] = None
     sample_len: Optional[int] = None
     best_of: Optional[int] = None
     beam_size: Optional[int] = None
     patience: Optional[int] = None
     length_penalty: Optional[float] = None
 
-    format: Optional[STTOutputFormat] = STTOutputFormat.json
+    format: Optional[STTOutputFormat] = STTOutputFormat.txt
 
     highlight_words: Optional[bool] = False
     max_line_count: Optional[int] = None

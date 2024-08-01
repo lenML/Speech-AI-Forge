@@ -192,7 +192,7 @@ cython_debug/
 .vscode
 
 tests/test_outputs
-tests/test_inputs
+!tests/test_inputs/**/*.wav
 
 /datasets/data_*
 

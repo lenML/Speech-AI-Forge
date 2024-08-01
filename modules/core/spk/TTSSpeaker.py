@@ -3,7 +3,8 @@ import copy
 import dataclasses
 import json
 import uuid
-from typing import Any, Callable, Optional
+from tempfile import _TemporaryFileWrapper
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import torch
@@ -17,6 +18,7 @@ from modules.core.spk.dcls import (
     DcSpkTrainInfo,
     DcSpkVoiceToken,
 )
+from modules.utils import audio_utils
 
 dclses = [
     DcSpk,
@@ -179,6 +181,18 @@ class TTSSpeaker:
         if found_ref is not None:
             return found_ref
         return ref0
+
+    def get_ref_wav(
+        self, get_func: Optional[Callable[[DcSpkReference], bool]] = None
+    ) -> Union[tuple[int, np.ndarray, str], tuple[None, None, None]]:
+        ref0 = self.get_ref(get_func)
+        if ref0 is None:
+            return None, None, None
+        sr = ref0.wav_sr
+        wav_bytes = ref0.wav
+        wav = audio_utils.bytes_to_librosa_array(audio_bytes=wav_bytes, sample_rate=sr)
+        text = ref0.text
+        return sr, wav, text
 
     def get_recommend_config(self) -> Optional[DcSpkInferConfig]:
         if self._data.recommend_config:

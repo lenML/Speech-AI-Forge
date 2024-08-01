@@ -1,8 +1,10 @@
+import logging
 import threading
 from pathlib import Path
 from typing import Optional
 
 import librosa
+import numpy as np
 import torch
 from whisper import Whisper, audio, load_model
 
@@ -38,9 +40,15 @@ class WhisperModel(STTModel):
 
     lock = threading.Lock()
 
+    logger = logging.getLogger(__name__)
+
+    model: Optional[Whisper] = None
+
     def __init__(self, model_id: str):
         # example: `whisper.large` or `whisper` or `whisper.small`
-        model_ver = model_id.split(".")
+        model_ver = model_id.lower().split(".")
+
+        assert model_ver[0] == "whisper", f"Invalid model id: {model_id}"
 
         self.model_size = model_ver[1] if len(model_ver) > 1 else "large"
         self.model_dir = Path("./models/whisper")
@@ -48,30 +56,38 @@ class WhisperModel(STTModel):
         self.device = devices.get_device_for("whisper")
         self.dtype = devices.dtype
 
-        self.model: Whisper = None
-
     def load(self):
-        if self.model is None:
+        if WhisperModel.model is None:
             with self.lock:
-                self.model = load_model(
+                self.logger.info(f"Loading Whisper model [{self.model_size}]...")
+                WhisperModel.model = load_model(
                     name=self.model_size,
                     download_root=str(self.model_dir),
                     device=self.device,
                 )
-        return self.model
+                self.logger.info("Whisper model loaded.")
+        return WhisperModel.model
 
     @devices.after_gc()
     def unload(self):
-        if self.model is None:
+        if WhisperModel.model is None:
             return
-        del self.model
-        self.model = None
+        with self.lock:
+            del self.model
+            self.model = None
+            del WhisperModel.model
+            WhisperModel.model = None
 
     def resample_audio(self, audio: NP_AUDIO):
         sr, data = audio
+
+        if data.dtype == np.int16:
+            data = data.astype(np.float32)
+            data /= np.iinfo(np.int16).max
+
         if sr == self.SAMPLE_RATE:
             return sr, data
-        data = librosa.resample(data, sr, self.SAMPLE_RATE)
+        data = librosa.resample(data, orig_sr=sr, target_sr=self.SAMPLE_RATE)
         return self.SAMPLE_RATE, data
 
     def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> TranscribeResult:
@@ -97,8 +113,14 @@ class WhisperModel(STTModel):
 
         model = self.load()
 
+        _, audio_data = self.resample_audio(audio=audio)
+
+        # ref https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
+        if tempperature is None or tempperature <= 0:
+            tempperature = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+
         result: WhisperTranscribeResult = model.transcribe(
-            audio,
+            audio=audio_data,
             language=language,
             prompt=prompt,
             prefix=prefix,
@@ -127,7 +149,6 @@ class WhisperModel(STTModel):
 if __name__ == "__main__":
     import json
 
-    import numpy as np
     from scipy.io import wavfile
 
     devices.reset_device()
