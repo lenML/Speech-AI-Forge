@@ -1,5 +1,114 @@
 # Changelog
 
+<a name="0.8.0-rc"></a>
+
+## 0.8.0-rc (2024-08-02)
+
+### Added
+
+- ✨ add stt api [#92](https://github.com/lenML/ChatTTS-Forge/issues/92) [[92b992f](https://github.com/lenML/ChatTTS-Forge/commit/92b992f2a5f77c95696590dd1f6c8f548c6a687d)]
+- ✨ impl whisper model [[ae3f416](https://github.com/lenML/ChatTTS-Forge/commit/ae3f4162d8e85173eda94112e6fdcf4513ad2a71)]
+- ✨ api support specify model_id [[a486098](https://github.com/lenML/ChatTTS-Forge/commit/a486098ab0640b234cb639bbb920e1c176c36d65)]
+- ✨ ChatTTS 支持 reference 推理 [#113](https://github.com/lenML/ChatTTS-Forge/issues/113) [[ff4991e](https://github.com/lenML/ChatTTS-Forge/commit/ff4991e0131ab38a929815dedbfbaf1e5b8f854a)]
+- ✨ webui add Speaker Builder [[c5b5a27](https://github.com/lenML/ChatTTS-Forge/commit/c5b5a278ce787d783ed2b107e5e76c082cefc65f)]
+- ✨ update chatts 下载脚本 [[702d63d](https://github.com/lenML/ChatTTS-Forge/commit/702d63d6828190e1e77e80c47df5005fb70dfcb0)]
+- ✨ api support latest speaker structure [[e210f03](https://github.com/lenML/ChatTTS-Forge/commit/e210f03bed662117d4dc2a805d95436080386748)]
+- ✨ add &#x60;/text/normalize&#x60; api [[ca0f7b2](https://github.com/lenML/ChatTTS-Forge/commit/ca0f7b25587a917bd314eb2885f5f1751c60588e)]
+- ✨ add excepthook [[241bceb](https://github.com/lenML/ChatTTS-Forge/commit/241bcebbe642433ecd92b61358aaa4457f30510e)]
+- ✨ support more tts models [#90](https://github.com/lenML/ChatTTS-Forge/issues/90) [[e3d1b14](https://github.com/lenML/ChatTTS-Forge/commit/e3d1b142ea5f80daf042cd10fa8a9b54dcd2893c)]
+- ✨ add &#x60;CosyVoiceModel&#x60; [#90](https://github.com/lenML/ChatTTS-Forge/issues/90) [[3adb574](https://github.com/lenML/ChatTTS-Forge/commit/3adb5743802a16fc2fe96f2027f546ec59ce7703)]
+- ✨ webui &#x60;tts_generate_with_history&#x60; [[58fe589](https://github.com/lenML/ChatTTS-Forge/commit/58fe589e85e8169dee47dcc5f2fb21f8a40f77ea)]
+- ✨ webui min_temp &#x60;0.1&#x60; &#x3D;&gt; &#x60;0.000000001&#x60; [[3a41ef9](https://github.com/lenML/ChatTTS-Forge/commit/3a41ef9d3110d618f783c2c4d48646bc5b3400f0)]
+- ✨ add xtts_v2 api &#x60;no_cache&#x60; [[a8d913d](https://github.com/lenML/ChatTTS-Forge/commit/a8d913d476d07c28135c5907fd6da36f0bec3036)]
+- ✨ add cosyvoice spk file [[2854902](https://github.com/lenML/ChatTTS-Forge/commit/2854902fe0551dfed0292a5a24fc7e42b3779c92)]
+- ✨ add spk edit script [[837b49b](https://github.com/lenML/ChatTTS-Forge/commit/837b49bc4fbc62d2085ed714ea9e9380bb33d8f3)]
+- ✨ add cosyvoice config [[6556306](https://github.com/lenML/ChatTTS-Forge/commit/65563060de105e37b222521a2c44d237713423f7)]
+- ✨ add cosyvoice downloader [[cc60120](https://github.com/lenML/ChatTTS-Forge/commit/cc60120076c3b880cbe3ced31227ce75cd979cae)]
+- ✨ support fish speech model [[1835565](https://github.com/lenML/ChatTTS-Forge/commit/1835565997e2b8ed7f23c7e96bb3cda9ea41d59e)]
+- ✨ refacotor style prompt [[9c8c0de](https://github.com/lenML/ChatTTS-Forge/commit/9c8c0de66106c283a669132f7a47fc738521858d)]
+- ✨ add fishspeech model dl [[bdb3ee5](https://github.com/lenML/ChatTTS-Forge/commit/bdb3ee56086c819a377d1532e2739eb5735c2122)]
+- ✨ improve tts handler [[8b85878](https://github.com/lenML/ChatTTS-Forge/commit/8b85878a48cb2971cabbd69044b5a6ab965c168c)]
+- ✨ tn 兼容 windows [[0919b01](https://github.com/lenML/ChatTTS-Forge/commit/0919b0143bf2c872e4335493fa3b7492fd0963e4)]
+- ✨ webui in &#x60;tts_pipeline&#x60; [[ea39d6b](https://github.com/lenML/ChatTTS-Forge/commit/ea39d6b64784f393a430171df5c33ac7eb0a5c94)]
+- ✨ streaming encoder [[50d41a9](https://github.com/lenML/ChatTTS-Forge/commit/50d41a9491913d24705b470bcf10d5a438906492)]
+- ✨ 完善 stream mode [[3095d4c](https://github.com/lenML/ChatTTS-Forge/commit/3095d4cd8067fbc6dda95bd6a6278c5b324f4cf1)]
+- ✨ add InferCache [[fd93e79](https://github.com/lenML/ChatTTS-Forge/commit/fd93e79537d71d3fb6a7e925f61eaacddee80c18)]
+- ✅ pass TN test cases [[f604f5c](https://github.com/lenML/ChatTTS-Forge/commit/f604f5cdb6080adb64e04109016df8bd03e4ad95)]
+- ✨ models load by zoo [[7835eb6](https://github.com/lenML/ChatTTS-Forge/commit/7835eb61c34fc2371be75f11604bb1030a8cdf47)]
+- ✨ fit tests case to &#x60;dev_tts_pipeline&#x60; [[b24cb17](https://github.com/lenML/ChatTTS-Forge/commit/b24cb1761ee02df22df5181349e54dc4c326392e)]
+- ✨ fit api &#x3D;&gt; tts pipeline [[c4baeb1](https://github.com/lenML/ChatTTS-Forge/commit/c4baeb166337baf371800b2235ed14647ac96d21)]
+- ✨ add &#x60;--train_mse&#x60; [[7e54bb7](https://github.com/lenML/ChatTTS-Forge/commit/7e54bb7482465010ac960440ac7a343ca35e202b)]
+
+### Changed
+
+- 📌 sync upstream [#113](https://github.com/lenML/ChatTTS-Forge/issues/113) [[5d4bafc](https://github.com/lenML/ChatTTS-Forge/commit/5d4bafc6e17c1f124f606159655b127a0870b942)]
+- 📌 pin repos_static.ChatTTS [[b1102ed](https://github.com/lenML/ChatTTS-Forge/commit/b1102eda29178bc89635180ee3b43b8af498e162)]
+- 📌 pin markedjs [[20f6781](https://github.com/lenML/ChatTTS-Forge/commit/20f6781d1373edfe063e57bcb6639af0c0dec22e)]
+- 📌 pin cosyvoice [[54f59e8](https://github.com/lenML/ChatTTS-Forge/commit/54f59e8b4f2c8a3e4a2afcb9ea8dcbaf7fee4b5b)]
+- 📌 pin fishspeech rename [[af9efdf](https://github.com/lenML/ChatTTS-Forge/commit/af9efdfd2ca00216afc0db9ef9d378a41a8d44ee)]
+- 📌 pin fishspeech [[c8905df](https://github.com/lenML/ChatTTS-Forge/commit/c8905df4fc7dc780104144728773b1c4ce655f95)]
+- ♻️ refactor TTSSpeaker [#90](https://github.com/lenML/ChatTTS-Forge/issues/90) [[7d7f465](https://github.com/lenML/ChatTTS-Forge/commit/7d7f4652e88d97384c289dc30f9fc2a8d400a351)]
+- ⬆️ Bump certifi from 2024.2.2 to 2024.7.4 [[006f246](https://github.com/lenML/ChatTTS-Forge/commit/006f24685e1089c09909556797334bae25e1fd07)]
+
+### Breaking changes
+
+- 💥 breaking improve [#91](https://github.com/lenML/ChatTTS-Forge/issues/91) [[3d62765](https://github.com/lenML/ChatTTS-Forge/commit/3d62765eb8173527be993fcee58fab668bfae1fd)]
+
+### Removed
+
+- 🔥 remove test files [[b1d5d69](https://github.com/lenML/ChatTTS-Forge/commit/b1d5d6931c5bf2c9496b3c9483ccc8b931d9e035)]
+- 🔥 remove old speaker files [[caf8787](https://github.com/lenML/ChatTTS-Forge/commit/caf87872652d5a9adc33fac0ea054b43e44c15e3)]
+
+### Fixed
+
+- 🐛 fix model loader [[d904679](https://github.com/lenML/ChatTTS-Forge/commit/d904679f7361508904ff14d701c59900055988f5)]
+- 🐛 fix mps error msg [[928a9b4](https://github.com/lenML/ChatTTS-Forge/commit/928a9b44ae74b82dfec986ddec67785a068159bf)]
+- 🐛 fix generate function precision [#120](https://github.com/lenML/ChatTTS-Forge/issues/120) [[77e6eeb](https://github.com/lenML/ChatTTS-Forge/commit/77e6eebc57265a1ffeff7c28197e5511395e117e)]
+- 🐛 fix tokenizer.padding_side [[e46379c](https://github.com/lenML/ChatTTS-Forge/commit/e46379cdcc3b071a356fb9ad07a129d6303ddb18)]
+- 🐛 fix test case in &#x60;spk&#x3D;&#x3D;None&#x60; [[ff26e67](https://github.com/lenML/ChatTTS-Forge/commit/ff26e67a4aaf9ca636007b460d17059940640af4)]
+- 🐛 fix refine [#117](https://github.com/lenML/ChatTTS-Forge/issues/117) [[f0c2602](https://github.com/lenML/ChatTTS-Forge/commit/f0c26024b150859c75d39b1e93b90068fcf2362c)]
+- 🐛 fix execpthook [[a9c9d16](https://github.com/lenML/ChatTTS-Forge/commit/a9c9d16c86201e68089b275062d5a076e27f62e8)]
+- 🐛 fix playground pages [[d106390](https://github.com/lenML/ChatTTS-Forge/commit/d106390f51b17aca26418dd61f13ef8f10f2a8ab)]
+- 🐛 fix refine api [#116](https://github.com/lenML/ChatTTS-Forge/issues/116) [[86ae55a](https://github.com/lenML/ChatTTS-Forge/commit/86ae55a27dafa5e55f4243b525dabfabe0dc9550)]
+- 🐛 improve generator gc [[3b45772](https://github.com/lenML/ChatTTS-Forge/commit/3b4577293e52101de32ed824bf50dee2f3600d56)]
+- 🐛 fix cosy voice model loader [[fb3df64](https://github.com/lenML/ChatTTS-Forge/commit/fb3df6408e4a070c7911565537ce83583e554831)]
+- 🐛 fix spk file api [#114](https://github.com/lenML/ChatTTS-Forge/issues/114) [[c0a1373](https://github.com/lenML/ChatTTS-Forge/commit/c0a13734ee331d5541c9a027d13adbbaa4fc5210)]
+- 🐛 add &#x60;--off_track_tqdm&#x60; fix [#110](https://github.com/lenML/ChatTTS-Forge/issues/110) [[e57b37c](https://github.com/lenML/ChatTTS-Forge/commit/e57b37cd1884afcbf0c939b275e8177200ebb4e1)]
+- 🐛 fix downloader [[d0c1467](https://github.com/lenML/ChatTTS-Forge/commit/d0c1467d29abc9f1a9b1d35d56ab1587ad8eae82)]
+- 🐛 fix &#x60;StreamEncoder&#x60; reader mode [#108](https://github.com/lenML/ChatTTS-Forge/issues/108) [[3613d0d](https://github.com/lenML/ChatTTS-Forge/commit/3613d0db54e692c6dfbfe7697be2411b7e8ef7f9)]
+- 🐛 compatible with py3.11 [#106](https://github.com/lenML/ChatTTS-Forge/issues/106) [[8f4d8b6](https://github.com/lenML/ChatTTS-Forge/commit/8f4d8b6653b7870495f1be6b19fa9d771b89780c)]
+- 🐛 fix webui bug [#105](https://github.com/lenML/ChatTTS-Forge/issues/105) [[5c6b098](https://github.com/lenML/ChatTTS-Forge/commit/5c6b0983d36ea71b18e8b7360220a2665a4aac3a)]
+- 🐛 fix stream encoder header [#103](https://github.com/lenML/ChatTTS-Forge/issues/103) [[f7312c1](https://github.com/lenML/ChatTTS-Forge/commit/f7312c11cd8e3d156dbff62367fa725d95aeaa94)]
+- 🐛 fix file encoding [[c5006fb](https://github.com/lenML/ChatTTS-Forge/commit/c5006fb5d76260443727220875dd69efd4abc866)]
+- 🐛 tn 兼容 windows [[bbada30](https://github.com/lenML/ChatTTS-Forge/commit/bbada30c9e10e2119a45af09f99cc3af17c1b20f)]
+- 🐛 修复 playground ssml page error [[112a90f](https://github.com/lenML/ChatTTS-Forge/commit/112a90f01ba69666077ec8395bfc30bf832e235e)]
+- 🐛 修复 style/spk 计算逻辑 [[62ed997](https://github.com/lenML/ChatTTS-Forge/commit/62ed99750d419d511181a72fcb18b2a797b32d1b)]
+- 🐛 fix &#x60;ensure_non_empty&#x60; issues [#99](https://github.com/lenML/ChatTTS-Forge/issues/99) [[bfc3789](https://github.com/lenML/ChatTTS-Forge/commit/bfc37897eca494129d462473cdcb8ec899f00ba0)]
+- 🐛 manual pick ee07d82f2155c56ee31340f5c073a2bef64ba55c [[6d857a7](https://github.com/lenML/ChatTTS-Forge/commit/6d857a72b0e88a6afd7a331b58a980bba3bd8cb2)]
+- 🐛 manual pick 906f2f78cc4a71b59dcf83f4c7fea33e7a637127 [[878fa52](https://github.com/lenML/ChatTTS-Forge/commit/878fa52aa969a9a9b924926cbfa53c907324d07a)]
+- 🐛 fix api test cases [[0953816](https://github.com/lenML/ChatTTS-Forge/commit/09538162117942fe0d18598cbc39113d53db8de0)]
+- 🐛 fix generate dtype [[ee07d82](https://github.com/lenML/ChatTTS-Forge/commit/ee07d82f2155c56ee31340f5c073a2bef64ba55c)]
+- 🐛 fix ensure memory usage [#99](https://github.com/lenML/ChatTTS-Forge/issues/99) [[906f2f7](https://github.com/lenML/ChatTTS-Forge/commit/906f2f78cc4a71b59dcf83f4c7fea33e7a637127)]
+
+### Miscellaneous
+
+- 📝 update [[7b05ab6](https://github.com/lenML/ChatTTS-Forge/commit/7b05ab6bc2bdc99c59d77e8e01db02ab375eed34)]
+- 📝 rebuild spk files [[fd15498](https://github.com/lenML/ChatTTS-Forge/commit/fd154984e865cfe4a47fe6d82205dace266f7a3d)]
+- fix: ensure SpkEncoder tensor with dtype.float [[b9491a6](https://github.com/lenML/ChatTTS-Forge/commit/b9491a6140d6a8c9a41ccecb751e4d9560e859e4)]
+- fix: topK and topP not valid [#115](https://github.com/lenML/ChatTTS-Forge/issues/115) [[3ce2424](https://github.com/lenML/ChatTTS-Forge/commit/3ce2424993fd585b46a5931df76bc91a370d8e2e)]
+- Merge pull request [#115](https://github.com/lenML/ChatTTS-Forge/issues/115) from wenyangchou/main [[f9cb075](https://github.com/lenML/ChatTTS-Forge/commit/f9cb0751696fa1e241840318c99dbee5c82ca94f)]
+- fix: topK and topP not valid [[c0bfe02](https://github.com/lenML/ChatTTS-Forge/commit/c0bfe022fb131e0cddf7a0ccea67e9b005025b24)]
+- 📝 update roadmap [[6869d99](https://github.com/lenML/ChatTTS-Forge/commit/6869d99b3efcd5e96b9357a752aa0a73c30b75a1)]
+- 📝 update template [[d57c97d](https://github.com/lenML/ChatTTS-Forge/commit/d57c97d681e7dcce0667565d1356832267d4bee7)]
+- 📝 update README [[3dc64be](https://github.com/lenML/ChatTTS-Forge/commit/3dc64bee9988a9c2846968d1031069dbc14b4fa3)]
+- Merge pull request [#102](https://github.com/lenML/ChatTTS-Forge/issues/102) from lenML/dev_tts_pipeline [[4028da1](https://github.com/lenML/ChatTTS-Forge/commit/4028da172e970e7bfeb0e8d2eb41d433881f9bdc)]
+- merge main into dev_tts_pipeline [[846d18f](https://github.com/lenML/ChatTTS-Forge/commit/846d18f4992d1ba39c525072c8974172192587e5)]
+- 📝 update [[7eff3ec](https://github.com/lenML/ChatTTS-Forge/commit/7eff3ecd7a5726aafb14e5c9d80a378c12f32652)]
+- Merge pull request [#93](https://github.com/lenML/ChatTTS-Forge/issues/93) from lenML/dependabot/pip/certifi-2024.7.4 [[2f252df](https://github.com/lenML/ChatTTS-Forge/commit/2f252df6cd616a1b633224a1b34b71984947e90d)]
+- 📝 update 整合包 url [[30a6936](https://github.com/lenML/ChatTTS-Forge/commit/30a693666ade02657912ccd5370afea0bee0fda0)]
+- 📝 update gpu usage [[4e7c6c3](https://github.com/lenML/ChatTTS-Forge/commit/4e7c6c35fa77d2e624d93ae3ae8ac73c9606f613)]
+- 📝 update [[c3006e4](https://github.com/lenML/ChatTTS-Forge/commit/c3006e4629ea9ee7074e0761f5885c5b0883ae3b)]
+
 <a name="0.7.0"></a>
 
 ## 0.7.0 (2024-07-04)
