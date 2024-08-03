@@ -17,11 +17,17 @@ transformers==4.41.2
 torch
 torchvision
 torchaudio
-gradio
+
+# TN
 emojiswitch
 python-dotenv
 zhon
 mistune==3.0.2
+
+# gradio
+gradio==4.39.0
+gradio_client==1.1.1
+
 cn2an
 # audio_denoiser
 python-box

@@ -141,8 +141,8 @@ def speaker_creator_ui():
                 )
                 random_button = gr.Button("Random Speaker")
             with gr.Group():
-                gr.Markdown("🔊Generate speaker.pt")
-                generate_button = gr.Button("Save .pt file")
+                gr.Markdown("🔊Generate speaker.json")
+                generate_button = gr.Button("Save .json file")
                 output_file = gr.File(label="Save to File")
         with gr.Column(scale=5):
             create_test_voice_card(seed_input=seed_input)

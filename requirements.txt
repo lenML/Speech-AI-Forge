@@ -16,12 +16,17 @@ tqdm
 # torch
 # torchvision
 # torchaudio
-gradio
+
+# TN
 emojiswitch
 python-dotenv
 zhon
 mistune==3.0.2
-cn2an
+
+# gradio
+gradio==4.39.0
+gradio_client==1.1.1
+
 # audio_denoiser
 python-box
 ftfy
