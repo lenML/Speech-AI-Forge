@@ -40,17 +40,11 @@ def encode_to_b64(tensor: torch.Tensor) -> str:
     byts:bytes = ndarr.tobytes()
     return base64.b64encode(byts).decode("utf-8")
 
-def encode_to_b14(tensor: torch.Tensor) -> str:
-    arr: npt.NDArray = tensor.to(dtype=torch.uint16, device="cpu").numpy()
-    shp = arr.shape
-    if len(shp) == 1:
-        arr = arr.reshape(1, -1)
-        shp = arr.shape
-    assert len(shp) == 2, "prompt must be a 2D tensor"
+def encode_to_b14(spk_emb: torch.Tensor) -> str:
+    arr: np.ndarray = spk_emb.to(dtype=torch.float16, device="cpu").numpy()
     s = b14.encode_to_string(
-        np.array(shp, dtype="<u2").tobytes()
-        + lzma.compress(
-            arr.astype("<u2").tobytes(),
+        lzma.compress(
+            arr.tobytes(),
             format=lzma.FORMAT_RAW,
             filters=[{"id": lzma.FILTER_LZMA2, "preset": 9 | lzma.PRESET_EXTREME}],
         ),
@@ -58,6 +52,16 @@ def encode_to_b14(tensor: torch.Tensor) -> str:
     del arr
     return s
 
+def _decode_b14_str(b14_str: str) -> np.ndarray:
+    return np.frombuffer(
+        lzma.decompress(
+            b14.decode_from_string(b14_str),
+            format=lzma.FORMAT_RAW,
+            filters=[{"id": lzma.FILTER_LZMA2, "preset": 9 | lzma.PRESET_EXTREME}],
+        ),
+        dtype=np.float16,
+    ).copy()
+        
 if __name__ == "__main__":
     """
     此脚本用于将 spk_emb 输出为 字符串
@@ -93,3 +97,6 @@ if __name__ == "__main__":
     else:
         with open(args.out, "w") as f:
             f.write(token)
+            
+    # decoded = _decode_b14_str(output)
+    # print(f"Decoded: {decoded.shape}")
