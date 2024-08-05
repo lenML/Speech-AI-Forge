@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional, Union
 
-from openai import BaseModel
+from pydantic import BaseModel
 
 
 class STTOutputFormat(str, Enum):
