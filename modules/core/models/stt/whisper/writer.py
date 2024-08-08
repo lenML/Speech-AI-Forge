@@ -73,7 +73,7 @@ class WriteTXT(ResultWriter):
         **kwargs,
     ):
         for segment in segments:
-            print(segment.text.strip() + "\n", file=file, flush=True)
+            print(segment.text.strip(), file=file, flush=True)
 
 
 class WriteVTT(ResultWriter):
