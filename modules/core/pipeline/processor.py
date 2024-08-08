@@ -1,12 +1,13 @@
-from typing import Union
+from typing import Tuple, Union
 
 import numpy as np
+import numpy.typing as npt
 from pydub import AudioSegment
 
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.utils import audio_utils as audio_utils
 
-NP_AUDIO = tuple[int, np.ndarray]
+NP_AUDIO = Tuple[int, npt.NDArray]
 AUDIO = Union[NP_AUDIO, AudioSegment]
 
 

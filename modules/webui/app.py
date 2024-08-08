@@ -5,6 +5,7 @@ import gradio as gr
 
 from modules import config
 from modules.webui import gradio_extensions, webui_config
+from modules.webui.audio_tools.tools_tab import create_tools_tab
 from modules.webui.changelog_tab import create_changelog_tab
 from modules.webui.finetune.ft_tab import create_ft_tabs
 from modules.webui.localization_runtime import ENLocalizationVars, ZHLocalizationVars
@@ -120,6 +121,9 @@ def create_interface():
                 gr.Markdown("🚧 Under construction")
             with gr.TabItem("Finetune", visible=webui_config.experimental):
                 create_ft_tabs(demo)
+
+            with gr.TabItem("Tools"):
+                create_tools_tab()
 
             with gr.TabItem("System"):
                 create_system_tab()

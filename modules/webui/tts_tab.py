@@ -283,8 +283,8 @@ def create_tts_interface():
                 volume_up_input = gr.Slider(
                     label="Volume Gain",
                     value=0,
-                    minimum=-12,
-                    maximum=12,
+                    minimum=-20,
+                    maximum=6,
                     step=0.1,
                 )
 

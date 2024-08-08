@@ -17,50 +17,22 @@ from modules.core.pipeline.processor import (
 from modules.utils import audio_utils
 
 
-class TTSPipeline:
-    def __init__(self, context: TTSPipelineContext):
+class AudioPipeline:
+
+    def __init__(self, context: TTSPipelineContext) -> None:
         self.modules: list[Union[AudioProcessor, PreProcessor]] = []
-        self.model: TTSModel = None
         self.context = context
 
     def add_module(self, module):
         self.modules.append(module)
 
-    def set_model(self, model):
-        self.model = model
-
-    def create_synth(self):
-        chunker = TTSChunker(context=self.context)
-        segments = chunker.segments()
-        # 其实这个在 chunker 之前调用好点...但是有副作用所以放在后面
-        segments = [self.process_pre(seg) for seg in segments]
-
-        synth = BatchSynth(
-            input_segments=segments, context=self.context, model=self.model
-        )
-        return synth
+    def generate_audio() -> NP_AUDIO:
+        pass
 
     def generate(self) -> NP_AUDIO:
-        synth = self.create_synth()
-        synth.start_generate()
-        synth.wait_done()
-        audio = synth.sr(), synth.read()
-        return self.process_np_audio(audio)
-
-    def generate_stream(self) -> Generator[NP_AUDIO, None, None]:
-        synth = self.create_synth()
-        synth.start_generate()
-        while not synth.is_done():
-            data = synth.read()
-            if data.size > 0:
-                audio = synth.sr(), data
-                yield self.process_np_audio(audio)
-            # TODO: replace with threading.Event
-            sleep(0.1)
-        data = synth.read()
-        if data.size > 0:
-            audio = synth.sr(), data
-            yield self.process_np_audio(audio)
+        audio_data = self.generate_audio()
+        audio_data = self.process_np_audio(audio=audio_data)
+        return audio_data
 
     def process_np_audio(self, audio: NP_AUDIO) -> NP_AUDIO:
         audio = self.process_audio(audio)
@@ -101,3 +73,49 @@ class TTSPipeline:
             if isinstance(module, AudioProcessor):
                 audio = module.process(audio=audio, context=self.context)
         return audio
+
+
+class TTSPipeline(AudioPipeline):
+
+    def __init__(self, context: TTSPipelineContext):
+        super().__init__(context=context)
+        self.model: TTSModel = None
+
+    def add_module(self, module):
+        self.modules.append(module)
+
+    def set_model(self, model):
+        self.model = model
+
+    def create_synth(self):
+        chunker = TTSChunker(context=self.context)
+        segments = chunker.segments()
+        # 其实这个在 chunker 之前调用好点...但是有副作用所以放在后面
+        segments = [self.process_pre(seg) for seg in segments]
+
+        synth = BatchSynth(
+            input_segments=segments, context=self.context, model=self.model
+        )
+        return synth
+
+    def generate(self) -> NP_AUDIO:
+        synth = self.create_synth()
+        synth.start_generate()
+        synth.wait_done()
+        audio = synth.sr(), synth.read()
+        return self.process_np_audio(audio)
+
+    def generate_stream(self) -> Generator[NP_AUDIO, None, None]:
+        synth = self.create_synth()
+        synth.start_generate()
+        while not synth.is_done():
+            data = synth.read()
+            if data.size > 0:
+                audio = synth.sr(), data
+                yield self.process_np_audio(audio)
+            # TODO: replace with threading.Event
+            sleep(0.1)
+        data = synth.read()
+        if data.size > 0:
+            audio = synth.sr(), data
+            yield self.process_np_audio(audio)

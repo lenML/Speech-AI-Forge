@@ -11,6 +11,8 @@ from pydub import AudioSegment, effects
 
 INT16_MAX = np.iinfo(np.int16).max
 
+import numpy as np
+
 
 def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:
     audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
@@ -110,11 +112,17 @@ def apply_prosody_to_audio_data(
     pitch: float = 0,
     sr: int = 24000,
 ) -> np.ndarray:
+    if audio_data.dtype == np.int16:
+        # NOTE: 其实感觉一个报个错...
+        audio_data = audio_data.astype(np.float32) / 32768.0
+
     if rate != 1:
         audio_data = pyrb.time_stretch(audio_data, sr=sr, rate=rate)
 
     if volume != 0:
-        audio_data = audio_data * volume
+        volume = max(min(volume, 6), -20)
+        gain = 10 ** (volume / 20)
+        audio_data = audio_data * gain
 
     if pitch != 0:
         audio_data = pyrb.pitch_shift(audio_data, sr=sr, n_steps=pitch)
