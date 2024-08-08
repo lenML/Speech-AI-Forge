@@ -6,33 +6,28 @@ from typing import Optional
 import librosa
 import numpy as np
 import torch
-from whisper import Whisper, audio, load_model
 
-from modules.core.handler.datacls.stt_model import STTConfig
+from whisper import audio
+from whisper.tokenizer import get_tokenizer
+from faster_whisper import WhisperModel as FasterWhisperModel
+
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
 from modules.core.models.stt.whisper.writer import get_writer
+from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
+from modules.core.handler.datacls.stt_model import STTConfig
 
 
-# typing
-class WhisperSegment:
-    seek: int
-    start: float
-    end: float
-    text: str
-    tokens: list
-    temperature: float
-    avg_logprob: float
-    compression_ratio: float
-    noise_level: float
+# ref https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
+DEFAULT_TEMPERATURE = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
-
-# typing
-class WhisperTranscribeResult(dict):
-    text: str
-    segments: list[WhisperSegment]
-    language: Optional[str]
+whisper_tokenizer = get_tokenizer(multilingual=True)
+number_tokens = [
+    i
+    for i in range(whisper_tokenizer.eot)
+    if all(c in "0123456789" for c in whisper_tokenizer.decode([i]).removeprefix(" "))
+]
 
 
 class WhisperModel(STTModel):
@@ -42,7 +37,7 @@ class WhisperModel(STTModel):
 
     logger = logging.getLogger(__name__)
 
-    model: Optional[Whisper] = None
+    model: Optional[FasterWhisperModel] = None
 
     def __init__(self, model_id: str):
         # example: `whisper.large` or `whisper` or `whisper.small`
@@ -51,7 +46,8 @@ class WhisperModel(STTModel):
         assert model_ver[0] == "whisper", f"Invalid model id: {model_id}"
 
         self.model_size = model_ver[1] if len(model_ver) > 1 else "large"
-        self.model_dir = Path("./models/whisper")
+        # self.model_dir = Path("./models/whisper")
+        self.model_dir = Path("./models/faster-whisper-large-v3")
 
         self.device = devices.get_device_for("whisper")
         self.dtype = devices.dtype
@@ -60,10 +56,22 @@ class WhisperModel(STTModel):
         if WhisperModel.model is None:
             with self.lock:
                 self.logger.info(f"Loading Whisper model [{self.model_size}]...")
-                WhisperModel.model = load_model(
-                    name=self.model_size,
-                    download_root=str(self.model_dir),
-                    device=self.device,
+
+                # WhisperModel.model = FasterWhisperModel(
+                #     model_size_or_path=self.model_size,
+                #     download_root=str(self.model_dir),
+                #     device=self.device.type,
+                #     compute_type=(
+                #         "float16" if self.dtype == torch.float16 else "float32"
+                #     ),
+                # )
+                WhisperModel.model = FasterWhisperModel(
+                    model_size_or_path=str(self.model_dir),
+                    local_files_only=True,
+                    device=self.device.type,
+                    compute_type=(
+                        "float16" if self.dtype == torch.float16 else "float32"
+                    ),
                 )
                 self.logger.info("Whisper model loaded.")
         return WhisperModel.model
@@ -75,6 +83,7 @@ class WhisperModel(STTModel):
         with self.lock:
             del self.model
             self.model = None
+            WhisperModel.unload()
             del WhisperModel.model
             WhisperModel.model = None
 
@@ -90,7 +99,9 @@ class WhisperModel(STTModel):
         data = librosa.resample(data, orig_sr=sr, target_sr=self.SAMPLE_RATE)
         return self.SAMPLE_RATE, data
 
-    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> TranscribeResult:
+    def transcribe_to_result(
+        self, audio: NP_AUDIO, config: STTConfig
+    ) -> WhisperTranscribeResult:
         prompt = config.prompt
         prefix = config.prefix
 
@@ -102,6 +113,34 @@ class WhisperModel(STTModel):
         patience = config.patience
         length_penalty = config.length_penalty
 
+        _, audio_data = self.resample_audio(audio=audio)
+
+        if tempperature is None or tempperature <= 0:
+            tempperature = DEFAULT_TEMPERATURE
+
+        model = self.load()
+
+        segments, info = model.transcribe(
+            audio=audio_data,
+            language=language,
+            initial_prompt=prompt,
+            prefix=prefix,
+            # sample_len=sample_len,
+            temperature=tempperature or DEFAULT_TEMPERATURE,
+            best_of=best_of or 1,
+            beam_size=beam_size or 5,
+            patience=patience or 1,
+            length_penalty=length_penalty or 1,
+            word_timestamps=True,
+            suppress_tokens=[-1] + number_tokens,
+            # fp16=self.dtype == torch.float16,
+        )
+
+        return WhisperTranscribeResult(segments=segments, info=info)
+
+    def convert_result_with_format(
+        self, config: STTConfig, result: WhisperTranscribeResult
+    ) -> str:
         writer_options = {
             "highlight_words": config.highlight_words,
             "max_line_count": config.max_line_count,
@@ -111,61 +150,70 @@ class WhisperModel(STTModel):
 
         format = config.format
 
-        model = self.load()
-
-        _, audio_data = self.resample_audio(audio=audio)
-
-        # ref https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
-        if tempperature is None or tempperature <= 0:
-            tempperature = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
-
-        result: WhisperTranscribeResult = model.transcribe(
-            audio=audio_data,
-            language=language,
-            prompt=prompt,
-            prefix=prefix,
-            sample_len=sample_len,
-            temperature=tempperature,
-            best_of=best_of,
-            beam_size=beam_size,
-            patience=patience,
-            length_penalty=length_penalty,
-            word_timestamps=True,
-            initial_prompt=prefix,
-            fp16=self.dtype == torch.float16,
-        )
-
         writer = get_writer(format.value)
-        output = writer.write(result=result, options=writer_options)
+        output = writer.write(segments=result.segments, options=writer_options)
 
         return TranscribeResult(
             text=output,
-            segments=result.get("segments", []),
-            language=result.get("language", language),
-            # TODO 其他参数, 需要重写 transcribe 函数
+            segments=writer.subtitles,
+            info=result.info._asdict(),
         )
+
+    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> TranscribeResult:
+        result = self.transcribe_to_result(audio=audio, config=config)
+        result_formated = self.convert_result_with_format(config=config, result=result)
+        return result_formated
 
 
 if __name__ == "__main__":
     import json
 
     from scipy.io import wavfile
+    from modules.core.handler.datacls.stt_model import STTOutputFormat
+    from pydub import AudioSegment
 
     devices.reset_device()
+    devices.dtype = torch.float32
 
-    model = WhisperModel("whisper.large")
+    def pydub_to_numpy(audio_segment: AudioSegment):
+        raw_data = audio_segment.raw_data
+        sample_width = audio_segment.sample_width
+        channels = audio_segment.channels
+        audio_data = np.frombuffer(raw_data, dtype=np.int16)
+        if channels > 1:
+            audio_data = audio_data.reshape((-1, channels))
+            audio_data = audio_data.mean(axis=1).astype(np.int16)
+        return audio_data
 
+    model = WhisperModel("whisper.large-v3")
+
+    # sr1, wav1 = wavfile.read("./test_cosyvoice.wav")
+
+    # print(f"Input audio sample rate: {sr1}")
+    # print(f"Input audio shape: {wav1.shape}")
+    # print(f"Input audio duration: {len(wav1) / sr1}s")
+
+    # input_audio_path = "./input_audio_1.mp3"
     input_audio_path = "./test_cosyvoice.wav"
-    sr, input_data = wavfile.read(input_audio_path)
-    input_data = input_data.astype(np.float32)
-    input_data /= np.iinfo(np.int16).max
+    audio1: AudioSegment = AudioSegment.from_file(input_audio_path, format="mp3")
+
+    sr = audio1.frame_rate
+    input_data = pydub_to_numpy(audio1)
 
     print(f"Input audio sample rate: {sr}")
+    print(f"Input audio shape: {input_data.shape}")
+    print(f"Input audio duration: {len(input_data) / sr}s")
 
     result = model.transcribe(
-        input_data, STTConfig(mid="whisper.large", language="Chinese")
+        audio=(sr, input_data),
+        config=STTConfig(
+            mid="whisper.large-v3", language="zh", format=STTOutputFormat.srt
+        ),
     )
 
-    print(result.text)
+    # print(result.text)
     with open("test_whisper_result.json", "w") as f:
         json.dump(result.__dict__, f, ensure_ascii=False, indent=2)
+
+    with open("test_whisper_result.srt", "w") as f:
+        f.write(result.text)

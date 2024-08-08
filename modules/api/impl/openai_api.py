@@ -178,6 +178,16 @@ openai api document:
         """,
     )(openai_speech_api)
 
+    def pydub_to_numpy(audio_segment: AudioSegment) -> np.ndarray:
+        raw_data = audio_segment.raw_data
+        sample_width = audio_segment.sample_width
+        channels = audio_segment.channels
+        audio_data = np.frombuffer(raw_data, dtype=np.int16)
+        if channels > 1:
+            audio_data = audio_data.reshape((-1, channels))
+            audio_data = audio_data.mean(axis=1).astype(np.int16)
+        return audio_data
+
     @app.post(
         "/v1/audio/transcriptions",
         # NOTE: 其实最好是不设置这个model...因为这个接口可以返回很多情况...
@@ -204,7 +214,7 @@ openai api document:
         audio_segment: AudioSegment = AudioSegment.from_file(io.BytesIO(audio_bytes))
 
         sample_rate = audio_segment.frame_rate
-        samples = np.array(audio_segment.get_array_of_samples())
+        samples = pydub_to_numpy(audio_segment=audio_segment)
 
         input_audio = (sample_rate, samples)
 

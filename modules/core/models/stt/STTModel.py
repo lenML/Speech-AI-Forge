@@ -10,10 +10,7 @@ class TranscribeResult:
     text: str
     segments: list
 
-    # decoding output
-    audio_features: Any = None
-    language: str = ""
-    language_probs: Optional[Dict[str, float]] = None
+    info: dict
 
 
 class STTModel:

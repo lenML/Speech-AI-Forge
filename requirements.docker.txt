@@ -54,3 +54,6 @@ openai-whisper
 onnxruntime
 inflect
 matcha-tts
+
+# whisper
+faster_whisper

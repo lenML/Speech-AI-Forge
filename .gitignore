@@ -179,6 +179,7 @@ cython_debug/
 /models/**/.gitattributes
 /models/**/.gitignore
 /models/CosyVoice_*/**/*
+/models/whisper/**/*
 
 /*.pt
 
