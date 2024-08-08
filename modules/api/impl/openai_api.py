@@ -222,7 +222,7 @@ openai api document:
             mid=model,
             prompt=prompt,
             language=language,
-            tempperature=temperature if temperature > 0 else None,
+            temperature=temperature if temperature > 0 else None,
             format=response_format,
         )
 

@@ -20,7 +20,7 @@ class STTConfig(BaseModel):
     prefix: Optional[Union[str, List[int]]] = None
 
     language: Optional[str] = None
-    tempperature: Optional[float] = None
+    temperature: Optional[float] = None
     sample_len: Optional[int] = None
     best_of: Optional[int] = None
     beam_size: Optional[int] = None
