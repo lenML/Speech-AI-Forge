@@ -229,7 +229,8 @@ openai api document:
         try:
             handler = STTHandler(input_audio=input_audio, stt_config=sst_config)
 
-            return {"text": handler.enqueue()}
+            result = handler.enqueue()
+            return {"text": result.text}
         except Exception as e:
             import logging
 

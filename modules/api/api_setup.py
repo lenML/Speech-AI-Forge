@@ -17,6 +17,7 @@ from modules.api.impl import (
     style_api,
     tts_api,
     xtts_v2_api,
+    stt_api,
 )
 from modules.utils import env
 
@@ -36,6 +37,7 @@ def create_api(app: FastAPI, exclude=[]):
     openai_api.setup(app_mgr)
     refiner_api.setup(app_mgr)
     xtts_v2_api.setup(app_mgr)
+    stt_api.setup(app_mgr)
 
     return app_mgr
 

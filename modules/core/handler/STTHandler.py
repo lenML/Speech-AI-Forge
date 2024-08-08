@@ -1,6 +1,7 @@
 from typing import Generator
 
 from modules.core.handler.datacls.stt_model import STTConfig
+from modules.core.models.stt.STTModel import TranscribeResult
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.pipeline.processor import NP_AUDIO
 
@@ -21,11 +22,11 @@ class STTHandler:
 
         raise Exception(f"Model {model_id} is not supported")
 
-    def enqueue(self) -> str:
+    def enqueue(self) -> TranscribeResult:
         result = self.model.transcribe(audio=self.input_audio, config=self.stt_config)
-        return result.text
+        return result
 
-    def enqueue_stream(self) -> Generator[str, None, None]:
+    def enqueue_stream(self) -> Generator[TranscribeResult, None, None]:
         raise NotImplementedError(
             "Method 'enqueue_stream' must be implemented by subclass"
         )

@@ -195,3 +195,19 @@ google api document: <br/>
 - 编码格式影响的是 audioContent 的二进制格式，所以所有format都是返回带有base64数据的json
         """,
     )(google_text_synthesize)
+
+    @app.post(
+        "/v1/speech:recognize",
+        # response_model=None,
+        description="Performs synchronous speech recognition: receive results after all audio has been sent and processed.",
+    )
+    async def speech_recognize():
+        raise HTTPException(status_code=501, detail="Not implemented")
+
+    @app.post(
+        "/v1/speech:longrunningrecognize",
+        # response_model=None,
+        description="Performs asynchronous speech recognition: receive results via the google.longrunning.Operations interface.",
+    )
+    async def long_running_recognize():
+        raise HTTPException(status_code=501, detail="Not implemented")
