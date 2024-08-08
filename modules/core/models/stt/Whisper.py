@@ -17,7 +17,9 @@ from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
 from modules.core.handler.datacls.stt_model import STTConfig
+from modules.utils.monkey_tqdm import disable_tqdm
 
+from modules import config as global_config
 
 # ref https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
 DEFAULT_TEMPERATURE = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
@@ -93,14 +95,39 @@ class WhisperModel(STTModel):
     def resample_audio(self, audio: NP_AUDIO):
         sr, data = audio
 
-        if data.dtype == np.int16:
-            data = data.astype(np.float32)
-            data /= np.iinfo(np.int16).max
-
         if sr == self.SAMPLE_RATE:
             return sr, data
         data = librosa.resample(data, orig_sr=sr, target_sr=self.SAMPLE_RATE)
         return self.SAMPLE_RATE, data
+
+    def ensure_float32(self, audio: NP_AUDIO):
+        sr, data = audio
+        if data.dtype == np.int16:
+            data = data.astype(np.float32)
+            data /= np.iinfo(np.int16).max
+        elif data.dtype == np.int32:
+            data = data.astype(np.float32)
+            data /= np.iinfo(np.int32).max
+        elif data.dtype == np.float64:
+            data = data.astype(np.float32)
+        elif data.dtype == np.float32:
+            pass
+        else:
+            raise ValueError(f"Unsupported data type: {data.dtype}")
+
+        return sr, data
+
+    def ensure_stereo_to_mono(self, audio: NP_AUDIO):
+        sr, data = audio
+        if data.ndim == 2:
+            data = data.mean(axis=1)
+        return sr, data
+
+    def normalize_audio(self, audio: NP_AUDIO):
+        sr, data = self.ensure_float32(audio)
+        sr, data = self.ensure_stereo_to_mono(audio)
+        sr, data = self.resample_audio(audio=audio)
+        return sr, data
 
     def transcribe_to_result(
         self, audio: NP_AUDIO, config: STTConfig
@@ -109,14 +136,15 @@ class WhisperModel(STTModel):
         prefix = config.prefix
 
         language = config.language
-        tempperature = config.tempperature
+        tempperature = config.temperature
         sample_len = config.sample_len
         best_of = config.best_of
         beam_size = config.beam_size
         patience = config.patience
         length_penalty = config.length_penalty
 
-        _, audio_data = self.resample_audio(audio=audio)
+        _, audio_data = self.normalize_audio(audio=audio)
+        # _, audio_data = audio
 
         if tempperature is None or tempperature <= 0:
             tempperature = DEFAULT_TEMPERATURE
@@ -154,7 +182,8 @@ class WhisperModel(STTModel):
         format = config.format
 
         writer = get_writer(format.value)
-        output = writer.write(segments=result.segments, options=writer_options)
+        with disable_tqdm(enabled=global_config.runtime_env_vars.off_tqdm):
+            output = writer.write(result=result, options=writer_options)
 
         return TranscribeResult(
             text=output,

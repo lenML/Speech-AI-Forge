@@ -8,12 +8,14 @@ from modules.core.models.stt.whisper.SegmentNormalizer import (
     SubtitleSegment,
 )
 
-from faster_whisper.transcribe import Segment
+import tqdm
+
+from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
 
 
 class ResultWriter:
-    always_include_hours: bool
-    decimal_marker: str
+    always_include_hours: bool = True
+    decimal_marker: str = "."
 
     subtitles: list[SubtitleSegment] = []
 
@@ -21,26 +23,35 @@ class ResultWriter:
         self.output: TextIO = output or io.StringIO()
 
     def __call__(
-        self, segments: Iterable[Segment], options: Optional[dict] = None, **kwargs
+        self, result: WhisperTranscribeResult, options: Optional[dict] = None, **kwargs
     ):
-        return self.write(segments, options=options, **kwargs)
+        return self.write(result=result, options=options, **kwargs)
 
     def write(
-        self, segments: Iterable[Segment], options: Optional[dict] = None, **kwargs
+        self, result: WhisperTranscribeResult, options: Optional[dict] = None, **kwargs
     ):
         self.output.seek(0)
         self.output.truncate(0)
 
         normalizer = SegmentNormalizer(
-            segments=segments,
+            segments=result.segments,
             always_include_hours=self.always_include_hours,
             decimal_marker=self.decimal_marker,
         )
 
+        total_duration = result.info.duration
+        tqdm_bar = tqdm.tqdm(total=int(total_duration), desc="Transcribing")
+
         def _iter():
-            for segment in normalizer.normalize(options=options, **kwargs):
-                self.subtitles.append(segment._asdict())
-                yield segment
+            try:
+                for segment in normalizer.normalize(options=options, **kwargs):
+                    self.subtitles.append(segment._asdict())
+                    end = segment.end_s
+                    next_n = int(end)
+                    tqdm_bar.update(next_n - tqdm_bar.n)
+                    yield segment
+            finally:
+                tqdm_bar.close()
 
         sub_segments = _iter()
         self.write_result(sub_segments, file=self.output, options=options, **kwargs)
@@ -143,7 +154,7 @@ class WriteTSV(ResultWriter):
 
 
 class WriteJSON(ResultWriter):
-    extension: str = "json"
+    always_include_hours: bool = True
 
     def write_result(
         self,
@@ -152,7 +163,10 @@ class WriteJSON(ResultWriter):
         options: Optional[dict] = None,
         **kwargs,
     ):
-        json.dump(segments, file, ensure_ascii=False)
+        segments_list = []
+        for segment in segments:
+            segments_list.append(segment._asdict())
+        json.dump(segments_list, file, ensure_ascii=False)
 
 
 def get_writer(output_format: str) -> ResultWriter:
