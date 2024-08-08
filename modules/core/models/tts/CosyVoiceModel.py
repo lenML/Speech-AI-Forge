@@ -69,6 +69,9 @@ class CosyVoiceTTSModel(TTSModel):
         self.model = CosyVoiceTTSModel.model
         self.frontend = CosyVoiceTTSModel.frontend
 
+    def is_loaded(self) -> bool:
+        return CosyVoiceTTSModel.model is not None
+
     def reset(self) -> None:
         return super().reset()
 
@@ -236,7 +239,7 @@ class CosyVoiceTTSModel(TTSModel):
 
         # NOTE: 因为不支持流式，所以是同步的
 
-        self.load(context=context)
+        self.load()
 
         seg0 = segments[0]
         spk = seg0.spk
@@ -313,7 +316,7 @@ if __name__ == "__main__":
 
     model = CosyVoiceTTSModel()
     model.logger.setLevel(logging.DEBUG)
-    model.load(None)
+    model.load()
 
     t1 = "我们走的每一步，都是我们策略的一部分；你看到的所有一切，包括我此刻与你交谈，所做的一切，所说的每一句话，都有深远的含义。"
     t2 = "你好，此语音使用 Cosy Voice 合成。"

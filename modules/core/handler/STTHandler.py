@@ -1,9 +1,9 @@
 from typing import Generator
 
 from modules.core.handler.datacls.stt_model import STTConfig
-from modules.core.models.stt.STTModel import TranscribeResult
-from modules.core.models.stt.Whisper import WhisperModel
+from modules.core.models.stt.STTModel import STTModel, TranscribeResult
 from modules.core.pipeline.processor import NP_AUDIO
+from modules.core.models.zoo.ModelZoo import model_zoo
 
 
 class STTHandler:
@@ -13,12 +13,15 @@ class STTHandler:
 
         self.input_audio = input_audio
         self.stt_config = stt_config
-        self.model = self.get_model()
+        self.model: STTModel = self.get_model()
+
+        if self.model is None:
+            raise Exception(f"Model {self.stt_config.mid} is not supported")
 
     def get_model(self):
         model_id = self.stt_config.mid.lower()
         if model_id.startswith("whisper"):
-            return WhisperModel(model_id=model_id)
+            return model_zoo.get_model(model_id="whisper")
 
         raise Exception(f"Model {model_id} is not supported")
 

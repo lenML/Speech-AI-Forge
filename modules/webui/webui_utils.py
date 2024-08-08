@@ -14,6 +14,7 @@ from modules.core.handler.datacls.audio_model import (
     EncoderConfig,
 )
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
@@ -24,7 +25,6 @@ from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01
 from modules.core.tn import ChatTtsTN
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.data import styles_mgr
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance as _apply_audio_enhance
 from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
@@ -95,12 +95,6 @@ def segments_length_limit(
             break
         ret_segments.append(seg)
     return ret_segments
-
-
-@torch.inference_mode()
-@spaces.GPU(duration=120)
-def apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance):
-    return _apply_audio_enhance(audio_data, sr, enable_denoise, enable_enhance)
 
 
 @torch.inference_mode()
@@ -301,8 +295,11 @@ def tts_generate(
     return sample_rate, audio_data
 
 
+@torch.inference_mode()
 def text_normalize(text: str) -> str:
-    return ChatTtsTN.ChatTtsTN.normalize(text)
+    return ChatTtsTN.ChatTtsTN.normalize(
+        text, config=TNConfig(disabled=["replace_unk_tokens"])
+    )
 
 
 @torch.inference_mode()

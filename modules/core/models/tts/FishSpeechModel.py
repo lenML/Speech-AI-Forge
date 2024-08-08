@@ -46,6 +46,9 @@ class FishSpeechModel(TTSModel):
 
         self.encoded_prefix = []
 
+    def is_loaded(self) -> bool:
+        return FishSpeechModel.model is not None
+
     def reset(self):
         self.encoded_prefix = []
 
@@ -146,7 +149,7 @@ class FishSpeechModel(TTSModel):
             yield cached
             return
 
-        self.load(context=context)
+        self.load()
 
         infer = FishSpeechInfer(
             llama=self.model,
@@ -187,7 +190,7 @@ if __name__ == "__main__":
     import soundfile as sf
 
     tts_model = FishSpeechModel()
-    tts_model.load(context=None)
+    tts_model.load()
 
     seeds = [
         111,

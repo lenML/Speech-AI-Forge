@@ -1,36 +1,15 @@
 from typing import Generator, Union
 
+from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.tts.InerCache import InferCache
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
 
 
-class TTSModel:
+class TTSModel(BaseZooModel):
 
     def __init__(self, model_id: str) -> None:
-        self.model_id = model_id
-        self.hash = ""
-
-    def reset(self) -> None:
-        """
-        重置推理上下文
-        """
-        pass
-
-    def load(self, context: TTSPipelineContext = None) -> None:
-        pass
-
-    def unload(self, context: TTSPipelineContext = None) -> None:
-        pass
-
-    def check_exists(self, context: TTSPipelineContext = None) -> bool:
-        return False
-
-    def download(self, context: TTSPipelineContext = None) -> None:
-        pass
-
-    def interrupt(self, context: TTSPipelineContext = None) -> None:
-        pass
+        super().__init__(model_id=model_id)
 
     def encode(self, text: str) -> list[int]:
         return [ord(char) for char in text]

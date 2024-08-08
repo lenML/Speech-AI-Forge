@@ -18,7 +18,6 @@ from modules.core.tn.CosyVoiceTN import CosyVoiceTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
 from modules.core.tn.TNPipeline import TNPipeline
 from modules.data import styles_mgr
-from modules.Enhancer.ResembleEnhance import apply_audio_enhance_full
 from modules.utils import audio_utils
 
 logger = logging.getLogger(__name__)
@@ -38,7 +37,9 @@ class EnhancerProcessor(AudioProcessor):
         tau = enhancer_config.tau
 
         sample_rate, audio_data = audio
-        audio_data, sample_rate = apply_audio_enhance_full(
+
+        model = model_zoo.get_resemble_enhance()
+        audio_data, sample_rate = model.apply_audio_enhance_full(
             audio_data=audio_data,
             sr=sample_rate,
             nfe=nfe,
@@ -152,8 +153,11 @@ class PipelineFactory:
     def create_base_pipeline(cls, ctx: TTSPipelineContext):
         pipeline = TTSPipeline(ctx)
         pipeline.add_module(EnhancerProcessor())
-        pipeline.add_module(AdjusterProcessor())
+
+        # NOTE: 先 normalizer 后 adjuster，不然 volume_gain_db 和 normalize 冲突
         pipeline.add_module(AudioNormalizer())
+        pipeline.add_module(AdjusterProcessor())
+
         pipeline.add_module(TTSStyleProcessor())
         return pipeline
 
@@ -161,7 +165,7 @@ class PipelineFactory:
     def create_chattts_pipeline(cls, ctx: TTSPipelineContext):
         pipeline = cls.create_base_pipeline(ctx=ctx)
         pipeline.add_module(TNProcess(tn_pipeline=ChatTtsTN))
-        model = model_zoo.get_model("chat-tts")
+        model = model_zoo.get_chat_tts()
         pipeline.set_model(model)
         return pipeline
 
@@ -169,7 +173,7 @@ class PipelineFactory:
     def create_fishspeech_pipeline(cls, ctx: TTSPipelineContext):
         pipeline = cls.create_base_pipeline(ctx=ctx)
         pipeline.add_module(TNProcess(tn_pipeline=FishSpeechTN))
-        model = model_zoo.get_model("fish-speech")
+        model = model_zoo.get_fish_speech()
         pipeline.set_model(model)
         return pipeline
 
@@ -177,6 +181,6 @@ class PipelineFactory:
     def create_cosyvoice_pipeline(cls, ctx: TTSPipelineContext):
         pipeline = cls.create_base_pipeline(ctx=ctx)
         pipeline.add_module(TNProcess(tn_pipeline=CosyVoiceTN))
-        model = model_zoo.get_model("cosy-voice")
+        model = model_zoo.get_cosy_voice()
         pipeline.set_model(model)
         return pipeline

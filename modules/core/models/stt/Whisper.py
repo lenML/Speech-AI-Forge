@@ -52,6 +52,9 @@ class WhisperModel(STTModel):
         self.device = devices.get_device_for("whisper")
         self.dtype = devices.dtype
 
+    def is_loaded(self) -> bool:
+        return WhisperModel.model is not None
+
     def load(self):
         if WhisperModel.model is None:
             with self.lock:

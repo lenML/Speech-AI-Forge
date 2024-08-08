@@ -32,7 +32,10 @@ class ChatTTSModel(TTSModel):
         super().__init__("chat-tts")
         self.chat: ChatTTS.Chat = None
 
-    def load(self, context: TTSPipelineContext = None) -> "ChatTTS.Chat":
+    def is_loaded(self) -> bool:
+        return self.chat is not None
+
+    def load(self) -> "ChatTTS.Chat":
         self.chat = load_chat_tts()
         return self.chat
 
@@ -61,7 +64,7 @@ class ChatTTSModel(TTSModel):
         return self.generate_batch_base(segments, context, stream=True)
 
     def get_infer(self, context: TTSPipelineContext):
-        return ChatTTSInfer(self.load(context=context))
+        return ChatTTSInfer(self.load())
 
     current_infer: ChatTTSInfer = None
 

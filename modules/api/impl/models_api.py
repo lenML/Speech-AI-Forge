@@ -1,22 +1,21 @@
+from fastapi import HTTPException
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 from modules.core.models import zoo
-from modules.Enhancer.ResembleEnhance import reload_enhancer, unload_enhancer
 
 
 def setup(app: APIManager):
-    """
-    TODO: 需要增强 zoo 以支持多 models 管理
-    """
 
     @app.get("/v1/models/reload", response_model=api_utils.BaseResponse)
     async def reload_models():
-        zoo.ChatTTS.reload_chat_tts()
-        reload_enhancer()
+        zoo.model_zoo.reload_all_models()
         return api_utils.success_response("Models reloaded")
 
     @app.get("/v1/models/unload", response_model=api_utils.BaseResponse)
-    async def reload_models():
-        zoo.ChatTTS.unload_chat_tts()
-        unload_enhancer()
+    async def unload_models():
+        zoo.model_zoo.unload_all_models()
         return api_utils.success_response("Models unloaded")
+
+    @app.get("/v1/models/list", response_model=api_utils.BaseResponse)
+    async def unload_models():
+        raise HTTPException(status_code=501, detail="Not implemented")

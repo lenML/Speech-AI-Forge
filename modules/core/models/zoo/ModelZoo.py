@@ -1,9 +1,11 @@
 from typing import Dict, Union
 
+from modules.core.models.BaseZooModel import BaseZooModel
+from modules.core.models.enhancer.ResembleEnhance import ResembleEnhanceModel
+from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.FishSpeechModel import FishSpeechModel
-from modules.core.models.TTSModel import TTSModel
 from modules.devices import devices
 
 
@@ -12,10 +14,17 @@ class ModelZoo:
     管理控制 model load/unload/download/checker
     """
 
-    models: Dict[str, TTSModel] = {
+    models: Dict[str, BaseZooModel] = {
         "chat-tts": ChatTTSModel(),
         "fish-speech": FishSpeechModel(),
         "cosy-voice": CosyVoiceTTSModel(),
+        "resemble-enhance": ResembleEnhanceModel(),
+        # whisper
+        "whisper": WhisperModel("whisper.large"),
+        # "whisper.large": WhisperModel("whisper.large"),
+        # "whisper.medium": WhisperModel("whisper.medium"),
+        # "whisper.small": WhisperModel("whisper.small"),
+        # "whisper.tiny": WhisperModel("whisper.tiny"),
     }
 
     # 当mem不足时，是否自动卸载其他模型
@@ -24,14 +33,23 @@ class ModelZoo:
     def __init__(self) -> None:
         pass
 
-    def get_model(self, model_id: str) -> Union[TTSModel, None]:
+    def get_model(self, model_id: str) -> Union[BaseZooModel, None]:
         return self.models[model_id]
 
+    @devices.after_gc()
     def unload_all_models(self, exclude=None):
         for model in self.models.values():
             if model == exclude:
                 continue
             model.unload()
+
+    @devices.after_gc()
+    def reload_all_models(self, exclude=None):
+        loaded_models = [model for model in self.models.values() if model.is_loaded()]
+        self.unload_all_models(exclude=exclude)
+
+        for model in loaded_models:
+            model.load()
 
     def is_not_engouh_mem(self):
         usage = devices.get_memory_usage()
@@ -46,12 +64,30 @@ class ModelZoo:
         model.load()
         return model
 
+    @devices.after_gc()
     def unload_model(self, model_id: str):
         model = self.get_model(model_id)
         if model is None:
             raise ValueError(f"Model {model_id} not found")
         model.unload()
         return model
+
+    # --------------- getters --------------
+
+    def get_chat_tts(self) -> ChatTTSModel:
+        return self.get_model("chat-tts")
+
+    def get_cosy_voice(self) -> CosyVoiceTTSModel:
+        return self.get_model("cosy-voice")
+
+    def get_fish_speech(self) -> FishSpeechModel:
+        return self.get_model("fish-speech")
+
+    def get_resemble_enhance(self) -> ResembleEnhanceModel:
+        return self.get_model("resemble-enhance")
+
+    def get_whisper(self) -> WhisperModel:
+        return self.get_model("whisper")
 
 
 model_zoo = ModelZoo()

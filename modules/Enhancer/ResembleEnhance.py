@@ -4,7 +4,6 @@ from pathlib import Path
 from threading import Lock
 from typing import Literal
 
-import numpy as np
 import torch
 
 from modules import config
@@ -115,46 +114,6 @@ def reload_enhancer():
     unload_enhancer()
     load_enhancer()
     logger.info("ResembleEnhance model reloaded")
-
-
-def apply_audio_enhance_full(
-    audio_data: np.ndarray,
-    sr: int,
-    nfe=32,
-    solver: Literal["midpoint", "rk4", "euler"] = "midpoint",
-    lambd=0.5,
-    tau=0.5,
-):
-    # FIXME: 这里可能改成 to(device) 会优化一点？
-    tensor = torch.from_numpy(audio_data).float().squeeze().cpu()
-    enhancer = load_enhancer()
-
-    tensor, sr = enhancer.enhance(
-        tensor, sr, tau=tau, nfe=nfe, solver=solver, lambd=lambd
-    )
-
-    audio_data = tensor.cpu().numpy()
-    return audio_data, int(sr)
-
-
-def apply_audio_enhance(
-    audio_data: np.ndarray, sr: int, enable_denoise: bool, enable_enhance: bool
-):
-    if not enable_denoise and not enable_enhance:
-        return audio_data, sr
-
-    # FIXME: 这里可能改成 to(device) 会优化一点？
-    tensor = torch.from_numpy(audio_data).float().squeeze().cpu()
-    enhancer = load_enhancer()
-
-    if enable_enhance or enable_denoise:
-        lambd = 0.9 if enable_denoise else 0.1
-        tensor, sr = enhancer.enhance(
-            tensor, sr, tau=0.5, nfe=64, solver="rk4", lambd=lambd
-        )
-
-    audio_data = tensor.cpu().numpy()
-    return audio_data, int(sr)
 
 
 if __name__ == "__main__":
