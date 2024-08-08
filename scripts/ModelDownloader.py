@@ -1,3 +1,4 @@
+import logging
 import time
 from pathlib import Path
 
@@ -8,6 +9,8 @@ class ModelDownloader:
     def __init__(self):
         self.model_name = "<no-name>"
         self.dir_path = MODEL_DIR
+
+        self.logger = logging.getLogger(__name__)
 
     def from_modelscope(self):
         raise NotImplementedError()

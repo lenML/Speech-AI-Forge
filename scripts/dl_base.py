@@ -1,4 +1,3 @@
-import logging
 import os
 import shutil
 import sys
@@ -15,8 +14,6 @@ class BaseModelDownloader(ModelDownloader):
         self.required_files = required_files
         self.model_dir = self.dir_path / model_name
         self.cache_dir = self.dir_path / "cache"
-
-        self.logger = logging.getLogger(__name__)
 
         if not self.dir_path.exists():
             self.dir_path.mkdir(parents=True)
