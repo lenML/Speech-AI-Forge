@@ -6,6 +6,8 @@ from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.handler.STTHandler import STTHandler
 from modules.webui import webui_config
 
+from tempfile import NamedTemporaryFile
+
 
 def stereo_to_mono(audio_input: tuple[int, np.ndarray]) -> tuple[int, np.ndarray]:
     sample_rate, audio_data = audio_input
@@ -98,6 +100,7 @@ def create_asr_tab():
 
         with gr.Column():
             output = gr.Textbox(label="Transcript")
+            output_file = gr.File(label="Download")
 
     def submit(
         audio_input,
@@ -138,7 +141,10 @@ def create_asr_tab():
             ),
         )
         audio = handler.enqueue()
-        return audio.text
+
+        with NamedTemporaryFile(delete=False, suffix=f".{format_select}") as tmp_file:
+            tmp_file.write(audio.text.encode("utf-8"))
+            return audio.text, tmp_file.name
 
     submit_button.click(
         fn=submit,
@@ -155,5 +161,5 @@ def create_asr_tab():
             max_line_width_input,
             max_line_count_input,
         ],
-        outputs=[output],
+        outputs=[output, output_file],
     )
