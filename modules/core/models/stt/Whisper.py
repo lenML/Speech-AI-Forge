@@ -124,10 +124,10 @@ class WhisperModel(STTModel):
         return sr, data
 
     def normalize_audio(self, audio: NP_AUDIO):
-        sr, data = self.ensure_float32(audio)
-        sr, data = self.ensure_stereo_to_mono(audio)
-        sr, data = self.resample_audio(audio=audio)
-        return sr, data
+        audio = self.ensure_float32(audio=audio)
+        audio = self.resample_audio(audio=audio)
+        audio = self.ensure_stereo_to_mono(audio=audio)
+        return audio
 
     def transcribe_to_result(
         self, audio: NP_AUDIO, config: STTConfig
