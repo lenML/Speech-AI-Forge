@@ -2,8 +2,8 @@ from typing import Generator
 
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
-from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.models.zoo.ModelZoo import model_zoo
+from modules.core.pipeline.processor import NP_AUDIO
 
 
 class STTHandler:

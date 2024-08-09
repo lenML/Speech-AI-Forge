@@ -1,11 +1,9 @@
 import gradio as gr
 import numpy as np
-
-from modules.core.handler.STTHandler import STTHandler
-from modules.core.handler.datacls.stt_model import STTConfig
-
 from whisper.tokenizer import LANGUAGES
 
+from modules.core.handler.datacls.stt_model import STTConfig
+from modules.core.handler.STTHandler import STTHandler
 from modules.webui import webui_config
 
 

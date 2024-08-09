@@ -14,10 +14,10 @@ from modules.api.impl import (
     refiner_api,
     speaker_api,
     ssml_api,
+    stt_api,
     style_api,
     tts_api,
     xtts_v2_api,
-    stt_api,
 )
 from modules.utils import env
 

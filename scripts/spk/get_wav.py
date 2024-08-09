@@ -24,7 +24,7 @@ def parse_args():
 if __name__ == "__main__":
     """
     此脚本用于检查 spk 文件的 wav 音频信息
-    
+
     NOTE: 暂时只检查第一个，后续补充其他参数
     """
     args = parse_args()

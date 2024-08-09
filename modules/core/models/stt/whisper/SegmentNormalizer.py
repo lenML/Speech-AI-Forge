@@ -1,10 +1,8 @@
 import copy
-from typing import Iterable, NamedTuple, Optional, Generator, List
+from typing import Generator, Iterable, List, NamedTuple, Optional
 
-
-from faster_whisper.transcribe import Word
+from faster_whisper.transcribe import Segment, Word
 from whisper.utils import format_timestamp
-from faster_whisper.transcribe import Segment
 
 
 class SubtitleSegment(NamedTuple):

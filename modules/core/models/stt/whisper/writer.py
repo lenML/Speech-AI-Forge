@@ -2,14 +2,12 @@ import io
 import json
 from typing import Iterable, Optional, TextIO
 
+import tqdm
 
 from modules.core.models.stt.whisper.SegmentNormalizer import (
     SegmentNormalizer,
     SubtitleSegment,
 )
-
-import tqdm
-
 from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
 
 

@@ -3,12 +3,13 @@ from typing import Literal, Optional
 
 import numpy as np
 import torch
+
+from modules.core.models.BaseZooModel import BaseZooModel
 from modules.Enhancer.ResembleEnhance import (
+    ResembleEnhance,
     load_enhancer,
     unload_enhancer,
-    ResembleEnhance,
 )
-from modules.core.models.BaseZooModel import BaseZooModel
 
 
 class ResembleEnhanceModel(BaseZooModel):

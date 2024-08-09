@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 from modules.core.models import zoo

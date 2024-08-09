@@ -6,20 +6,18 @@ from typing import Optional
 import librosa
 import numpy as np
 import torch
-
+from faster_whisper import WhisperModel as FasterWhisperModel
 from whisper import audio
 from whisper.tokenizer import get_tokenizer
-from faster_whisper import WhisperModel as FasterWhisperModel
-
-from modules.core.models.stt.STTModel import STTModel, TranscribeResult
-from modules.core.models.stt.whisper.writer import get_writer
-from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
-from modules.core.pipeline.processor import NP_AUDIO
-from modules.devices import devices
-from modules.core.handler.datacls.stt_model import STTConfig
-from modules.utils.monkey_tqdm import disable_tqdm
 
 from modules import config as global_config
+from modules.core.handler.datacls.stt_model import STTConfig
+from modules.core.models.stt.STTModel import STTModel, TranscribeResult
+from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
+from modules.core.models.stt.whisper.writer import get_writer
+from modules.core.pipeline.processor import NP_AUDIO
+from modules.devices import devices
+from modules.utils.monkey_tqdm import disable_tqdm
 
 # ref https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
 DEFAULT_TEMPERATURE = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
@@ -200,9 +198,10 @@ class WhisperModel(STTModel):
 if __name__ == "__main__":
     import json
 
-    from scipy.io import wavfile
-    from modules.core.handler.datacls.stt_model import STTOutputFormat
     from pydub import AudioSegment
+    from scipy.io import wavfile
+
+    from modules.core.handler.datacls.stt_model import STTOutputFormat
 
     devices.reset_device()
     devices.dtype = torch.float32

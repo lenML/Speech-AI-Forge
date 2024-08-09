@@ -4,7 +4,7 @@ from numpy import ndarray
 
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.dcls import TTSSegment
-from modules.core.pipeline.pipeline import TTSPipeline, AudioPipeline
+from modules.core.pipeline.pipeline import AudioPipeline, TTSPipeline
 from modules.core.pipeline.processor import (
     NP_AUDIO,
     AudioProcessor,
