@@ -129,6 +129,11 @@ class ChatTTSModel(TTSModel):
             prompt_suffix = " [Stts][Ptts][Stts][Ptts][Stts]"
             prompt2 = f"{prompt_prefix}{prompt2}{prompt_suffix}"
 
+        # NOTE: 加这个的原因:
+        # https://github.com/lenML/ChatTTS-Forge/issues/133
+        if txt_smp and not txt_smp.endswith("。"):
+            txt_smp = txt_smp + "。"
+
         sr = 24000
 
         if not stream:
