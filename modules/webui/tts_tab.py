@@ -15,6 +15,7 @@ from modules.webui.webui_utils import (
 
 def tts_generate_with_history(
     audio_history: list,
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
     *args,
     **kwargs,
 ):
