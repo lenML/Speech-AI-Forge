@@ -1,5 +1,8 @@
 from typing import Generator, Union
 
+import librosa
+import numpy as np
+
 from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.tts.InerCache import InferCache
 from modules.core.pipeline.dcls import TTSSegment
@@ -48,7 +51,8 @@ class TTSModel(BaseZooModel):
         texts = [segment.text for segment in segments]
 
         seg0 = segments[0]
-        spk_emb = self.get_spk_emb(segment=seg0, context=context) if seg0.spk else None
+        spk = seg0.spk
+        spk_id = spk.id if spk else None
         top_P = seg0.top_p
         top_K = seg0.top_k
         temperature = seg0.temperature
@@ -63,7 +67,7 @@ class TTSModel(BaseZooModel):
 
         kwargs = dict(
             text="|".join(texts),
-            spk_emb=spk_emb,
+            spk_id=spk_id,
             top_P=top_P,
             top_K=top_K,
             temperature=temperature,
@@ -110,3 +114,40 @@ class TTSModel(BaseZooModel):
 
         kwargs = self.get_cache_kwargs(segments=segments, context=context)
         InferCache.set_cache_val(model_id=self.model_id, value=value, **kwargs)
+
+    def resample_audio(self, audio: NP_AUDIO, target_sr: int):
+        sr, data = audio
+
+        if sr == target_sr:
+            return sr, data
+        data = librosa.resample(data, orig_sr=sr, target_sr=target_sr)
+        return target_sr, data
+
+    def ensure_float32(self, audio: NP_AUDIO):
+        sr, data = audio
+        if data.dtype == np.int16:
+            data = data.astype(np.float32)
+            data /= np.iinfo(np.int16).max
+        elif data.dtype == np.int32:
+            data = data.astype(np.float32)
+            data /= np.iinfo(np.int32).max
+        elif data.dtype == np.float64:
+            data = data.astype(np.float32)
+        elif data.dtype == np.float32:
+            pass
+        else:
+            raise ValueError(f"Unsupported data type: {data.dtype}")
+
+        return sr, data
+
+    def ensure_stereo_to_mono(self, audio: NP_AUDIO):
+        sr, data = audio
+        if data.ndim == 2:
+            data = data.mean(axis=1)
+        return sr, data
+
+    def normalize_audio(self, audio: NP_AUDIO, target_sr: int):
+        audio = self.ensure_float32(audio=audio)
+        audio = self.resample_audio(audio=audio, target_sr=target_sr)
+        audio = self.ensure_stereo_to_mono(audio=audio)
+        return audio

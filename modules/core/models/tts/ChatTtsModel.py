@@ -82,9 +82,12 @@ class ChatTTSModel(TTSModel):
         wav = audio_utils.bytes_to_librosa_array(
             audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
         )
+        _, wav = self.normalize_audio(
+            audio=(ref_data.wav_sr, wav),
+            # 调整采样率到 24kHz
+            target_sr=24000,
+        )
         text = ref_data.text
-        # 调整采样率到 24kHz
-        wav = librosa.resample(wav, orig_sr=ref_data.wav_sr, target_sr=24000)
         return wav, text
 
     def generate_batch_base(
