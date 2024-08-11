@@ -69,6 +69,7 @@ class SsmlNormalizer:
                 prompt2=params.get("prompt2", ""),
                 prefix=params.get("prefix", ""),
                 emotion=params.get("emotion", ""),
+                duration_s=params.get("duration", None),
             )
 
         text = str(text).strip()
@@ -88,6 +89,7 @@ class SsmlNormalizer:
         top_k = to_number(attrs.top_k, int, None)
         top_p = to_number(attrs.top_p, float, None)
         temp = to_number(attrs.temp, float, None)
+        duration = to_number(attrs.duration, float, None)
 
         prompt1 = attrs.prompt1 or ss_params.get("prompt1")
         prompt2 = attrs.prompt2 or ss_params.get("prompt2")
@@ -105,6 +107,7 @@ class SsmlNormalizer:
             prompt2=prompt2,
             prefix=prefix,
             emotion=emotion or style,
+            duration_s=duration,
         )
 
         # NOTE 每个batch的默认seed保证前后一致即使是没设置spk的情况
@@ -153,11 +156,18 @@ class SsmlNormalizer:
 
         # 将 none_speak 合并到前一个 speak segment
         for i in range(1, len(ret_segments)):
-            if is_none_speak_segment(ret_segments[i]):
+            segment = ret_segments[i]
+            if not isinstance(segment, SSMLBreak) and is_none_speak_segment(
+                segment=segment
+            ):
                 ret_segments[i - 1].text += ret_segments[i].text
                 ret_segments[i].text = ""
         # 移除空的 segment
-        ret_segments = [seg for seg in ret_segments if seg.text.strip()]
+        ret_segments = [
+            seg
+            for seg in ret_segments
+            if isinstance(seg, SSMLSegment) and seg.text.strip()
+        ]
 
         return ret_segments
 

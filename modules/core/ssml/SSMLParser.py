@@ -24,6 +24,7 @@ class SSMLContext(Box):
         self.prompt2 = None
         self.prefix = None
         self.emotion = None
+        self.duration = None
 
         super().__init__(*args, **kwargs)
 
@@ -38,7 +39,7 @@ class SSMLSegment(Box):
 class SSMLBreak:
     def __init__(self, duration_ms: Union[str, int, float]):
         # TODO 支持其他单位
-        duration_ms = int(str(duration_ms).replace("ms", ""))
+        duration_ms = float(str(duration_ms).replace("ms", ""))
         self.attrs = Box(**{"duration": duration_ms})
 
 
@@ -126,6 +127,7 @@ def create_ssml_v01_parser():
         ctx.prompt2 = element.get("prompt2", ctx.prompt2)
         ctx.prefix = element.get("prefix", ctx.prefix)
         ctx.emotion = element.get("emotion", ctx.emotion)
+        ctx.duration = element.get("duration", ctx.duration)
 
         # 处理 voice 开头的文本
         if element.text and element.text.strip():
@@ -145,7 +147,7 @@ def create_ssml_v01_parser():
         segments: List[Union[SSMLSegment, SSMLBreak]],
         parser: SSMLParser,
     ):
-        time_ms = int(element.get("time", "0").replace("ms", ""))
+        time_ms = float(element.get("time", "0").replace("ms", ""))
         segments.append(SSMLBreak(time_ms))
 
     @parser.resolver("prosody")
@@ -173,6 +175,7 @@ def create_ssml_v01_parser():
         ctx.prompt2 = element.get("prompt2", ctx.prompt2)
         ctx.prefix = element.get("prefix", ctx.prefix)
         ctx.emotion = element.get("emotion", ctx.emotion)
+        ctx.duration = element.get("duration", ctx.duration)
 
         if element.text and element.text.strip():
             segments.append(SSMLSegment(element.text.strip(), ctx))

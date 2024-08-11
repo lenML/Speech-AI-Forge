@@ -182,3 +182,6 @@ matcha-tts==0.0.6
 
 # whisper
 faster_whisper==1.0.3
+
+# webui
+pysubs2==1.7.3

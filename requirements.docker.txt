@@ -57,3 +57,6 @@ matcha-tts
 
 # whisper
 faster_whisper
+
+# webui
+pysubs2

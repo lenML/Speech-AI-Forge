@@ -15,6 +15,7 @@ from modules.webui.speaker_tab import create_speaker_panel
 from modules.webui.ssml.podcast_tab import create_ssml_podcast_tab
 from modules.webui.ssml.spliter_tab import create_spliter_tab
 from modules.webui.ssml.ssml_tab import create_ssml_interface
+from modules.webui.ssml.subtitle_tab import create_subtitle_tab
 from modules.webui.system_tab import create_system_tab
 from modules.webui.tts_tab import create_tts_interface
 
@@ -111,6 +112,10 @@ def create_interface():
                         )
                     with gr.TabItem("Podcast"):
                         create_ssml_podcast_tab(
+                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                        )
+                    with gr.TabItem("From subtitle"):
+                        create_subtitle_tab(
                             ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
                         )
 
