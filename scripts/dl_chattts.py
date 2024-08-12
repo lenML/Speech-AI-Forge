@@ -23,7 +23,7 @@ class ChatTTSDownloader(BaseModelDownloader):
         ]
         super().__init__(
             model_name="ChatTTS",
-            modelscope_repo="pzc163/chatTTS",
+            modelscope_repo="AI-ModelScope/ChatTTS",
             huggingface_repo="2Noise/ChatTTS",
             required_files=required_files,
         )
