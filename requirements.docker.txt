@@ -60,3 +60,7 @@ faster_whisper
 
 # webui
 pysubs2
+
+# OpenVoice
+eng-to-ipa
+jieba

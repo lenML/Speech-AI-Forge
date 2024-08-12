@@ -1,9 +1,8 @@
-import threading
 from typing import Any, Generator, Union
 
-import librosa
 import numpy as np
 
+from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.TTSModel import TTSModel
 from modules.core.models.zoo.ChatTTS import ChatTTS, load_chat_tts, unload_chat_tts
 from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
@@ -82,7 +81,7 @@ class ChatTTSModel(TTSModel):
         wav = audio_utils.bytes_to_librosa_array(
             audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
         )
-        _, wav = self.normalize_audio(
+        _, wav = AudioReshaper.normalize_audio(
             audio=(ref_data.wav_sr, wav),
             # 调整采样率到 24kHz
             target_sr=24000,

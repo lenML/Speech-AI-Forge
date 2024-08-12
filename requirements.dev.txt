@@ -185,3 +185,7 @@ faster_whisper==1.0.3
 
 # webui
 pysubs2==1.7.3
+
+# OpenVoice
+eng-to-ipa==0.0.2
+jieba==0.42.1

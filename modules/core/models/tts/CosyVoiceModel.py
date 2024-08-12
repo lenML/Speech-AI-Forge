@@ -14,9 +14,11 @@ import numpy as np
 import torch
 from hyperpyyaml import load_hyperpyyaml
 
+from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.tts.CosyVoiceFE import CosyVoiceFrontEnd
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
+from modules.core.pipeline.factory import AudioNormalizer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk import TTSSpeaker
 from modules.devices import devices
@@ -222,6 +224,7 @@ class CosyVoiceTTSModel(TTSModel):
         wav = audio_utils.bytes_to_librosa_array(ref_data.wav)
         # 调整采样率到 16kHz
         wav = librosa.resample(wav, orig_sr=ref_data.wav_sr, target_sr=target_sr)
+        wav = AudioReshaper.normalize_audio(wav)
         return wav, ref_data.text
 
     def generate_batch(

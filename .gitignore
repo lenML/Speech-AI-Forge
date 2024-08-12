@@ -201,3 +201,5 @@ test*.json
 test*.vtt
 test*.srt
 test*.tsv
+
+.DS_Store

@@ -6,6 +6,7 @@ from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.FishSpeechModel import FishSpeechModel
+from modules.core.models.vc.OpenVoice import OpenVoiceModel
 from modules.devices import devices
 
 
@@ -25,6 +26,8 @@ class ModelZoo:
         # "whisper.medium": WhisperModel("whisper.medium"),
         # "whisper.small": WhisperModel("whisper.small"),
         # "whisper.tiny": WhisperModel("whisper.tiny"),
+        # === voice clone ===
+        "open-voice": OpenVoiceModel(),
     }
 
     # 当mem不足时，是否自动卸载其他模型
@@ -88,6 +91,9 @@ class ModelZoo:
 
     def get_whisper(self) -> WhisperModel:
         return self.get_model("whisper")
+
+    def get_open_voice(self) -> OpenVoiceModel:
+        return self.get_model("open-voice")
 
 
 model_zoo = ModelZoo()

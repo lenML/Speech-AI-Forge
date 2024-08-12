@@ -6,7 +6,9 @@ from scripts.ModelDownloader import ModelDownloader
 
 
 class BaseModelDownloader(ModelDownloader):
-    def __init__(self, model_name, modelscope_repo, huggingface_repo, required_files):
+    def __init__(
+        self, model_name, modelscope_repo=None, huggingface_repo=None, required_files=[]
+    ):
         super().__init__()
         self.model_name = model_name
         self.modelscope_repo = modelscope_repo
@@ -23,6 +25,11 @@ class BaseModelDownloader(ModelDownloader):
             self.cache_dir.mkdir(parents=True)
 
     def from_modelscope(self):
+        if self.modelscope_repo is None:
+            raise Exception(
+                "This downloader does not support downloading from ModelScope."
+            )
+
         from modelscope import snapshot_download
 
         snapshot_download(self.modelscope_repo, cache_dir=self.cache_dir)
@@ -43,6 +50,11 @@ class BaseModelDownloader(ModelDownloader):
         )
 
     def from_huggingface(self):
+        if self.huggingface_repo is None:
+            raise Exception(
+                "This downloader does not support downloading from HuggingFace."
+            )
+
         from huggingface_hub import snapshot_download
 
         snapshot_download(
