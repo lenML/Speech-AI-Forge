@@ -1,9 +1,12 @@
 import os
 import sys
 
-COSYVOICE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "./cosyvoice"))
+REPO_DIR = lambda name: os.path.abspath(os.path.join(os.path.dirname(__file__), name))
 
-paths = [COSYVOICE_DIR]
+paths = [
+    REPO_DIR("cosyvoice"),
+    REPO_DIR("openvoice"),
+]
 
 
 def setup_repos_paths():
