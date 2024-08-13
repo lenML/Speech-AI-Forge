@@ -220,10 +220,12 @@ class CosyVoiceTTSModel(TTSModel):
         ref_data = spk.get_ref(lambda x: x.emotion == emotion)
         if ref_data is None:
             return None, None
-        wav = audio_utils.bytes_to_librosa_array(ref_data.wav)
-        # 调整采样率到 16kHz
-        wav = librosa.resample(wav, orig_sr=ref_data.wav_sr, target_sr=target_sr)
-        wav = AudioReshaper.normalize_audio(wav)
+        wav = audio_utils.bytes_to_librosa_array(
+            audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
+        )
+        _, wav = AudioReshaper.normalize_audio(
+            audio=(ref_data.wav_sr, wav), target_sr=target_sr
+        )
         return wav, ref_data.text
 
     def generate_batch(
@@ -280,7 +282,7 @@ class CosyVoiceTTSModel(TTSModel):
                 spk_embedding=spk_embedding,
                 instruct_text=instruct_text,
             )
-        elif ref_wav and ref_text:
+        elif ref_wav is not None and ref_text:
             # NOTE: 如果 ref_wav 和 ref_text 都不为空，则使用 zero-shot
             infer_func = partial(
                 self.inference_zero_shot,

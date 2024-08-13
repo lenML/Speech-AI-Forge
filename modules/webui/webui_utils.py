@@ -39,10 +39,17 @@ SPK_FILE_EXTS = [
 ]
 
 
-def get_speakers():
+def get_speakers(model_id="chat-tts", include_ref_spk=True) -> list[TTSSpeaker]:
     spks = spk_mgr.list_speakers()
-    # TODO webui 暂时只支持chat-tts
-    spks = [spk for spk in spks if spk.get_token("chat-tts") is not None]
+
+    if include_ref_spk:
+        spks = [
+            spk
+            for spk in spks
+            if spk.get_token(model_id=model_id) is not None or len(spk._data.refs) > 0
+        ]
+    else:
+        spks = [spk for spk in spks if spk.get_token(model_id=model_id) is not None]
 
     return spks
 
@@ -200,6 +207,7 @@ def tts_generate(
     volume_gain_db: float = 0,
     normalize: bool = True,
     headroom: float = 1,
+    model_id: str = "chat-tts",
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     try:
@@ -246,6 +254,7 @@ def tts_generate(
             raise gr.Error("Failed to load speaker file")
 
     tts_config = TTSConfig(
+        mid=model_id,
         style=style,
         temperature=temperature,
         top_k=top_k,

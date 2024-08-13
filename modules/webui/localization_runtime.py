@@ -13,7 +13,7 @@ class LocalizationVars:
 class ZHLocalizationVars(LocalizationVars):
     def __init__(self):
         super().__init__()
-        self.DEFAULT_TTS_TEXT = "chat T T S 是一款强大的对话式文本转语音模型。它有中英混读和多说话人的能力。"
+        self.DEFAULT_TTS_TEXT = "ChatTTS Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。"
         self.DEFAULT_SPEAKER_TEST_TEXT = (
             "说话人测试 123456789 [uv_break] ok, test done [lbreak]"
         )
@@ -257,7 +257,7 @@ May the force be with you!
 class ENLocalizationVars(LocalizationVars):
     def __init__(self):
         super().__init__()
-        self.DEFAULT_TTS_TEXT = "Chat T T S is a powerful conversational text-to-speech model. It has the ability to mix Chinese and English and multiple speakers."
+        self.DEFAULT_TTS_TEXT = "ChatTTS Forge is a project developed around TTS generation model, implementing an API Server and a Gradio-based WebUI."
         self.DEFAULT_SPEAKER_TEST_TEXT = (
             "Speaker test 123456789 [uv_break] ok, test done [lbreak]"
         )
