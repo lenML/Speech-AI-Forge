@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Optional, Union
 
 import gradio as gr
 import numpy as np
@@ -207,6 +207,8 @@ def tts_generate(
     volume_gain_db: float = 0,
     normalize: bool = True,
     headroom: float = 1,
+    ref_audio: Optional[tuple[int, np.ndarray]] = None,
+    ref_audio_text: Optional[str] = None,
     model_id: str = "chat-tts",
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
@@ -252,6 +254,15 @@ def tts_generate(
             spk: TTSSpeaker = TTSSpeaker.from_file(spk_file)
         except Exception:
             raise gr.Error("Failed to load speaker file")
+
+    if ref_audio is not None:
+        if ref_audio_text is None or ref_audio_text.strip() == "":
+            raise gr.Error("ref_audio_text is empty")
+
+        spk = TTSSpeaker.from_ref_wav(
+            ref_wav=ref_audio,
+            text=ref_audio_text,
+        )
 
     tts_config = TTSConfig(
         mid=model_id,

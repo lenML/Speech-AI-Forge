@@ -108,7 +108,24 @@ class TTSInterface:
                         fn=load_spk_info, inputs=[spk_file_upload], outputs=[infos]
                     )
 
-        return spk_input_text, spk_input_dropdown, spk_file_upload
+                with gr.Tab(label="Refrence"):
+                    # 使用参考音频
+                    ref_audio_upload = gr.Audio(label="Refrence Audio")
+                    ref_text_input = gr.Textbox(
+                        label="Refrence Text",
+                        placeholder="Text from refrence audio",
+                        value="",
+                        show_label=False,
+                        lines=1,
+                    )
+
+        return (
+            spk_input_text,
+            spk_input_dropdown,
+            spk_file_upload,
+            ref_audio_upload,
+            ref_text_input,
+        )
 
     def create_style_interface(self):
         with gr.Group():
@@ -286,9 +303,13 @@ class TTSInterface:
     def create_tts_interface(self):
         with gr.Row():
             with gr.Column(scale=1):
-                spk_input_text, spk_input_dropdown, spk_file_upload = (
-                    self.create_speaker_interface()
-                )
+                (
+                    spk_input_text,
+                    spk_input_dropdown,
+                    spk_file_upload,
+                    ref_audio_upload,
+                    ref_text_input,
+                ) = self.create_speaker_interface()
                 style_input_dropdown = self.create_style_interface()
                 temperature_input, top_p_input, top_k_input, batch_size_input = (
                     self.create_sampling_interface()
@@ -367,6 +388,8 @@ class TTSInterface:
                 volume_up_input,
                 enable_loudness_normalization,
                 headroom_input,
+                ref_audio_upload,
+                ref_text_input,
             ],
             outputs=[tts_output1, tts_output2, tts_output3, audio_history],
         )
