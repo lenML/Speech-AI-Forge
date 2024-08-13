@@ -10,7 +10,7 @@ def test_openai_speech_api_with_invalid_style(client: TestClient):
         response = client.post(
             "/v1/audio/transcriptions",
             files={"file": (file_path, file, "audio/wav")},
-            data={
+            params={
                 "model": "whisper.large",
                 "language": "zh",
                 "prompt": "",

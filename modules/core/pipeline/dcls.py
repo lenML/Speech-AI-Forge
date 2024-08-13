@@ -5,6 +5,7 @@ from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
+from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 
@@ -38,6 +39,7 @@ class TTSPipelineContext:
     infer_config: InferConfig = field(default_factory=InferConfig)
     adjust_config: AdjustConfig = field(default_factory=AdjustConfig)
     enhancer_config: EnhancerConfig = field(default_factory=EnhancerConfig)
+    vc_config: VCConfig = field(default_factory=VCConfig)
 
     tn_config: TNConfig = field(default_factory=TNConfig)
 

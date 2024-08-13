@@ -18,7 +18,6 @@ from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.tts.CosyVoiceFE import CosyVoiceFrontEnd
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
-from modules.core.pipeline.factory import AudioNormalizer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk import TTSSpeaker
 from modules.devices import devices

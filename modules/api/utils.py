@@ -57,7 +57,9 @@ def merge_prompt(attrs: dict, elem: Dict[str, Any]):
     attr_num(attrs, "break", 0, 7)
 
 
-def calc_spk_style(spk: Union[str, int], style: Union[str, int]):
+def calc_spk_style(
+    spk: Union[str, int, None] = None, style: Union[str, int, None] = None
+):
     voice_attrs = {
         "spk": None,
         "prompt1": None,

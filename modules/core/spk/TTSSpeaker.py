@@ -132,6 +132,13 @@ class TTSSpeaker:
         spk.set_token(tokens=tokens, model_id=model_id)
         return spk
 
+    @staticmethod
+    def from_ref_wav(ref_wav: tuple[int, np.ndarray], text="") -> "TTSSpeaker":
+        sr, data = ref_wav
+        spk = TTSSpeaker.empty()
+        spk.add_ref(ref=DcSpkReference(text=text, wav=data.tobytes(), wav_sr=sr))
+        return spk
+
     def __init__(self, data: DcSpk) -> None:
         assert isinstance(data, DcSpk), "data must be a DcSpk instance"
 

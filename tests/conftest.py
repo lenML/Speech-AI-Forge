@@ -5,6 +5,14 @@ import fastapi
 from fastapi.testclient import TestClient
 from pytest import fixture
 
+try:
+    from modules.repos_static.sys_paths import setup_repos_paths
+
+    # NOTE: 需要在 api_setup 之前调用
+    setup_repos_paths()
+except Exception:
+    pass
+
 from modules import config
 from modules.api.api_setup import create_api
 from modules.devices import devices

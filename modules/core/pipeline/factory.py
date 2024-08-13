@@ -1,16 +1,18 @@
 import logging
 
-from numpy import ndarray
 
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.pipeline import AudioPipeline, TTSPipeline
 from modules.core.pipeline.processor import (
     NP_AUDIO,
-    AudioProcessor,
     PreProcessor,
     TTSPipelineContext,
 )
+from modules.core.pipeline.processors.Adjuster import AdjusterProcessor
+from modules.core.pipeline.processors.Enhancer import EnhancerProcessor
+from modules.core.pipeline.processors.Normalizer import AudioNormalizer
+from modules.core.pipeline.processors.VoiceClone import VoiceCloneProcessor
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.tn.ChatTtsTN import ChatTtsTN
@@ -18,71 +20,8 @@ from modules.core.tn.CosyVoiceTN import CosyVoiceTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
 from modules.core.tn.TNPipeline import TNPipeline
 from modules.data import styles_mgr
-from modules.utils import audio_utils
 
 logger = logging.getLogger(__name__)
-
-
-class EnhancerProcessor(AudioProcessor):
-    def _process_array(
-        self, audio: tuple[int, ndarray], context: TTSPipelineContext
-    ) -> tuple[int, ndarray]:
-        enhancer_config = context.enhancer_config
-
-        if not enhancer_config.enabled:
-            return audio
-        nfe = enhancer_config.nfe
-        solver = enhancer_config.solver
-        lambd = enhancer_config.lambd
-        tau = enhancer_config.tau
-
-        sample_rate, audio_data = audio
-
-        model = model_zoo.get_resemble_enhance()
-        audio_data, sample_rate = model.apply_audio_enhance_full(
-            audio_data=audio_data,
-            sr=sample_rate,
-            nfe=nfe,
-            solver=solver,
-            lambd=lambd,
-            tau=tau,
-        )
-
-        return sample_rate, audio_data
-
-
-class AdjusterProcessor(AudioProcessor):
-    def _process_array(self, audio: NP_AUDIO, context: TTSPipelineContext) -> NP_AUDIO:
-        sample_rate, audio_data = audio
-        adjust_config = context.adjust_config
-
-        segment_duration = audio_data.shape[0] / sample_rate
-        speed_rate = adjust_config.speed_rate
-        duration_s = adjust_config.duration_s
-
-        if duration_s is not None:
-            speed_rate = duration_s / segment_duration
-
-        audio_data = audio_utils.apply_prosody_to_audio_data(
-            audio_data=audio_data,
-            rate=speed_rate,
-            pitch=adjust_config.pitch,
-            volume=adjust_config.volume_gain_db,
-            sr=sample_rate,
-        )
-        return sample_rate, audio_data
-
-
-class AudioNormalizer(AudioProcessor):
-    def _process_array(self, audio: NP_AUDIO, context: TTSPipelineContext) -> NP_AUDIO:
-        adjust_config = context.adjust_config
-        if not adjust_config.normalize:
-            return audio
-        sample_rate, audio_data = audio
-        sample_rate, audio_data = audio_utils.apply_normalize(
-            audio_data=audio_data, headroom=adjust_config.headroom, sr=sample_rate
-        )
-        return sample_rate, audio_data
 
 
 class TNProcess(PreProcessor):
@@ -168,6 +107,7 @@ class PipelineFactory:
 
     @classmethod
     def setup_base_modules(cls, pipeline: AudioPipeline):
+        pipeline.add_module(VoiceCloneProcessor())
         pipeline.add_module(EnhancerProcessor())
 
         # NOTE: 先 normalizer 后 adjuster，不然 volume_gain_db 和 normalize 冲突
