@@ -75,7 +75,7 @@ def speaker_editor_ui():
         with gr.Column(scale=2):
             with gr.Group():
                 gr.Markdown("💼Speaker file")
-                spk_file = gr.File(label="*.pt file", file_types=SPK_FILE_EXTS)
+                spk_file = gr.File(label="*.json file", file_types=SPK_FILE_EXTS)
 
             with gr.Group():
                 gr.Markdown("ℹ️Speaker info")
