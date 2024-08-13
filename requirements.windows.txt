@@ -35,7 +35,8 @@ pyrubberband
 pybase16384
 cachetools
 langdetect
-# NOTE: wetext 依赖 pynini 无法在 Windows 上安装
+# NOTE: 截至2024/08/13，WeTextProcessing 安裝方法，需要在conda环境下，执行命令 conda install -c conda-forge pynini==2.1.6
+# NOTE: 然后再执行命令 pip install WeTextProcessing==1.0.4
 # WeTextProcessing
 
 #### fish-speech
