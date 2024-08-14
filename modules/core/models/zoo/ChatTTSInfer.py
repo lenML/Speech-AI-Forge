@@ -362,7 +362,9 @@ class ChatTTSInfer:
     def generate_audio_stream(
         self,
         text: Union[str, list[str]],
-        spk_emb=None,
+        spk_emb: Union[None, torch.Tensor] = None,
+        spk_smp: Union[None, torch.Tensor] = None,
+        txt_smp: Union[None, str] = None,
         top_P=0.7,
         top_K=20,
         temperature=0.3,
@@ -377,6 +379,8 @@ class ChatTTSInfer:
         gen: Generator[list[np.ndarray], None, None] = self._generate_audio(
             text=text,
             spk_emb=spk_emb,
+            spk_smp=spk_smp,
+            txt_smp=txt_smp,
             top_P=top_P,
             top_K=top_K,
             temperature=temperature,
