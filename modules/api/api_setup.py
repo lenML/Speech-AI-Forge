@@ -10,12 +10,12 @@ from modules.api.impl import (
     google_api,
     models_api,
     openai_api,
-    ping_api,
     refiner_api,
     speaker_api,
     ssml_api,
     stt_api,
     style_api,
+    sys_api,
     tts_api,
     xtts_v2_api,
     vc_api,
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def create_api(app: FastAPI, exclude=[]):
     app_mgr = APIManager(app=app, exclude_patterns=exclude)
 
-    ping_api.setup(app_mgr)
+    sys_api.setup(app_mgr)
     models_api.setup(app_mgr)
     style_api.setup(app_mgr)
     speaker_api.setup(app_mgr)
