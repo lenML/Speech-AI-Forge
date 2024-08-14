@@ -16,11 +16,11 @@ default_tts_params = {
 def test_synthesize_tts_to_audio(client: TestClient):
     response = client.post("/v1/xtts_v2/tts_to_audio", json=default_tts_params)
     assert response.status_code == 200
-    assert response.headers["content-type"] == "audio/mpeg"
+    assert response.headers["content-type"] == "audio/wav"
 
     output_file = os.path.join(
         tests.conftest.test_outputs_dir,
-        f"xtts_v2_api_success.mp3",
+        f"xtts_v2_api_success.wav",
     )
     with open(
         output_file,
@@ -39,11 +39,11 @@ def test_synthesize_tts_to_audio_stream(client: TestClient):
         params=default_tts_params,
     )
     assert response.status_code == 200
-    assert response.headers["content-type"] == "audio/mpeg"
+    assert response.headers["content-type"] == "audio/wav"
 
     output_file = os.path.join(
         tests.conftest.test_outputs_dir,
-        f"xtts_v2_api_stream_success.mp3",
+        f"xtts_v2_api_stream_success.wav",
     )
     with open(
         output_file,

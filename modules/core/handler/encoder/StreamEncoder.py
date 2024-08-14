@@ -95,7 +95,13 @@ class StreamEncoder:
         if self.p is None:
             raise Exception("Encoder is not open")
         data = b""
-        while self.p.poll() is None or not self.output_queue.empty():
+
+        def is_end():
+            if not isinstance(self.p, subprocess.Popen):
+                return True
+            return self.p.poll() is not None
+
+        while not is_end() or not self.output_queue.empty():
             try:
                 data += self.output_queue.get(timeout=self.timeout)
             except queue.Empty:

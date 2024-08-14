@@ -126,8 +126,7 @@ def setup(app: APIManager):
             # lambd=0.9 if params.denoise else 0.1,
         )
         encoder_config = EncoderConfig(
-            format=AudioFormat.mp3,
-            bitrate="64k",
+            format=AudioFormat.raw,
         )
 
         handler = TTSHandler(

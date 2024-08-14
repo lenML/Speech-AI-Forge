@@ -40,6 +40,8 @@ class RawEncoder(StreamEncoder):
 
     def __init__(self) -> None:
         super().__init__()
+
+        # FIXME: This is a hack to make the encoder work with the current implementation of the StreamEncoder.
         self.p = True
 
     def open(self, format: str = "", acodec: str = "", bitrate: str = ""):
