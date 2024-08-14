@@ -22,8 +22,10 @@ class TTSChunker:
         raise ValueError("No input text or ssml")
 
     def tokenize(self, text: str) -> list[int]:
-        model = zoo.model_zoo.get_model(self.context.tts_config.mid)
-        return model.encode(text)
+        return [ord(char) for char in text]
+        # NOTE: 使用 model.tokenizer 延迟有点高，最好还是用 tokenizer ，需要排查具体是哪的问题
+        # model = zoo.model_zoo.get_model(self.context.tts_config.mid)
+        # return model.encode(text)
 
     def text_segments(self):
         spliter_threshold = self.context.infer_config.spliter_threshold
