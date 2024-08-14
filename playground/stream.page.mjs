@@ -115,7 +115,7 @@ const useStore = create((set, get) => ({
 }));
 
 const StreamForm = () => {
-  const { speakers, styles } = useGlobalStore();
+  const { speakers, styles, formats } = useGlobalStore();
 
   const { params, setParams, setAudioUrl } = useStore();
 
@@ -225,11 +225,10 @@ const StreamForm = () => {
         <label>
           Format
           <select name="format" value=${params.format} onChange=${handleChange}>
-            <option value="mp3">mp3</option>
-            <option value="wav">wav</option>
-            <option value="flac">flac</option>
-            <option value="acc">acc</option>
-            <option value="ogg">ogg</option>
+            ${formats.map(
+              (format) =>
+                html`<option key=${format} value=${format}>${format}</option>`
+            )}
           </select>
         </label>
         <label>

@@ -10,6 +10,7 @@ class AudioFormat(str, Enum):
     ogg = "ogg"
     acc = "acc"
     flac = "flac"
+    raw = "raw"
 
 
 class AdjustConfig(BaseModel):

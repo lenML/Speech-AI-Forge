@@ -34,3 +34,22 @@ class AacEncoder(StreamEncoder):
     def open(self, acodec: str = "aac", bitrate: str = "128k"):
         acodec = acodec or "acc"
         return super().open("aac", acodec, bitrate)
+
+
+class RawEncoder(StreamEncoder):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.p = True
+
+    def open(self, format: str = "", acodec: str = "", bitrate: str = ""):
+        pass
+
+    def write(self, data: bytes):
+        self.output_queue.put(data)
+
+    def close(self):
+        pass
+
+    def terminate(self):
+        pass

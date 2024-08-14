@@ -13,6 +13,7 @@ from modules.core.handler.encoder.encoders import (
     FlacEncoder,
     Mp3Encoder,
     OggEncoder,
+    RawEncoder,
     WavEncoder,
 )
 from modules.core.handler.encoder.StreamEncoder import StreamEncoder
@@ -74,6 +75,8 @@ class AudioHandler:
         # FIXME: BrokenPipeError: [Errno 32] Broken pipe
         elif format == AudioFormat.ogg:
             encoder = OggEncoder()
+        elif format == AudioFormat.raw:
+            encoder = RawEncoder()
         else:
             raise ValueError(f"Unsupported audio format: {format}")
 
@@ -171,6 +174,8 @@ class AudioHandler:
         media_type = f"audio/{encoder_config.format}"
         if encoder_config.format == AudioFormat.mp3:
             media_type = "audio/mpeg"
+        if encoder_config.format == AudioFormat.raw:
+            media_type = "audio/wav"
 
         return media_type
 

@@ -1,6 +1,8 @@
 import { client } from "./client.mjs";
 import { html, create, styled } from "./misc.mjs";
 
+import { useGlobalStore } from "./global.store.mjs";
+
 const default_ssml = `
 <speak version="0.1">
   <voice spk="Bob" seed="-1" style="narration-relaxed">
@@ -141,6 +143,7 @@ const SSMLFormContainer = styled.div`
 
 const SSMLOptions = () => {
   const { params, setParams } = useStore();
+  const { formats } = useGlobalStore();
   return html`
     <fieldset style=${{ flex: 5 }}>
       <legend>Options</legend>
@@ -150,8 +153,10 @@ const SSMLOptions = () => {
           value=${params.format}
           onChange=${(e) => setParams({ ...params, format: e.target.value })}
         >
-          <option value="mp3">MP3</option>
-          <option value="wav">WAV</option>
+          ${formats.map(
+            (format) =>
+              html` <option key=${format} value=${format}>${format}</option> `
+          )}
         </select>
       </label>
     </fieldset>

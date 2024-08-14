@@ -315,7 +315,7 @@ const TTSPageContainer = styled.div`
 
 export const TTSPage = () => {
   const { tts, setTTS, synthesizeTTS, ui, setUI } = useStore();
-  const { speakers, styles } = useGlobalStore();
+  const { speakers, styles, formats } = useGlobalStore();
 
   const request = async () => {
     if (ui.loading) {
@@ -455,9 +455,10 @@ export const TTSPage = () => {
               value=${tts.format}
               onChange=${(e) => setTTS({ format: e.target.value })}
             >
-              <option value="mp3">MP3</option>
-              <option value="wav">WAV</option>
-              <option value="ogg">ogg</option>
+              ${formats.map(
+                (format) =>
+                  html`<option key=${format} value=${format}>${format}</option>`
+              )}
             </select>
           </label>
           <label>

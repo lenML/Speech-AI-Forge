@@ -213,6 +213,22 @@ class APIClient {
     }
   }
 
+  async getAudioFormats() {
+    try {
+      const response = await this.client.get(
+        "/v1/audio_formats",
+        {},
+        {
+          responseType: "json",
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error get audio formats:", error);
+      return { data: ["mp3", "wav"] };
+    }
+  }
+
   async createSpeaker({ name, seed, describe, gender, tensor }) {
     try {
       const response = await this.client.post("/v1/speaker/create", {
