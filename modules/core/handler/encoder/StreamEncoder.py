@@ -28,6 +28,7 @@ class StreamEncoder:
         self.read_thread = None
         self.chunk_size = 1024
         self.header = None
+        self.timeout = 0.1
 
     def set_header(
         self, *, frame_input=b"", channels=1, sample_width=2, sample_rate=24000
@@ -47,6 +48,8 @@ class StreamEncoder:
         self.p = subprocess.Popen(
             [
                 encoder,
+                "-threads",
+                "4",
                 "-f",
                 "wav",
                 "-i",
@@ -70,10 +73,9 @@ class StreamEncoder:
     def _read_output(self):
         while self.p:
             data = self.p.stdout.read(self.chunk_size)
-            if not data:
-                sleep(0.1)
-                continue
-            self.output_queue.put(data)
+            if data:
+                self.output_queue.put(data)
+            sleep(self.timeout)
 
     def write(self, data: bytes):
         if self.p is None:
@@ -81,23 +83,24 @@ class StreamEncoder:
         self.p.stdin.write(data)
         self.p.stdin.flush()
 
-    def read(self, timeout=0.1) -> bytes:
+    def read(self) -> bytes:
         if self.p is None:
             raise Exception("Encoder is not open")
         try:
-            return self.output_queue.get(timeout=timeout)
+            return self.output_queue.get(timeout=self.timeout)
         except queue.Empty:
             return b""
 
-    def read_all(self, timeout=5) -> bytes:
+    def read_all(self) -> bytes:
         if self.p is None:
             raise Exception("Encoder is not open")
         data = b""
-        while True:
+        while self.p.poll() is None or not self.output_queue.empty():
             try:
-                data += self.output_queue.get(timeout=timeout)
+                data += self.output_queue.get(timeout=self.timeout)
             except queue.Empty:
                 break
+            sleep(self.timeout)
         return data
 
     def close(self):
