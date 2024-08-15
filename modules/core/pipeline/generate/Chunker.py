@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 from modules.core.models import zoo
@@ -22,7 +23,13 @@ class TTSChunker:
         raise ValueError("No input text or ssml")
 
     def tokenize(self, text: str) -> list[int]:
-        return [ord(char) for char in text]
+        # NOTE: 略微比纯基于char的好一点，因为只是给 spliter 用，所以大概能计算出一个结果即可
+        tokens = re.findall(r"\w{1,4}|[^\w\s]", text, re.UNICODE)
+        return [ord(char[0]) for char in tokens]
+
+        # NOTE: char tokenizer
+        # return [ord(char) for char in text]
+
         # NOTE: 使用 model.tokenizer 延迟有点高，最好还是用 tokenizer ，需要排查具体是哪的问题
         # model = zoo.model_zoo.get_model(self.context.tts_config.mid)
         # return model.encode(text)
