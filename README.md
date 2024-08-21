@@ -36,6 +36,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Se
     - 5.1.2. [ASR](#ASR)
     - 5.1.3. [Voice Clone](#VoiceClone)
     - 5.1.4. [Enhancer](#Enhancer)
+    - 5.1.5. [模型下载](#-1)
 - 6. [FAQ](#FAQ)
   - 6.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
   - 6.2. [什么是 Prefix？](#Prefix)
@@ -191,6 +192,8 @@ WIP 开发中
 
 下载模型: `python -m scripts.download_models --source modelscope`
 
+> 此脚本将下载 `chat-tts` 和 `enhancer` 模型，如需下载其他模型，请看后续的 `模型下载` 介绍
+
 - webui: `docker-compose -f ./docker-compose.webui.yml up -d`
 - api: `docker-compose -f ./docker-compose.api.yml up -d`
 
@@ -231,6 +234,25 @@ WIP 开发中
 | 模型名称        | 实现情况 |
 | --------------- | -------- |
 | ResembleEnhance | ✅       |
+
+#### 5.1.5. <a name='-1'></a>模型下载
+
+由于 forge 主要是面向 api 功能开发，所以目前暂未实现自动下载逻辑，下载模型需手动调用下载脚本，具体脚本在 `./scripts` 目录下
+
+下面列出一些下载脚本使用示例：
+
+- TTS
+  - 下载 ChatTTS： `python -m scripts.dl_chattts.py --source huggingface`
+  - 下载 FishSpeech： `python -m scripts.downloader.fish_speech_1_2sft.py --source huggingface`
+  - 下载 CosyVoice： `python -m scripts.downloader.dl_cosyvoice_instruct.py --source huggingface`
+- ASR
+  - 下载 Whisper： `python -m scripts.downloader.fish_speech_1_2sft.py --source huggingface`
+- CV
+  - OpenVoice: `python -m scripts.downloader.open_voice.py --source huggingface`
+- Enhancer: `python -m scripts.dl_enhance.py --source huggingface`
+
+> 其中若需要使用 model scope 下载模型，使用 `--source modelscope` 即可。
+> 注：部分模型无法使用 model scope 下载，因为其中没有
 
 ## 6. <a name='FAQ'></a>FAQ
 
