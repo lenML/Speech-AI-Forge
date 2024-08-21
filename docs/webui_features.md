@@ -61,15 +61,21 @@ tips:
 
 该页面提供了一个强大的对话式文本转语音（TTS）模型接口，支持中英文混读和多说话人能力。用户可以通过调节各种参数生成高质量的语音输出。
 
+![image](https://github.com/user-attachments/assets/6caecf06-2d73-4969-9cfe-d1aaafae9b35)
+
 ### 关于参数的解释
 
 #### 音色切换
+
+![image](https://github.com/user-attachments/assets/1afd81cb-b01b-4cb9-9457-8cdf9b011fb3)
 
 - 可输入 seed 、 说话人名称 使用内置说话人
 - 切换到 `上传` tab，可以上传 `.spkv1.json` 文件，使用说话人来推理
 - 切换到 `refrence` tab， 可以使用参考音频推理 （注意，参考音频必须和对应文本一起使用）
 
 #### Style
+
+![image](https://github.com/user-attachments/assets/5c55e0e9-4282-47c5-ad69-10614622036a)
 
 音色风格，此处提供对于音色的内置风格切换的功能
 
@@ -79,6 +85,8 @@ tips:
 
 #### 采样配置
 
+![image](https://github.com/user-attachments/assets/742ff608-9f44-43ea-850d-0ff6e9b03a46)
+
 - 温度： 越高生成结果越有创意性越有真实感，但是质量可能下降
 - Top P: 和温度类似，但是不能太低
 - Top K: 和温度类似，但是不能太低
@@ -86,9 +94,13 @@ tips:
 
 #### 文本输入
 
+![image](https://github.com/user-attachments/assets/7a0d0ed0-c684-4666-b54f-66cbb6d98e58)
+
 现已支持超长文本生成，超长文本将根据分割器配置，自动分割然后合成并合并。
 
 #### 分割器配置
+
+![image](https://github.com/user-attachments/assets/54d01253-8f5d-4241-a9ed-edf812b318ec)
 
 可以对分割器进行配置，可配置 eos 和 阈值
 
@@ -97,11 +109,15 @@ tips:
 
 #### 调节器
 
+![image](https://github.com/user-attachments/assets/1aacfcb2-1e40-48bc-8ef1-bcbaa68277ef)
+
 调节器可以对生成结果进行调节，可以调节 速度、音调、响度
 
 > 其中 headroom 参数为 `响度均衡` 功能参数，一般情况使用默认值即可
 
 #### Enhancer
+
+![image](https://github.com/user-attachments/assets/3a1feacd-7eb6-4227-8ff0-c3aa08ead932)
 
 人声增强、美化，使用 `Enhancer` 模型对生成结果进行人声增强和美化
 
@@ -109,9 +125,13 @@ tips:
 
 #### 输出历史
 
+![image](https://github.com/user-attachments/assets/74927f4e-14fd-4b93-a476-5890d9267f03)
+
 将会保留输出结果，并在下一次生成之后滚动保存最近三个生成结果
 
 ## SSML
+
+![image](https://github.com/user-attachments/assets/829c2acc-7192-4390-8bd5-44cc5ab56a1c)
 
 此 tab 中，主要包含了关于 SSML 系统的各种使用工具
 
@@ -119,17 +139,25 @@ tips:
 
 ### 编辑器
 
+![image](https://github.com/user-attachments/assets/e86e6058-76f6-42b6-a523-0c61bc755621)
+
 调用 SSML 功能，参数含义与 TTS 页面中一致。
 
 ### 分割器
+
+![image](https://github.com/user-attachments/assets/d53c24d4-b22c-4cfb-a33b-88c7b6574234)
 
 本页面可以输出超长文本，然后将根据分割器，将其拆分为 SSML 脚本
 
 ### Podcast
 
+![image](https://github.com/user-attachments/assets/433e1d74-e0e1-4276-9f0b-e19f5587605f)
+
 本页面用于编辑 博客脚本 根据其生成对应的 ssml
 
 ### From Subtitle
+
+![image](https://github.com/user-attachments/assets/25e56444-8425-4fee-b8ec-e59fbfa1d0ee)
 
 此工具用于将 字幕文件 生成为本系统可以使用的 ssml
 
@@ -138,6 +166,8 @@ tips:
 ## 音色
 
 ### Builder
+
+![image](https://github.com/user-attachments/assets/73f4118b-aa81-4778-994d-12b204dd9a9f)
 
 在这个页面你可以创建 spk.json 文件，用于复用
 
@@ -148,6 +178,8 @@ tips:
   - ChatTTS: chattts 可以从随机种子中采样出说话人（质量一般都不高）
 
 ### Test Voice
+
+![image](https://github.com/user-attachments/assets/bc453955-e5ca-45d3-bb57-17ef3005d985)
 
 在这个页面，你可以上传你的 spk.json 文件，并快速的测试和对比生成结果
 
@@ -179,12 +211,16 @@ tips:
 
 ### Whisper
 
+![image](https://github.com/user-attachments/assets/b29bd6ea-5c69-4d46-93bb-4fa792c1a373)
+
 此页面提供对 whisper 模型的调用
 （多用于测试模型是否可以正常运行）
 
 ## Tools
 
 ### Post Process
+
+![image](https://github.com/user-attachments/assets/bae5465e-e328-47fc-866d-d0b414bb7af6)
 
 在 tts 生成中，对于语速语调和增强的部分，均属于后处理，此工具可以独立于 tts 生成，对音频进行后处理操作
 
