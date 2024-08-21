@@ -20,7 +20,7 @@ def stereo_to_mono(audio_input: tuple[int, np.ndarray]) -> tuple[int, np.ndarray
     return (sample_rate, mono_audio)
 
 
-def create_asr_tab():
+def create_whisper_asr_tab():
     """
     上传音频，然后转录
 
@@ -163,3 +163,12 @@ def create_asr_tab():
         ],
         outputs=[output, output_file],
     )
+
+
+def create_asr_tab():
+
+    with gr.Tabs():
+        with gr.TabItem("Whisper"):
+            create_whisper_asr_tab()
+        with gr.TabItem("SenseVoice", visible=webui_config.experimental):
+            gr.Markdown("🚧 Under construction")
