@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import threading
 from typing import Generator, Union
 
@@ -30,6 +31,8 @@ logger = logging.getLogger(__name__)
 
 class FishSpeechModel(TTSModel):
     lock = threading.Lock()
+
+    MODEL_PATH = Path("./models/fish-speech-1.2-sft")
 
     model: FISH_SPEECH_LLAMA = None
     vqgan: FireflyArchitecture = None
@@ -69,7 +72,7 @@ class FishSpeechModel(TTSModel):
             )
 
             model, token_decoder = load_llama_model(
-                checkpoint_path="./models/FishSpeech/",
+                checkpoint_path=str(self.MODEL_PATH),
                 device=self.device,
                 precision=self.dtype,
                 compile=config.runtime_env_vars.compile,
@@ -92,8 +95,8 @@ class FishSpeechModel(TTSModel):
                 f"loading FishSpeech vqgan on device [{self.device}] with dtype [{self.dtype}]"
             )
             config_name = "firefly_gan_vq"
-            checkpoint_path = (
-                "./models/FishSpeech/firefly-gan-vq-fsq-4x1024-42hz-generator.pth"
+            checkpoint_path = str(
+                self.MODEL_PATH / "firefly-gan-vq-fsq-4x1024-42hz-generator.pth"
             )
             model: FireflyArchitecture = load_vqgan_model(
                 config_name=config_name,
@@ -222,7 +225,7 @@ if __name__ == "__main__":
         audio = np.empty(0)
         for sr, data in tts_model.generate_batch(
             segments=[create_seg(t1), create_seg(t2)],
-            context=None,
+            context=TTSPipelineContext(),
         ):
             audio = np.concatenate((audio, data), axis=0)
 

@@ -16,11 +16,13 @@ class FishSpeechDownloader(BaseModelDownloader):
             "tokenizer_config.json",
         ]
         super().__init__(
-            model_name="FishSpeech",
-            modelscope_repo="AI-ModelScope/fish-speech-1.2",
-            huggingface_repo="fishaudio/fish-speech-1.2",
+            model_name="fish-speech-1.2-sft",
+            # 好像没有，没找到 modelscope 的库
+            modelscope_repo=None,
+            huggingface_repo="fishaudio/fish-speech-1.2-sft",
             required_files=required_files,
         )
+
         self.logger = logger
 
 
