@@ -1,6 +1,6 @@
 import io
 import logging
-from typing import Literal, Union
+from typing import Literal, Optional, Union
 
 from fastapi import Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, StreamingResponse
@@ -16,6 +16,7 @@ from modules.core.handler.datacls.audio_model import (
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
@@ -26,9 +27,14 @@ model_ids = ["chat-tts", "fish-speech", "cosy-voice"]
 
 class TTSParams(BaseModel):
     text: str = Query(..., description="Text to synthesize")
+
     spk: str = Query(
         "female2", description="Specific speaker by speaker name or speaker seed"
     )
+    ref_spk: Optional[str] = Query(
+        None, description="Specific speaker by speaker name or speaker seed"
+    )
+
     style: str = Query("chat", description="Specific style by style name")
     temperature: float = Query(
         0.3, description="Temperature for sampling (may be overridden by style or spk)"
@@ -134,6 +140,8 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             else params.no_cache == "on"
         )
 
+        ref_spk = params.ref_spk
+
         if eos == "[uv_break]" and params.model != "chat-tts":
             eos = " "
 
@@ -172,6 +180,21 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             bitrate="64k",
         )
 
+        vc_config = VCConfig()
+        has_ref_spk = ref_spk is not None and isinstance(ref_spk, str) and ref_spk != ""
+        if has_ref_spk:
+            vc_config.enabled = True
+            try:
+                vc_config.spk = spk_mgr.get_speaker(ref_spk)
+            except Exception as e:
+                raise HTTPException(status_code=422, detail=str(e))
+
+            if not vc_config.spk.has_refs:
+                raise HTTPException(
+                    status_code=422,
+                    detail='Invalid "ref_spk", speaker has no refs data',
+                )
+
         handler = TTSHandler(
             text_content=params.text,
             spk=spk,
@@ -180,6 +203,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
             encoder_config=encoder_config,
+            vc_config=vc_config,
         )
 
         return handler.enqueue_to_response(request=request)

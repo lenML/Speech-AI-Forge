@@ -1,5 +1,6 @@
 import os
 
+from fastapi.testclient import TestClient
 import pytest
 
 import tests
@@ -11,7 +12,7 @@ default_tts_params = TTSParams(
 
 
 @pytest.mark.tts_api
-def test_synthesize_tts(client):
+def test_synthesize_tts(client: TestClient):
     tts_params = default_tts_params.model_copy()
 
     response = client.get("/v1/tts", params=tts_params.model_dump())
@@ -30,7 +31,7 @@ def test_synthesize_tts(client):
 
 
 @pytest.mark.tts_api
-def test_long_same_text_synthesize_tts(client):
+def test_long_same_text_synthesize_tts(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.text = tts_params.text * 12
 
@@ -40,7 +41,7 @@ def test_long_same_text_synthesize_tts(client):
 
 
 @pytest.mark.tts_api
-def test_synthesize_tts_missing_text(client):
+def test_synthesize_tts_missing_text(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.text = ""
 
@@ -50,7 +51,7 @@ def test_synthesize_tts_missing_text(client):
 
 
 @pytest.mark.tts_api
-def test_synthesize_tts_invalid_temperature(client):
+def test_synthesize_tts_invalid_temperature(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.temperature = -1
 
@@ -60,7 +61,7 @@ def test_synthesize_tts_invalid_temperature(client):
 
 
 @pytest.mark.tts_api
-def test_synthesize_tts_invalid_format(client):
+def test_synthesize_tts_invalid_format(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.format = "invalid_format"
 
@@ -70,7 +71,7 @@ def test_synthesize_tts_invalid_format(client):
 
 
 @pytest.mark.tts_api
-def test_synthesize_tts_large_top_p(client):
+def test_synthesize_tts_large_top_p(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.top_p = 1.5
 
@@ -80,7 +81,7 @@ def test_synthesize_tts_large_top_p(client):
 
 
 @pytest.mark.tts_api
-def test_synthesize_tts_large_top_k(client):
+def test_synthesize_tts_large_top_k(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.top_k = 1000
 
@@ -90,7 +91,7 @@ def test_synthesize_tts_large_top_k(client):
 
 
 @pytest.mark.tts_api
-def test_adjust_tts_generate(client):
+def test_adjust_tts_generate(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.text = "Hello, world! I am a test case."
     tts_params.speed = 1.5
@@ -108,7 +109,7 @@ def test_adjust_tts_generate(client):
 
 @pytest.mark.tts_api
 @pytest.mark.stream_api
-def test_stream_tts_generate(client):
+def test_stream_tts_generate(client: TestClient):
     tts_params = default_tts_params.model_copy()
     tts_params.text = "Hello, world! I am a test case."
     tts_params.stream = True
@@ -120,6 +121,36 @@ def test_stream_tts_generate(client):
     output_file = os.path.join(
         tests.conftest.test_outputs_dir, "tts_api_stream_success.mp3"
     )
+    with open(
+        output_file,
+        "wb",
+    ) as f:
+        f.write(response.content)
+
+    assert os.path.getsize(output_file) > 0, "Stream output file is empty"
+
+
+@pytest.mark.tts_api
+@pytest.mark.vc_api
+def test_tts_api_with_vc(client: TestClient):
+    tts_params = default_tts_params.model_copy()
+
+    # base: female2.spk => clone to: mona.spk
+    tts_params.spk = "female2"
+    tts_params.ref_spk = "mona"
+
+    tts_params.text = (
+        "你好，这是一段 vioce clone 测试，基于 feamle2 音色克隆到 mona 音色。"
+    )
+
+    response = client.get("/v1/tts", params=tts_params.model_dump())
+    assert response.status_code == 200
+    assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
+
+    output_file = os.path.join(
+        tests.conftest.test_outputs_dir, "tts_api_vc_success.mp3"
+    )
+
     with open(
         output_file,
         "wb",

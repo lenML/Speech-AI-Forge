@@ -144,6 +144,13 @@ class TTSSpeaker:
 
         self._data = data
 
+    @property
+    def has_refs(self):
+        """
+        用于判断是否可以作为 ref spk 用于 vicoe clone pipeline
+        """
+        return len(self._data.refs) != 0
+
     def to_json_str(self, just_info=False) -> str:
         data = self._data
         if just_info:

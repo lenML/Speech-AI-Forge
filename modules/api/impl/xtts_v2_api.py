@@ -13,6 +13,7 @@ from modules.core.handler.datacls.audio_model import (
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.spk.SpkMgr import spk_mgr
 
 logger = logging.getLogger(__name__)
@@ -137,6 +138,8 @@ def setup(app: APIManager):
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
             encoder_config=encoder_config,
+            # NOTE: 这里不支持是因为 xtts 接口不太好加参数
+            vc_config=VCConfig(enabled=False),
         )
 
         return handler.enqueue_to_response(request=request)
@@ -195,6 +198,8 @@ def setup(app: APIManager):
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
             encoder_config=encoder_config,
+            # NOTE: 这里不支持是因为 xtts 接口不太好加参数
+            vc_config=VCConfig(enabled=False),
         )
 
         return handler.enqueue_to_response(request=request)

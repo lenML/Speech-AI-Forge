@@ -5,6 +5,7 @@ from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
+from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import NP_AUDIO
@@ -23,6 +24,7 @@ class TTSHandler(AudioHandler):
         adjust_config: AdjustConfig,
         enhancer_config: EnhancerConfig,
         encoder_config: EncoderConfig,
+        vc_config: VCConfig,
     ):
         assert isinstance(text_content, str), "text_content should be str"
         assert isinstance(spk, TTSSpeaker), "spk should be Speaker"
@@ -36,6 +38,10 @@ class TTSHandler(AudioHandler):
         assert isinstance(
             enhancer_config, EnhancerConfig
         ), "enhancer_config should be EnhancerConfig"
+        assert isinstance(
+            encoder_config, EncoderConfig
+        ), "encoder_config should be EncoderConfig"
+        assert isinstance(vc_config, VCConfig), "vc_config should be VCConfig"
 
         self.text_content = text_content
         self.spk = spk
@@ -43,6 +49,7 @@ class TTSHandler(AudioHandler):
         self.infer_config = infer_config
         self.adjest_config = adjust_config
         self.enhancer_config = enhancer_config
+        self.vc_config = vc_config
 
         super().__init__(encoder_config=encoder_config, infer_config=infer_config)
 
@@ -61,6 +68,7 @@ class TTSHandler(AudioHandler):
         tts_config = self.tts_config
         adjust_config = self.adjest_config
         enhancer_config = self.enhancer_config
+        vc_config = self.vc_config
         spk = self.spk
 
         ctx = TTSPipelineContext(
@@ -70,6 +78,7 @@ class TTSHandler(AudioHandler):
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
+            vc_config=vc_config,
         )
         return ctx
 

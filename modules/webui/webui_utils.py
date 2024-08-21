@@ -18,6 +18,7 @@ from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.models.tts import ChatTtsModel
 from modules.core.spk import TTSSpeaker, spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
@@ -306,6 +307,7 @@ def tts_generate(
         adjust_config=adjust_config,
         enhancer_config=enhancer_config,
         encoder_config=encoder_config,
+        vc_config=VCConfig(enabled=False),
     )
 
     sample_rate, audio_data = handler.enqueue()

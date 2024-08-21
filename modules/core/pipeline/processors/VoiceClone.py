@@ -1,4 +1,5 @@
 from modules.core.handler.VCHandler import VCHandler
+from modules.core.handler.datacls.audio_model import AudioFormat, EncoderConfig
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.processor import NP_AUDIO, AudioProcessor
 
@@ -13,6 +14,11 @@ class VoiceCloneProcessor(AudioProcessor):
         if vc_config.spk is None:
             raise ValueError("spk must be specified")
 
-        handler = VCHandler(input_audio=audio, vc_config=vc_config)
+        handler = VCHandler(
+            input_audio=audio,
+            vc_config=vc_config,
+            # raw encoder
+            encoder_config=EncoderConfig(format=AudioFormat.raw),
+        )
 
         return handler.enqueue()
