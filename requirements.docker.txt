@@ -64,3 +64,4 @@ pysubs2
 # OpenVoice
 eng-to-ipa
 jieba
+cn2an
