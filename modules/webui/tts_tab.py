@@ -127,10 +127,13 @@ class TTSInterface:
             ref_text_input,
         )
 
+    def create_tts_style_guide(self):
+        gr.Markdown("TTS_STYLE_GUIDE")
+
     def create_style_interface(self):
         with gr.Group():
             gr.Markdown("🎭Style")
-            gr.Markdown("TTS_STYLE_GUIDE")
+            self.create_tts_style_guide()
             style_input_dropdown = gr.Dropdown(
                 choices=self.styles, interactive=True, show_label=False, value="*auto"
             )
@@ -158,10 +161,13 @@ class TTSInterface:
             )
         return eos_input, spliter_thr_input
 
+    def create_tts_text_guide(self):
+        gr.Markdown(f"TTS_TEXT_GUIDE")
+
     def create_text_input_interface(self):
         with gr.Group():
             input_title = gr.Markdown("📝Text Input", elem_id="input-title")
-            gr.Markdown(f"TTS_TEXT_GUIDE")
+            self.create_tts_text_guide()
             text_input = gr.Textbox(
                 show_label=False,
                 label="Text to Speech",
@@ -403,6 +409,21 @@ class CosyVoiceInterface(TTSInterface):
         self.contorl_tokens = []
         self.spliter_eos = " 。 "
 
+        # NOTE: 只使用 _p 结尾的 因为没有 prompt 在这个模型中没用
+        styles: list[str] = [s.get("name") for s in get_styles()]
+        self.styles = (
+            ["*auto"]
+            # NOTE: _p_en 在前面，因为对中文指令识别一般
+            + [s for s in styles if s.endswith("_p_en")]
+            + [s for s in styles if s.endswith("_p")]
+        )
+
+    def create_tts_style_guide(self):
+        pass
+
+    def create_tts_text_guide(self):
+        pass
+
     def create_examples_interface(self, text_input):
         return None
 
@@ -414,6 +435,21 @@ class FishSpeechInterface(TTSInterface):
         self.refine_visible = False
         self.contorl_tokens = []
         self.spliter_eos = " 。 "
+
+        # NOTE: 只使用 _p 的 因为没有 prompt 在这个模型中没用
+        styles: list[str] = [s.get("name") for s in get_styles()]
+        self.styles = (
+            ["*auto"]
+            # NOTE: _p_en 在前面，因为对中文指令识别一般
+            + [s for s in styles if s.endswith("_p_en")]
+            + [s for s in styles if s.endswith("_p")]
+        )
+
+    def create_tts_style_guide(self):
+        pass
+
+    def create_tts_text_guide(self):
+        pass
 
     def create_examples_interface(self, text_input):
         return None
