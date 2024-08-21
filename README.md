@@ -53,13 +53,13 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Se
 
 ## 2. <a name='InstallationandRunning'></a> Installation and Running
 
-1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
-2. 根据你的需求启动需要的服务。
+首先，确保 [相关依赖](./docs/dependencies.md) 已经正确安装
 
-- webui: `python webui.py`
-- api: `python launch.py`
+启动：
 
-- webui + api: `python webui.py --api`
+```
+python webui.py
+```
 
 ### 2.1. <a name='webuifeatures'></a>webui features
 
@@ -97,11 +97,20 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Se
 
 ### 2.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
-某些情况，你并不需要 webui，那么可以使用这个脚本启动单纯的 api 服务。
+某些情况，你并不需要 webui 或者需要更高的 api 吞吐，那么可以使用这个脚本启动单纯的 api 服务。
 
-launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开启。
+启动：
 
-[详细 API 文档](./docs/api.md)
+```
+python launch.py
+```
+
+启动之后开启 `http://localhost:7870/docs` 可以查看开启了哪些 api 端点
+
+更多帮助信息:
+
+- 通过 `python launch.py -h` 查看脚本参数
+- 查看 [API 文档](./docs/api.md)
 
 #### 2.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
 

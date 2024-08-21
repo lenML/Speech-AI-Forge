@@ -4,10 +4,10 @@
 
 ```
 usage: launch.py [-h] [--cors_origin CORS_ORIGIN] [--no_playground] [--no_docs] [--exclude EXCLUDE]
-                 [--compile] [--no_half] [--off_tqdm] [--device_id DEVICE_ID]
-                 [--use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]] [--lru_size LRU_SIZE]
-                 [--debug_generate] [--preload_models] [--host HOST] [--port PORT] [--reload]
-                 [--workers WORKERS] [--log_level LOG_LEVEL] [--access_log] [--proxy_headers]
+                 [--compile] [--flash_attn] [--no_half] [--off_tqdm] [--device_id DEVICE_ID]
+                 [--use_cpu {all,chattts,enhancer,trainer} [{all,chattts,enhancer,trainer} ...]]
+                 [--lru_size LRU_SIZE] [--debug_generate] [--preload_models] [--host HOST] [--port PORT]
+                 [--reload] [--workers WORKERS] [--log_level LOG_LEVEL] [--access_log] [--proxy_headers]
                  [--timeout_keep_alive TIMEOUT_KEEP_ALIVE]
                  [--timeout_graceful_shutdown TIMEOUT_GRACEFUL_SHUTDOWN] [--ssl_keyfile SSL_KEYFILE]
                  [--ssl_certfile SSL_CERTFILE] [--ssl_keyfile_password SSL_KEYFILE_PASSWORD]
@@ -22,12 +22,13 @@ options:
   --no_docs             Disable the documentation entry
   --exclude EXCLUDE     Exclude the specified API from the server
   --compile             Enable model compile
+  --flash_attn          Enable flash attention
   --no_half             Disalbe half precision for model inference
   --off_tqdm            Disable tqdm progress bar
   --device_id DEVICE_ID
-                        Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be
-                        needed before)
-  --use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]
+                        Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might
+                        be needed before)
+  --use_cpu {all,chattts,enhancer,trainer} [{all,chattts,enhancer,trainer} ...]
                         use CPU as torch device for specified modules
   --lru_size LRU_SIZE   Set the size of the request cache pool, set it to 0 will disable lru_cache
   --debug_generate      Enable debug mode for audio generation
