@@ -210,7 +210,7 @@ WIP 开发中
 | ChatTTS    | token 级 | ✅       | ❓       | ❓          | ✅                     |
 | FishSpeech | 句子级   | ✅       | ❓       | ❓          | ✅ (SFT 版本开发中 🚧) |
 | CosyVoice  | 句子级   | ✅       | ❓       | ✅          | ✅                     |
-| GPTSoVits  | 句子级   | ✅       | ❓       | ❓          | ✅                     |
+| GPTSoVits  | 句子级   | ✅       | ❓       | ❓          | 🚧                     |
 
 #### 5.1.2. <a name='ASR'></a>ASR
 
