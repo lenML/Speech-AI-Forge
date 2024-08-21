@@ -20,27 +20,29 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Se
 <!-- vscode-markdown-toc -->
 
 - 1. [INDEX](#INDEX)
-- 2. [GPU 显存要求](#GPU)
-  - 2.1. [加载模型显存要求](#)
-  - 2.2. [Batch Size 显存要求](#BatchSize)
-- 3. [ Installation and Running](#InstallationandRunning)
-  - 3.1. [webui features](#webuifeatures)
-  - 3.2. [`launch.py`: API Server](#launch.py:APIServer)
-    - 3.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
-- 4. [demo](#demo)
-  - 4.1. [风格化控制](#-1)
-  - 4.2. [长文本生成](#-1)
-- 5. [Docker](#Docker)
-  - 5.1. [镜像](#-1)
-  - 5.2. [手动 build](#build)
-- 6. [Roadmap](#Roadmap)
-- 7. [FAQ](#FAQ)
-  - 7.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
-  - 7.2. [什么是 Prefix？](#Prefix)
-  - 7.3. [Style 中 `_p` 的区别是什么？](#Style_p)
-  - 7.4. [为什么开启了 `--compile` 很慢？](#--compile)
-  - 7.5. [为什么 colab 里面非常慢只有 2 it/s ？](#colab2its)
-- 8. [离线整合包](#-1)
+- 2. [ Installation and Running](#InstallationandRunning)
+  - 2.1. [webui features](#webuifeatures)
+  - 2.2. [`launch.py`: API Server](#launch.py:APIServer)
+    - 2.2.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
+- 3. [demo](#demo)
+  - 3.1. [风格化控制](#)
+  - 3.2. [长文本生成](#-1)
+- 4. [Docker](#Docker)
+  - 4.1. [镜像](#-1)
+  - 4.2. [手动 build](#build)
+- 5. [Roadmap](#Roadmap)
+  - 5.1. [Model Supports](#ModelSupports)
+    - 5.1.1. [TTS](#TTS)
+    - 5.1.2. [ASR](#ASR)
+    - 5.1.3. [Voice Clone](#VoiceClone)
+    - 5.1.4. [Enhancer](#Enhancer)
+- 6. [FAQ](#FAQ)
+  - 6.1. [什么是 Prompt1 和 Prompt2？](#Prompt1Prompt2)
+  - 6.2. [什么是 Prefix？](#Prefix)
+  - 6.3. [Style 中 `_p` 的区别是什么？](#Style_p)
+  - 6.4. [为什么开启了 `--compile` 很慢？](#--compile)
+  - 6.5. [为什么 colab 里面非常慢只有 2 it/s ？](#colab2its)
+- 7. [离线整合包](#-1)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -48,34 +50,7 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Se
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
 
-## 2. GPU 显存要求
-
-### 2.1. 模型加载显存需求
-
-| 精度   | ChatTTS 模型 | Enhancer 模型 |
-| ------ | ------------ | ------------- |
-| 全精度 | 2GB          | 3GB           |
-| 半精度 | 1GB          | 1.5GB         |
-
-注：半精度为默认设置，全精度可通过 `--no_half` 参数启用。
-
-### 2.2. 推理过程显存需求
-
-| 精度   | Batch Size | 不使用 Enhancer | 使用 Enhancer |
-| ------ | ---------- | --------------- | ------------- |
-| 全精度 | ≤ 4        | 2GB             | 4GB           |
-| 全精度 | 8          | 4-10GB          | 6-14GB        |
-| 半精度 | ≤ 4        | 1GB             | 2GB           |
-| 半精度 | 8          | 2-6GB           | 4-8GB         |
-
-注意事项：
-
-1. 显存需求与上下文长度相关，因此呈现为一个范围。
-2. 半精度（默认）的显存需求约为全精度的一半。
-3. 对于 Batch Size ≤ 4，4GB 显存通常足够进行推理。
-4. Batch Size 为 8 时，可能需要 6-14GB 显存，具体取决于精度和是否使用 Enhancer。
-
-## 3. <a name='InstallationandRunning'></a> Installation and Running
+## 2. <a name='InstallationandRunning'></a> Installation and Running
 
 1. 确保 [相关依赖](./docs/dependencies.md) 已经正确安装，
 2. 根据你的需求启动需要的服务。
@@ -83,36 +58,43 @@ ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Se
 - webui: `python webui.py`
 - api: `python launch.py`
 
-### 3.1. <a name='webuifeatures'></a>webui features
+- webui + api: `python webui.py --api`
+
+### 2.1. <a name='webuifeatures'></a>webui features
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
-- ChatTTS 模型原生功能 Refiner/Generate
-- 原生 Batch 合成，高效合成超长文本
-- Style control
-- SSML
-  - Editor: 简单的 SSML 编辑，配合其他功能使用
-  - Spliter：超长文本分割预处理
-  - Podcast: 支持创建编辑播客脚本
-- Speaker
-  - 内置音色：内置众多 speaker 可以使用
-  - speaker creator: 支持试音抽卡，创建 speaker
-  - embdding: 支持 speaker embdding 上传，可以复用保存下来的 speaker
-  - speaker merge: 支持合并说话人，微调 speaker
-- Prompt Slot
-- Text Normalize
-- 音质增强：
-  - enhance: 音质增强提高输出质量
-  - denoise: 去除噪音
-- Experimental 实验功能
-  - fintune
-    - speaker embedding
-    - [WIP] GPT lora
-    - [WIP] AE
-  - [WIP] ASR
-  - [WIP] Inpainting
+- TTS: tts 模型的功能
+  - Speaker Switch: 可以切换音色
+    - 内置音色： 内置多个音色可使用， `27 ChatTTS` / `7 CosyVoice` 音色 + `1 参考音色`
+    - 音色上传： 支持上传自定义音色文件，并实时推理
+    - 参考音色： 支持上传参考音频/文本，直接使用参考音频进行 `tts` 推理
+  - Style： 风格控制内置多种风格控制
+  - Long Text： 支持超长文本推理，自动分割文本
+    - Batch Size： 可设置 `Batch size` ，对于支持 `batch` 推理的模型长文本推理速度更快
+  - Refiner: 支持 `ChatTTS` 原生文本 `refiner` ，同时支持无限长文本
+  - 分割器： 可调整分割器配置，控制分割器 `eos` 和 `分割阈值`
+  - 调节器： 支持对 `速度/音调/音量` 调整，并增加实用的 `响度均衡` 功能
+  - 人声增强： 支持使用 `Enhancer` 模型增强 `TTS` 输出结果，进一步提高输出质量
+  - 生成历史： 支持保留最近三次生成结果，方便对比
+  - 多模型： 支持多种 `TTS` 模型推理，包括 `ChatTTS` / `CosyVoice` / `FishSpeech` / `GPT-SoVITS` 等
+- SSML: 类 XML 语法的高级 TTS 合成控制工具
+  - 分割器： 在这里面可以更加细致的控制长文本分割结果
+  - PodCast： 博客工具，帮助你根据博客脚本创建 `长文本`、`多角色` 音频
+  - From subtitle： 从字幕文件创建 `SSML` 脚本
+- 音色：
+  - Builder： 创建音色，目前可以从 ChatTTS seed 创建音色、或者使用 Refrence Audio 创建 `参考音色`
+  - Test Voice： 试音，上传音色文件，简单测试音色
+  - ChatTTS: 针对 ChatTTS 音色的调试工具
+    - 抽卡： 使用随机种子抽卡，创建随机音色
+    - 融合： 融合不同种子创建的音色
+- ASR:
+  - Whisper: 使用 whisper 模型进行 asr
+  - SenseVoice： WIP
+- Tools： 一些实用的工具
+  - Post Process: 后处理工具，可以在这里 `剪辑`、`调整`、`增强` 音频
 
-### 3.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
+### 2.2. <a name='launch.py:APIServer'></a>`launch.py`: API Server
 
 某些情况，你并不需要 webui，那么可以使用这个脚本启动单纯的 api 服务。
 
@@ -120,7 +102,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 [详细 API 文档](./docs/api.md)
 
-#### 3.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
+#### 2.2.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
 
 通过 `/v1/xtts_v2` 系列 api，你可以方便的将 ChatTTS-Forge 连接到你的 SillyTavern 中。
 
@@ -135,9 +117,9 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 ![sillytavern_tts](./docs/sillytavern_tts.png)
 
-## 4. <a name='demo'></a>demo
+## 3. <a name='demo'></a>demo
 
-### 4.1. <a name='-1'></a>风格化控制
+### 3.1. <a name=''></a>风格化控制
 
 <details>
 <summary>input</summary>
@@ -177,7 +159,7 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-### 4.2. <a name='-1'></a>长文本生成
+### 3.2. <a name='-1'></a>长文本生成
 
 <details>
 <summary>input</summary>
@@ -199,13 +181,13 @@ launch.py 脚本启动成功后，你可以在 `/docs` 下检查 api 是否开�
 
 </details>
 
-## 5. <a name='Docker'></a>Docker
+## 4. <a name='Docker'></a>Docker
 
-### 5.1. <a name='-1'></a>镜像
+### 4.1. <a name='-1'></a>镜像
 
 WIP 开发中
 
-### 5.2. <a name='build'></a>手动 build
+### 4.2. <a name='build'></a>手动 build
 
 下载模型: `python -m scripts.download_models --source modelscope`
 
@@ -217,62 +199,63 @@ WIP 开发中
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-## 6. <a name='Roadmap'></a>Roadmap
+## 5. <a name='Roadmap'></a>Roadmap
 
-### Model Supports
+### 5.1. <a name='ModelSupports'></a>Model Supports
 
-#### TTS
+#### 5.1.1. <a name='TTS'></a>TTS
 
 | 模型名称   | 流式级别 | 支持复刻 | 支持训练 | 支持 prompt | 实现情况               |
 | ---------- | -------- | -------- | -------- | ----------- | ---------------------- |
 | ChatTTS    | token 级 | ✅       | ❓       | ❓          | ✅                     |
 | FishSpeech | 句子级   | ✅       | ❓       | ❓          | ✅ (SFT 版本开发中 🚧) |
 | CosyVoice  | 句子级   | ✅       | ❓       | ✅          | ✅                     |
+| GPTSoVits  | 句子级   | ✅       | ❓       | ❓          | ✅                     |
 
-#### ASR
+#### 5.1.2. <a name='ASR'></a>ASR
 
 | 模型名称   | 流式识别 | 支持训练 | 支持多语言 | 实现情况 |
 | ---------- | -------- | -------- | ---------- | -------- |
 | Whisper    | ✅       | ❓       | ✅         | ✅       |
 | SenseVoice | ✅       | ❓       | ✅         | 🚧       |
 
-#### Voice Clone
+#### 5.1.3. <a name='VoiceClone'></a>Voice Clone
 
 | 模型名称  | 实现情况 |
 | --------- | -------- |
-| OpenVoice | 🚧       |
+| OpenVoice | ✅       |
 | RVC       | 🚧       |
 
-#### Enhancer
+#### 5.1.4. <a name='Enhancer'></a>Enhancer
 
 | 模型名称        | 实现情况 |
 | --------------- | -------- |
 | ResembleEnhance | ✅       |
 
-## 7. <a name='FAQ'></a>FAQ
+## 6. <a name='FAQ'></a>FAQ
 
-### 7.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
+### 6.1. <a name='Prompt1Prompt2'></a>什么是 Prompt1 和 Prompt2？
 
 Prompt1 和 Prompt2 都是系统提示（system prompt），区别在于插入点不同。因为测试发现当前模型对第一个 [Stts] token 非常敏感，所以需要两个提示。
 
 - Prompt1 插入到第一个 [Stts] 之前
 - Prompt2 插入到第一个 [Stts] 之后
 
-### 7.2. <a name='Prefix'></a>什么是 Prefix？
+### 6.2. <a name='Prefix'></a>什么是 Prefix？
 
 Prefix 主要用于控制模型的生成能力，类似于官方示例中的 refine prompt。这个 prefix 中应该只包含特殊的非语素 token，如 `[laugh_0]`、`[oral_0]`、`[speed_0]`、`[break_0]` 等。
 
-### 7.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
+### 6.3. <a name='Style_p'></a>Style 中 `_p` 的区别是什么？
 
 Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使用 prefix。
 
-### 7.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
+### 6.4. <a name='--compile'></a>为什么开启了 `--compile` 很慢？
 
 由于还未实现推理 padding 所以如果每次推理 shape 改变都可能触发 torch 进行 compile
 
 > 暂时不建议开启
 
-### 7.5. <a name='colab2its'></a>为什么 colab 里面非常慢只有 2 it/s ？
+### 6.5. <a name='colab2its'></a>为什么 colab 里面非常慢只有 2 it/s ？
 
 请确保使用 gpu 而非 cpu。
 
@@ -280,7 +263,7 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 - 点击 【笔记本设置】
 - 选择 【硬件加速器】 => T4 GPU
 
-## 8. <a name='-1'></a>离线整合包
+## 7. <a name='-1'></a>离线整合包
 
 感谢 @Phrixus2023 提供的整合包：
 https://pan.baidu.com/s/1Q1vQV5Gs0VhU5J76dZBK4Q?pwd=d7xu

@@ -1,17 +1,15 @@
-# ChatTTS-Forge WebUI Features
+# WebUI Features
 
 ## webui.py
 
-WebUI.py 是一个用于配置和启动 Gradio Web UI 界面的脚本。
+`webui.py` 是一个用于配置和启动 Gradio Web UI 界面的脚本。
 
 ```
-usage: webui.py [-h] [--server_name SERVER_NAME] [--server_port SERVER_PORT] [--share] [--debug]
-                [--auth AUTH] [--tts_max_len TTS_MAX_LEN] [--ssml_max_len SSML_MAX_LEN]
-                [--max_batch_size MAX_BATCH_SIZE] [--webui_experimental] [--language LANGUAGE] [--api]
-                [--compile] [--no_half] [--off_tqdm] [--device_id DEVICE_ID]
-                [--use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]] [--lru_size LRU_SIZE]
-                [--debug_generate] [--preload_models] [--cors_origin CORS_ORIGIN] [--no_playground]
-                [--no_docs] [--exclude EXCLUDE]
+usage: webui.py [-h] [--server_name SERVER_NAME] [--server_port SERVER_PORT] [--share] [--debug] [--auth AUTH] [--tts_max_len TTS_MAX_LEN]
+                [--ssml_max_len SSML_MAX_LEN] [--max_batch_size MAX_BATCH_SIZE] [--webui_experimental] [--language LANGUAGE] [--api]
+                [--off_track_tqdm] [--compile] [--flash_attn] [--no_half] [--off_tqdm] [--device_id DEVICE_ID]
+                [--use_cpu {all,chattts,enhancer,trainer} [{all,chattts,enhancer,trainer} ...]] [--lru_size LRU_SIZE] [--debug_generate]
+                [--preload_models] [--cors_origin CORS_ORIGIN] [--no_playground] [--no_docs] [--exclude EXCLUDE]
 
 Gradio App
 
@@ -32,15 +30,15 @@ options:
                         Max batch size for TTS
   --webui_experimental  Enable webui_experimental features
   --language LANGUAGE   Set the default language for the webui
-  --api                 use api=True to launch the API together with the webui (run launch.py for only API
-                        server)
+  --api                 use api=True to launch the API together with the webui (run launch.py for only API server)
+  --off_track_tqdm      turn off track_tqdm
   --compile             Enable model compile
+  --flash_attn          Enable flash attention
   --no_half             Disalbe half precision for model inference
   --off_tqdm            Disable tqdm progress bar
   --device_id DEVICE_ID
-                        Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be
-                        needed before)
-  --use_cpu {all,chattts,enhancer} [{all,chattts,enhancer} ...]
+                        Select the default CUDA device to use (export CUDA_VISIBLE_DEVICES=0,1,etc might be needed before)
+  --use_cpu {all,chattts,enhancer,trainer} [{all,chattts,enhancer,trainer} ...]
                         use CPU as torch device for specified modules
   --lru_size LRU_SIZE   Set the size of the request cache pool, set it to 0 will disable lru_cache
   --debug_generate      Enable debug mode for audio generation
