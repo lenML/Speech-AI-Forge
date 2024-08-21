@@ -12,9 +12,9 @@ def create_speaker_panel():
     with gr.Tabs():
         with gr.Tab("Builder"):
             speaker_editor_ui_v2()
+        with gr.Tab("Test Voice"):
+            speaker_editor_ui()
         with gr.Tab("ChatTTS"):
-            with gr.Tab("Editor"):
-                speaker_editor_ui()
             with gr.Tab("Creator"):
                 speaker_creator_ui()
             with gr.Tab("Merger"):
