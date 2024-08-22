@@ -29,6 +29,7 @@ from modules.data import styles_mgr
 from modules.utils import audio_utils
 from modules.utils.hf import spaces
 from modules.webui import webui_config
+from modules.webui.speaker.wav_misc import encode_to_wav
 
 logger = logging.getLogger(__name__)
 
@@ -254,9 +255,9 @@ def tts_generate(
     if ref_audio is not None:
         if ref_audio_text is None or ref_audio_text.strip() == "":
             raise gr.Error("ref_audio_text is empty")
-
-        spk = TTSSpeaker.from_ref_wav(
-            ref_wav=ref_audio,
+        ref_audio_bytes = encode_to_wav(audio_tuple=ref_audio)
+        spk = TTSSpeaker.from_ref_wav_bytes(
+            ref_wav=ref_audio_bytes,
             text=ref_audio_text,
         )
 

@@ -139,6 +139,13 @@ class TTSSpeaker:
         spk.add_ref(ref=DcSpkReference(text=text, wav=data.tobytes(), wav_sr=sr))
         return spk
 
+    @staticmethod
+    def from_ref_wav_bytes(ref_wav: tuple[int, bytes], text="") -> "TTSSpeaker":
+        sr, data = ref_wav
+        spk = TTSSpeaker.empty()
+        spk.add_ref(ref=DcSpkReference(text=text, wav=data, wav_sr=sr))
+        return spk
+
     def __init__(self, data: DcSpk) -> None:
         assert isinstance(data, DcSpk), "data must be a DcSpk instance"
 
