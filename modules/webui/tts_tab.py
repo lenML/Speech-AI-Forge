@@ -15,7 +15,14 @@ from modules.webui.webui_utils import (
 
 class TTSInterface:
     def __init__(self, model_id="chat-tts"):
-        self.speakers = get_speakers(model_id=model_id)
+        def spk_filter(spk: TTSSpeaker):
+            if spk.has_refs:
+                return True
+            if spk.get_token(model_id=model_id) is not None:
+                return True
+            return False
+
+        self.speakers = get_speakers(spk_filter)
         self.speaker_names = self.get_speaker_names()
         self.styles = ["*auto"] + [s.get("name") for s in get_styles()]
 

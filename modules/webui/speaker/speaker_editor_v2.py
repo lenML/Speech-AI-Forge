@@ -32,11 +32,34 @@ def test_spk_voice(
 
 
 def encode_to_wav(audio_tuple: tuple[int, np.ndarray]):
+    if not isinstance(audio_tuple, tuple) or len(audio_tuple) != 2:
+        raise ValueError(
+            "Invalid audio data format. Expected a tuple (sample_rate, audio_data)."
+        )
+
     sample_rate, audio_data = audio_tuple
-    audio_data = audio_data.astype(np.int16)
+
+    if not isinstance(sample_rate, int) or not isinstance(audio_data, np.ndarray):
+        raise ValueError("Invalid types for audio data. Expected (int, np.ndarray).")
+
+    if audio_data.size == 0:
+        raise ValueError("Audio data is empty.")
+
+    # 如果音频数据是多声道的，取第一个声道或对声道进行平均处理
+    if len(audio_data.shape) > 1 and audio_data.shape[1] > 1:
+        audio_data = np.mean(audio_data, axis=1)  # 取所有声道的平均值作为单声道音频数据
+
+    # Ensure the audio data is within the valid range before converting to int16
+    if np.issubdtype(audio_data.dtype, np.floating):
+        audio_data = np.clip(audio_data, -1.0, 1.0)  # Ensure data is within [-1.0, 1.0]
+        audio_data = (audio_data * 32767).astype(np.int16)  # Convert to int16 range
+    else:
+        audio_data = audio_data.astype(np.int16)
+
     wav_buffer = io.BytesIO()
     wavfile.write(wav_buffer, sample_rate, audio_data)
     wav_bytes = wav_buffer.getvalue()
+
     return sample_rate, wav_bytes
 
 
@@ -193,7 +216,8 @@ def speaker_editor_ui_v2():
 
         with gr.Column(scale=5):
 
-            with gr.Group():
+            # NOTE: 这里暂时不显示了，需要创建的话可以从 ChatTTS/creator 里面创建
+            with gr.Group(visible=False):
                 # 从种子创建 spk -1 为默认值，即不使用种子
                 gr.Markdown("From Seed")
                 chat_tts_seed = gr.Number(

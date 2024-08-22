@@ -55,14 +55,14 @@ names_list = [
 @torch.inference_mode()
 @spaces.GPU(duration=120)
 def create_spk_from_seed(
-    seed: int,
-    name: str,
-    gender: str,
-    desc: str,
+    seed: int, name: str, gender: str, desc: str, author: str, version: str
 ):
     spk = ChatTTSModel.create_speaker_from_seed(seed)
     spk.set_name(name=name)
     spk.set_desc(desc=desc)
+    spk.set_gender(gender=gender)
+    spk.set_author(author=author)
+    spk.set_version(version=version)
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".spkv1.json") as tmp_file:
         json_str = spk.to_json_str()
@@ -90,8 +90,8 @@ def random_speaker():
 
 
 def speaker_creator_ui():
-    def on_generate(seed, name, gender, desc):
-        file_path = create_spk_from_seed(seed, name, gender, desc)
+    def on_generate(seed, name, gender, desc, author, version):
+        file_path = create_spk_from_seed(seed, name, gender, desc, author, version)
         return file_path
 
     def create_test_voice_card(seed_input):
@@ -135,6 +135,16 @@ def speaker_creator_ui():
                 gender_input = gr.Textbox(
                     label="Gender", placeholder="Enter gender", value="*"
                 )
+                author_input = gr.Textbox(
+                    label="Author",
+                    placeholder="Enter author",
+                    value="",
+                )
+                version_input = gr.Textbox(
+                    label="Version",
+                    placeholder="Enter version",
+                    value="",
+                )
                 desc_input = gr.Textbox(
                     label="Description",
                     placeholder="Enter description",
@@ -157,6 +167,13 @@ def speaker_creator_ui():
 
     generate_button.click(
         fn=on_generate,
-        inputs=[seed_input, name_input, gender_input, desc_input],
+        inputs=[
+            seed_input,
+            name_input,
+            gender_input,
+            desc_input,
+            author_input,
+            version_input,
+        ],
         outputs=[output_file],
     )

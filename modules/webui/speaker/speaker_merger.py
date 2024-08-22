@@ -132,7 +132,10 @@ def merge_spk_to_file(
 # 显示 a b c d 四个选择框，选择一个或多个，然后可以试音，并导出
 def create_speaker_merger():
     def get_spk_choices():
-        speakers, speaker_names = webui_utils.get_speaker_names()
+        def is_chattts_spk(spk: TTSSpeaker):
+            return spk.get_token("chat-tts") is not None
+
+        speakers, speaker_names = webui_utils.get_speaker_names(is_chattts_spk)
         speaker_names = ["None"] + speaker_names
         return speaker_names
 

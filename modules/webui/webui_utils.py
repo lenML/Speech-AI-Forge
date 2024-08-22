@@ -40,23 +40,18 @@ SPK_FILE_EXTS = [
 ]
 
 
-def get_speakers(model_id="chat-tts", include_ref_spk=True) -> list[TTSSpeaker]:
+def get_speakers(filter: Optional[callable] = None) -> list[TTSSpeaker]:
     spks = spk_mgr.list_speakers()
-
-    if include_ref_spk:
-        spks = [
-            spk
-            for spk in spks
-            if spk.get_token(model_id=model_id) is not None or len(spk._data.refs) > 0
-        ]
-    else:
-        spks = [spk for spk in spks if spk.get_token(model_id=model_id) is not None]
+    if filter is not None:
+        spks = [spk for spk in spks if filter(spk)]
 
     return spks
 
 
-def get_speaker_names() -> tuple[list[TTSSpeaker], list[str]]:
-    speakers = get_speakers()
+def get_speaker_names(
+    filter: Optional[callable] = None,
+) -> tuple[list[TTSSpeaker], list[str]]:
+    speakers = get_speakers(filter)
 
     def get_speaker_show_name(spk: TTSSpeaker):
         if spk.gender == "*" or spk.gender == "":
