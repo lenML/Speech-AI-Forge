@@ -1,14 +1,10 @@
 import gradio as gr
 import pandas as pd
-import torch
 
-from modules.utils.hf import spaces
 from modules.webui import webui_config, webui_utils
 
 
-# NOTE: 因为 text_normalize 需要使用 tokenizer
-@torch.inference_mode()
-@spaces.GPU(duration=120)
+# UPDATE NOTE: webui_utils.text_normalize 里面屏蔽了 gpu 要求，所以这个函数不需要 gpu 资源了
 def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
     ssml = ""
     indent = " " * 2
@@ -26,13 +22,13 @@ def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
         ssml += f"{indent}<voice"
         if spk:
             ssml += f' spk="{spk}"'
-        if style:
+        if style and style != "*auto":
             ssml += f' style="{style}"'
         ssml += ">\n"
         ssml += f"{indent}{indent}{text}\n"
         ssml += f"{indent}</voice>\n"
     # 原封不动输出回去是为了触发 loadding 效果
-    return msg, spk, style, f"<speak version='0.1'>\n{ssml}</speak>"
+    return f"<speak version='0.1'>\n{ssml}</speak>"
 
 
 def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Tabs):
@@ -69,9 +65,12 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
                     show_label=False,
                     placeholder="Type speaker message here",
                 )
-                add = gr.Button("Add")
-                undo = gr.Button("Undo")
-                clear = gr.Button("Clear")
+                add = gr.Button("➕ Add")
+                undo = gr.Button("🔙 Undo")
+                clear = gr.Button("🧹 Clear")
+
+            with gr.Group():
+                reload = gr.Button("🔄 Reload demo script")
 
         with gr.Column(scale=5):
             with gr.Group():
@@ -81,7 +80,7 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
                     datatype=["number", "str", "str", "str"],
                     interactive=True,
                     wrap=True,
-                    value=webui_config.localization.podcast_default,
+                    value=webui_config.localization.podcast_default.copy(),
                     row_count=(0, "dynamic"),
                     col_count=(4, "fixed"),
                 )
@@ -92,17 +91,27 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
         if not msg:
             return "", sheet
 
+        speaker = spk
+        if ":" in spk:
+            speaker = spk.split(" : ")[1].strip()
+        else:
+            speaker = ""
+
         data = pd.DataFrame(
             {
                 "index": [sheet.shape[0]],
-                "speaker": [spk.split(" : ")[1].strip()],
+                "speaker": [speaker],
                 "text": [msg],
                 "style": [style],
             },
         )
 
         # 如果只有一行 并且是空的
-        is_empty = sheet.empty or (sheet.shape[0] == 1 and "text" not in sheet.iloc[0])
+        is_empty = (
+            sheet.empty
+            or (sheet.shape[0] == 1 and "text" not in sheet.iloc[0])
+            or (sheet.shape[0] == 1 and sheet.iloc[0]["text"] == "")
+        )
 
         if is_empty:
             sheet = data
@@ -136,16 +145,27 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
     def send_to_ssml(msg, spk, style, sheet: pd.DataFrame):
         if sheet.empty:
             raise gr.Error("Please add some text to the script table.")
-        msg, spk, style, ssml = merge_dataframe_to_ssml(msg, spk, style, sheet)
-        return [
+        ssml = merge_dataframe_to_ssml(msg, spk, style, sheet)
+        return (
             msg,
             spk,
             style,
             gr.Textbox(value=ssml),
             gr.Tabs(selected="ssml"),
             gr.Tabs(selected="ssml.editor"),
-        ]
+        )
 
+    def reload_default_data():
+        data = webui_config.localization.podcast_default.copy()
+        return "", pd.DataFrame(
+            data,
+            columns=["index", "speaker", "text", "style"],
+        )
+
+    reload.click(
+        reload_default_data,
+        outputs=[msg, script_table],
+    )
     msg.submit(
         add_message,
         inputs=[msg, spk_input_dropdown, style_input_dropdown, script_table],
