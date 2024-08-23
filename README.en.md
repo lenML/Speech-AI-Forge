@@ -15,128 +15,85 @@ You can experience and deploy ChatTTS-Forge through the following methods:
 | **Container Deployment** | See the docker section                  | [Docker](#docker)                                                                                                                                                   |
 | **Local Deployment**     | See the environment preparation section | [Local Deployment](#InstallationandRunning)                                                                                                                         |
 
-## 1. <a name='INDEX'></a>INDEX
+## Installation and Running
 
-<!-- vscode-markdown-toc -->
+First, ensure that the [relevant dependencies](./docs/dependencies.md) have been correctly installed.
 
-- 1. [INDEX](#INDEX)
-- 2. [GPU Memory Requirements](#GPUMemoryRequirements)
-  - 2.1. [Model Loading Memory Requirements](#ModelLoadingMemoryRequirements)
-  - 2.2. [Batch Size Memory Requirements](#BatchSizeMemoryRequirements)
-- 3. [ Installation and Running](#InstallationandRunning)
-     - 3.1. [WebUI Features](#WebUIFeatures)
-  - 3.1. [`launch.py`: API Server](#launch.py:APIServer)
-    - 3.1.1. [How to link to SillyTavern?](#HowtolinktoSillyTavern)
-- 4. [demo](#demo)
-  - 4.1. [风格化控制](#)
-  - 4.2. [长文本生成](#-1)
-- 5. [Docker](#Docker)
-  - 5.1. [Image](#Image)
-  - 5.2. [Manual build](#Manualbuild)
-- 6. [Roadmap](#Roadmap)
-- 7. [FAQ](#FAQ)
-  - 7.1. [What are Prompt1 and Prompt2?](#WhatarePrompt1andPrompt2)
-  - 7.2. [What is Prefix?](#WhatisPrefix)
-  - 7.3. [What is the difference in Style with `_p`?](#WhatisthedifferenceinStylewith_p)
-  - 7.4. [Why is it slow when `--compile` is enabled?](#Whyisitslowwhen--compileisenabled)
-  - 7.5. [7.5. Why is Colab very slow with only 2 it/s?](#WhyisColabveryslowwithonly2its)
+Start the application:
 
-<!-- vscode-markdown-toc-config
-	numbering=true
-	autoSave=true
-	/vscode-markdown-toc-config -->
-<!-- /vscode-markdown-toc -->
+```
+python webui.py
+```
 
-## 2. GPU Memory Requirements
+### WebUI Features
 
-### 2.1. Model Loading Memory Requirements
+[Click here for a detailed graphical introduction](./docs/webui_features.md)
 
-| Precision | ChatTTS Model | Enhancer Model |
-| --------- | ------------- | -------------- |
-| Full      | 2GB           | 3GB            |
-| Half      | 1GB           | 1.5GB          |
+- TTS: Functions related to the TTS model
+  - Speaker Switch: Allows you to switch between different voices
+    - Built-in voices: Several built-in voices are available, including `27 ChatTTS` / `7 CosyVoice` voices + `1 reference voice`
+    - Voice upload: Custom voice files can be uploaded, enabling real-time inference
+    - Reference voice: Upload reference audio/text and directly use the reference audio for `tts` inference
+  - Style: Includes various built-in style controls
+  - Long Text: Supports long text inference with automatic text splitting
+    - Batch Size: You can set the `Batch size`, which speeds up long text inference for models that support `batch` inference
+  - Refiner: Supports the `ChatTTS` native text `refiner` and can handle infinitely long texts
+  - Splitter: Allows configuration of the splitter to control `eos` and `split thresholds`
+  - Adjuster: Adjusts `speed/pitch/volume` with additional useful features like `loudness equalization`
+  - Voice Enhancer: Enhances `TTS` output with the `Enhancer` model to further improve output quality
+  - Generation History: Keeps the last three generated results for easy comparison
+  - Multi-model: Supports multiple `TTS` models for inference, including `ChatTTS` / `CosyVoice` / `FishSpeech` / `GPT-SoVITS`
+- SSML: An advanced TTS synthesis control tool with XML-like syntax
+  - Splitter: Provides more detailed control over long text splitting
+  - PodCast: A tool to help create `long text` and `multi-character` audio based on podcast scripts
+  - From subtitle: Create `SSML` scripts from subtitle files
+- Voices (Speakers):
+  - Builder: Create voices; currently supports creating voices from ChatTTS seeds or using reference audio to create `reference voices`
+  - Test Voice: Test uploaded voice files
+  - ChatTTS: Tools for debugging ChatTTS voices
+    - Draw Cards: Create random voices using random seeds
+    - Fusion: Merge voices created by different seeds
+- ASR:
+  - Whisper: Use the Whisper model for ASR
+  - SenseVoice: WIP
+- Tools: Various useful tools
+  - Post Process: Post-processing tools for `editing`, `adjusting`, and `enhancing` audio
 
-Note: Half precision is the default setting. Full precision can be enabled using the `--no_half` parameter.
+### `launch.py`: API Server
 
-### 2.2. Inference Process Memory Requirements
+In some cases, you might not need the WebUI or require higher API throughput, in which case you can start a simple API service with this script.
 
-| Precision | Batch Size | Without Enhancer | With Enhancer |
-| --------- | ---------- | ---------------- | ------------- |
-| Full      | ≤ 4        | 2GB              | 4GB           |
-| Full      | 8          | 4-10GB           | 6-14GB        |
-| Half      | ≤ 4        | 1GB              | 2GB           |
-| Half      | 8          | 2-6GB            | 4-8GB         |
+To start:
 
-Important notes:
+```bash
+python launch.py
+```
 
-1. Memory requirements are context-dependent, hence presented as a range.
-2. Half precision (default) typically requires about half the memory of full precision.
-3. For Batch Size ≤ 4, 4GB of VRAM is usually sufficient for inference.
-4. For Batch Size 8, 6-14GB of VRAM may be needed, depending on precision and Enhancer usage.
+Once launched, you can access `http://localhost:7870/docs` to see which API endpoints are available.
 
-## 3. <a name='InstallationandRunning'></a> Installation and Running
+More help:
 
-1. Ensure that the [related dependencies](./docs/dependencies.md) are correctly installed.
-2. Start the required services according to your needs.
+- Use `python launch.py -h` to view script parameters
+- Check out the [API Documentation](./docs/api.md)
 
-- webui: `python webui.py`
-- api: `python launch.py`
+#### How to link to SillyTavern?
 
-#### 3.1. <a name='WebUIFeatures'></a>WebUI Features
-
-[Click here for a detailed introduction with images](./docs/webui_features.md)
-
-- Native functions of ChatTTS model: Refiner/Generate
-- Native Batch synthesis for efficient long text synthesis
-- Style control
-- SSML
-  - Editor: Simple SSML editing, used in conjunction with other features
-  - Splitter: Preprocessing for long text segmentation
-  - Podcast: Support for creating and editing podcast scripts
-- Speaker
-  - Built-in voices: A variety of built-in speakers available
-  - Speaker creator: Supports voice testing and creation of new speakers
-  - Embedding: Supports uploading speaker embeddings to reuse saved speakers
-  - Speaker merge: Supports merging speakers and fine-tuning
-- Prompt Slot
-- Text normalization
-- Audio quality enhancement:
-  - Enhance: Improves output quality
-  - Denoise: Removes noise
-- Experimental features:
-  - fintune
-    - speaker embedding
-    - [WIP] GPT lora
-    - [WIP] AE
-  - [WIP] ASR
-  - [WIP] Inpainting
-
-### 3.1. <a name='launch.py:APIServer'></a>`launch.py`: API Server
-
-Launch.py is the startup script for ChatTTS-Forge, used to configure and launch the API server.
-
-Once the `launch.py` script has started successfully, you can check if the API is enabled at `/docs`.
-
-[Detailed API documentation](./docs/api.md)
-
-#### 3.1.1. <a name='HowtolinktoSillyTavern'></a>How to link to SillyTavern?
-
-Through the `/v1/xtts_v2` series API, you can easily connect ChatTTS-Forge to your SillyTavern.
+You can easily connect ChatTTS-Forge to your SillyTavern setup using the `/v1/xtts_v2` series of APIs.
 
 Here's a simple configuration guide:
 
-1. Open the plugin extension.
+1. Open the Plugin Extension menu.
 2. Open the `TTS` plugin configuration section.
-3. Switch `TTS Provider` to `XTTSv2`.
+3. Switch the `TTS Provider` to `XTTSv2`.
 4. Check `Enabled`.
-5. Select/configure `Voice`.
-6. **[Key Step]** Set the `Provider Endpoint` to `http://localhost:7870/v1/xtts_v2`.
+5. Select/Configure `Voice`.
+6. **[Important]** Set the `Provider Endpoint` to `http://localhost:7870/v1/xtts_v2`.
 
 ![sillytavern_tts](./docs/sillytavern_tts.png)
 
-## 4. <a name='demo'></a>demo
+## demo
 
-### 4.1. <a name=''></a>风格化控制
+### Styles Control
 
 <details>
 <summary>input</summary>
@@ -169,14 +126,14 @@ Here's a simple configuration guide:
 
 </details>
 
-<details open>
+<details>
 <summary>output</summary>
   
 [多角色.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/82d91409-ad71-42ac-a4cd-d9c9340e3a07)
 
 </details>
 
-### 4.2. <a name='-1'></a>长文本生成
+### Long Text
 
 <details>
 <summary>input</summary>
@@ -191,69 +148,161 @@ Here's a simple configuration guide:
 
 </details>
 
-<details open>
+<details>
 <summary>output</summary>
 
 [long_text_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/fe18b0f1-a85f-4255-8e25-3c953480b881)
 
 </details>
 
-## 5. <a name='Docker'></a>Docker
+## Docker
 
-### 5.1. <a name='Image'></a>Image
+### Image
 
-WIP
+WIP (Under development)
 
-### 5.2. <a name='Manualbuild'></a>Manual build
+### Manual Build
 
-download models
+Download models: `python -m scripts.download_models --source modelscope`
 
-```bash
-python -m scripts.download_models --source huggingface
-```
+> This script will download the `chat-tts` and `enhancer` models. If you need to download other models, please refer to the `Model Download` section below.
 
-- webui: `docker-compose -f ./docker-compose.webui.yml up -d`
-- api: `docker-compose -f ./docker-compose.api.yml up -d`
+- For the webui: `docker-compose -f ./docker-compose.webui.yml up -d`
+- For the API: `docker-compose -f ./docker-compose.api.yml up -d`
 
-Environment variable configuration
+Environment variable configuration:
 
 - webui: [.env.webui](./.env.webui)
-- api: [.env.api](./.env.api)
+- API: [.env.api](./.env.api)
 
-## 6. <a name='Roadmap'></a>Roadmap
+## Roadmap
 
-WIP
+### Model Supports
 
-## 7. <a name='FAQ'></a>FAQ
+#### TTS
 
-### 7.1. <a name='WhatarePrompt1andPrompt2'></a>What are Prompt1 and Prompt2?
+| Model      | Stream Mode    | vocie clone | training | support prompt | ready progress          |
+| ---------- | -------------- | ----------- | -------- | -------------- | ----------------------- |
+| ChatTTS    | token level    | ✅          | ❓       | ❓             | ✅                      |
+| FishSpeech | sentence level | ✅          | ❓       | ❓             | ✅ (SFT version WIP 🚧) |
+| CosyVoice  | sentence level | ✅          | ❓       | ✅             | ✅                      |
+| GPTSoVits  | sentence level | ✅          | ❓       | ❓             | 🚧                      |
 
-Prompt1 and Prompt2 are system prompts with different insertion points. The current model is very sensitive to the first [Stts] token, hence the need for two prompts.
+#### ASR
 
-- Prompt1 is inserted before the first [Stts].
-- Prompt2 is inserted after the first [Stts].
+| Model      | Streaming | training | mulit lang | ready progress |
+| ---------- | --------- | -------- | ---------- | -------------- |
+| Whisper    | ✅        | ❓       | ✅         | ✅             |
+| SenseVoice | ✅        | ❓       | ✅         | 🚧             |
 
-### 7.2. <a name='WhatisPrefix'></a>What is Prefix?
+#### Voice Clone
 
-The prefix is primarily used to control the model's generation capabilities, similar to the refine prompt in the official examples. This prefix should only contain special non-lexical tokens, such as `[laugh_0]`, `[oral_0]`, `[speed_0]`, `[break_0]`, etc.
+| Model     | ready progress |
+| --------- | -------------- |
+| OpenVoice | ✅             |
+| RVC       | 🚧             |
 
-### 7.3. <a name='WhatisthedifferenceinStylewith_p'></a>What is the difference in Style with `_p`?
+#### Enhancer
 
-Styles with `_p` use both prompt and prefix, while those without `_p` use only the prefix.
+| Model           | ready progress |
+| --------------- | -------------- |
+| ResembleEnhance | ✅             |
 
-### 7.4. <a name='Whyisitslowwhen--compileisenabled'></a>Why is it slow when `--compile` is enabled?
+## Model Download
 
-Due to the lack of inference padding, any change in the inference shape may trigger torch to compile.
+Since Forge is mainly focused on API functionality development, automatic download logic has not been implemented yet. You need to manually call the download scripts to get the models. The specific scripts are located in the `./scripts` directory.
 
-> It is currently not recommended to enable this.
+Below are some examples of how to use the download scripts:
 
-### 7.5. <a name='WhyisColabveryslowwithonly2its'></a>7.5. Why is Colab very slow with only 2 it/s?
+- TTS
+  - Download ChatTTS: `python -m scripts.dl_chattts.py --source huggingface`
+  - Download FishSpeech: `python -m scripts.downloader.fish_speech_1_2sft.py --source huggingface`
+  - Download CosyVoice: `python -m scripts.downloader.dl_cosyvoice_instruct.py --source huggingface`
+- ASR
+  - Download Whisper: `python -m scripts.downloader.faster_whisper.py --source huggingface`
+- CV
+  - OpenVoice: `python -m scripts.downloader.open_voice.py --source huggingface`
+- Enhancer: `python -m scripts.dl_enhance.py --source huggingface`
 
-Make sure you are using a GPU instead of a CPU.
+> If you need to download models from ModelScope, use the `--source modelscope` option.
+> Note: Some models cannot be downloaded from ModelScope because they are not available there.
 
-- Click on the menu bar **[Edit]**
-- Click **[Notebook settings]**
-- Select **[Hardware accelerator]** => T4 GPU
+> About `CosyVoice`: To be honest, I'm not quite sure which model should be used. Overall, it seems that the instruct model has the most features, but its quality may not be the best. If you want to use other models, you can use `dl_cosyvoice_base.py` or `dl_cosyvoice_instruct.py` or the sft script on your own. The loading priority is determined by whether the folder exists, with the priority order being `base` > `instruct` > `sft`.
+
+## FAQ
+
+### How to perform voice cloning?
+
+Currently, voice cloning is supported across various models, and formats like reference audio in `skpv1` are also adapted. Here are a few methods to use voice cloning:
+
+1. **In the WebUI**: You can upload reference audio in the voice selection section, which is the simplest way to use the voice cloning feature.
+2. **Using the API**: When using the API, you need to use a voice (i.e., a speaker) for voice cloning. First, you need to create a speaker file (e.g., `.spkv1.json`) with the required voice, and when calling the API, set the `spk` parameter to the speaker's name to enable cloning.
+3. **Voice Clone**: The system now also supports voice cloning using the voice clone model. When using the API, configure the appropriate `reference` to utilize this feature. (Currently, only OpenVoice is supported for voice cloning, so there’s no need to specify the model name.)
+
+For related discussions, see issue #118.
+
+### The generated result with a reference audio `spk` file is full of noise?
+
+This is likely caused by an issue with the uploaded audio configuration. You can try the following solutions:
+
+1. **Update**: Update the code and dependency versions. Most importantly, update Gradio (it's recommended to use the latest version if possible).
+2. **Process the audio**: Use ffmpeg or other software to edit the audio, convert it to mono, and then upload it. You can also try converting it to WAV format.
+3. **Check the text**: Make sure there are no unsupported characters in the reference text. It's also recommended to end the reference text with a `"。"` (this is a quirk of the model 😂).
+4. **Create with Colab**: Consider using the Colab environment to create the `spk` file to minimize environment-related issues.
+5. **TTS Test**: Currently, in the WebUI TTS page, you can upload reference audio directly. You can first test the audio and text, make adjustments, and then generate the `spk` file.
+
+### Can I train models?
+
+Not at the moment. This repository mainly provides a framework for inference services. There are plans to add some training-related features, but they are not a priority.
+
+### How can I optimize inference speed?
+
+This repository focuses on integrating and developing engineering solutions, so model inference optimizations largely depend on upstream repositories or community implementations. If you have good optimization ideas, feel free to submit an issue or PR.
+
+For now, the most practical optimization is to enable multiple workers. When running the `launch.py` script, you can start with the `--workers N` option to increase service throughput.
+
+There are also other potential speed-up optimizations that are not yet fully implemented. If interested, feel free to explore:
+
+1. **Compile**: Models support compile acceleration, which can provide around a 30% speed increase, but the compilation process is slow.
+2. **Flash Attention**: Flash attention acceleration is supported (using the `--flash_attn` option), but it is still not perfect.
+3. **vllm**: Not yet implemented, pending updates from upstream repositories.
+
+### What are Prompt1 and Prompt2?
+
+> Only for ChatTTS
+
+Both Prompt1 and Prompt2 are system prompts, but the difference lies in their insertion points. Through testing, it was found that the current model is very sensitive to the first `[Stts]` token, so two prompts are required:
+
+- Prompt1 is inserted before the first `[Stts]`.
+- Prompt2 is inserted after the first `[Stts]`.
+
+### What is Prefix?
+
+> Only for ChatTTS
+
+Prefix is mainly used to control the model's generation capabilities, similar to refine prompts in official examples. The prefix should only include special non-lexical tokens, such as `[laugh_0]`, `[oral_0]`, `[speed_0]`, `[break_0]`, etc.
+
+### What is the difference with `_p` in the Style?
+
+In the Style settings, those with `_p` use both prompt + prefix, while those without `_p` use only the prefix.
+
+### Why is it so slow when `--compile` is enabled?
+
+Since inference padding has not yet been implemented, changing the shape during each inference may trigger torch to recompile.
+
+> For now, it’s not recommended to enable this option.
+
+### Why is it so slow in Colab, only 2 it/s?
+
+Please ensure that you are using a GPU instead of a CPU.
+
+- Click on the menu bar **Edit**.
+- Select **Notebook Settings**.
+- Choose **Hardware Accelerator** => T4 GPU.
+
+# Documents
+
+find more documents from [here](./docs/readme.md)
 
 # Contributing
 
@@ -267,6 +316,7 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - OpenVoice: https://github.com/myshell-ai/OpenVoice
 - FishSpeech: https://github.com/fishaudio/fish-speech
 - SenseVoice: https://github.com/FunAudioLLM/SenseVoice
+- CosyVoice: https://github.com/FunAudioLLM/CosyVoice
 - Whisper: https://github.com/openai/whisper
 
 - ChatTTS 默认说话人: https://github.com/2noise/ChatTTS/issues/238
