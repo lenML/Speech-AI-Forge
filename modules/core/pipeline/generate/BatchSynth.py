@@ -22,6 +22,7 @@ class BatchSynth:
         )
         self.bucketizer = Bucketizer(segments=self.segments)
         self.buckets = self.bucketizer.build_buckets()
+
         self.generator = BatchGenerate(
             buckets=self.buckets, context=context, model=model
         )

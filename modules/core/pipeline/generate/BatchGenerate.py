@@ -50,7 +50,7 @@ class BatchGenerate:
 
     def generate_break(self, batch: TTSBatch):
         for seg in batch.segments:
-            seg.data = audio_utils.silence_np(seg.seg.duration_s)
+            seg.data = audio_utils.silence_np(seg.seg.duration_ms / 1000)
             seg.done = True
 
     def generate_batch(self, batch: TTSBatch):

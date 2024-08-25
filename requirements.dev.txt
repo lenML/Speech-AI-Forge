@@ -163,6 +163,7 @@ pybase16384==0.3.7
 cachetools==5.3.3
 langdetect==1.0.9
 WeTextProcessing==1.0.3
+python-ms==1.1.0
 
 #### fish-speech
 hydra-core==1.3.2

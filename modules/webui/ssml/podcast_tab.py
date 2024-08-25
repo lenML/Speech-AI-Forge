@@ -2,14 +2,19 @@ import gradio as gr
 import pandas as pd
 
 from modules.webui import webui_config, webui_utils
+import xml.dom.minidom
 
 
 # UPDATE NOTE: webui_utils.text_normalize 里面屏蔽了 gpu 要求，所以这个函数不需要 gpu 资源了
 def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
-    ssml = ""
-    indent = " " * 2
+    document = xml.dom.minidom.Document()
 
-    for i, row in df.iterrows():
+    root = document.createElement("speak")
+    root.setAttribute("version", "0.1")
+
+    document.appendChild(root)
+
+    for _, row in df.iterrows():
         text = row.get("text")
         spk = row.get("speaker")
         style = row.get("style")
@@ -19,16 +24,17 @@ def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
         if text.strip() == "":
             continue
 
-        ssml += f"{indent}<voice"
+        voice_node = document.createElement("voice")
         if spk:
-            ssml += f' spk="{spk}"'
+            voice_node.setAttribute("spk", spk)
         if style and style != "*auto":
-            ssml += f' style="{style}"'
-        ssml += ">\n"
-        ssml += f"{indent}{indent}{text}\n"
-        ssml += f"{indent}</voice>\n"
-    # 原封不动输出回去是为了触发 loadding 效果
-    return f"<speak version='0.1'>\n{ssml}</speak>"
+            voice_node.setAttribute("style", style)
+
+        voice_node.appendChild(document.createTextNode(text))
+        root.appendChild(voice_node)
+
+    xml_content = document.toprettyxml(indent="  ")
+    return xml_content
 
 
 def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Tabs):
@@ -71,6 +77,22 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
 
             with gr.Group():
                 reload = gr.Button("🔄 Reload demo script")
+
+            with gr.Group():
+                gr.Markdown("🎶Refiner (ChatTTS)")
+                rf_oral_input = gr.Slider(
+                    label="Oral", value=2, minimum=-1, maximum=9, step=1
+                )
+                rf_speed_input = gr.Slider(
+                    label="Speed", value=2, minimum=-1, maximum=9, step=1
+                )
+                rf_break_input = gr.Slider(
+                    label="Break", value=2, minimum=-1, maximum=7, step=1
+                )
+                rf_laugh_input = gr.Slider(
+                    label="Laugh", value=0, minimum=-1, maximum=2, step=1
+                )
+                refine_button = gr.Button("✍️Refine Text")
 
         with gr.Column(scale=5):
             with gr.Group():
@@ -162,6 +184,51 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
             columns=["index", "speaker", "text", "style"],
         )
 
+    def refine_texts(
+        sheet: pd.DataFrame,
+        oral,
+        speed,
+        break_,
+        laugh,
+        progress: gr.Progress = gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
+    ):
+        """
+        将每行的 text 调用 refine
+        """
+
+        def need_refine(text: str):
+            if text.strip() == "":
+                return False
+            if "[uv_break]" in text or "[laugh]" in text or "[v_break]" in text:
+                return False
+            return True
+
+        for i, row in sheet.iterrows():
+            text = row["text"]
+            if not need_refine(text):
+                continue
+            text = webui_utils.refine_text(
+                text=text,
+                oral=oral,
+                speed=speed,
+                rf_break=break_,
+                laugh=laugh,
+            )
+            text = text.replace("\n", " ")
+            sheet.at[i, "text"] = text
+        return sheet
+
+    refine_button.click(
+        refine_texts,
+        inputs=[
+            script_table,
+            rf_oral_input,
+            rf_speed_input,
+            rf_break_input,
+            rf_laugh_input,
+        ],
+        outputs=script_table,
+    )
     reload.click(
         reload_default_data,
         outputs=[msg, script_table],

@@ -3,12 +3,16 @@ from typing import List
 
 from modules.core.models import zoo
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
+from modules.core.pipeline.generate.SimpleTokenizer import RegexpTokenizer
 from modules.core.pipeline.generate.SsmlNormalizer import SsmlNormalizer
 from modules.core.ssml.SSMLParser import SSMLContext, get_ssml_parser_for
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 
 
 class TTSChunker:
+    # NOTE: 为了性能，所以用这个作为 tokenizer
+    tokenizer = RegexpTokenizer()
+
     def __init__(self, context: TTSPipelineContext) -> None:
         self.context = context
 
@@ -23,9 +27,7 @@ class TTSChunker:
         raise ValueError("No input text or ssml")
 
     def tokenize(self, text: str) -> list[int]:
-        # NOTE: 略微比纯基于char的好一点，因为只是给 spliter 用，所以大概能计算出一个结果即可
-        tokens = re.findall(r"\w{1,4}|[^\w\s]", text, re.UNICODE)
-        return [ord(char[0]) for char in tokens]
+        return self.tokenizer.encode(text)
 
         # NOTE: char tokenizer
         # return [ord(char) for char in text]
@@ -43,9 +45,6 @@ class TTSChunker:
         top_K = self.context.tts_config.top_k
         spk = self.context.spk
         infer_seed = self.context.infer_config.seed
-        # 这个只有 chattts 需要，并且没必要填 false...
-        # use_decoder = self.context.tts_config.use_decoder
-        use_decoder = True
         prompt1 = self.context.tts_config.prompt1
         prompt2 = self.context.tts_config.prompt2
         prefix = self.context.tts_config.prefix
@@ -56,10 +55,15 @@ class TTSChunker:
         spliter = SentenceSplitter(threshold=spliter_threshold, tokenizer=self.tokenize)
         sentences = spliter.parse(text)
 
+        def append_eos(text: str):
+            if text.strip().endswith(eos):
+                return text
+            return text + eos
+
         text_segments = [
             TTSSegment(
                 _type="audio",
-                text=s + eos,
+                text=append_eos(s),
                 temperature=temperature,
                 top_p=top_P,
                 top_k=top_K,
@@ -86,7 +90,6 @@ class TTSChunker:
         ctx.top_p = self.context.tts_config.top_p
         ctx.top_k = self.context.tts_config.top_k
         ctx.seed = self.context.infer_config.seed
-        # ctx.noramalize = self.context.tts_config.normalize
         ctx.prompt1 = self.context.tts_config.prompt1
         ctx.prompt2 = self.context.tts_config.prompt2
         ctx.prefix = self.context.tts_config.prefix

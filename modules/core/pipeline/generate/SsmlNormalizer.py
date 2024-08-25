@@ -5,6 +5,7 @@ from typing import List, Union
 from modules.api.utils import calc_spk_style, to_number
 from modules.core.models import zoo
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
+from modules.core.pipeline.generate.SimpleTokenizer import RegexpTokenizer
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.utils import rng
@@ -18,6 +19,9 @@ class SsmlNormalizer:
 
     and split the text in SSMLSegment into multiple segments if the text is too long
     """
+
+    # NOTE: 为了性能，所以用这个代替 model.tokenizer
+    tokenizer = RegexpTokenizer()
 
     def __init__(self, context: TTSPipelineContext, eos="", spliter_thr=100):
         self.batch_default_spk_seed = rng.np_rng()
@@ -39,12 +43,14 @@ class SsmlNormalizer:
         return text
 
     def tokenize(self, text: str) -> list[int]:
-        model = zoo.model_zoo.get_model(self.context.tts_config.mid)
-        return model.encode(text)
+        return self.tokenizer.encode(text)
+
+        # model = zoo.model_zoo.get_model(self.context.tts_config.mid)
+        # return model.encode(text)
 
     def convert_ssml_seg(self, segment: Union[SSMLSegment, SSMLBreak]) -> TTSSegment:
         if isinstance(segment, SSMLBreak):
-            return TTSSegment(_type="break", duration_s=segment.attrs.duration)
+            return TTSSegment(_type="break", duration_ms=segment.attrs.duration)
 
         tts_config = self.context.tts_config
         infer_config = self.context.infer_config
@@ -69,7 +75,7 @@ class SsmlNormalizer:
                 prompt2=params.get("prompt2", ""),
                 prefix=params.get("prefix", ""),
                 emotion=params.get("emotion", ""),
-                duration_s=params.get("duration", None),
+                duration_ms=params.get("duration", None),
             )
 
         text = str(text).strip()
@@ -107,7 +113,7 @@ class SsmlNormalizer:
             prompt2=prompt2,
             prefix=prefix,
             emotion=emotion or style,
-            duration_s=duration,
+            duration_ms=duration,
         )
 
         # NOTE 每个batch的默认seed保证前后一致即使是没设置spk的情况

@@ -12,7 +12,7 @@ from modules.core.spk.TTSSpeaker import TTSSpeaker
 @dataclass(repr=False, eq=False)
 class TTSSegment:
     _type: Literal["break", "audio"]
-    duration_s: int = 0
+    duration_ms: int = 0
 
     text: str = ""
     temperature: float = 0.3

@@ -23,22 +23,20 @@ def read_subtitle_file(file: str, spk: str):
     document.appendChild(root)
 
     for line in subs:
-        start = line.start / 1000
-        end = line.end / 1000
-        duration = end - start
-        duration = round(duration, 3)
-        text = line.text
+        start = line.start
+        end = line.end
         if ts != start:
             break_node = document.createElement("break")
             break_duration = start - ts
-            break_duration = round(break_duration, 3)
-            break_node.setAttribute("time", str(break_duration))
+            break_duration = round(break_duration)
+            break_node.setAttribute("time", str(break_duration) + "ms")
             root.appendChild(break_node)
+        duration = end - start
         voice_node = document.createElement("voice")
-        voice_node.setAttribute("duration", str(duration))
+        voice_node.setAttribute("duration", str(duration) + "ms")
         if spk != "*random":
             voice_node.setAttribute("spk", spk)
-        voice_node.appendChild(document.createTextNode(text))
+        voice_node.appendChild(document.createTextNode(line.text))
         root.appendChild(voice_node)
         ts = end
 

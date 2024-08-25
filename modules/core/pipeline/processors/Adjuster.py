@@ -10,7 +10,11 @@ class AdjusterProcessor(AudioProcessor):
 
         segment_duration = audio_data.shape[0] / sample_rate
         speed_rate = adjust_config.speed_rate
-        duration_s = adjust_config.duration_s
+        duration_s = (
+            adjust_config.duration_ms / 1000
+            if adjust_config.duration_ms is not None
+            else None
+        )
 
         if duration_s is not None:
             speed_rate = duration_s / segment_duration
