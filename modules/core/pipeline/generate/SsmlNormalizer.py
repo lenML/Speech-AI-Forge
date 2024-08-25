@@ -172,7 +172,8 @@ class SsmlNormalizer:
         ret_segments = [
             seg
             for seg in ret_segments
-            if isinstance(seg, SSMLSegment) and seg.text.strip()
+            if (isinstance(seg, SSMLSegment) and seg.text.strip())
+            or isinstance(seg, SSMLBreak)
         ]
 
         return ret_segments

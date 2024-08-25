@@ -20,7 +20,13 @@ class Bucketizer:
 
         return hash(
             json.dumps(
-                {k: v for k, v in json_data.items() if k != "text"}, sort_keys=True
+                {
+                    k: v
+                    for k, v in json_data.items()
+                    # NOTE: 这两个都不影响模型
+                    if k != "text" and k != "duration_ms"
+                },
+                sort_keys=True,
             )
         )
 

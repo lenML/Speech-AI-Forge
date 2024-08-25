@@ -31,6 +31,9 @@ class ChatTTSModel(TTSModel):
         super().__init__("chat-tts")
         self.chat: ChatTTS.Chat = None
 
+    def get_sample_rate(self) -> int:
+        return 24000
+
     def is_loaded(self) -> bool:
         return self.chat is not None
 

@@ -29,11 +29,19 @@ def read_subtitle_file(file: str, spk: str):
             break_node = document.createElement("break")
             break_duration = start - ts
             break_duration = round(break_duration)
-            break_node.setAttribute("time", str(break_duration) + "ms")
-            root.appendChild(break_node)
+            if break_duration > 0:
+                break_node.setAttribute("time", str(break_duration) + "ms")
+                root.appendChild(break_node)
+            else:
+                # TODO: logging
+                pass
         duration = end - start
-        voice_node = document.createElement("voice")
-        voice_node.setAttribute("duration", str(duration) + "ms")
+        if duration > 0:
+            voice_node = document.createElement("voice")
+            voice_node.setAttribute("duration", str(duration) + "ms")
+        else:
+            # TODO: logging
+            pass
         if spk != "*random":
             voice_node.setAttribute("spk", spk)
         voice_node.appendChild(document.createTextNode(line.text))

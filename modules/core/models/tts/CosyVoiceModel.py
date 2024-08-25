@@ -228,6 +228,9 @@ class CosyVoiceTTSModel(TTSModel):
         )
         return wav, ref_data.text
 
+    def get_sample_rate(self) -> int:
+        return 22050
+
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> list[NP_AUDIO]:

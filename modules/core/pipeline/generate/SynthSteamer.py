@@ -20,7 +20,7 @@ class SynthStreamer:
 
         for seg in self.segments:
             data = seg.data
-            if data.size == 0:
+            if data.size == 0 and not seg.done:
                 break
             output_wav = np.concatenate((output_wav, data), axis=0)
             if not seg.done:

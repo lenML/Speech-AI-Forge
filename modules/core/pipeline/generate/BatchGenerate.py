@@ -7,6 +7,10 @@ from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.generate.dcls import TTSBatch, TTSBucket
 from modules.utils import audio_utils
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class BatchGenerate:
     def __init__(
@@ -50,7 +54,12 @@ class BatchGenerate:
 
     def generate_break(self, batch: TTSBatch):
         for seg in batch.segments:
-            seg.data = audio_utils.silence_np(seg.seg.duration_ms / 1000)
+            sr, data = audio_utils.silence_np(
+                duration_s=seg.seg.duration_ms / 1000,
+                sample_rate=self.model.get_sample_rate(),
+            )
+            seg.data = data
+            seg.sr = sr
             seg.done = True
 
     def generate_batch(self, batch: TTSBatch):
@@ -63,9 +72,24 @@ class BatchGenerate:
             audio.sr = sr
             audio.done = True
 
+            if audio.seg.duration_ms is not None:
+                # 表示需要调整时间
+                result_duration = data.size / sr * 1000
+                audio.data = audio_utils.apply_prosody_to_audio_data(
+                    sr=sr,
+                    audio_data=audio.data,
+                    rate=audio.seg.duration_ms / result_duration,
+                )
+
     def generate_batch_stream(self, batch: TTSBatch):
         model = self.model
         segments = [audio.seg for audio in batch.segments]
+
+        # NOTE: stream 不支持 duration_ms
+        for seg in segments:
+            if seg.duration_ms is not None:
+                logger.warning("Not support duration_ms in stream mode")
+                break
 
         for results in model.generate_batch_stream(
             segments=segments, context=self.context

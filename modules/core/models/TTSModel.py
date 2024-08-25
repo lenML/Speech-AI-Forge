@@ -18,6 +18,9 @@ class TTSModel(BaseZooModel):
     def decode(self, ids: list[int]) -> str:
         return "".join([chr(id) for id in ids])
 
+    def get_sample_rate(self) -> int:
+        return 24000
+
     def generate(self, segment: TTSSegment, context: TTSPipelineContext) -> NP_AUDIO:
         return self.generate_batch([segment], context=context)[0]
 

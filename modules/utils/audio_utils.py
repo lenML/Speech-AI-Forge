@@ -115,6 +115,8 @@ def apply_prosody_to_audio_data(
     if audio_data.dtype == np.int16:
         # NOTE: 其实感觉一个报个错...
         audio_data = audio_data.astype(np.float32) / 32768.0
+    elif audio_data.dtype == np.float16:
+        audio_data = audio_data.astype(np.float32)
 
     if rate != 1:
         audio_data = pyrb.time_stretch(audio_data, sr=sr, rate=rate)
@@ -141,10 +143,8 @@ def apply_normalize(
     return pydub_to_np(segment)
 
 
-def silence_np(
-    duration_s: float,
-) -> tuple[int, np.ndarray]:
-    silence = AudioSegment.silent(duration=duration_s * 1000)
+def silence_np(duration_s: float, sample_rate: int = 24000) -> tuple[int, np.ndarray]:
+    silence = AudioSegment.silent(duration=duration_s * 1000, frame_rate=sample_rate)
     return pydub_to_np(silence)
 
 
