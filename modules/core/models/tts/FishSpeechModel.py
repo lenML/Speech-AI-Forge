@@ -1,3 +1,8 @@
+if __name__ == "__main__":
+    from modules.repos_static.sys_paths import setup_repos_paths
+
+    setup_repos_paths()
+
 import logging
 from pathlib import Path
 import threading

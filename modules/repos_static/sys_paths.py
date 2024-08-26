@@ -6,6 +6,7 @@ REPO_DIR = lambda name: os.path.abspath(os.path.join(os.path.dirname(__file__), 
 paths = [
     REPO_DIR("cosyvoice"),
     REPO_DIR("openvoice"),
+    REPO_DIR("fish_speech"),
 ]
 
 
