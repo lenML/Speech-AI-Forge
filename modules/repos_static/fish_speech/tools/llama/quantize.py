@@ -12,11 +12,9 @@ import click
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from tools.llama.generate import load_model
 
-from modules.repos_static.fish_speech.fish_speech.models.text2semantic.llama import (
-    find_multiple,
-)
+from fish_speech.models.text2semantic.llama import find_multiple
+from tools.llama.generate import load_model
 
 ##### Quantization Primitives ######
 
@@ -430,7 +428,7 @@ def generate_folder_name():
 @click.option(
     "--checkpoint-path",
     type=click.Path(path_type=Path, exists=True),
-    default="checkpoints/fish-speech-1.2",
+    default="checkpoints/fish-speech-1.2-sft",
 )
 @click.option(
     "--mode", type=str, default="int8", help="type of quantization to perform"

@@ -14,9 +14,7 @@ from torch.nn.utils.parametrizations import weight_norm
 from torch.nn.utils.parametrize import remove_parametrizations
 from torch.utils.checkpoint import checkpoint
 
-from modules.repos_static.fish_speech.fish_speech.models.vqgan.utils import (
-    sequence_mask,
-)
+from fish_speech.models.vqgan.utils import sequence_mask
 
 
 def init_weights(m, mean=0.0, std=0.01):
@@ -244,7 +242,7 @@ class HiFiGANGenerator(nn.Module):
             if self.use_template:
                 x = x + self.noise_convs[i](template)
 
-            if self.training and self.checkpointing:
+            if self.training:
                 x = checkpoint(
                     self.resblocks[i],
                     x,
@@ -514,7 +512,7 @@ class FireflyArchitecture(nn.Module):
         if x.ndim == 2:
             x = x[:, None, :]
 
-        if self.vq is not None:
+        if self.quantizer is not None:
             return x, vq_result
 
         return x

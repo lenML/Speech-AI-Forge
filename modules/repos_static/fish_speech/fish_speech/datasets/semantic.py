@@ -16,18 +16,12 @@ from torch.distributed import get_rank, get_world_size, is_initialized
 from torch.utils.data import DataLoader, IterableDataset, get_worker_info
 from transformers import AutoTokenizer
 
-from modules.repos_static.fish_speech.fish_speech.conversation import (
-    CODEBOOK_PAD_TOKEN_ID,
-)
-from modules.repos_static.fish_speech.fish_speech.datasets.protos.text_data_pb2 import (
-    SampledData,
-)
-from modules.repos_static.fish_speech.fish_speech.datasets.protos.text_data_stream import (
-    read_pb_stream,
-)
-from modules.repos_static.fish_speech.fish_speech.text.clean import clean_text
-from modules.repos_static.fish_speech.fish_speech.utils import RankedLogger
-from modules.repos_static.fish_speech.fish_speech.utils.braceexpand import braceexpand
+from fish_speech.conversation import CODEBOOK_PAD_TOKEN_ID
+from fish_speech.datasets.protos.text_data_pb2 import SampledData
+from fish_speech.datasets.protos.text_data_stream import read_pb_stream
+from fish_speech.text.clean import clean_text
+from fish_speech.utils import RankedLogger
+from fish_speech.utils.braceexpand import braceexpand
 
 log = RankedLogger(__name__, rank_zero_only=True)
 

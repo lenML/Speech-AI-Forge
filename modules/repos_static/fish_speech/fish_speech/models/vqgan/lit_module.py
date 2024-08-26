@@ -10,17 +10,9 @@ from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 from matplotlib import pyplot as plt
 from torch import nn
 
-from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.discriminator import (
-    Discriminator,
-)
-from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.wavenet import (
-    WaveNet,
-)
-from modules.repos_static.fish_speech.fish_speech.models.vqgan.utils import (
-    avg_with_mask,
-    plot_mel,
-    sequence_mask,
-)
+from fish_speech.models.vqgan.modules.discriminator import Discriminator
+from fish_speech.models.vqgan.modules.wavenet import WaveNet
+from fish_speech.models.vqgan.utils import avg_with_mask, plot_mel, sequence_mask
 
 
 class VQGAN(L.LightningModule):

@@ -11,7 +11,7 @@ from hydra.utils import instantiate
 from loguru import logger
 from omegaconf import OmegaConf
 
-from modules.repos_static.fish_speech.fish_speech.utils.file import AUDIO_EXTENSIONS
+from tools.file import AUDIO_EXTENSIONS
 
 # register eval resolver
 OmegaConf.register_new_resolver("eval", eval)
@@ -59,7 +59,7 @@ def load_model(config_name, checkpoint_path, device="cuda"):
 @click.option("--config-name", default="firefly_gan_vq")
 @click.option(
     "--checkpoint-path",
-    default="checkpoints/fish-speech-1.2/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+    default="checkpoints/fish-speech-1.2-sft/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
 )
 @click.option(
     "--device",

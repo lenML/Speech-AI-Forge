@@ -12,9 +12,7 @@
 __author__ = "Zhiyang Zhou <zyzhou@stu.xmu.edu.cn>"
 __data__ = "2019-05-02"
 
-from modules.repos_static.fish_speech.fish_speech.text.chn_text_norm.basic_constant import (
-    NUMBERING_TYPES,
-)
+from fish_speech.text.chn_text_norm.basic_constant import NUMBERING_TYPES
 
 
 class ChineseChar(object):

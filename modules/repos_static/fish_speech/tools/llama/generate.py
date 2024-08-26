@@ -2,6 +2,7 @@ import os
 import queue
 import threading
 import time
+from contextlib import nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, Optional, Tuple, Union
@@ -15,10 +16,8 @@ import torch._inductor.config
 from loguru import logger
 from tqdm import tqdm
 
-from modules.repos_static.fish_speech.fish_speech.conversation import (
-    CODEBOOK_PAD_TOKEN_ID,
-)
-from modules.repos_static.fish_speech.fish_speech.text import clean_text, split_text
+from fish_speech.conversation import CODEBOOK_PAD_TOKEN_ID
+from fish_speech.text import clean_text, split_text
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 torch._inductor.config.coordinate_descent_tuning = True
@@ -29,7 +28,7 @@ if hasattr(torch._inductor.config, "fx_graph_cache"):
     torch._inductor.config.fx_graph_cache = True
 
 
-from modules.repos_static.fish_speech.fish_speech.models.text2semantic.llama import (
+from fish_speech.models.text2semantic.llama import (
     BaseTransformer,
     DualARTransformer,
     NaiveTransformer,
@@ -183,8 +182,12 @@ def decode_n_tokens(
         else:
             window = previous_tokens[:, i - win_size : i]
 
-        with torch.backends.cuda.sdp_kernel(
-            enable_flash=False, enable_mem_efficient=False, enable_math=True
+        with (
+            torch.backends.cuda.sdp_kernel(
+                enable_flash=False, enable_mem_efficient=False, enable_math=True
+            )
+            if torch.cuda.is_available()
+            else nullcontext()
         ):  # Actually better for Inductor to codegen attention here
             next_token = decode_one_token(
                 model=model,
@@ -358,7 +361,10 @@ def load_model(checkpoint_path, device, precision, compile=False):
     if compile:
         logger.info("Compiling function...")
         decode_one_token = torch.compile(
-            decode_one_token, mode="reduce-overhead", fullgraph=True
+            decode_one_token,
+            fullgraph=True,
+            backend="inductor" if torch.cuda.is_available() else "aot_eager",
+            mode="reduce-overhead" if torch.cuda.is_available() else None,
         )
 
     return model.eval(), decode_one_token
@@ -606,7 +612,7 @@ def launch_thread_safe_queue(
 @click.option(
     "--checkpoint-path",
     type=click.Path(path_type=Path, exists=True),
-    default="checkpoints/fish-speech-1.2",
+    default="checkpoints/fish-speech-1.2-sft",
 )
 @click.option("--device", type=str, default="cuda")
 @click.option("--compile/--no-compile", default=False)

@@ -17,11 +17,7 @@ from lightning import LightningModule
 from loguru import logger
 from omegaconf import OmegaConf
 
-from modules.repos_static.fish_speech.fish_speech.utils.file import (
-    AUDIO_EXTENSIONS,
-    list_files,
-    load_filelist,
-)
+from tools.file import AUDIO_EXTENSIONS, list_files, load_filelist
 
 # register eval resolver
 OmegaConf.register_new_resolver("eval", eval)
@@ -46,7 +42,7 @@ logger.add(sys.stderr, format=logger_format)
 @lru_cache(maxsize=1)
 def get_model(
     config_name: str = "firefly_gan_vq",
-    checkpoint_path: str = "checkpoints/fish-speech-1.2/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+    checkpoint_path: str = "checkpoints/fish-speech-1.2-sft/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
     device: str | torch.device = "cuda",
 ):
     with initialize(version_base="1.3", config_path="../../fish_speech/configs"):
@@ -137,7 +133,7 @@ def process_batch(files: list[Path], model) -> float:
 @click.option("--config-name", default="firefly_gan_vq")
 @click.option(
     "--checkpoint-path",
-    default="checkpoints/fish-speech-1.2/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+    default="checkpoints/fish-speech-1.2-sft/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
 )
 @click.option("--batch-size", default=64)
 @click.option("--filelist", default=None, type=Path)

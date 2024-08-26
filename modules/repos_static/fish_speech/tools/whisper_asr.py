@@ -32,10 +32,7 @@ from loguru import logger
 from pydub import AudioSegment
 from tqdm import tqdm
 
-from modules.repos_static.fish_speech.fish_speech.utils.file import (
-    AUDIO_EXTENSIONS,
-    list_files,
-)
+from tools.file import AUDIO_EXTENSIONS, list_files
 
 
 @click.command()
@@ -57,7 +54,17 @@ from modules.repos_static.fish_speech.fish_speech.utils.file import (
 )
 @click.option("--device", default="cuda", help="Device to use [cuda / cpu]")
 @click.option("--language", default="auto", help="Language of the transcription")
-def main(model_size, compute_type, audio_dir, save_dir, sample_rate, device, language):
+@click.option("--initial-prompt", default=None, help="Initial prompt for transcribing")
+def main(
+    model_size,
+    compute_type,
+    audio_dir,
+    save_dir,
+    sample_rate,
+    device,
+    language,
+    initial_prompt,
+):
     logger.info("Loading / Downloading Faster Whisper model...")
 
     model = WhisperModel(
@@ -76,8 +83,6 @@ def main(model_size, compute_type, audio_dir, save_dir, sample_rate, device, lan
         path=audio_dir, extensions=AUDIO_EXTENSIONS, recursive=True
     )
 
-    numbered_suffix_pattern = re.compile(r"-\d{3}$")
-
     for file_path in tqdm(audio_files, desc="Processing audio file"):
         file_stem = file_path.stem
         file_suffix = file_path.suffix
@@ -85,22 +90,13 @@ def main(model_size, compute_type, audio_dir, save_dir, sample_rate, device, lan
         rel_path = Path(file_path).relative_to(audio_dir)
         (save_path / rel_path.parent).mkdir(parents=True, exist_ok=True)
 
-        # Skip files that already have a .lab file or a -{3-digit number} suffix
-        numbered_suffix = numbered_suffix_pattern.search(file_stem)
-        lab_file = file_path.with_suffix(".lab")
-
-        if numbered_suffix and lab_file.exists():
-            continue
-
-        if not numbered_suffix and lab_file.with_stem(lab_file.stem + "-001").exists():
-            if file_path.exists():
-                file_path.unlink()
-            continue
-
         audio = AudioSegment.from_file(file_path)
 
         segments, info = model.transcribe(
-            file_path, beam_size=5, language=None if language == "auto" else language
+            file_path,
+            beam_size=5,
+            language=None if language == "auto" else language,
+            initial_prompt=initial_prompt,
         )
 
         print(
@@ -109,6 +105,7 @@ def main(model_size, compute_type, audio_dir, save_dir, sample_rate, device, lan
         )
         print("Total len(ms): ", len(audio))
 
+        whole_text = None
         for segment in segments:
             id, start, end, text = (
                 segment.id,
@@ -117,26 +114,24 @@ def main(model_size, compute_type, audio_dir, save_dir, sample_rate, device, lan
                 segment.text,
             )
             print("Segment %03d [%.2fs -> %.2fs] %s" % (id, start, end, text))
-            start_ms = int(start * 1000)
-            end_ms = int(end * 1000) + 200  # add 0.2s avoid truncating
-            segment_audio = audio[start_ms:end_ms]
-            audio_save_path = (
-                save_path / rel_path.parent / f"{file_stem}-{id:03d}{file_suffix}"
-            )
-            segment_audio.export(audio_save_path, format=file_suffix[1:])
-            print(f"Exported {audio_save_path}")
+            if not whole_text:
+                whole_text = text
+            else:
+                whole_text += ", " + text
 
-            transcript_save_path = (
-                save_path / rel_path.parent / f"{file_stem}-{id:03d}.lab"
-            )
-            with open(
-                transcript_save_path,
-                "w",
-                encoding="utf-8",
-            ) as f:
-                f.write(segment.text)
+        whole_text += "."
 
-        file_path.unlink()
+        audio_save_path = save_path / rel_path.parent / f"{file_stem}{file_suffix}"
+        audio.export(audio_save_path, format=file_suffix[1:])
+        print(f"Exported {audio_save_path}")
+
+        transcript_save_path = save_path / rel_path.parent / f"{file_stem}.lab"
+        with open(
+            transcript_save_path,
+            "w",
+            encoding="utf-8",
+        ) as f:
+            f.write(whole_text)
 
 
 if __name__ == "__main__":

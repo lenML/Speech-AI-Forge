@@ -3,6 +3,7 @@ import io
 import json
 import queue
 import random
+import sys
 import traceback
 import wave
 from argparse import ArgumentParser
@@ -10,11 +11,11 @@ from http import HTTPStatus
 from pathlib import Path
 from typing import Annotated, Literal, Optional
 
-import librosa
 import numpy as np
 import pyrootutils
 import soundfile as sf
 import torch
+import torchaudio
 from kui.asgi import (
     Body,
     HTTPException,
@@ -30,6 +31,10 @@ from pydantic import BaseModel, Field
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
+# from fish_speech.models.vqgan.lit_module import VQGAN
+from fish_speech.models.vqgan.modules.firefly import FireflyArchitecture
+from fish_speech.utils import autocast_exclude_mps
+from tools.auto_rerank import batch_asr, calculate_wer, is_chinese, load_model
 from tools.llama.generate import (
     GenerateRequest,
     GenerateResponse,
@@ -37,11 +42,6 @@ from tools.llama.generate import (
     launch_thread_safe_queue,
 )
 from tools.vqgan.inference import load_model as load_decoder_model
-
-# from modules.repos_static.fish_speech.fish_speech.models.vqgan.lit_module import VQGAN
-from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.firefly import (
-    FireflyArchitecture,
-)
 
 
 def wav_chunk_header(sample_rate=44100, bit_depth=16, channels=1):
@@ -88,7 +88,18 @@ def load_audio(reference_audio, sr):
         except base64.binascii.Error:
             raise ValueError("Invalid path or base64 string")
 
-    audio, _ = librosa.load(reference_audio, sr=sr, mono=True)
+    waveform, original_sr = torchaudio.load(
+        reference_audio, backend="sox" if sys.platform == "linux" else "soundfile"
+    )
+
+    if waveform.shape[0] > 1:
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+
+    if original_sr != sr:
+        resampler = torchaudio.transforms.Resample(orig_freq=original_sr, new_freq=sr)
+        waveform = resampler(waveform)
+
+    audio = waveform.squeeze().numpy()
     return audio
 
 
@@ -268,7 +279,7 @@ def inference(req: InvokeRequest):
         if result.action == "next":
             break
 
-        with torch.autocast(
+        with autocast_exclude_mps(
             device_type=decoder_model.device.type, dtype=args.precision
         ):
             fake_audios = decode_vq_tokens(
@@ -294,6 +305,39 @@ def inference(req: InvokeRequest):
 
     fake_audios = np.concatenate(segments, axis=0)
     yield fake_audios
+
+
+def auto_rerank_inference(req: InvokeRequest, use_auto_rerank: bool = True):
+    if not use_auto_rerank:
+        # 如果不使用 auto_rerank，直接调用原始的 inference 函数
+        return inference(req)
+
+    zh_model, en_model = load_model()
+    max_attempts = 5
+    best_wer = float("inf")
+    best_audio = None
+
+    for attempt in range(max_attempts):
+        # 调用原始的 inference 函数
+        audio_generator = inference(req)
+        fake_audios = next(audio_generator)
+
+        asr_result = batch_asr(
+            zh_model if is_chinese(req.text) else en_model, [fake_audios], 44100
+        )[0]
+        wer = calculate_wer(req.text, asr_result["text"])
+
+        if wer <= 0.1 and not asr_result["huge_gap"]:
+            return fake_audios
+
+        if wer < best_wer:
+            best_wer = wer
+            best_audio = fake_audios
+
+        if attempt == max_attempts - 1:
+            break
+
+    return best_audio
 
 
 async def inference_async(req: InvokeRequest):
@@ -366,12 +410,12 @@ def parse_args():
     parser.add_argument(
         "--llama-checkpoint-path",
         type=str,
-        default="checkpoints/fish-speech-1.2",
+        default="checkpoints/fish-speech-1.2-sft",
     )
     parser.add_argument(
         "--decoder-checkpoint-path",
         type=str,
-        default="checkpoints/fish-speech-1.2/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+        default="checkpoints/fish-speech-1.2-sft/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
     )
     parser.add_argument("--decoder-config-name", type=str, default="firefly_gan_vq")
     parser.add_argument("--device", type=str, default="cuda")
@@ -380,6 +424,7 @@ def parse_args():
     parser.add_argument("--max-text-length", type=int, default=0)
     parser.add_argument("--listen", type=str, default="127.0.0.1:8000")
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--use-auto-rerank", type=bool, default=True)
 
     return parser.parse_args()
 
