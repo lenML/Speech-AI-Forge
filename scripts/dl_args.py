@@ -7,7 +7,7 @@ def parser_args():
     )
     parser.add_argument(
         "--source",
-        choices=["modelscope", "huggingface"],
+        choices=["modelscope", "ms", "huggingface", "hf"],
         required=True,
         help="Choose the source to download the model from",
     )

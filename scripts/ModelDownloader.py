@@ -33,9 +33,9 @@ class ModelDownloader:
             print(f"Model {downloader.model_name} already exists.")
             return
 
-        if source == "modelscope":
+        if source == "modelscope" or source == "ms":
             downloader.from_modelscope()
-        elif source == "huggingface":
+        elif source == "huggingface" or source == "hf":
             downloader.from_huggingface()
         else:
             raise ValueError("Invalid source")
