@@ -9,6 +9,7 @@ import typing
 
 import torch.utils.data
 import torchaudio
+from tqdm import tqdm
 import transformers
 import vocos
 
@@ -16,7 +17,10 @@ from modules.repos_static.ChatTTS.ChatTTS.norm import Normalizer
 
 normalizer = Normalizer(
     os.path.join(
-        os.path.dirname(__file__), "../../ChatTTS/ChatTTS", "res", "homophones_map.json"
+        os.path.dirname(__file__),
+        "../repos_static/ChatTTS/ChatTTS",
+        "res",
+        "homophones_map.json",
     ),
 )
 
@@ -31,29 +35,27 @@ class LazyDataType(typing.TypedDict):
 class DataType(LazyDataType):
     text_input_ids: torch.Tensor  # (batch_size, text_len)
     text_attention_mask: torch.Tensor  # (batch_size, text_len)
-    audio_mel_specs: torch.Tensor  # (batch_size, audio_len*2, 100)
-    audio_attention_mask: torch.Tensor  # (batch_size, audio_len)
+    waveform: torch.Tensor  # (batch_size, time)
+    waveform_attention_mask: torch.Tensor  # (batch_size, time)
 
 
 class XzListTarKwargsType(typing.TypedDict):
-    tokenizer: typing.Union[transformers.PreTrainedTokenizer, None]
-    vocos_model: typing.Union[vocos.Vocos, None]
-    device: typing.Union[str, torch.device, None]
-    speakers: typing.Union[typing.Iterable[str], None]
-    sample_rate: typing.Union[int]
-    default_speaker: typing.Union[str, None]
-    default_lang: typing.Union[str, None]
-    tar_in_memory: typing.Union[bool, None]
-    process_ahead: typing.Union[bool, None]
+    tokenizer: typing.Optional[transformers.PreTrainedTokenizer | None]
+    normalizer: typing.Optional[Normalizer | None]
+    speakers: typing.Optional[typing.Iterable[str] | None]
+    sample_rate: typing.Optional[int]
+    default_speaker: typing.Optional[str | None]
+    default_lang: typing.Optional[str | None]
+    tar_in_memory: typing.Optional[bool]
+    process_ahead: typing.Optional[bool]
 
 
 class AudioFolder(torch.utils.data.Dataset, abc.ABC):
     def __init__(
         self,
-        root: str | io.BytesIO,
+        root: str,
         tokenizer: transformers.PreTrainedTokenizer | None = None,
-        vocos_model: vocos.Vocos | None = None,
-        device: str | torch.device | None = None,
+        normalizer: Normalizer | None = None,
         speakers: typing.Iterable[str] | None = None,
         sample_rate: int = 24_000,
         default_speaker: str | None = None,
@@ -68,14 +70,8 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
         self.default_lang = default_lang
 
         self.logger = logging.getLogger(__name__)
-        self.normalizer = {}
-
+        self.normalizer = normalizer
         self.tokenizer = tokenizer
-        self.vocos = vocos_model
-        self.vocos_device = (
-            None if self.vocos is None else next(self.vocos.parameters()).device
-        )
-        self.device = device or self.vocos_device
 
         # tar -cvf ../Xz.tar *
         # tar -xf Xz.tar -C ./Xz
@@ -93,10 +89,11 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
         self.lazy_data, self.speakers = self.get_lazy_data(root, speakers)
 
         self.text_input_ids: dict[int, torch.Tensor] = {}
-        self.audio_mel_specs: dict[int, torch.Tensor] = {}
+        self.waveforms: dict[int, torch.Tensor] = {}
         if process_ahead:
-            for n, item in enumerate(self.lazy_data):
-                self.audio_mel_specs[n] = self.preprocess_audio(item["filepath"])
+            print("Processing data ...")
+            for n, item in enumerate(tqdm(self.lazy_data)):
+                self.waveforms[n] = self.preprocess_audio(item["filepath"])
                 self.text_input_ids[n] = self.preprocess_text(
                     item["text"], item["lang"]
                 )
@@ -119,15 +116,15 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
 
     def __getitem__(self, n: int) -> DataType:
         lazy_data = self.lazy_data[n]
-        if n in self.audio_mel_specs:
-            audio_mel_specs = self.audio_mel_specs[n]
+        if n in self.waveforms:
+            waveforms = self.waveforms[n]
             text_input_ids = self.text_input_ids[n]
         else:
-            audio_mel_specs = self.preprocess_audio(lazy_data["filepath"])
+            waveforms = self.preprocess_audio(lazy_data["filepath"])
             text_input_ids = self.preprocess_text(lazy_data["text"], lazy_data["lang"])
-            self.audio_mel_specs[n] = audio_mel_specs
+            self.waveforms[n] = waveforms
             self.text_input_ids[n] = text_input_ids
-            if len(self.audio_mel_specs) == len(self.lazy_data):
+            if len(self.waveforms) == len(self.lazy_data):
                 if self.tar_file is not None:
                     self.tar_file.close()
                 if self.tar_io is not None:
@@ -135,19 +132,16 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
         text_attention_mask = torch.ones(
             len(text_input_ids), device=text_input_ids.device
         )
-        audio_attention_mask = torch.ones(
-            (len(audio_mel_specs) + 1) // 2,
-            device=audio_mel_specs.device,
-        )
+        waveform_attention_mask = torch.ones(len(waveforms), device=waveforms.device)
         return {
             "filepath": lazy_data["filepath"],
             "speaker": lazy_data["speaker"],
             "lang": lazy_data["lang"],
             "text": lazy_data["text"],
-            "text_input_ids": text_input_ids,
+            "text_input_id": text_input_ids,
             "text_attention_mask": text_attention_mask,
-            "audio_mel_specs": audio_mel_specs,
-            "audio_attention_mask": audio_attention_mask,
+            "waveform": waveforms,
+            "waveform_attention_mask": waveform_attention_mask,
         }
 
     def get_lazy_data(
@@ -191,15 +185,20 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
         self,
         text: str,
         lang: str,
+        do_text_normalization: bool = True,
+        do_homophone_replacement: bool = True,
     ) -> torch.Tensor:
-        text = normalizer(text)
+        text = normalizer(
+            text,
+            do_text_normalization,
+            do_homophone_replacement,
+            lang,
+        )
 
         text = f"[Stts][spk_emb]{text}[Ptts]"
         # text = f'[Stts][empty_spk]{text}[Ptts]'
 
-        text_token = self.tokenizer(
-            text, return_tensors="pt", add_special_tokens=False
-        ).to(device=self.device)
+        text_token = self.tokenizer(text, return_tensors="pt", add_special_tokens=False)
         return text_token["input_ids"].squeeze(0)
 
     def preprocess_audio(self, filepath: str) -> torch.Tensor:
@@ -208,17 +207,14 @@ class AudioFolder(torch.utils.data.Dataset, abc.ABC):
             waveform, sample_rate = torchaudio.load(file)
         else:
             waveform, sample_rate = torchaudio.load(filepath)
-        waveform = waveform.to(device=self.vocos_device)
         if sample_rate != self.sample_rate:
             waveform = torchaudio.functional.resample(
                 waveform,
                 orig_freq=sample_rate,
                 new_freq=self.sample_rate,
             )
-        mel_spec: torch.Tensor = self.vocos.feature_extractor(waveform)
-        return (
-            mel_spec.to(device=self.device).squeeze(0).transpose(0, 1)
-        )  # (audio_len*2, 100)
+        # (channel, time)
+        return waveform.mean(0)  # (time,)
 
 
 class JsonFolder(AudioFolder):
@@ -379,27 +375,27 @@ class AudioCollator:
     def __call__(self, batch: list[DataType]):
         batch = [x for x in batch if x is not None]
 
-        audio_maxlen = max(len(item["audio_attention_mask"]) for item in batch)
-        text_maxlen = max(len(item["text_attention_mask"]) for item in batch)
+        audio_maxlen = max(len(item["waveform"]) for item in batch)
+        text_maxlen = max(len(item["text_input_id"]) for item in batch)
 
         filepath = []
         speaker = []
         lang = []
         text = []
-        text_input_ids = []
+        text_input_id = []
         text_attention_mask = []
-        audio_mel_specs = []
-        audio_attention_mask = []
+        waveform = []
+        waveform_attention_mask = []
 
         for x in batch:
             filepath.append(x["filepath"])
             speaker.append(x["speaker"])
             lang.append(x["lang"])
             text.append(x["text"])
-            text_input_ids.append(
+            text_input_id.append(
                 torch.nn.functional.pad(
-                    x["text_input_ids"],
-                    (text_maxlen - len(x["text_input_ids"]), 0),
+                    x["text_input_id"],
+                    (text_maxlen - len(x["text_attention_mask"]), 0),
                     value=self.text_pad,
                 )
             )
@@ -410,17 +406,17 @@ class AudioCollator:
                     value=0,
                 )
             )
-            audio_mel_specs.append(
+            waveform.append(
                 torch.nn.functional.pad(
-                    x["audio_mel_specs"],
-                    (0, 0, 0, audio_maxlen * 2 - len(x["audio_mel_specs"])),
+                    x["waveform"],
+                    (0, audio_maxlen - len(x["waveform_attention_mask"])),
                     value=self.audio_pad,
                 )
             )
-            audio_attention_mask.append(
+            waveform_attention_mask.append(
                 torch.nn.functional.pad(
-                    x["audio_attention_mask"],
-                    (0, audio_maxlen - len(x["audio_attention_mask"])),
+                    x["waveform_attention_mask"],
+                    (0, audio_maxlen - len(x["waveform_attention_mask"])),
                     value=0,
                 )
             )
@@ -429,10 +425,10 @@ class AudioCollator:
             "speaker": speaker,
             "lang": lang,
             "text": text,
-            "text_input_ids": torch.stack(text_input_ids),
+            "text_input_id": torch.stack(text_input_id),
             "text_attention_mask": torch.stack(text_attention_mask),
-            "audio_mel_specs": torch.stack(audio_mel_specs),
-            "audio_attention_mask": torch.stack(audio_attention_mask),
+            "waveform": torch.stack(waveform),
+            "waveform_attention_mask": torch.stack(waveform_attention_mask),
         }
 
 

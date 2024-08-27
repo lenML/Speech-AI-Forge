@@ -3,14 +3,14 @@
 import statistics
 import time
 from collections import defaultdict, deque
+from tqdm import tqdm as tqdm_class
+
 from typing import Generator, Iterable, TypeVar
 
 import torch
 import torch.distributed as dist
-from tqdm import tqdm as tqdm_class
-from typing_extensions import Self
 
-from .output import ansi, get_ansi_len, prints
+from .output import ansi, prints, get_ansi_len
 
 __all__ = ["SmoothedValue", "MetricLogger"]
 
@@ -54,7 +54,7 @@ class SmoothedValue:
         self.total: float = 0.0
         self.fmt = fmt
 
-    def update(self, value: float, n: int = 1) -> Self:
+    def update(self, value: float, n: int = 1) -> "SmoothedValue":
         r"""Update :attr:`n` pieces of data with same :attr:`value`.
 
         .. code-block:: python
@@ -75,7 +75,7 @@ class SmoothedValue:
         self.count += n
         return self
 
-    def update_list(self, value_list: list[float]) -> Self:
+    def update_list(self, value_list: list[float]) -> "SmoothedValue":
         r"""Update :attr:`value_list`.
 
         .. code-block:: python
@@ -97,7 +97,7 @@ class SmoothedValue:
         self.count += len(value_list)
         return self
 
-    def reset(self) -> Self:
+    def reset(self) -> "SmoothedValue":
         r"""Reset ``deque``, ``count`` and ``total`` to be empty.
 
         Returns:
@@ -222,7 +222,7 @@ class MetricLogger:
         self.data_time = SmoothedValue()
         self.memory = SmoothedValue(fmt="{max:.0f}")
 
-    def create_meters(self, **kwargs: str) -> Self:
+    def create_meters(self, **kwargs: str) -> "SmoothedValue":
         r"""Create meters with specific ``fmt`` in :attr:`self.meters`.
 
         ``self.meters[meter_name] = SmoothedValue(fmt=fmt)``
@@ -237,7 +237,7 @@ class MetricLogger:
             self.meters[k] = SmoothedValue(fmt="{global_avg:.3f}" if v is None else v)
         return self
 
-    def update(self, n: int = 1, **kwargs: float) -> Self:
+    def update(self, n: int = 1, **kwargs: float) -> "SmoothedValue":
         r"""Update values to :attr:`self.meters` by calling :meth:`SmoothedValue.update()`.
 
         ``self.meters[meter_name].update(float(value), n=n)``
@@ -255,7 +255,7 @@ class MetricLogger:
             self.meters[k].update(float(v), n=n)
         return self
 
-    def update_list(self, **kwargs: list) -> Self:
+    def update_list(self, **kwargs: list) -> "SmoothedValue":
         r"""Update values to :attr:`self.meters` by calling :meth:`SmoothedValue.update_list()`.
 
         ``self.meters[meter_name].update_list(value_list)``
@@ -270,7 +270,7 @@ class MetricLogger:
             self.meters[k].update_list(v)
         return self
 
-    def reset(self) -> Self:
+    def reset(self) -> "SmoothedValue":
         r"""Reset meter in :attr:`self.meters` by calling :meth:`SmoothedValue.reset()`.
 
         Returns:
