@@ -10,12 +10,17 @@ import re
 from contextlib import contextmanager
 from typing import Dict
 
-import torch
 import transformer_engine as te
-import transformers
 from transformer_engine.pytorch.attention import RotaryPositionEmbedding
+
+import torch
+
+import transformers
+from transformers.models.llama.modeling_llama import (
+    LlamaModel,
+    LlamaConfig,
+)
 from transformers.modeling_utils import _load_state_dict_into_model
-from transformers.models.llama.modeling_llama import LlamaConfig, LlamaModel
 
 from .patch import LlamaRMSNorm
 

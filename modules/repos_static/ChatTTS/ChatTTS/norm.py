@@ -1,11 +1,11 @@
 import json
 import logging
 import re
+from typing import Dict, Tuple, List, Literal, Callable, Optional
 import sys
-from typing import Callable, Dict, List, Literal, Optional, Tuple
 
-import numpy as np
 from numba import jit
+import numpy as np
 
 from .utils import del_all
 
@@ -34,6 +34,40 @@ def _fast_replace(
     return result, replaced_words
 
 
+@jit
+def _split_tags(text: str) -> Tuple[List[str], List[str]]:
+    texts: List[str] = []
+    tags: List[str] = []
+    current_text = ""
+    current_tag = ""
+    for c in text:
+        if c == "[":
+            texts.append(current_text)
+            current_text = ""
+            current_tag = c
+        elif current_tag != "":
+            current_tag += c
+        else:
+            current_text += c
+        if c == "]":
+            tags.append(current_tag)
+            current_tag = ""
+    if current_text != "":
+        texts.append(current_text)
+    return texts, tags
+
+
+@jit
+def _combine_tags(texts: List[str], tags: List[str]) -> str:
+    text = ""
+    for t in texts:
+        tg = ""
+        if len(tags) > 0:
+            tg = tags.pop(0)
+        text += t + tg
+    return text
+
+
 class Normalizer:
     def __init__(self, map_file_path: str, logger=logging.getLogger(__name__)):
         self.logger = logger
@@ -57,8 +91,8 @@ class Normalizer:
 
         """
         self.coding = "utf-16-le" if sys.byteorder == "little" else "utf-16-be"
-        self.accept_pattern = re.compile(r"[^\u4e00-\u9fffA-Za-z，。、,\. ]")
-        self.sub_pattern = re.compile(r"\[uv_break\]|\[laugh\]|\[lbreak\]")
+        self.reject_pattern = re.compile(r"[^\u4e00-\u9fffA-Za-z，。、,\. ]")
+        self.sub_pattern = re.compile(r"\[[\w_]+\]")
         self.chinese_char_pattern = re.compile(r"[\u4e00-\u9fff]")
         self.english_word_pattern = re.compile(r"\b[A-Za-z]+\b")
         self.character_simplifier = str.maketrans(
@@ -77,17 +111,13 @@ class Normalizer:
                 "《": "，",
                 "》": "，",
                 "－": "，",
-                "‘": "",
-                "“": "",
-                "’": "",
-                "”": "",
                 ":": ",",
                 ";": ",",
                 "!": ".",
                 "(": ",",
                 ")": ",",
-                "[": ",",
-                "]": ",",
+                # "[": ",",
+                # "]": ",",
                 ">": ",",
                 "<": ",",
                 "-": ",",
@@ -140,7 +170,12 @@ class Normalizer:
         if do_text_normalization:
             _lang = self._detect_language(text) if lang is None else lang
             if _lang in self.normalizers:
-                text = self.normalizers[_lang](text)
+                texts, tags = _split_tags(text)
+                self.logger.debug("split texts %s, tags %s", str(texts), str(tags))
+                texts = [self.normalizers[_lang](t) for t in texts]
+                self.logger.debug("normed texts %s", str(texts))
+                text = _combine_tags(texts, tags) if len(tags) > 0 else texts[0]
+                self.logger.debug("combined text %s", text)
             if _lang == "zh":
                 text = self._apply_half2full_map(text)
         invalid_characters = self._count_invalid_characters(text)
@@ -156,6 +191,13 @@ class Normalizer:
                 text = arr.tobytes().decode(self.coding)
                 repl_res = ", ".join([f"{_[0]}->{_[1]}" for _ in replaced_words])
                 self.logger.info(f"replace homophones: {repl_res}")
+        if len(invalid_characters):
+            texts, tags = _split_tags(text)
+            self.logger.debug("split texts %s, tags %s", str(texts), str(tags))
+            texts = [self.reject_pattern.sub("", t) for t in texts]
+            self.logger.debug("normed texts %s", str(texts))
+            text = _combine_tags(texts, tags) if len(tags) > 0 else texts[0]
+            self.logger.debug("combined text %s", text)
         return text
 
     def register(self, name: str, normalizer: Callable[[str], str]) -> bool:
@@ -192,7 +234,7 @@ class Normalizer:
 
     def _count_invalid_characters(self, s: str):
         s = self.sub_pattern.sub("", s)
-        non_alphabetic_chinese_chars = self.accept_pattern.findall(s)
+        non_alphabetic_chinese_chars = self.reject_pattern.findall(s)
         return set(non_alphabetic_chinese_chars)
 
     def _apply_half2full_map(self, text: str) -> str:

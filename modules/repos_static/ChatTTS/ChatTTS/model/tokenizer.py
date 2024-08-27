@@ -5,13 +5,9 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
 """
 
-import lzma
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple, Optional, Union
 
-import numpy as np
-import pybase16384 as b14
 import torch
-import torch.nn.functional as F
 from transformers import BertTokenizerFast
 
 from ..utils import del_all
@@ -19,12 +15,16 @@ from ..utils import del_all
 
 class Tokenizer:
     def __init__(
-        self, tokenizer_path: torch.serialization.FILE_LIKE, device: torch.device
+        self,
+        tokenizer_path: torch.serialization.FILE_LIKE,
     ):
+        """
         tokenizer: BertTokenizerFast = torch.load(
-            tokenizer_path, map_location="cpu", mmap=True
+            tokenizer_path, map_location=device, mmap=True
         )
-        tokenizer.padding_side = "left"
+        # tokenizer.save_pretrained("asset/tokenizer", legacy_format=False)
+        """
+        tokenizer: BertTokenizerFast = BertTokenizerFast.from_pretrained(tokenizer_path)
         self._tokenizer = tokenizer
 
         self.len = len(tokenizer)
@@ -32,14 +32,12 @@ class Tokenizer:
         self.break_0_ids = tokenizer.convert_tokens_to_ids("[break_0]")
         self.eos_token = tokenizer.convert_tokens_to_ids("[Ebreak]")
 
-        self.decode = self._tokenizer.batch_decode
-
     @torch.inference_mode()
     def encode(
         self,
         text: List[str],
         num_vq: int,
-        prompt_str: Optional[str] = None,
+        prompt: Optional[torch.Tensor] = None,
         device="cpu",
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
 
@@ -48,8 +46,6 @@ class Tokenizer:
         max_input_ids_len = -1
         max_attention_mask_len = -1
         prompt_size = 0
-
-        prompt = self._decode_prompt(prompt_str) if prompt_str is not None else None
 
         if prompt is not None:
             assert prompt.size(0) == num_vq, "prompt dim 0 must equal to num_vq"
@@ -129,91 +125,14 @@ class Tokenizer:
 
         return new_input_ids, attention_mask, text_mask
 
-    @staticmethod
-    def _decode_spk_emb(spk_emb: str) -> np.ndarray:
-        return np.frombuffer(
-            lzma.decompress(
-                b14.decode_from_string(spk_emb),
-                format=lzma.FORMAT_RAW,
-                filters=[{"id": lzma.FILTER_LZMA2, "preset": 9 | lzma.PRESET_EXTREME}],
-            ),
-            dtype=np.float16,
-        ).copy()
-
-    @torch.no_grad()
-    def apply_spk_emb(
+    @torch.inference_mode
+    def decode(
         self,
-        emb: torch.Tensor,
-        spk_emb: Union[str, torch.Tensor],
-        input_ids: torch.Tensor,
-        device: torch.device,
+        sequences: Union[List[int], List[List[int]]],
+        skip_special_tokens: bool = False,
+        clean_up_tokenization_spaces: bool = None,
+        **kwargs,
     ):
-        dtype = emb.dtype
-        spk_emb = (
-            spk_emb
-            if isinstance(spk_emb, torch.Tensor)
-            else torch.from_numpy(self._decode_spk_emb(spk_emb)).unsqueeze_(0)
+        return self._tokenizer.batch_decode(
+            sequences, skip_special_tokens, clean_up_tokenization_spaces, **kwargs
         )
-        n = (
-            F.normalize(
-                spk_emb.expand(emb.size(0), -1),
-                p=2.0,
-                dim=1,
-                eps=1e-12,
-            )
-            .to(device=device, dtype=dtype)
-            .unsqueeze_(1)
-            .expand(emb.shape)
-        )
-        cond = input_ids.narrow(-1, 0, 1).eq(self.spk_emb_ids).expand(emb.shape)
-        torch.where(cond, n, emb, out=emb)
-        del cond, n
-
-    @staticmethod
-    @torch.no_grad()
-    def _decode_prompt(prompt: str) -> torch.Tensor:
-        if isinstance(prompt, torch.Tensor):
-            return prompt
-        dec = b14.decode_from_string(prompt)
-        shp = np.frombuffer(dec[:4], dtype="<u2")
-        p = np.frombuffer(
-            lzma.decompress(
-                dec[4:],
-                format=lzma.FORMAT_RAW,
-                filters=[{"id": lzma.FILTER_LZMA2, "preset": 9 | lzma.PRESET_EXTREME}],
-            ),
-            dtype="<u2",
-        ).copy()
-        del dec
-        return torch.from_numpy(p).view(*shp)
-
-    @staticmethod
-    @torch.no_grad()
-    def _encode_prompt(prompt: torch.Tensor) -> str:
-        arr: np.ndarray = prompt.to(dtype=torch.uint16, device="cpu").numpy()
-        shp = arr.shape
-        assert len(shp) == 2, "prompt must be a 2D tensor"
-        s = b14.encode_to_string(
-            np.array(shp, dtype="<u2").tobytes()
-            + lzma.compress(
-                arr.astype("<u2").tobytes(),
-                format=lzma.FORMAT_RAW,
-                filters=[{"id": lzma.FILTER_LZMA2, "preset": 9 | lzma.PRESET_EXTREME}],
-            ),
-        )
-        del arr
-        return s
-
-    @staticmethod
-    @torch.no_grad()
-    def _encode_spk_emb(spk_emb: torch.Tensor) -> str:
-        arr: np.ndarray = spk_emb.to(dtype=torch.float16, device="cpu").numpy()
-        s = b14.encode_to_string(
-            lzma.compress(
-                arr.tobytes(),
-                format=lzma.FORMAT_RAW,
-                filters=[{"id": lzma.FILTER_LZMA2, "preset": 9 | lzma.PRESET_EXTREME}],
-            ),
-        )
-        del arr
-        return s
