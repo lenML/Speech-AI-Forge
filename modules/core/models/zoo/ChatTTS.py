@@ -31,8 +31,16 @@ def do_load_chat_tts():
         source="custom",
         custom_path="./models/ChatTTS",
         device=device,
-        dtype=dtype,
     )
+
+    all_modules: list[torch.nn.Module] = [
+        chat_tts.gpt,
+        chat_tts.dvae,
+        chat_tts.decoder,
+        chat_tts.vocos,
+    ]
+    for md in all_modules:
+        md.to(device=device, dtype=dtype)
 
     # 如果 device 为 cpu 同时，又是 dtype == float16 那么报 warn
     # 提示可能无法正常运行，建议使用 float32 即开启 `--no_half` 参数

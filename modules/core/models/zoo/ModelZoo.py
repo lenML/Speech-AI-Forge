@@ -1,3 +1,10 @@
+try:
+    from modules.repos_static.sys_paths import setup_repos_paths
+
+    setup_repos_paths()
+except:
+    pass
+
 from typing import Dict, Union
 
 from modules.core.models.BaseZooModel import BaseZooModel

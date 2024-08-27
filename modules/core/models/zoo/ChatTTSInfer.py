@@ -7,6 +7,7 @@ import torch
 
 from modules import config
 from modules.core.models import zoo
+from modules.devices import devices
 from modules.repos_static.ChatTTS.ChatTTS.core import Chat
 from modules.repos_static.ChatTTS.ChatTTS.model import GPT
 from modules.utils.monkey_tqdm import disable_tqdm
@@ -47,7 +48,7 @@ class ChatTTSInfer:
     def __init__(self, instance: Chat) -> None:
         self.instance = instance
         self.device = instance.device
-        self.dtype = instance.dtype
+        self.dtype = devices.dtype
         ChatTTSInfer.current_infer = self
 
         if zoo.zoo_config.debug_generate:
@@ -271,7 +272,7 @@ class ChatTTSInfer:
                 chunk_data[None].permute(0, 2, 1).to(device=self.instance.device)
             )
             if use_decoder:
-                input_data = input_data.to(dtype=self.instance.dtype)
+                input_data = input_data.to(dtype=self.dtype)
             mel_spec = decoder(input_data)
             del input_data
             del chunk_data
