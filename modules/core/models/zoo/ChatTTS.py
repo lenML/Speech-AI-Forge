@@ -28,6 +28,7 @@ def do_load_chat_tts():
     chat_tts.load(
         compile=config.runtime_env_vars.compile,
         use_flash_attn=config.runtime_env_vars.flash_attn,
+        use_vllm=config.runtime_env_vars.vllm,
         source="custom",
         custom_path="./models/ChatTTS",
         device=device,
