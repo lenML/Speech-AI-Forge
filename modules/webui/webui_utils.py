@@ -231,7 +231,8 @@ def tts_generate(
 
     infer_seed = infer_seed or params.get("seed", infer_seed)
     temperature = temperature or params.get("temperature", temperature)
-    prefix = prefix or params.get("prefix", prefix)
+    prefix = prefix or params.get("prefix", "")
+    prompt = params.get("prompt", "")
     prompt1 = prompt1 or params.get("prompt1", "")
     prompt2 = prompt2 or params.get("prompt2", "")
 
@@ -267,6 +268,7 @@ def tts_generate(
         temperature=temperature,
         top_k=top_k,
         top_p=top_p,
+        prompt=prompt,
         prefix=prefix,
         prompt1=prompt1,
         prompt2=prompt2,

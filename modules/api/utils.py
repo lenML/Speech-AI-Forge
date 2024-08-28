@@ -47,9 +47,9 @@ def merge_prompt(attrs: dict, elem: Dict[str, Any]):
         if val == "min":
             val = min_value
         val = np.clip(int(val), min_value, max_value)
-        if "prefix" not in attrs or attrs["prefix"] == None:
-            attrs["prefix"] = ""
-        attrs["prefix"] += " " + f"[{k}_{val}]"
+        if "prompt" not in attrs or attrs["prompt"] == None:
+            attrs["prompt"] = ""
+        attrs["prompt"] += " " + f"[{k}_{val}]"
 
     attr_num(attrs, "oral", 0, 9)
     attr_num(attrs, "speed", 0, 9)
@@ -65,6 +65,7 @@ def calc_spk_style(
         "prompt1": None,
         "prompt2": None,
         "prefix": None,
+        "prompt": None,
         "temperature": None,
     }
     params = {}
