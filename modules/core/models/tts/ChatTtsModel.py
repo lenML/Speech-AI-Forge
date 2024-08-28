@@ -119,6 +119,7 @@ class ChatTTSModel(TTSModel):
         temperature = seg0.temperature
         # repetition_penalty = seg0.repetition_penalty
         # max_new_token = seg0.max_new_token
+        prompt = seg0.prompt
         prompt1 = seg0.prompt1
         prompt2 = seg0.prompt2
         prefix = seg0.prefix
@@ -148,6 +149,7 @@ class ChatTTSModel(TTSModel):
                     top_P=top_P,
                     top_K=top_K,
                     temperature=temperature,
+                    prompt=prompt,
                     prompt1=prompt1,
                     prompt2=prompt2,
                     prefix=prefix,
@@ -173,6 +175,7 @@ class ChatTTSModel(TTSModel):
                         top_P=top_P,
                         top_K=top_K,
                         temperature=temperature,
+                        prompt=prompt,
                         prompt1=prompt1,
                         prompt2=prompt2,
                         prefix=prefix,

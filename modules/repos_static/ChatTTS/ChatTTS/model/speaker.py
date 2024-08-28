@@ -58,6 +58,9 @@ class Speaker:
         prompt: str,
         txt_smp: Optional[str],
         spk_emb: Optional[str],
+        prefix: Optional[str] = None,
+        prompt1: Optional[str] = None,
+        prompt2: Optional[str] = None,
     ) -> List[str]:
         for i, t in enumerate(text):
             text[i] = (
@@ -70,14 +73,24 @@ class Speaker:
             see https://github.com/2noise/ChatTTS/issues/459
             """
 
+        prefix = prefix or ""
+        prompt1 = prompt1 or ""
+        prompt2 = prompt2 or ""
+
         if prompt:
             text = [prompt + i for i in text]
 
         txt_smp = "" if txt_smp is None else txt_smp
         if spk_emb is not None:
-            text = [f"[Stts][spk_emb]{txt_smp}{i}[Ptts]" for i in text]
+            text = [
+                f"{prompt1}[Stts]{prompt2}[spk_emb]{txt_smp}{i}[Ptts]{prefix}"
+                for i in text
+            ]
         else:
-            text = [f"[Stts][empty_spk]{txt_smp}{i}[Ptts]" for i in text]
+            text = [
+                f"{prompt1}[Stts]{prompt2}[empty_spk]{txt_smp}{i}[Ptts]{prefix}"
+                for i in text
+            ]
 
         return text
 

@@ -473,6 +473,9 @@ class Chat:
                 params.prompt,
                 params.txt_smp,
                 params.spk_emb,
+                prefix=params.prefix,
+                prompt1=params.prompt1,
+                prompt2=params.prompt2,
             ),
             self.config.gpt.num_vq,
             prompt=(

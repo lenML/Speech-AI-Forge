@@ -49,8 +49,9 @@ class TTSParams(BaseModel):
         42, description="Seed for generate (may be overridden by style or spk)"
     )
     format: str = Query("mp3", description="Response audio format: [mp3,wav]")
-    prompt1: str = Query("", description="Text prompt for inference")
-    prompt2: str = Query("", description="Text prompt for inference")
+    prompt: str = Query("", description="Text prompt for inference")
+    prompt1: str = Query("", description="Text prompt_1 for inference")
+    prompt2: str = Query("", description="Text prompt_2 for inference")
     prefix: str = Query("", description="Text prefix for inference")
     bs: str = Query("8", description="Batch size for inference")
     thr: str = Query("100", description="Threshold for sentence spliter")
@@ -130,6 +131,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             "temperature", params.temperature
         )
         prefix = params.prefix or calc_params.get("prefix", params.prefix)
+        prompt = params.prompt or calc_params.get("prompt", params.prompt)
         prompt1 = params.prompt1 or calc_params.get("prompt1", params.prompt1)
         prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
         eos = params.eos or ""
@@ -154,6 +156,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             top_k=params.top_k,
             top_p=params.top_p,
             prefix=prefix,
+            prompt=prompt,
             prompt1=prompt1,
             prompt2=prompt2,
             mid=params.model,
