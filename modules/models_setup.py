@@ -7,6 +7,9 @@ from modules.Enhancer.ResembleEnhance import load_enhancer
 from modules.utils import env
 
 
+logger = logging.getLogger(__name__)
+
+
 def setup_model_args(parser: argparse.ArgumentParser):
     parser.add_argument("--compile", action="store_true", help="Enable model compile")
     parser.add_argument(
@@ -74,6 +77,9 @@ def process_model_args(args: argparse.Namespace):
     devices.first_time_calculation()
 
     zoo.zoo_config.debug_generate = debug_generate
+
+    if compile:
+        logger.info("Model compile is enabled")
 
     if preload_models:
         """

@@ -83,9 +83,6 @@ def process_api_args(args: argparse.Namespace, app: FastAPI):
     if not no_playground:
         api.setup_playground()
 
-    if compile:
-        logger.info("Model compile is enabled")
-
     threading.excepthook = lambda exctype: logger.exception(
         "Uncaught exception", exc_info=(exctype)
     )
