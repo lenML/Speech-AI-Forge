@@ -1,9 +1,11 @@
 import fnmatch
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
 
 def is_excluded(path, exclude_patterns):
@@ -19,6 +21,49 @@ def is_excluded(path, exclude_patterns):
             print(path, pattern)
             return True
     return False
+
+
+CURRENT_CDN = "fastly.jsdelivr.net"
+
+# 备选 CDN
+# 节点                      描述            可用性
+# gcore.jsdelivr.net	    Gcore 节点	    可用性高
+# testingcf.jsdelivr.net	Cloudflare 节点	可用性高
+# quantil.jsdelivr.net	    Quantil 节点	可用性一般
+# fastly.jsdelivr.net	    Fastly 节点	    可用性一般
+# originfastly.jsdelivr.net	Fastly 节点	    可用性低
+# test1.jsdelivr.net	    Cloudflare 节点	可用性低
+# cdn.jsdelivr.net	        通用节点	    可用性低
+
+
+class CustomStaticFiles(StaticFiles):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if not isinstance(response, FileResponse):
+            return response
+        content_type = response.headers.get("Content-Type") or ""
+        if "text/html" not in content_type:
+            return response
+        request = Request(scope)
+        cdn_host = request.query_params.get("cdn_host")
+        if cdn_host:
+            response = self.replace_cdn_host(response, cdn_host)
+        return response
+
+    def replace_cdn_host(self, response: FileResponse, cdn_host: str):
+        content_path = response.path
+        with open(content_path, "rb") as f:
+            content_bytes = f.read()
+        content = content_bytes.decode("utf-8")
+        content = content.replace(CURRENT_CDN, cdn_host)
+        del response.headers["Content-Length"]
+        new_response = Response(
+            content, headers=response.headers, media_type=response.media_type
+        )
+        return new_response
 
 
 class APIManager:
@@ -53,7 +98,7 @@ class APIManager:
         app = self.app
         app.mount(
             "/playground",
-            StaticFiles(directory="playground", html=True),
+            CustomStaticFiles(directory="playground", html=True),
             name="playground",
         )
 
