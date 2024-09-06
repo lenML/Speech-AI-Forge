@@ -72,10 +72,11 @@ class StreamEncoder:
 
     def _read_output(self):
         while self.p:
-            data = self.p.stdout.read(self.chunk_size)
+            data: bytes = self.p.stdout.read(self.chunk_size)
             if data:
                 self.output_queue.put(data)
-            sleep(self.timeout)
+            else:
+                sleep(self.timeout)
 
     def write(self, data: bytes):
         if self.p is None:
@@ -103,7 +104,8 @@ class StreamEncoder:
 
         while not is_end() or not self.output_queue.empty():
             try:
-                data += self.output_queue.get(timeout=self.timeout)
+                while not is_end() or not self.output_queue.empty():
+                    data += self.output_queue.get(timeout=self.timeout)
             except queue.Empty:
                 break
             sleep(self.timeout)
