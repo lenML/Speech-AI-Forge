@@ -100,7 +100,7 @@ curl http://localhost:7870/v1/audio/speech \
   -H "Authorization: Bearer anything_your_wanna" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "chattts-4w",
+    "model": "chattts",
     "input": "Today is a wonderful day to build something people love! [lbreak]",
     "voice": "female2",
     "style": "chat"
