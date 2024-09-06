@@ -107,7 +107,7 @@ class StreamEncoder:
                 while not is_end() or not self.output_queue.empty():
                     data += self.output_queue.get(timeout=self.timeout)
             except queue.Empty:
-                break
+                pass
             sleep(self.timeout)
         return data
 
