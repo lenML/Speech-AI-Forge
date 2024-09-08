@@ -167,6 +167,14 @@ pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%
 python -m pip install -r requirements.txt
 ```
 
+对于 windows 环境，请使用 `requirements.windows.txt`
+
+> 因为有类似 `pynini` 这样的可选依赖库不支持在 windows 环境安装
+
+```bash
+python -m pip install -r requirements.windows.txt
+```
+
 ## 6. 其他
 
 如果需要部署 Docker 环境，请配置 Docker 和 Docker Compose。
