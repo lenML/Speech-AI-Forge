@@ -245,6 +245,9 @@ def tts_generate(
         temperature = min_n
 
     if isinstance(spk, int):
+        if model_id != 'chat-tts':
+            # NOTE: 只有 ChatTTS 模型支持从 seed 创建 speaker
+            raise gr.Error("Only ChatTTS model support create speaker from seed")
         spk = ChatTtsModel.ChatTTSModel.create_speaker_from_seed(spk)
 
     if spk_file:
