@@ -21,7 +21,7 @@ class ChatTTSModel(TTSModel):
     def create_speaker_from_seed(seed: int):
         chat = load_chat_tts()
         with SeedContext(seed):
-            token = chat._sample_random_speaker().float()
+            token = chat.speaker._sample_random().float()
             spk = TTSSpeaker.empty()
             spk.set_token(tokens=[token], model_id=ChatTTSModel.model_id)
             spk.set_name(f"spk[seed={seed}]")
