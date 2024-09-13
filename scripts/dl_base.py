@@ -77,4 +77,8 @@ class BaseModelDownloader(ModelDownloader):
         return True
 
     def gc(self):
-        os.system(f"rm -rf {self.cache_dir}")
+        try:
+            shutil.rmtree(self.cache_dir)
+            self.logger.info(f"Cache directory {self.cache_dir} deleted successfully.")
+        except Exception as e:
+            self.logger.error(f"Failed to delete cache directory {self.cache_dir}: {e}")
