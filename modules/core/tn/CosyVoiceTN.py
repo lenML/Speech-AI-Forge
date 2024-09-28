@@ -17,6 +17,12 @@ CosyVoiceTN.freeze_tokens = [
     "</laughter>",
     "<storng>",
     "</storng>",
+    # <|zh|><|en|><|jp|><|yue|><|ko|> for Chinese/English/Japanese/Cantonese/Korean
+    "<|zh|>",
+    "<|en|>",
+    "<|jp|>",
+    "<|yue|>",
+    "<|ko|>",
 ]
 
 
