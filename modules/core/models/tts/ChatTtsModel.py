@@ -86,8 +86,7 @@ class ChatTTSModel(TTSModel):
         )
         _, wav = AudioReshaper.normalize_audio(
             audio=(ref_data.wav_sr, wav),
-            # 调整采样率到 24kHz
-            target_sr=24000,
+            target_sr=self.get_sample_rate(),
         )
         text = ref_data.text
         return wav, text
@@ -137,7 +136,7 @@ class ChatTTSModel(TTSModel):
         if txt_smp and not txt_smp.endswith("。"):
             txt_smp = txt_smp + "。"
 
-        sr = 24000
+        sr = self.get_sample_rate()
 
         if not stream:
             with SeedContext(seed, cudnn_deterministic=False):

@@ -3,6 +3,7 @@ from typing import Generator, Literal, Union
 
 from pydub import AudioSegment
 
+from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.generate.BatchSynth import BatchSynth
@@ -22,6 +23,8 @@ class AudioPipeline:
     def __init__(self, context: TTSPipelineContext) -> None:
         self.modules: list[Union[AudioProcessor, PreProcessor]] = []
         self.context = context
+        
+        self.audio_sr = 44100
 
     def add_module(self, module):
         self.modules.append(module)
@@ -31,12 +34,16 @@ class AudioPipeline:
 
     def generate(self) -> NP_AUDIO:
         audio_data = self.generate_audio()
+        audio_data = AudioReshaper.normalize_audio(audio=audio_data, target_sr=self.audio_sr)
+        # audio_data = AudioReshaper.normalize_audio_type(audio=audio_data)
         audio_data = self.process_np_audio(audio=audio_data)
         return audio_data
 
     def process_np_audio(self, audio: NP_AUDIO) -> NP_AUDIO:
         audio = self.process_audio(audio)
-        return self.ensure_audio_type(audio, "ndarray")
+        audio = self.ensure_audio_type(audio, "ndarray")
+        audio = AudioReshaper.normalize_audio(audio=audio, target_sr=self.audio_sr)
+        return audio
 
     def ensure_audio_type(
         self, audio: AUDIO, output_type: Literal["ndarray", "segment"]

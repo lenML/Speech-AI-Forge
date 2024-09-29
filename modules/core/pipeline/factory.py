@@ -124,6 +124,8 @@ class PipelineFactory:
         pipeline.add_module(TNProcess(tn_pipeline=ChatTtsTN))
         model = model_zoo.get_chat_tts()
         pipeline.set_model(model)
+        
+        pipeline.audio_sr = model.get_sample_rate()
         return pipeline
 
     @classmethod
@@ -133,6 +135,8 @@ class PipelineFactory:
         pipeline.add_module(TNProcess(tn_pipeline=FishSpeechTN))
         model = model_zoo.get_fish_speech()
         pipeline.set_model(model)
+        
+        pipeline.audio_sr = model.get_sample_rate()
         return pipeline
 
     @classmethod
@@ -142,6 +146,8 @@ class PipelineFactory:
         pipeline.add_module(TNProcess(tn_pipeline=CosyVoiceTN))
         model = model_zoo.get_cosy_voice()
         pipeline.set_model(model)
+        
+        pipeline.audio_sr = model.get_sample_rate()
         return pipeline
 
     @classmethod

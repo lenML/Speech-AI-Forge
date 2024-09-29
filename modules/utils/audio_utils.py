@@ -15,13 +15,13 @@ import numpy as np
 
 
 def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:
-    audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
-    byte_io = io.BytesIO()
-    wavfile.write(byte_io, sample_rate, audio_np)
-    byte_io.seek(0)
-    _, audio_data = wavfile.read(byte_io)
-    audio_float = audio_data.astype(np.float32) / np.iinfo(np.int16).max
-    return audio_float
+    byte_io = io.BytesIO(audio_bytes)
+    audio_data, read_sr = sf.read(byte_io, dtype='float32')
+    
+    if read_sr != sample_rate:
+        raise ValueError(f"Sample rate mismatch: {read_sr} != {sample_rate}")
+    
+    return audio_data
 
 
 def audio_to_int16(audio_data: np.ndarray) -> np.ndarray:
