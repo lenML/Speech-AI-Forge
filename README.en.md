@@ -215,14 +215,14 @@ Since Forge is mainly focused on API functionality development, automatic downlo
 Below are some examples of how to use the download scripts:
 
 - TTS
-  - Download ChatTTS: `python -m scripts.dl_chattts.py --source huggingface`
-  - Download FishSpeech: `python -m scripts.downloader.fish_speech_1_2sft.py --source huggingface`
-  - Download CosyVoice: `python -m scripts.downloader.dl_cosyvoice_instruct.py --source huggingface`
+  - Download ChatTTS: `python -m scripts.dl_chattts --source huggingface`
+  - Download FishSpeech: `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`
+  - Download CosyVoice: `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface`
 - ASR
-  - Download Whisper: `python -m scripts.downloader.faster_whisper.py --source huggingface`
+  - Download Whisper: `python -m scripts.downloader.faster_whisper --source huggingface`
 - CV
-  - OpenVoice: `python -m scripts.downloader.open_voice.py --source huggingface`
-- Enhancer: `python -m scripts.dl_enhance.py --source huggingface`
+  - OpenVoice: `python -m scripts.downloader.open_voice --source huggingface`
+- Enhancer: `python -m scripts.dl_enhance --source huggingface`
 
 > If you need to download models from ModelScope, use the `--source modelscope` option.
 > Note: Some models cannot be downloaded from ModelScope because they are not available there.

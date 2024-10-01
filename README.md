@@ -215,14 +215,14 @@ WIP 开发中
 下面列出一些下载脚本使用示例：
 
 - TTS
-  - 下载 ChatTTS： `python -m scripts.dl_chattts.py --source huggingface`
-  - 下载 FishSpeech： `python -m scripts.downloader.fish_speech_1_2sft.py --source huggingface`
-  - 下载 CosyVoice： `python -m scripts.downloader.dl_cosyvoice_instruct.py --source huggingface`
+  - 下载 ChatTTS： `python -m scripts.dl_chattts --source huggingface`
+  - 下载 FishSpeech： `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`
+  - 下载 CosyVoice： `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface`
 - ASR
-  - 下载 Whisper： `python -m scripts.downloader.faster_whisper.py --source huggingface`
+  - 下载 Whisper： `python -m scripts.downloader.faster_whisper --source huggingface`
 - CV
-  - OpenVoice: `python -m scripts.downloader.open_voice.py --source huggingface`
-- Enhancer: `python -m scripts.dl_enhance.py --source huggingface`
+  - OpenVoice: `python -m scripts.downloader.open_voice --source huggingface`
+- Enhancer: `python -m scripts.dl_enhance --source huggingface`
 
 > 其中若需要使用 model scope 下载模型，使用 `--source modelscope` 即可。
 > 注：部分模型无法使用 model scope 下载，因为其中没有
