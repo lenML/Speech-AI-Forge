@@ -191,3 +191,6 @@ pysubs2==1.7.3
 eng-to-ipa==0.0.2
 jieba==0.42.1
 cn2an==0.5.22
+
+### fire red tts
+lingua-language-detector==2.0.2

@@ -65,3 +65,6 @@ pysubs2
 eng-to-ipa
 jieba
 cn2an
+
+### fire red tts
+lingua-language-detector
