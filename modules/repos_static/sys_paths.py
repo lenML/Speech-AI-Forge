@@ -7,6 +7,7 @@ paths = [
     REPO_DIR("cosyvoice"),
     REPO_DIR("openvoice"),
     REPO_DIR("fish_speech"),
+    REPO_DIR("FireRedTTS"),
 ]
 
 
