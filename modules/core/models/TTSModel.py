@@ -1,10 +1,12 @@
 from typing import Generator, Union
 
 
+from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.tts.InerCache import InferCache
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
+from modules.utils import audio_utils
 
 
 class TTSModel(BaseZooModel):
@@ -24,6 +26,7 @@ class TTSModel(BaseZooModel):
     def generate(self, segment: TTSSegment, context: TTSPipelineContext) -> NP_AUDIO:
         return self.generate_batch([segment], context=context)[0]
 
+    # NOTE: 这里会有假设，所有的 segments 除了文本以外所有配置相同，具体调用逻辑在 core.pipeline.generate 中
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> list[NP_AUDIO]:
@@ -115,3 +118,21 @@ class TTSModel(BaseZooModel):
 
         kwargs = self.get_cache_kwargs(segments=segments, context=context)
         InferCache.set_cache_val(model_id=self.model_id, value=value, **kwargs)
+    
+    def get_ref_wav(self, segment: TTSSegment):
+        spk = segment.spk
+        if spk is None:
+            return None, None
+        emotion = segment.emotion
+        ref_data = spk.get_ref(lambda x: x.emotion == emotion)
+        if ref_data is None:
+            return None, None
+        wav = audio_utils.bytes_to_librosa_array(
+            audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
+        )
+        _, wav = AudioReshaper.normalize_audio(
+            audio=(ref_data.wav_sr, wav),
+            target_sr=self.get_sample_rate(),
+        )
+        text = ref_data.text
+        return wav, text

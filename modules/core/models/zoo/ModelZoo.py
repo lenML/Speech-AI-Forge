@@ -12,6 +12,7 @@ from modules.core.models.enhancer.ResembleEnhance import ResembleEnhanceModel
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
+from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
 from modules.core.models.tts.FishSpeechModel import FishSpeechModel
 from modules.core.models.vc.OpenVoice import OpenVoiceModel
 from modules.devices import devices
@@ -23,11 +24,14 @@ class ModelZoo:
     """
 
     models: Dict[str, BaseZooModel] = {
+        # === tts ===
         "chat-tts": ChatTTSModel(),
         "fish-speech": FishSpeechModel(),
         "cosy-voice": CosyVoiceTTSModel(),
+        "fire-red-tts": FireRedTTSModel(),
+        # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
-        # whisper
+        # === whisper ===
         "whisper": WhisperModel("whisper.large"),
         # "whisper.large": WhisperModel("whisper.large"),
         # "whisper.medium": WhisperModel("whisper.medium"),
@@ -101,6 +105,9 @@ class ModelZoo:
 
     def get_open_voice(self) -> OpenVoiceModel:
         return self.get_model("open-voice")
+
+    def get_fire_red_tts(self) -> FireRedTTSModel:
+        return self.get_model("fire-red-tts")
 
 
 model_zoo = ModelZoo()

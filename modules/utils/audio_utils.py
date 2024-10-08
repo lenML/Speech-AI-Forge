@@ -8,10 +8,10 @@ import pyrubberband as pyrb
 import scipy.io.wavfile as wavfile
 import soundfile as sf
 from pydub import AudioSegment, effects
+import numpy as np
 
 INT16_MAX = np.iinfo(np.int16).max
 
-import numpy as np
 
 
 def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:

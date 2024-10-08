@@ -42,6 +42,15 @@ class TTSInterface:
 
         self.default_content = webui_config.localization.DEFAULT_TTS_TEXT
 
+        # 是否需要参考文本，某些模型不需要，直接填一个占位符然后隐藏
+        self.need_ref_text = True
+
+        self.default_temprature = 0.3
+        self.default_top_p = 0.7
+        self.default_top_k = 20
+
+        self.show_style_dropdown = True
+
     def get_speaker_names(self):
         names = ["*random"] + [
             self.get_speaker_show_name(speaker) for speaker in self.speakers
@@ -76,33 +85,39 @@ class TTSInterface:
         mp3_3 = audio_history[-2] if len(audio_history) > 1 else None
         return mp3_1, mp3_2, mp3_3, [mp3_3, mp3_2, mp3_1]
 
+    def create_speaker_picker(self):
+        spk_input_text = gr.Textbox(
+            label="Speaker (Text or Seed)",
+            value=self.default_speaker_name,
+            show_label=False,
+        )
+        spk_input_dropdown = gr.Dropdown(
+            choices=self.speaker_names,
+            interactive=True,
+            value=self.default_selected_speaker,
+            show_label=False,
+        )
+        spk_rand_button = gr.Button(value="🎲", variant="secondary")
+
+        spk_input_dropdown.change(
+            fn=self.get_speaker_name_from_show_name,
+            inputs=[spk_input_dropdown],
+            outputs=[spk_input_text],
+        )
+        spk_rand_button.click(
+            lambda x: str(torch.randint(0, 2**32 - 1, (1,)).item()),
+            inputs=[spk_input_text],
+            outputs=[spk_input_text],
+        )
+        return spk_input_text, spk_input_dropdown, spk_rand_button
+
     def create_speaker_interface(self):
         with gr.Group():
             gr.Markdown("🗣️Speaker")
             with gr.Tabs():
                 with gr.Tab(label="Pick"):
-                    spk_input_text = gr.Textbox(
-                        label="Speaker (Text or Seed)",
-                        value=self.default_speaker_name,
-                        show_label=False,
-                    )
-                    spk_input_dropdown = gr.Dropdown(
-                        choices=self.speaker_names,
-                        interactive=True,
-                        value=self.default_selected_speaker,
-                        show_label=False,
-                    )
-                    spk_rand_button = gr.Button(value="🎲", variant="secondary")
-
-                    spk_input_dropdown.change(
-                        fn=self.get_speaker_name_from_show_name,
-                        inputs=[spk_input_dropdown],
-                        outputs=[spk_input_text],
-                    )
-                    spk_rand_button.click(
-                        lambda x: str(torch.randint(0, 2**32 - 1, (1,)).item()),
-                        inputs=[spk_input_text],
-                        outputs=[spk_input_text],
+                    spk_input_text, spk_input_dropdown, spk_rand_button = (
+                        self.create_speaker_picker()
                     )
 
                 with gr.Tab(label="Upload"):
@@ -118,12 +133,15 @@ class TTSInterface:
                 with gr.Tab(label="Refrence"):
                     # 使用参考音频
                     ref_audio_upload = gr.Audio(label="Refrence Audio")
+
+                    text_visible = self.need_ref_text == True
                     ref_text_input = gr.Textbox(
                         label="Refrence Text",
                         placeholder="Text from refrence audio",
-                        value="",
+                        value="" if text_visible else "无意义文本",
                         show_label=False,
                         lines=1,
+                        visible=text_visible,
                     )
 
         return (
@@ -138,7 +156,7 @@ class TTSInterface:
         gr.Markdown("TTS_STYLE_GUIDE")
 
     def create_style_interface(self):
-        with gr.Group():
+        with gr.Group(visible=self.show_style_dropdown):
             gr.Markdown("🎭Style")
             self.create_tts_style_guide()
             style_input_dropdown = gr.Dropdown(
@@ -150,10 +168,14 @@ class TTSInterface:
         with gr.Group():
             gr.Markdown("🎛️Sampling")
             temperature_input = gr.Slider(
-                0.01, 2.0, value=0.3, step=0.01, label="Temperature"
+                0.01, 2.0, value=self.default_temprature, step=0.01, label="Temperature"
             )
-            top_p_input = gr.Slider(0.1, 1.0, value=0.7, step=0.1, label="Top P")
-            top_k_input = gr.Slider(1, 50, value=20, step=1, label="Top K")
+            top_p_input = gr.Slider(
+                0.1, 1.0, value=self.default_top_p, step=0.1, label="Top P"
+            )
+            top_k_input = gr.Slider(
+                1, 50, value=self.default_top_k, step=1, label="Top K"
+            )
             batch_size_input = gr.Slider(
                 1, webui_config.max_batch_size, value=4, step=1, label="Batch Size"
             )
@@ -434,6 +456,95 @@ class CosyVoiceInterface(TTSInterface):
     def create_examples_interface(self, text_input):
         return None
 
+    def create_speaker_picker(self):
+        spk_input_dropdown = gr.Dropdown(
+            choices=self.speaker_names,
+            interactive=True,
+            value=self.default_selected_speaker,
+            show_label=False,
+        )
+        spk_input_text = gr.Textbox(
+            label="Speaker (Text or Seed)",
+            value=self.default_speaker_name,
+            show_label=False,
+            visible=False,
+        )
+        spk_input_dropdown.change(
+            fn=self.get_speaker_name_from_show_name,
+            inputs=[spk_input_dropdown],
+            outputs=[spk_input_text],
+        )
+
+        spk_rand_button = gr.Button(value="🎲", variant="secondary", visible=False)
+
+        return spk_input_text, spk_input_dropdown, spk_rand_button
+
+
+class FireRedTTSInterface(TTSInterface):
+
+    def __init__(self):
+        super().__init__("fire-red-tts")
+        self.refine_visible = False
+        self.contorl_tokens = [
+            "[elong]",
+            "[oralsii]",
+            "[tsk]",
+            "[breath]",
+            "[laugh]",
+            "(filled pause)",
+            "(confirmation)",
+        ]
+        self.spliter_eos = " 。 "
+
+        # NOTE: 只使用 _p 结尾的 因为没有 prompt 在这个模型中没用
+        styles: list[str] = [s.get("name") for s in get_styles()]
+        self.styles = (
+            ["*auto"]
+            # NOTE: _p_en 在前面，因为对中文指令识别一般
+            + [s for s in styles if s.endswith("_p_en")]
+            + [s for s in styles if s.endswith("_p")]
+        )
+
+        # NOTE: 这个模型不需要参考文本
+        self.need_ref_text = False
+        self.show_style_dropdown = False
+
+        self.default_temprature = 0.75
+        self.default_top_p = 0.85
+        self.default_top_k = 30
+
+    def create_tts_style_guide(self):
+        pass
+
+    def create_tts_text_guide(self):
+        pass
+
+    def create_examples_interface(self, text_input):
+        return None
+
+    def create_speaker_picker(self):
+        spk_input_dropdown = gr.Dropdown(
+            choices=self.speaker_names,
+            interactive=True,
+            value=self.default_selected_speaker,
+            show_label=False,
+        )
+        spk_input_text = gr.Textbox(
+            label="Speaker (Text or Seed)",
+            value=self.default_speaker_name,
+            show_label=False,
+            visible=False,
+        )
+        spk_input_dropdown.change(
+            fn=self.get_speaker_name_from_show_name,
+            inputs=[spk_input_dropdown],
+            outputs=[spk_input_text],
+        )
+
+        spk_rand_button = gr.Button(value="🎲", variant="secondary", visible=False)
+
+        return spk_input_text, spk_input_dropdown, spk_rand_button
+
 
 class FishSpeechInterface(TTSInterface):
 
@@ -461,6 +572,29 @@ class FishSpeechInterface(TTSInterface):
     def create_examples_interface(self, text_input):
         return None
 
+    def create_speaker_picker(self):
+        spk_input_dropdown = gr.Dropdown(
+            choices=self.speaker_names,
+            interactive=True,
+            value=self.default_selected_speaker,
+            show_label=False,
+        )
+        spk_input_text = gr.Textbox(
+            label="Speaker (Text or Seed)",
+            value=self.default_speaker_name,
+            show_label=False,
+            visible=False,
+        )
+        spk_input_dropdown.change(
+            fn=self.get_speaker_name_from_show_name,
+            inputs=[spk_input_dropdown],
+            outputs=[spk_input_text],
+        )
+
+        spk_rand_button = gr.Button(value="🎲", variant="secondary", visible=False)
+
+        return spk_input_text, spk_input_dropdown, spk_rand_button
+
 
 def create_tts_interface():
 
@@ -471,6 +605,9 @@ def create_tts_interface():
         with gr.TabItem("CosyVoice"):
             cosy_voice_interface = CosyVoiceInterface()
             cosy_voice_interface.create_tts_interface()
+        with gr.TabItem("FireRedTTS"):
+            fire_red_tts_interface = FireRedTTSInterface()
+            fire_red_tts_interface.create_tts_interface()
 
         # NOTE: 现在没有SFT版本，效果很差
         with gr.TabItem("FishSpeech", visible=webui_config.experimental):

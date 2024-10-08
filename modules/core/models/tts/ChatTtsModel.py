@@ -73,24 +73,6 @@ class ChatTTSModel(TTSModel):
     def interrupt(self, context: TTSPipelineContext = None) -> None:
         self.current_infer.interrupt()
 
-    def get_ref_wav(self, segment: TTSSegment):
-        spk = segment.spk
-        if spk is None:
-            return None, None
-        emotion = segment.emotion
-        ref_data = spk.get_ref(lambda x: x.emotion == emotion)
-        if ref_data is None:
-            return None, None
-        wav = audio_utils.bytes_to_librosa_array(
-            audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
-        )
-        _, wav = AudioReshaper.normalize_audio(
-            audio=(ref_data.wav_sr, wav),
-            target_sr=self.get_sample_rate(),
-        )
-        text = ref_data.text
-        return wav, text
-
     def generate_batch_base(
         self, segments: list[TTSSegment], context: TTSPipelineContext, stream=False
     ) -> Union[list[NP_AUDIO], Generator[list[NP_AUDIO], Any, None]]:

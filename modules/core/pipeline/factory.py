@@ -15,6 +15,7 @@ from modules.core.pipeline.processors.Normalizer import AudioNormalizer
 from modules.core.pipeline.processors.VoiceClone import VoiceCloneProcessor
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
+from modules.core.tn.FireRedTtsTN import FireRedTtsTN
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.core.tn.CosyVoiceTN import CosyVoiceTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
@@ -102,6 +103,8 @@ class PipelineFactory:
             return cls.create_fishspeech_pipeline(ctx)
         elif model_id == "cosyvoice" or model_id == "cosy-voice":
             return cls.create_cosyvoice_pipeline(ctx)
+        elif model_id == "firered" or model_id == "fire-red-tts":
+            return cls.create_fire_red_tts_pipeline(ctx)
         else:
             raise Exception(f"Unknown model id: {model_id}")
 
@@ -124,7 +127,7 @@ class PipelineFactory:
         pipeline.add_module(TNProcess(tn_pipeline=ChatTtsTN))
         model = model_zoo.get_chat_tts()
         pipeline.set_model(model)
-        
+
         pipeline.audio_sr = model.get_sample_rate()
         return pipeline
 
@@ -135,7 +138,7 @@ class PipelineFactory:
         pipeline.add_module(TNProcess(tn_pipeline=FishSpeechTN))
         model = model_zoo.get_fish_speech()
         pipeline.set_model(model)
-        
+
         pipeline.audio_sr = model.get_sample_rate()
         return pipeline
 
@@ -146,7 +149,18 @@ class PipelineFactory:
         pipeline.add_module(TNProcess(tn_pipeline=CosyVoiceTN))
         model = model_zoo.get_cosy_voice()
         pipeline.set_model(model)
-        
+
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
+    @classmethod
+    def create_fire_red_tts_pipeline(cls, ctx: TTSPipelineContext):
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        pipeline.add_module(TNProcess(tn_pipeline=FireRedTtsTN))
+        model = model_zoo.get_fire_red_tts()
+        pipeline.set_model(model)
+
         pipeline.audio_sr = model.get_sample_rate()
         return pipeline
 
