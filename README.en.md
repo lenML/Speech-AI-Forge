@@ -186,6 +186,7 @@ Environment variable configuration:
 | ChatTTS    | token level    | ✅          | ❓       | ❓             | ✅                      |
 | FishSpeech | sentence level | ✅          | ❓       | ❓             | ✅ (SFT version WIP 🚧) |
 | CosyVoice  | sentence level | ✅          | ❓       | ✅             | ✅                      |
+| FireRedTTS  | sentence level | ✅          | ❓       | ✅             | ✅                      |
 | GPTSoVits  | sentence level | ✅          | ❓       | ❓             | 🚧                      |
 
 #### ASR
@@ -210,24 +211,23 @@ Environment variable configuration:
 
 ## Model Download
 
-Since Forge is mainly focused on API functionality development, automatic download logic has not been implemented yet. You need to manually call the download scripts to get the models. The specific scripts are located in the `./scripts` directory.
+Since Forge primarily focuses on API functionality development, automatic download logic has not yet been implemented. To download models, you need to manually invoke the download scripts, which can be found in the `./scripts` directory.
 
-Below are some examples of how to use the download scripts:
+### Download Script
 
-- TTS
-  - Download ChatTTS: `python -m scripts.dl_chattts --source huggingface`
-  - Download FishSpeech: `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`
-  - Download CosyVoice: `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface`
-- ASR
-  - Download Whisper: `python -m scripts.downloader.faster_whisper --source huggingface`
-- CV
-  - OpenVoice: `python -m scripts.downloader.open_voice --source huggingface`
-- Enhancer: `python -m scripts.dl_enhance --source huggingface`
+| Function    | Model          | Download Command                                            |
+|-------------|----------------|-----------------------------------------------------------|
+| **TTS**     | ChatTTS       | `python -m scripts.dl_chattts --source huggingface`     |
+|             | FishSpeech    | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface` |
+|             | CosyVoice     | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
+|             | FireRedTTS    | `python -m scripts.downloader.fire_red_tts --source huggingface` |
+| **ASR**     | Whisper       | `python -m scripts.downloader.faster_whisper --source huggingface` |
+| **CV**      | OpenVoice     | `python -m scripts.downloader.open_voice --source huggingface` |
+| **Enhancer**| Enhancer Model | `python -m scripts.dl_enhance --source huggingface`     |
 
-> If you need to download models from ModelScope, use the `--source modelscope` option.
-> Note: Some models cannot be downloaded from ModelScope because they are not available there.
+> **Note**: If you need to use ModelScope to download models, use `--source modelscope`. Some models may not be available for download using ModelScope.
 
-> About `CosyVoice`: To be honest, I'm not quite sure which model should be used. Overall, it seems that the instruct model has the most features, but its quality may not be the best. If you want to use other models, you can use `dl_cosyvoice_base.py` or `dl_cosyvoice_instruct.py` or the sft script on your own. The loading priority is determined by whether the folder exists, with the priority order being `base` > `instruct` > `sft`.
+> **About CosyVoice**: It's unclear which model to use. Overall, the `instruct` model has the most features, but its quality may not be the best. If you wish to use other models, feel free to select `dl_cosyvoice_base.py`, `dl_cosyvoice_instruct.py`, or the `sft` script. The loading priority is `base` > `instruct` > `sft`, and you can determine which to load based on folder existence.
 
 ## FAQ
 

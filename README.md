@@ -186,6 +186,7 @@ WIP 开发中
 | ChatTTS    | token 级 | ✅       | ❓       | ❓          | ✅                     |
 | FishSpeech | 句子级   | ✅       | ❓       | ❓          | ✅ (SFT 版本开发中 🚧) |
 | CosyVoice  | 句子级   | ✅       | ❓       | ✅          | ✅                     |
+| FireRedTTS  | 句子级   | ✅       | ❓       | ✅          | ✅                     |
 | GPTSoVits  | 句子级   | ✅       | ❓       | ❓          | 🚧                     |
 
 #### ASR
@@ -210,24 +211,25 @@ WIP 开发中
 
 ## 模型下载
 
-由于 forge 主要是面向 api 功能开发，所以目前暂未实现自动下载逻辑，下载模型需手动调用下载脚本，具体脚本在 `./scripts` 目录下。
+由于 Forge 主要面向 API 功能开发，目前尚未实现自动下载逻辑，下载模型需手动调用下载脚本，具体脚本位于 `./scripts` 目录下。
 
-下面列出一些下载脚本使用示例：
+### 下载脚本
 
-- TTS
-  - 下载 ChatTTS： `python -m scripts.dl_chattts --source huggingface`
-  - 下载 FishSpeech： `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`
-  - 下载 CosyVoice： `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface`
-- ASR
-  - 下载 Whisper： `python -m scripts.downloader.faster_whisper --source huggingface`
-- CV
-  - OpenVoice: `python -m scripts.downloader.open_voice --source huggingface`
-- Enhancer: `python -m scripts.dl_enhance --source huggingface`
+| 功能       | 模型          | 下载命令                                                       |
+| ---------- | ------------- | ------------------------------------------------------------- |
+| **TTS**    | ChatTTS      | `python -m scripts.dl_chattts --source huggingface`          |
+|            | FishSpeech   | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface` |
+|            | CosyVoice    | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
+|            | FireRedTTS   | `python -m scripts.downloader.fire_red_tts --source huggingface` |
+| **ASR**    | Whisper      | `python -m scripts.downloader.faster_whisper --source huggingface` |
+| **CV**     | OpenVoice    | `python -m scripts.downloader.open_voice --source huggingface` |
+| **Enhancer**| 增强模型     | `python -m scripts.dl_enhance --source huggingface`          |
 
-> 其中若需要使用 model scope 下载模型，使用 `--source modelscope` 即可。
-> 注：部分模型无法使用 model scope 下载，因为其中没有
+> **注意**：如果需要使用 ModelScope 下载模型，请使用 `--source modelscope`。部分模型可能无法使用 ModelScope 下载。
 
-> 关于 `CosyVoice`: 老实说不太清楚应该用哪个模型，整体看 instruct 模型应该是功能最多的，但是可能质量不是最好的，如果要用其他模型可自行使用 `dl_cosyvoice_base.py` 或者 `dl_cosyvoice_instruct.py` 或者 sft 脚本。根据文件夹是否存在来判断加载哪个，加载优先级为 `base` > `instruct` > `sft`。
+> **关于 CosyVoice**：不太确定应该使用哪个模型。整体来看，`instruct` 模型功能最多，但可能质量不是最佳。如果需要使用其他模型，请自行选择 `dl_cosyvoice_base.py`、`dl_cosyvoice_instruct.py` 或 `sft` 脚本。加载优先级为 `base` > `instruct` > `sft`，可根据文件夹存在性判断加载顺序。
+
+这样格式是否符合你的要求？
 
 ## FAQ
 
@@ -327,6 +329,7 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - FishSpeech: https://github.com/fishaudio/fish-speech
 - SenseVoice: https://github.com/FunAudioLLM/SenseVoice
 - CosyVoice: https://github.com/FunAudioLLM/CosyVoice
+- FireRedTTS: https://github.com/FireRedTeam/FireRedTTS
 - Whisper: https://github.com/openai/whisper
 
 - ChatTTS 默认说话人: https://github.com/2noise/ChatTTS/issues/238
