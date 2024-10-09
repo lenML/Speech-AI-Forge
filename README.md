@@ -1,19 +1,19 @@
 [cn](./README.md) | [en](./README.en.md) | [Discord Server](https://discord.gg/9XnXUhAy3t)
 
-# 🍦 ChatTTS-Forge
+# 🍦 Speech-AI-Forge
 
-ChatTTS-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。
+Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。
 
 ![banner](./docs/banner.png)
 
-你可以通过以下几种方式体验和部署 ChatTTS-Forge：
+你可以通过以下几种方式体验和部署 Speech-AI-Forge：
 
-| -            | 描述                     | 链接                                                                                                                                                             |
-| ------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **在线体验** | 部署于 HuggingFace 中    | [HuggingFace Spaces](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                          |
-| **一键启动** | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.ipynb) |
-| **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                |
-| **本地部署** | 查看环境准备部分         | [本地部署](#InstallationandRunning)                                                                                                                              |
+| -            | 描述                     | 链接                                                                                                                                                               |
+| ------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **在线体验** | 部署于 HuggingFace 中    | [HuggingFace Spaces](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                            |
+| **一键启动** | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb) |
+| **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                  |
+| **本地部署** | 查看环境准备部分         | [本地部署](#InstallationandRunning)                                                                                                                                |
 
 ## Installation and Running
 
@@ -129,7 +129,7 @@ python launch.py
 <details open>
 <summary>output</summary>
   
-[多角色.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/82d91409-ad71-42ac-a4cd-d9c9340e3a07)
+[多角色.webm](https://github.com/lenML/Speech-AI-Forge/assets/37396659/82d91409-ad71-42ac-a4cd-d9c9340e3a07)
 
 </details>
 
@@ -151,7 +151,7 @@ python launch.py
 <details open>
 <summary>output</summary>
 
-[long_text_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/fe18b0f1-a85f-4255-8e25-3c953480b881)
+[long_text_demo.webm](https://github.com/lenML/Speech-AI-Forge/assets/37396659/fe18b0f1-a85f-4255-8e25-3c953480b881)
 
 </details>
 
@@ -186,7 +186,7 @@ WIP 开发中
 | ChatTTS    | token 级 | ✅       | ❓       | ❓          | ✅                     |
 | FishSpeech | 句子级   | ✅       | ❓       | ❓          | ✅ (SFT 版本开发中 🚧) |
 | CosyVoice  | 句子级   | ✅       | ❓       | ✅          | ✅                     |
-| FireRedTTS  | 句子级   | ✅       | ❓       | ✅          | ✅                     |
+| FireRedTTS | 句子级   | ✅       | ❓       | ✅          | ✅                     |
 | GPTSoVits  | 句子级   | ✅       | ❓       | ❓          | 🚧                     |
 
 #### ASR
@@ -215,15 +215,15 @@ WIP 开发中
 
 ### 下载脚本
 
-| 功能       | 模型          | 下载命令                                                       |
-| ---------- | ------------- | ------------------------------------------------------------- |
-| **TTS**    | ChatTTS      | `python -m scripts.dl_chattts --source huggingface`          |
-|            | FishSpeech   | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface` |
-|            | CosyVoice    | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
-|            | FireRedTTS   | `python -m scripts.downloader.fire_red_tts --source huggingface` |
-| **ASR**    | Whisper      | `python -m scripts.downloader.faster_whisper --source huggingface` |
-| **CV**     | OpenVoice    | `python -m scripts.downloader.open_voice --source huggingface` |
-| **Enhancer**| 增强模型     | `python -m scripts.dl_enhance --source huggingface`          |
+| 功能         | 模型       | 下载命令                                                                  |
+| ------------ | ---------- | ------------------------------------------------------------------------- |
+| **TTS**      | ChatTTS    | `python -m scripts.dl_chattts --source huggingface`                       |
+|              | FishSpeech | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`    |
+|              | CosyVoice  | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
+|              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
+| **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
+| **CV**       | OpenVoice  | `python -m scripts.downloader.open_voice --source huggingface`            |
+| **Enhancer** | 增强模型   | `python -m scripts.dl_enhance --source huggingface`                       |
 
 > **注意**：如果需要使用 ModelScope 下载模型，请使用 `--source modelscope`。部分模型可能无法使用 ModelScope 下载。
 
@@ -310,7 +310,7 @@ Style 中带有 `_p` 的使用了 prompt + prefix，而不带 `_p` 的则只使�
 https://pan.baidu.com/s/1Q1vQV5Gs0VhU5J76dZBK4Q?pwd=d7xu
 
 相关讨论：
-https://github.com/lenML/ChatTTS-Forge/discussions/65
+https://github.com/lenML/Speech-AI-Forge/discussions/65
 
 # Documents
 

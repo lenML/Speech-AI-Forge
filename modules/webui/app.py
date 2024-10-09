@@ -45,9 +45,9 @@ def create_app_footer():
 
     config.versions.gradio_version = gradio_version
 
-    footer_items = ["🍦 [ChatTTS-Forge](https://github.com/lenML/ChatTTS-Forge)"]
+    footer_items = ["🍦 [Speech-AI-Forge](https://github.com/lenML/Speech-AI-Forge)"]
     footer_items.append(
-        f"version: [{git_tag}](https://github.com/lenML/ChatTTS-Forge/commit/{git_commit})"
+        f"version: [{git_tag}](https://github.com/lenML/Speech-AI-Forge/commit/{git_commit})"
     )
     footer_items.append(f"branch: `{git_branch}`")
     footer_items.append(f"python: `{python_version}`")

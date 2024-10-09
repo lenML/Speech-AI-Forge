@@ -1,19 +1,19 @@
 [cn](./README.md) | [en](./README.en.md) | [Discord Server](https://discord.gg/9XnXUhAy3t)
 
-# 🍦 ChatTTS-Forge
+# 🍦 Speech-AI-Forge
 
-ChatTTS-Forge is a project developed around TTS generation model, implementing an API Server and a Gradio-based WebUI.
+Speech-AI-Forge is a project developed around TTS generation model, implementing an API Server and a Gradio-based WebUI.
 
 ![banner](./docs/banner.png)
 
-You can experience and deploy ChatTTS-Forge through the following methods:
+You can experience and deploy Speech-AI-Forge through the following methods:
 
-| -                        | Description                             | Link                                                                                                                                                                |
-| ------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Online Demo**          | Deployed on HuggingFace                 | [HuggingFace Spaces](https://huggingface.co/spaces/lenML/ChatTTS-Forge)                                                                                             |
-| **One-Click Start**      | Click the button to start Colab         | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/ChatTTS-Forge/blob/main/colab.en.ipynb) |
-| **Container Deployment** | See the docker section                  | [Docker](#docker)                                                                                                                                                   |
-| **Local Deployment**     | See the environment preparation section | [Local Deployment](#InstallationandRunning)                                                                                                                         |
+| -                        | Description                             | Link                                                                                                                                                                  |
+| ------------------------ | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Online Demo**          | Deployed on HuggingFace                 | [HuggingFace Spaces](https://huggingface.co/spaces/lenML/Speech-AI-Forge)                                                                                             |
+| **One-Click Start**      | Click the button to start Colab         | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.en.ipynb) |
+| **Container Deployment** | See the docker section                  | [Docker](#docker)                                                                                                                                                     |
+| **Local Deployment**     | See the environment preparation section | [Local Deployment](#InstallationandRunning)                                                                                                                           |
 
 ## Installation and Running
 
@@ -129,7 +129,7 @@ Here's a simple configuration guide:
 <details>
 <summary>output</summary>
   
-[多角色.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/82d91409-ad71-42ac-a4cd-d9c9340e3a07)
+[多角色.webm](https://github.com/lenML/Speech-AI-Forge/assets/37396659/82d91409-ad71-42ac-a4cd-d9c9340e3a07)
 
 </details>
 
@@ -151,7 +151,7 @@ Here's a simple configuration guide:
 <details>
 <summary>output</summary>
 
-[long_text_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/fe18b0f1-a85f-4255-8e25-3c953480b881)
+[long_text_demo.webm](https://github.com/lenML/Speech-AI-Forge/assets/37396659/fe18b0f1-a85f-4255-8e25-3c953480b881)
 
 </details>
 
@@ -186,7 +186,7 @@ Environment variable configuration:
 | ChatTTS    | token level    | ✅          | ❓       | ❓             | ✅                      |
 | FishSpeech | sentence level | ✅          | ❓       | ❓             | ✅ (SFT version WIP 🚧) |
 | CosyVoice  | sentence level | ✅          | ❓       | ✅             | ✅                      |
-| FireRedTTS  | sentence level | ✅          | ❓       | ✅             | ✅                      |
+| FireRedTTS | sentence level | ✅          | ❓       | ✅             | ✅                      |
 | GPTSoVits  | sentence level | ✅          | ❓       | ❓             | 🚧                      |
 
 #### ASR
@@ -215,15 +215,15 @@ Since Forge primarily focuses on API functionality development, automatic downlo
 
 ### Download Script
 
-| Function    | Model          | Download Command                                            |
-|-------------|----------------|-----------------------------------------------------------|
-| **TTS**     | ChatTTS       | `python -m scripts.dl_chattts --source huggingface`     |
-|             | FishSpeech    | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface` |
-|             | CosyVoice     | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
-|             | FireRedTTS    | `python -m scripts.downloader.fire_red_tts --source huggingface` |
-| **ASR**     | Whisper       | `python -m scripts.downloader.faster_whisper --source huggingface` |
-| **CV**      | OpenVoice     | `python -m scripts.downloader.open_voice --source huggingface` |
-| **Enhancer**| Enhancer Model | `python -m scripts.dl_enhance --source huggingface`     |
+| Function     | Model          | Download Command                                                          |
+| ------------ | -------------- | ------------------------------------------------------------------------- |
+| **TTS**      | ChatTTS        | `python -m scripts.dl_chattts --source huggingface`                       |
+|              | FishSpeech     | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`    |
+|              | CosyVoice      | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
+|              | FireRedTTS     | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
+| **ASR**      | Whisper        | `python -m scripts.downloader.faster_whisper --source huggingface`        |
+| **CV**       | OpenVoice      | `python -m scripts.downloader.open_voice --source huggingface`            |
+| **Enhancer** | Enhancer Model | `python -m scripts.dl_enhance --source huggingface`                       |
 
 > **Note**: If you need to use ModelScope to download models, use `--source modelscope`. Some models may not be available for download using ModelScope.
 
