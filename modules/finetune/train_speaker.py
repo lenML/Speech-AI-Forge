@@ -1,9 +1,9 @@
 import torch
 
+from modules.repos_static.ChatTTS.ChatTTS.core import Chat
+
 from .dataset import XzListTar
 from .train import TrainModule, train_gpt
-
-from modules.repos_static.ChatTTS.ChatTTS.core import Chat
 
 
 def train_speaker_embeddings(
@@ -33,9 +33,9 @@ if __name__ == "__main__":
     import numpy as np
 
     from modules import config
+    from modules.core.models.zoo.ChatTTS import load_chat_tts
     from modules.core.spk.TTSSpeaker import TTSSpeaker
     from modules.devices import devices
-    from modules.core.models.zoo.ChatTTS import load_chat_tts
 
     config.runtime_env_vars.no_half = True
     config.runtime_env_vars.use_cpu = []

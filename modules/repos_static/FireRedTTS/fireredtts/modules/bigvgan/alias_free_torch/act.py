@@ -1,7 +1,8 @@
 # Adapted from https://github.com/junjun3518/alias-free-torch under the Apache License 2.0
 
 import torch.nn as nn
-from .resample import UpSample1d, DownSample1d
+
+from .resample import DownSample1d, UpSample1d
 
 
 class Activation1d(nn.Module):

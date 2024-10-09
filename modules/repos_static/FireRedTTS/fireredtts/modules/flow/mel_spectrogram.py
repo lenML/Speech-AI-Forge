@@ -1,7 +1,8 @@
 from functools import partial
-import torch
-import numpy as np
+
 import librosa
+import numpy as np
+import torch
 from librosa.filters import mel as librosa_mel_fn
 from torchaudio.functional import resample as ta_resample_fn
 
@@ -80,11 +81,11 @@ def mel_spectrogram(
 
 
 kaiser_best_resampling_fn = partial(
-    ta_resample_fn, 
-    resampling_method="sinc_interp_kaiser", # DO NOT CHANGE!
-    rolloff=0.917347, # DO NOT CHANGE!
-    beta=12.9846, # DO NOT CHANGE!
-    lowpass_filter_width=50, # DO NOT CHANGE!
+    ta_resample_fn,
+    resampling_method="sinc_interp_kaiser",  # DO NOT CHANGE!
+    rolloff=0.917347,  # DO NOT CHANGE!
+    beta=12.9846,  # DO NOT CHANGE!
+    lowpass_filter_width=50,  # DO NOT CHANGE!
 )
 
 
@@ -112,10 +113,16 @@ class MelSpectrogramExtractor(object):
         wav_data = torch.from_numpy(wav_data.copy()).unsqueeze(0)
         # for 16k wavs, up-downsample to reduce artifects
         if wav_sr == self.sampling_rate:
-            wav_data = kaiser_best_resampling_fn(wav_data, orig_freq=wav_sr, new_freq=24000)
-            wav_data = kaiser_best_resampling_fn(wav_data, orig_freq=24000, new_freq=self.sampling_rate)
+            wav_data = kaiser_best_resampling_fn(
+                wav_data, orig_freq=wav_sr, new_freq=24000
+            )
+            wav_data = kaiser_best_resampling_fn(
+                wav_data, orig_freq=24000, new_freq=self.sampling_rate
+            )
         else:
-            wav_data = kaiser_best_resampling_fn(wav_data, orig_freq=wav_sr, new_freq=self.sampling_rate)        
+            wav_data = kaiser_best_resampling_fn(
+                wav_data, orig_freq=wav_sr, new_freq=self.sampling_rate
+            )
 
         # (1, num_mels, t)
         mel = mel_spectrogram(

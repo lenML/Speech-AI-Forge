@@ -4,7 +4,6 @@ import contextlib
 
 import torch
 import torch.nn as nn
-
 from vllm.config import ModelConfig
 from vllm.model_executor.models import ModelRegistry
 from vllm.model_executor.weight_utils import get_quant_config, initialize_dummy_weights

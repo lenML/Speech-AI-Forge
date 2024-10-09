@@ -1,17 +1,17 @@
 import io
 from typing import Optional
+
+import numpy as np
 from fastapi import Depends, HTTPException, Request, UploadFile
 from fastapi.responses import StreamingResponse
-import numpy as np
 from pydantic import BaseModel
-from modules.api.Api import APIManager
-
 from pydub import AudioSegment
 
 from modules.api import utils as api_utils
-from modules.core.handler.VCHandler import VCHandler
+from modules.api.Api import APIManager
 from modules.core.handler.datacls.audio_model import AudioFormat, EncoderConfig
 from modules.core.handler.datacls.vc_model import VCConfig
+from modules.core.handler.VCHandler import VCHandler
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 

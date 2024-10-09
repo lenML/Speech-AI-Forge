@@ -17,9 +17,9 @@ from modules.core.handler.datacls.audio_model import (
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.stt_model import STTConfig, STTOutputFormat
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
+from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.handler.STTHandler import STTHandler
 from modules.core.handler.TTSHandler import TTSHandler
-from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.data import styles_mgr

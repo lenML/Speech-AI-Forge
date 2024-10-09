@@ -6,13 +6,12 @@ import lightning as L
 import torch
 import torch.nn.functional as F
 import wandb
-from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
-from matplotlib import pyplot as plt
-from torch import nn
-
 from fish_speech.models.vqgan.modules.discriminator import Discriminator
 from fish_speech.models.vqgan.modules.wavenet import WaveNet
 from fish_speech.models.vqgan.utils import avg_with_mask, plot_mel, sequence_mask
+from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
+from matplotlib import pyplot as plt
+from torch import nn
 
 
 class VQGAN(L.LightningModule):

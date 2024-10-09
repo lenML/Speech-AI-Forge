@@ -6,13 +6,13 @@ import torch.utils.data
 
 from modules.repos_static.ChatTTS.ChatTTS import Chat
 
-from .dataset import AudioFolder, AudioCollator
+from .dataset import AudioCollator, AudioFolder
 from .logger import MetricLogger
 from .model import (
-    get_mel_specs,
-    get_mel_attention_mask,
     get_dvae_mel_specs,
     get_hidden_states_and_labels,
+    get_mel_attention_mask,
+    get_mel_specs,
 )
 from .output import ansi, get_ansi_len, output_iter
 

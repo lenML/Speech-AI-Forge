@@ -5,7 +5,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
 """
 
-from typing import List, Tuple, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import torch
 from transformers import BertTokenizerFast

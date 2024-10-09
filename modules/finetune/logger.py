@@ -3,14 +3,13 @@
 import statistics
 import time
 from collections import defaultdict, deque
-from tqdm import tqdm as tqdm_class
-
 from typing import Generator, Iterable, TypeVar
 
 import torch
 import torch.distributed as dist
+from tqdm import tqdm as tqdm_class
 
-from .output import ansi, prints, get_ansi_len
+from .output import ansi, get_ansi_len, prints
 
 __all__ = ["SmoothedValue", "MetricLogger"]
 

@@ -1,5 +1,5 @@
-from modules.core.handler.VCHandler import VCHandler
 from modules.core.handler.datacls.audio_model import AudioFormat, EncoderConfig
+from modules.core.handler.VCHandler import VCHandler
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.processor import NP_AUDIO, AudioProcessor
 

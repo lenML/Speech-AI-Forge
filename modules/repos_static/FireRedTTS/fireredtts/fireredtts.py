@@ -1,13 +1,13 @@
-import os
 import json
-import torch
-from fireredtts.modules.gpt.gpt import GPT
-from fireredtts.modules import Token2Wav, MelSpectrogramExtractor
-from fireredtts.modules.tokenizer.tokenizer import VoiceBpeTokenizer
-from fireredtts.modules.codec.speaker import SpeakerEmbedddingExtractor
-from fireredtts.utils.utils import load_audio
-
+import os
 import time
+
+import torch
+from fireredtts.modules import MelSpectrogramExtractor, Token2Wav
+from fireredtts.modules.codec.speaker import SpeakerEmbedddingExtractor
+from fireredtts.modules.gpt.gpt import GPT
+from fireredtts.modules.tokenizer.tokenizer import VoiceBpeTokenizer
+from fireredtts.utils.utils import load_audio
 
 
 class FireRedTTS:

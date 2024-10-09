@@ -1,9 +1,9 @@
-import gradio as gr
+import xml.dom.minidom
 
+import gradio as gr
 import pysubs2
 
 from modules.webui import webui_utils
-import xml.dom.minidom
 
 
 def read_subtitle_file(file: str, spk: str):

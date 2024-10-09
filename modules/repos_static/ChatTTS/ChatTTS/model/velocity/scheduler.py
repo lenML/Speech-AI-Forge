@@ -3,9 +3,10 @@ import time
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from vllm.config import CacheConfig, SchedulerConfig
-from .block_manager import AllocStatus, BlockSpaceManager
 from vllm.core.policy import PolicyFactory
 from vllm.logger import init_logger
+
+from .block_manager import AllocStatus, BlockSpaceManager
 from .sequence import (
     Sequence,
     SequenceData,

@@ -10,18 +10,17 @@ import pyarrow.parquet as pq
 import torch
 import torch.nn.functional as F
 from datasets.download.streaming_download_manager import xopen
-from huggingface_hub import HfApi
-from lightning import LightningDataModule
-from torch.distributed import get_rank, get_world_size, is_initialized
-from torch.utils.data import DataLoader, IterableDataset, get_worker_info
-from transformers import AutoTokenizer
-
 from fish_speech.conversation import CODEBOOK_PAD_TOKEN_ID
 from fish_speech.datasets.protos.text_data_pb2 import SampledData
 from fish_speech.datasets.protos.text_data_stream import read_pb_stream
 from fish_speech.text.clean import clean_text
 from fish_speech.utils import RankedLogger
 from fish_speech.utils.braceexpand import braceexpand
+from huggingface_hub import HfApi
+from lightning import LightningDataModule
+from torch.distributed import get_rank, get_world_size, is_initialized
+from torch.utils.data import DataLoader, IterableDataset, get_worker_info
+from transformers import AutoTokenizer
 
 log = RankedLogger(__name__, rank_zero_only=True)
 

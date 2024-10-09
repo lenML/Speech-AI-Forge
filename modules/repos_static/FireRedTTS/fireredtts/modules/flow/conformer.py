@@ -1,9 +1,9 @@
-import typing as tp
 import math
+import typing as tp
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 from fireredtts.modules.flow.utils import make_pad_mask
 
 
@@ -17,11 +17,9 @@ class MultiHeadedAttention(nn.Module):
 
     """
 
-    def __init__(self,
-                 n_head: int,
-                 n_feat: int,
-                 dropout_rate: float,
-                 key_bias: bool = True):
+    def __init__(
+        self, n_head: int, n_feat: int, dropout_rate: float, key_bias: bool = True
+    ):
         """Construct an MultiHeadedAttention object."""
         super().__init__()
         assert n_feat % n_head == 0
@@ -67,7 +65,7 @@ class MultiHeadedAttention(nn.Module):
         self,
         value: torch.Tensor,
         scores: torch.Tensor,
-        mask: torch.Tensor = torch.ones((0, 0, 0), dtype=torch.bool)
+        mask: torch.Tensor = torch.ones((0, 0, 0), dtype=torch.bool),
     ) -> torch.Tensor:
         """Compute attention context vector.
 
@@ -92,10 +90,11 @@ class MultiHeadedAttention(nn.Module):
         if mask.size(2) > 0:  # time2 > 0
             mask = mask.unsqueeze(1).eq(0)  # (batch, 1, *, time2)
             # For last chunk, time2 might be larger than scores.size(-1)
-            mask = mask[:, :, :, :scores.size(-1)]  # (batch, 1, *, time2)
-            scores = scores.masked_fill(mask, -float('inf'))
+            mask = mask[:, :, :, : scores.size(-1)]  # (batch, 1, *, time2)
+            scores = scores.masked_fill(mask, -float("inf"))
             attn = torch.softmax(scores, dim=-1).masked_fill(
-                mask, 0.0)  # (batch, head, time1, time2)
+                mask, 0.0
+            )  # (batch, head, time1, time2)
         # NOTE(xcsong): When will `if mask.size(2) > 0` be False?
         #   1. onnx(16/-1, -1/-1, 16/0)
         #   2. jit (16/-1, -1/-1, 16/0, 16/4)
@@ -104,9 +103,9 @@ class MultiHeadedAttention(nn.Module):
 
         p_attn = self.dropout(attn)
         x = torch.matmul(p_attn, value)  # (batch, head, time1, d_k)
-        x = (x.transpose(1, 2).contiguous().view(n_batch, -1,
-                                                 self.h * self.d_k)
-             )  # (batch, time1, d_model)
+        x = (
+            x.transpose(1, 2).contiguous().view(n_batch, -1, self.h * self.d_k)
+        )  # (batch, time1, d_model)
 
         return self.linear_out(x)  # (batch, time1, d_model)
 
@@ -117,7 +116,7 @@ class MultiHeadedAttention(nn.Module):
         value: torch.Tensor,
         mask: torch.Tensor = torch.ones((0, 0, 0), dtype=torch.bool),
         pos_emb: torch.Tensor = torch.empty(0),
-        cache: torch.Tensor = torch.zeros((0, 0, 0, 0))
+        cache: torch.Tensor = torch.zeros((0, 0, 0, 0)),
     ) -> tp.Tuple[torch.Tensor, torch.Tensor]:
         """Compute scaled dot product attention.
 
@@ -162,9 +161,7 @@ class MultiHeadedAttention(nn.Module):
         # >>> d = torch.split(a, 2, dim=-1)
         # >>> torch.equal(d[0], d[1])  # True
         if cache.size(0) > 0:
-            key_cache, value_cache = torch.split(cache,
-                                                 cache.size(-1) // 2,
-                                                 dim=-1)
+            key_cache, value_cache = torch.split(cache, cache.size(-1) // 2, dim=-1)
             k = torch.cat([key_cache, k], dim=2)
             v = torch.cat([value_cache, v], dim=2)
         # NOTE(xcsong): We do cache slicing in encoder.forward_chunk, since it's
@@ -184,11 +181,9 @@ class RelPositionMultiHeadedAttention(MultiHeadedAttention):
         dropout_rate (float): Dropout rate.
     """
 
-    def __init__(self,
-                 n_head: int,
-                 n_feat: int,
-                 dropout_rate: float,
-                 key_bias: bool = True):
+    def __init__(
+        self, n_head: int, n_feat: int, dropout_rate: float, key_bias: bool = True
+    ):
         """Construct an RelPositionMultiHeadedAttention object."""
         super().__init__(n_head, n_feat, dropout_rate, key_bias)
         # linear transformation for positional encoding
@@ -227,7 +222,7 @@ class RelPositionMultiHeadedAttention(MultiHeadedAttention):
         value: torch.Tensor,
         mask: torch.Tensor = torch.ones((0, 0, 0), dtype=torch.bool),
         pos_emb: torch.Tensor = torch.empty(0),
-        cache: torch.Tensor = torch.zeros((0, 0, 0, 0))
+        cache: torch.Tensor = torch.zeros((0, 0, 0, 0)),
     ) -> tp.Tuple[torch.Tensor, torch.Tensor]:
         """Compute 'Scaled Dot Product Attention' with rel. positional encoding.
         Args:
@@ -267,9 +262,7 @@ class RelPositionMultiHeadedAttention(MultiHeadedAttention):
         # >>> d = torch.split(a, 2, dim=-1)
         # >>> torch.equal(d[0], d[1])  # True
         if cache.size(0) > 0:
-            key_cache, value_cache = torch.split(cache,
-                                                 cache.size(-1) // 2,
-                                                 dim=-1)
+            key_cache, value_cache = torch.split(cache, cache.size(-1) // 2, dim=-1)
             k = torch.cat([key_cache, k], dim=2)
             v = torch.cat([value_cache, v], dim=2)
         # NOTE(xcsong): We do cache slicing in encoder.forward_chunk, since it's
@@ -299,7 +292,8 @@ class RelPositionMultiHeadedAttention(MultiHeadedAttention):
             matrix_bd = self.rel_shift(matrix_bd)
 
         scores = (matrix_ac + matrix_bd) / math.sqrt(
-            self.d_k)  # (batch, head, time1, time2)
+            self.d_k
+        )  # (batch, head, time1, time2)
 
         return self.forward_attention(v, scores, mask), new_cache
 
@@ -318,11 +312,11 @@ class PositionwiseFeedForward(torch.nn.Module):
     """
 
     def __init__(
-            self,
-            idim: int,
-            hidden_units: int,
-            dropout_rate: float,
-            activation: torch.nn.Module = torch.nn.ReLU(),
+        self,
+        idim: int,
+        hidden_units: int,
+        dropout_rate: float,
+        activation: torch.nn.Module = torch.nn.ReLU(),
     ):
         """Construct a PositionwiseFeedForward object."""
         super(PositionwiseFeedForward, self).__init__()
@@ -386,7 +380,9 @@ class ConformerDecoderLayer(nn.Module):
         self.norm_ff = nn.LayerNorm(size, eps=1e-5)  # for the FNN module
         self.norm_mha = nn.LayerNorm(size, eps=1e-5)  # for the MHA module
         if src_attn is not None:
-            self.norm_mha2 = nn.LayerNorm(size, eps=1e-5)  # for the MHA module(src_attn)
+            self.norm_mha2 = nn.LayerNorm(
+                size, eps=1e-5
+            )  # for the MHA module(src_attn)
         if feed_forward_macaron is not None:
             self.norm_ff_macaron = nn.LayerNorm(size, eps=1e-5)
             self.ff_scale = 0.5
@@ -395,7 +391,8 @@ class ConformerDecoderLayer(nn.Module):
         if self.conv_module is not None:
             self.norm_conv = nn.LayerNorm(size, eps=1e-5)  # for the CNN module
             self.norm_final = nn.LayerNorm(
-                size, eps=1e-5)  # for the final output of the block
+                size, eps=1e-5
+            )  # for the final output of the block
         self.dropout = nn.Dropout(dropout_rate)
         self.size = size
         self.normalize_before = normalize_before
@@ -439,8 +436,7 @@ class ConformerDecoderLayer(nn.Module):
             residual = x
             if self.normalize_before:
                 x = self.norm_ff_macaron(x)
-            x = residual + self.ff_scale * self.dropout(
-                self.feed_forward_macaron(x))
+            x = residual + self.ff_scale * self.dropout(self.feed_forward_macaron(x))
             if not self.normalize_before:
                 x = self.norm_ff_macaron(x)
 
@@ -448,12 +444,11 @@ class ConformerDecoderLayer(nn.Module):
         residual = x
         if self.normalize_before:
             x = self.norm_mha(x)
-        x_att, new_att_cache = self.self_attn(x, x, x, mask, pos_emb,
-                                              att_cache)
+        x_att, new_att_cache = self.self_attn(x, x, x, mask, pos_emb, att_cache)
         x = residual + self.dropout(x_att)
         if not self.normalize_before:
             x = self.norm_mha(x)
-        
+
         # multi-headed cross-attention module
         if self.src_attn is not None:
             residual = x
@@ -562,10 +557,10 @@ class EspnetRelPositionalEncoding(torch.nn.Module):
         pos_emb = self.position_encoding(size=x.size(1), offset=offset)
         return self.dropout(x), self.dropout(pos_emb)
 
-    def position_encoding(self,
-                          offset: tp.Union[int, torch.Tensor],
-                          size: int) -> torch.Tensor:
-        """ For getting encoding in a streaming fashion
+    def position_encoding(
+        self, offset: tp.Union[int, torch.Tensor], size: int
+    ) -> torch.Tensor:
+        """For getting encoding in a streaming fashion
 
         Attention!!!!!
         we apply dropout only once at the whole utterance level in a none
@@ -597,8 +592,9 @@ class LinearNoSubsampling(torch.nn.Module):
 
     """
 
-    def __init__(self, idim: int, odim: int, dropout_rate: float,
-                 pos_enc_class: torch.nn.Module):
+    def __init__(
+        self, idim: int, odim: int, dropout_rate: float, pos_enc_class: torch.nn.Module
+    ):
         """Construct an linear object."""
         super().__init__()
         self.out = torch.nn.Sequential(
@@ -614,7 +610,7 @@ class LinearNoSubsampling(torch.nn.Module):
         self,
         x: torch.Tensor,
         x_mask: torch.Tensor,
-        offset: tp.Union[int, torch.Tensor] = 0
+        offset: tp.Union[int, torch.Tensor] = 0,
     ) -> tp.Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Input x.
 
@@ -635,29 +631,30 @@ class LinearNoSubsampling(torch.nn.Module):
 
 
 class ConformerDecoderV2(nn.Module):
-    def __init__(self,
-                 input_size: int = 512,
-                 output_size: int = 512,
-                 attention_heads: int = 8,
-                 linear_units: int = 2048,
-                 num_blocks: int = 6,
-                 dropout_rate: float = 0.01,
-                 srcattention_start_index: int = 0,
-                 srcattention_end_index: int = 2,
-                 attention_dropout_rate: float = 0.01,
-                 positional_dropout_rate: float = 0.01,
-                 key_bias: bool = True,
-                 normalize_before: bool = True,
-                 ):
+    def __init__(
+        self,
+        input_size: int = 512,
+        output_size: int = 512,
+        attention_heads: int = 8,
+        linear_units: int = 2048,
+        num_blocks: int = 6,
+        dropout_rate: float = 0.01,
+        srcattention_start_index: int = 0,
+        srcattention_end_index: int = 2,
+        attention_dropout_rate: float = 0.01,
+        positional_dropout_rate: float = 0.01,
+        key_bias: bool = True,
+        normalize_before: bool = True,
+    ):
         super().__init__()
         self.num_blocks = num_blocks
         self.normalize_before = normalize_before
         self.output_size = output_size
 
         self.embed = LinearNoSubsampling(
-            input_size, 
-            output_size, 
-            dropout_rate, 
+            input_size,
+            output_size,
+            dropout_rate,
             EspnetRelPositionalEncoding(output_size, positional_dropout_rate),
         )
 
@@ -666,58 +663,58 @@ class ConformerDecoderV2(nn.Module):
             # construct src attention
             if srcattention_start_index <= i <= srcattention_end_index:
                 srcattention_layer = MultiHeadedAttention(
-                    attention_heads, 
-                    output_size, 
-                    attention_dropout_rate, 
-                    key_bias
+                    attention_heads, output_size, attention_dropout_rate, key_bias
                 )
             else:
                 srcattention_layer = None
             # construct self attention
             selfattention_layer = RelPositionMultiHeadedAttention(
-                attention_heads, 
-                output_size, 
-                attention_dropout_rate, 
-                key_bias
+                attention_heads, output_size, attention_dropout_rate, key_bias
             )
             # construct ffn
             ffn_layer = PositionwiseFeedForward(
-                output_size, 
-                linear_units, 
-                dropout_rate, 
-                torch.nn.SiLU()
+                output_size, linear_units, dropout_rate, torch.nn.SiLU()
             )
             self.encoders.append(
                 ConformerDecoderLayer(
-                    output_size, 
-                    selfattention_layer, 
-                    srcattention_layer, 
-                    ffn_layer, 
-                    None, 
-                    None, 
-                    dropout_rate, 
-                    normalize_before=normalize_before
+                    output_size,
+                    selfattention_layer,
+                    srcattention_layer,
+                    ffn_layer,
+                    None,
+                    None,
+                    dropout_rate,
+                    normalize_before=normalize_before,
                 )
             )
         self.after_norm = torch.nn.LayerNorm(output_size, eps=1e-5)
 
-    def forward_layers(self, xs: torch.Tensor, chunk_masks: torch.Tensor,
-                       memory: torch.Tensor, memory_masks: torch.Tensor,
-                       pos_emb: torch.Tensor, mask_pad: torch.Tensor) -> torch.Tensor:
+    def forward_layers(
+        self,
+        xs: torch.Tensor,
+        chunk_masks: torch.Tensor,
+        memory: torch.Tensor,
+        memory_masks: torch.Tensor,
+        pos_emb: torch.Tensor,
+        mask_pad: torch.Tensor,
+    ) -> torch.Tensor:
         for layer in self.encoders:
-            xs, chunk_masks, _, _ = layer(xs, chunk_masks, memory, memory_masks, pos_emb, mask_pad)
+            xs, chunk_masks, _, _ = layer(
+                xs, chunk_masks, memory, memory_masks, pos_emb, mask_pad
+            )
         return xs
 
-    def forward(self, 
-                xs:torch.Tensor, 
-                xs_lens:torch.Tensor, 
-                memory:torch.Tensor, 
-                memory_lens: torch.Tensor,
-                ):
+    def forward(
+        self,
+        xs: torch.Tensor,
+        xs_lens: torch.Tensor,
+        memory: torch.Tensor,
+        memory_lens: torch.Tensor,
+    ):
         T = xs.size(1)
         masks = ~make_pad_mask(xs_lens, T).unsqueeze(1)  # (B, 1, T)
         T2 = memory.size(1)
-        memory_masks = ~make_pad_mask(memory_lens, T2).unsqueeze(1) # (B, 1, T2)
+        memory_masks = ~make_pad_mask(memory_lens, T2).unsqueeze(1)  # (B, 1, T2)
 
         xs, pos_emb, masks = self.embed(xs, masks)
 
@@ -725,6 +722,5 @@ class ConformerDecoderV2(nn.Module):
 
         if self.normalize_before:
             xs = self.after_norm(xs)
-        
-        return xs, masks
 
+        return xs, masks

@@ -2,9 +2,8 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from torch import nn
-
 from fish_speech.utils import autocast_exclude_mps
+from torch import nn
 
 from .wavenet import WaveNet
 

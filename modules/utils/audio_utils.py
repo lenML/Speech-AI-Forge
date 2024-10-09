@@ -8,7 +8,6 @@ import pyrubberband as pyrb
 import scipy.io.wavfile as wavfile
 import soundfile as sf
 from pydub import AudioSegment, effects
-import numpy as np
 
 INT16_MAX = np.iinfo(np.int16).max
 
@@ -32,7 +31,7 @@ def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:
     byte_io.seek(0)
 
     try:
-        audio_data, read_sr = sf.read(byte_io, dtype='float32')
+        audio_data, read_sr = sf.read(byte_io, dtype="float32")
         if read_sr != sample_rate:
             raise ValueError(f"Sample rate mismatch: {read_sr} != {sample_rate}")
         return audio_data

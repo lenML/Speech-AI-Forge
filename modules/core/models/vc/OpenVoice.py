@@ -3,12 +3,13 @@ if __name__ == "__main__":
 
     setup_repos_paths()
 
-from pathlib import Path
 import threading
+from pathlib import Path
 from typing import Optional
 
 import numpy.typing as npt
 import torch
+
 from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.vc.VCModel import VCModel

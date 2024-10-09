@@ -30,9 +30,8 @@ import soundfile as sf
 from faster_whisper import WhisperModel
 from loguru import logger
 from pydub import AudioSegment
-from tqdm import tqdm
-
 from tools.file import AUDIO_EXTENSIONS, list_files
+from tqdm import tqdm
 
 
 @click.command()

@@ -1,5 +1,5 @@
 import math
-from typing import List, Optional, Literal, Union
+from typing import List, Literal, Optional, Union
 
 import numpy as np
 import pybase16384 as b14

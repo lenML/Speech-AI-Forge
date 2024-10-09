@@ -1,8 +1,8 @@
 import lzma
 from typing import List, Optional, Union
 
-import pybase16384 as b14
 import numpy as np
+import pybase16384 as b14
 import torch
 import torch.nn.functional as F
 

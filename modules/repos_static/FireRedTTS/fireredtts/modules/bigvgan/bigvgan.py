@@ -1,13 +1,13 @@
 import typing as tp
+
 import torch
 import torch.nn as nn
-from torch.nn import Conv1d, ConvTranspose1d
-from torch.nn.utils import weight_norm, remove_weight_norm
-
+from fireredtts.modules.bigvgan.activations import Snake, SnakeBeta
 from fireredtts.modules.bigvgan.alias_free_torch import (
     Activation1d as TorchActivation1d,
 )
-from fireredtts.modules.bigvgan.activations import Snake, SnakeBeta
+from torch.nn import Conv1d, ConvTranspose1d
+from torch.nn.utils import remove_weight_norm, weight_norm
 
 
 def init_weights(m, mean=0.0, std=0.01):

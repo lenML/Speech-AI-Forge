@@ -1,6 +1,6 @@
+from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.processor import NP_AUDIO, AudioProcessor
-from modules.core.models.zoo.ModelZoo import model_zoo
 
 
 class EnhancerProcessor(AudioProcessor):

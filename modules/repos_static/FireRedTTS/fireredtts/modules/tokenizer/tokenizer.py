@@ -1,8 +1,8 @@
 import os
-import torch
-from fireredtts.modules.tokenizer.whisper_tokenizer import get_tokenizer
-from fireredtts.modules.text_normalizer.normalize import TextNormalizer
 
+import torch
+from fireredtts.modules.text_normalizer.normalize import TextNormalizer
+from fireredtts.modules.tokenizer.whisper_tokenizer import get_tokenizer
 
 DEFAULT_VOCAB_FILE = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), "../data/tokenizer.json"

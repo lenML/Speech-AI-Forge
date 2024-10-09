@@ -1,9 +1,10 @@
-import os, platform
-from dataclasses import dataclass
-import logging
-from typing import Union, List, Optional, Tuple, Callable
 import gc
+import logging
+import os
+import platform
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable, List, Optional, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -11,7 +12,7 @@ import torch.nn.functional as F
 import torch.nn.utils.parametrize as P
 from torch.nn.utils.parametrizations import weight_norm
 from tqdm import tqdm
-from transformers import LlamaModel, LlamaConfig
+from transformers import LlamaConfig, LlamaModel
 from transformers.cache_utils import Cache
 from transformers.modeling_outputs import BaseModelOutputWithPast
 from transformers.utils import is_flash_attn_2_available

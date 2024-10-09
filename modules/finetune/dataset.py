@@ -9,9 +9,9 @@ import typing
 
 import torch.utils.data
 import torchaudio
-from tqdm import tqdm
 import transformers
 import vocos
+from tqdm import tqdm
 
 from modules.repos_static.ChatTTS.ChatTTS.norm import Normalizer
 

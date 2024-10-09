@@ -1,24 +1,19 @@
 import logging
 
-
 from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.pipeline import AudioPipeline, TTSPipeline
-from modules.core.pipeline.processor import (
-    NP_AUDIO,
-    PreProcessor,
-    TTSPipelineContext,
-)
+from modules.core.pipeline.processor import NP_AUDIO, PreProcessor, TTSPipelineContext
 from modules.core.pipeline.processors.Adjuster import AdjusterProcessor
 from modules.core.pipeline.processors.Enhancer import EnhancerProcessor
 from modules.core.pipeline.processors.Normalizer import AudioNormalizer
 from modules.core.pipeline.processors.VoiceClone import VoiceCloneProcessor
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
-from modules.core.tn.FireRedTtsTN import FireRedTtsTN
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.core.tn.CosyVoiceTN import CosyVoiceTN
+from modules.core.tn.FireRedTtsTN import FireRedTtsTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
 from modules.core.tn.TNPipeline import TNPipeline
 from modules.data import styles_mgr
@@ -91,7 +86,9 @@ class FromAudioPipeline(AudioPipeline):
 
     def generate(self):
         audio_data = self.audio
-        audio_data = AudioReshaper.normalize_audio(audio=audio_data, target_sr=self.audio_sr)
+        audio_data = AudioReshaper.normalize_audio(
+            audio=audio_data, target_sr=self.audio_sr
+        )
         # audio_data = AudioReshaper.normalize_audio_type(audio=audio_data)
         audio_data = self.process_np_audio(audio=audio_data)
         return audio_data

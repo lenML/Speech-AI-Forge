@@ -1,3 +1,5 @@
+from tempfile import NamedTemporaryFile
+
 import gradio as gr
 import numpy as np
 from whisper.tokenizer import LANGUAGES
@@ -5,8 +7,6 @@ from whisper.tokenizer import LANGUAGES
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.handler.STTHandler import STTHandler
 from modules.webui import webui_config
-
-from tempfile import NamedTemporaryFile
 
 
 def stereo_to_mono(audio_input: tuple[int, np.ndarray]) -> tuple[int, np.ndarray]:

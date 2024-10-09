@@ -1,7 +1,7 @@
 import os
 
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 import tests
 from modules.api.impl.tts_api import TTSParams

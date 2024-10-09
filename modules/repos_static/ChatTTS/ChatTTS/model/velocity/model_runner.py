@@ -4,15 +4,18 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 import torch
 import torch.nn as nn
-
-from .configs import ModelConfig, ParallelConfig, SchedulerConfig
+from safetensors.torch import safe_open
 from vllm.logger import init_logger
-from .model_loader import get_model
 from vllm.model_executor import InputMetadata, SamplingMetadata
 from vllm.model_executor.parallel_utils.communication_op import (
     broadcast,
     broadcast_object_list,
 )
+from vllm.utils import in_wsl
+
+from .configs import ModelConfig, ParallelConfig, SchedulerConfig
+from .model_loader import get_model
+from .post_model import PostModel, Sampler
 from .sampling_params import SamplingParams, SamplingType
 from .sequence import (
     SamplerOutput,
@@ -21,9 +24,6 @@ from .sequence import (
     SequenceGroupOutput,
     SequenceOutput,
 )
-from vllm.utils import in_wsl
-from .post_model import PostModel, Sampler
-from safetensors.torch import safe_open
 
 logger = init_logger(__name__)
 

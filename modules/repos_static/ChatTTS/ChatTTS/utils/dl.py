@@ -1,10 +1,11 @@
-import os
-from pathlib import Path
 import hashlib
-import requests
+import os
 from io import BytesIO
+from mmap import ACCESS_READ, mmap
+from pathlib import Path
 from typing import Dict
-from mmap import mmap, ACCESS_READ
+
+import requests
 
 from .log import logger
 
@@ -114,8 +115,8 @@ def download_dns_yaml(url: str, folder: str):
 
 
 def download_all_assets(tmpdir: str, version="0.2.7"):
-    import subprocess
     import platform
+    import subprocess
 
     archs = {
         "aarch64": "arm64",

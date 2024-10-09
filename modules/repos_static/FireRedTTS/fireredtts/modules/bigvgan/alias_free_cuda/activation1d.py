@@ -3,10 +3,10 @@
 
 import torch
 import torch.nn as nn
-from token2wav.alias_free_torch.resample import UpSample1d, DownSample1d
 
 # load fused CUDA kernel: this enables importing anti_alias_activation_cuda
 from token2wav.alias_free_cuda import load
+from token2wav.alias_free_torch.resample import DownSample1d, UpSample1d
 
 load.load()
 

@@ -1,4 +1,5 @@
 import io
+
 import numpy as np
 from scipy.io import wavfile
 
@@ -22,10 +23,10 @@ def encode_to_wav(audio_tuple: tuple[int, np.ndarray]):
         dtype = audio_data.dtype
         if audio_data.shape[0] < audio_data.shape[1]:
             # 假设格式为 (channels, samples)
-            audio_data:np.ndarray = np.mean(audio_data, axis=0)
+            audio_data: np.ndarray = np.mean(audio_data, axis=0)
         else:
             # 假设格式为 (samples, channels)
-            audio_data:np.ndarray = np.mean(audio_data, axis=1)
+            audio_data: np.ndarray = np.mean(audio_data, axis=1)
         audio_data = audio_data.astype(dtype)
 
     # Ensure the audio data is within the valid range before converting to int16
@@ -51,11 +52,12 @@ def encode_to_wav(audio_tuple: tuple[int, np.ndarray]):
 
 if __name__ == "__main__":
     import soundfile as sf
+
     # 测试函数，读取音频处理并保存
     input_file = "./参考音频.wav"
     output_file = "./test_cosyvoice_encode.wav"
     audio_data, sample_rate = sf.read(input_file)
-    
+
     out_sr, wav_bytes = encode_to_wav((sample_rate, audio_data))
     print(f"Output sample rate: {sample_rate} -> {out_sr}")
     with open(output_file, "wb") as f:

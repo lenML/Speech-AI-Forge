@@ -23,7 +23,7 @@ class AudioPipeline:
     def __init__(self, context: TTSPipelineContext) -> None:
         self.modules: list[Union[AudioProcessor, PreProcessor]] = []
         self.context = context
-        
+
         self.audio_sr = 44100
 
     def add_module(self, module):

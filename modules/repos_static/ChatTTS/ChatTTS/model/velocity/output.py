@@ -1,12 +1,8 @@
 from typing import List, Optional
+
 import torch
 
-from .sequence import (
-    PromptLogprobs,
-    SampleLogprobs,
-    SequenceGroup,
-    SequenceStatus,
-)
+from .sequence import PromptLogprobs, SampleLogprobs, SequenceGroup, SequenceStatus
 
 
 class CompletionOutput:

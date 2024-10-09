@@ -1,8 +1,11 @@
 from fireredtts.modules.flow.codec_embedding import HHGCodecEmbedding
 from fireredtts.modules.flow.conformer import ConformerDecoderV2
-from fireredtts.modules.flow.mel_encoder import MelReduceEncoder
 from fireredtts.modules.flow.decoder import ConditionalCFM, ConditionalDecoder
-from fireredtts.modules.flow.flow_model import InterpolateRegulator, CrossAttnFlowMatching
+from fireredtts.modules.flow.flow_model import (
+    CrossAttnFlowMatching,
+    InterpolateRegulator,
+)
+from fireredtts.modules.flow.mel_encoder import MelReduceEncoder
 from fireredtts.modules.flow.mel_spectrogram import MelSpectrogramExtractor
 
 
@@ -16,9 +19,7 @@ def get_flow_frontend(flow_config):
         decoder=ConditionalCFM(
             estimator=ConditionalDecoder(**flow_config["decoder"]["estimator"]),
             t_scheduler=flow_config["decoder"]["t_scheduler"],
-            inference_cfg_rate=flow_config["decoder"]["inference_cfg_rate"]
-        )
+            inference_cfg_rate=flow_config["decoder"]["inference_cfg_rate"],
+        ),
     )
     return flow
-
-

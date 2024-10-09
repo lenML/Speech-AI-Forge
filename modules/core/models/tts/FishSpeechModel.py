@@ -4,8 +4,8 @@ if __name__ == "__main__":
     setup_repos_paths()
 
 import logging
-from pathlib import Path
 import threading
+from pathlib import Path
 from typing import Generator, Union
 
 from modules import config

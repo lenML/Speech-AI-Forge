@@ -4,12 +4,11 @@ from typing import Sequence
 import rich
 import rich.syntax
 import rich.tree
+from fish_speech.utils import logger as log
 from hydra.core.hydra_config import HydraConfig
 from lightning.pytorch.utilities import rank_zero_only
 from omegaconf import DictConfig, OmegaConf, open_dict
 from rich.prompt import Prompt
-
-from fish_speech.utils import logger as log
 
 
 @rank_zero_only

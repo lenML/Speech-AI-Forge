@@ -1,24 +1,23 @@
-from dataclasses import dataclass
-import os
 import json
-import torch
-import numpy as np
-import torchaudio
+import os
+import time
+from dataclasses import dataclass
 from typing import Tuple
+
+import numpy as np
+import torch
+import torchaudio
+
 from modules.core.models.tts.FireRed.MelExtractor import MelSpectrogramExtractor
-from modules.repos_static.FireRedTTS.fireredtts.modules.gpt.gpt import GPT
-from modules.repos_static.FireRedTTS.fireredtts.modules import (
-    Token2Wav,
-)
-from modules.repos_static.FireRedTTS.fireredtts.modules.tokenizer.tokenizer import (
-    VoiceBpeTokenizer,
-)
+from modules.repos_static.FireRedTTS.fireredtts.modules import Token2Wav
 from modules.repos_static.FireRedTTS.fireredtts.modules.codec.speaker import (
     SpeakerEmbedddingExtractor,
 )
+from modules.repos_static.FireRedTTS.fireredtts.modules.gpt.gpt import GPT
+from modules.repos_static.FireRedTTS.fireredtts.modules.tokenizer.tokenizer import (
+    VoiceBpeTokenizer,
+)
 from modules.repos_static.FireRedTTS.fireredtts.utils.utils import load_audio
-
-import time
 
 
 @dataclass(frozen=True, repr=False, eq=False)

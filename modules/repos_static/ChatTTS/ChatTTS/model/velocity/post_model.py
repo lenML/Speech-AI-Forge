@@ -5,11 +5,12 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 https://stackoverflow.com/questions/62691279/how-to-disable-tokenizers-parallelism-true-false-warning
 """
 
+from typing import Callable, List
+
 import torch
 import torch.nn as nn
 from torch.functional import F
 from torch.nn.utils.parametrizations import weight_norm
-from typing import List, Callable
 
 
 class PostModel(nn.Module):

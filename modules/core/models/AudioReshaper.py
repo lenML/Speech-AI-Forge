@@ -1,5 +1,6 @@
 import librosa
 import numpy as np
+
 from modules.core.pipeline.processor import NP_AUDIO
 
 
@@ -44,7 +45,6 @@ class AudioReshaper:
         audio = AudioReshaper.ensure_float32(audio=audio)
         audio = AudioReshaper.ensure_stereo_to_mono(audio=audio)
         return audio
-
 
     @staticmethod
     def normalize_audio(audio: NP_AUDIO, target_sr: int) -> NP_AUDIO:

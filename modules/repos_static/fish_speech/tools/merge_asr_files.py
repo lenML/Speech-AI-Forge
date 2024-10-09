@@ -2,9 +2,8 @@ import os
 from pathlib import Path
 
 from pydub import AudioSegment
-from tqdm import tqdm
-
 from tools.file import AUDIO_EXTENSIONS, list_files
+from tqdm import tqdm
 
 
 def merge_and_delete_files(save_dir, original_files):

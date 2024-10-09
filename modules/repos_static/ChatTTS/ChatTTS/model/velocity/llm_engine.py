@@ -1,17 +1,21 @@
 import copy
-from collections import defaultdict
 import os
 import time
+from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Tuple, Union
 
+import numpy as np
 from vllm.config import CacheConfig, ModelConfig, ParallelConfig, SchedulerConfig
-from .scheduler import Scheduler, SchedulerOutputs
-from .configs import EngineArgs
 from vllm.engine.metrics import record_metrics
 from vllm.engine.ray_utils import RayWorkerVllm, initialize_cluster, ray
 from vllm.logger import init_logger
+from vllm.transformers_utils.tokenizer import detokenize_incrementally, get_tokenizer
+from vllm.utils import Counter, get_ip, get_open_port, set_cuda_visible_devices
+
+from .configs import EngineArgs
 from .output import RequestOutput
 from .sampling_params import SamplingParams
+from .scheduler import Scheduler, SchedulerOutputs
 from .sequence import (
     SamplerOutput,
     Sequence,
@@ -20,9 +24,6 @@ from .sequence import (
     SequenceOutput,
     SequenceStatus,
 )
-from vllm.transformers_utils.tokenizer import detokenize_incrementally, get_tokenizer
-from vllm.utils import Counter, set_cuda_visible_devices, get_ip, get_open_port
-import numpy as np
 
 if ray:
     from ray.util.scheduling_strategies import PlacementGroupSchedulingStrategy

@@ -4,8 +4,9 @@ import enum
 from typing import Dict, List, Optional, Set, Tuple
 
 from vllm.block import PhysicalTokenBlock
-from .sequence import Sequence, SequenceGroup, SequenceStatus
 from vllm.utils import Device
+
+from .sequence import Sequence, SequenceGroup, SequenceStatus
 
 # Mapping: logical block number -> physical block.
 BlockTable = List[PhysicalTokenBlock]

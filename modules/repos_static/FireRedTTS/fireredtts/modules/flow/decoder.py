@@ -1,11 +1,11 @@
 import math
 from typing import Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from einops import pack, rearrange, repeat
 from diffusers.models.activations import get_activation
-
+from einops import pack, rearrange, repeat
 from fireredtts.modules.flow.transformer import BasicTransformerBlock
 
 
@@ -44,7 +44,9 @@ class Block1D(torch.nn.Module):
 class ResnetBlock1D(torch.nn.Module):
     def __init__(self, dim, dim_out, time_emb_dim, groups=8):
         super().__init__()
-        self.mlp = torch.nn.Sequential(nn.Mish(), torch.nn.Linear(time_emb_dim, dim_out))
+        self.mlp = torch.nn.Sequential(
+            nn.Mish(), torch.nn.Linear(time_emb_dim, dim_out)
+        )
 
         self.block1 = Block1D(dim, dim_out, groups=groups)
         self.block2 = Block1D(dim_out, dim_out, groups=groups)
@@ -129,7 +131,14 @@ class Upsample1D(nn.Module):
             number of output channels. Defaults to `channels`.
     """
 
-    def __init__(self, channels, use_conv=False, use_conv_transpose=True, out_channels=None, name="conv"):
+    def __init__(
+        self,
+        channels,
+        use_conv=False,
+        use_conv_transpose=True,
+        out_channels=None,
+        name="conv",
+    ):
         super().__init__()
         self.channels = channels
         self.out_channels = out_channels or channels
@@ -194,7 +203,9 @@ class ConditionalDecoder(nn.Module):
             input_channel = output_channel
             output_channel = channels[i]
             is_last = i == len(channels) - 1
-            resnet = ResnetBlock1D(dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim)
+            resnet = ResnetBlock1D(
+                dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim
+            )
             transformer_blocks = nn.ModuleList(
                 [
                     BasicTransformerBlock(
@@ -208,14 +219,20 @@ class ConditionalDecoder(nn.Module):
                 ]
             )
             downsample = (
-                Downsample1D(output_channel) if not is_last else nn.Conv1d(output_channel, output_channel, 3, padding=1)
+                Downsample1D(output_channel)
+                if not is_last
+                else nn.Conv1d(output_channel, output_channel, 3, padding=1)
             )
-            self.down_blocks.append(nn.ModuleList([resnet, transformer_blocks, downsample]))
+            self.down_blocks.append(
+                nn.ModuleList([resnet, transformer_blocks, downsample])
+            )
 
         for i in range(num_mid_blocks):
             input_channel = channels[-1]
             out_channels = channels[-1]
-            resnet = ResnetBlock1D(dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim)
+            resnet = ResnetBlock1D(
+                dim=input_channel, dim_out=output_channel, time_emb_dim=time_embed_dim
+            )
 
             transformer_blocks = nn.ModuleList(
                 [
@@ -263,7 +280,6 @@ class ConditionalDecoder(nn.Module):
         self.final_block = Block1D(channels[-1], channels[-1])
         self.final_proj = nn.Conv1d(channels[-1], self.out_channels, 1)
         self.initialize_weights()
-
 
     def initialize_weights(self):
         for m in self.modules():
@@ -337,7 +353,7 @@ class ConditionalDecoder(nn.Module):
         for resnet, transformer_blocks, upsample in self.up_blocks:
             mask_up = masks.pop()
             skip = hiddens.pop()
-            x = pack([x[:, :, :skip.shape[-1]], skip], "b * t")[0]
+            x = pack([x[:, :, : skip.shape[-1]], skip], "b * t")[0]
             x = resnet(x, mask_up, t)
             x = rearrange(x, "b c t -> b t c").contiguous()
             attn_mask = torch.matmul(mask_up.transpose(1, 2).contiguous(), mask_up)
@@ -355,16 +371,17 @@ class ConditionalDecoder(nn.Module):
 
 
 class ConditionalCFM(nn.Module):
-    def __init__(self, 
-                 estimator: nn.Module,
-                 t_scheduler: str = "cosine",
-                 inference_cfg_rate: float = 0.7,
-                 ):
+    def __init__(
+        self,
+        estimator: nn.Module,
+        t_scheduler: str = "cosine",
+        inference_cfg_rate: float = 0.7,
+    ):
         super().__init__()
         self.estimator = estimator
         self.t_scheduler = t_scheduler
         self.inference_cfg_rate = inference_cfg_rate
-    
+
     def solve_euler(self, x, t_span, mu, mask):
         t, _, dt = t_span[0], t_span[-1], t_span[1] - t_span[0]
 
@@ -377,8 +394,9 @@ class ConditionalCFM(nn.Module):
             # Classifier-Free Guidance inference introduced in VoiceBox
             if self.inference_cfg_rate > 0:
                 cfg_dphi_dt = self.estimator(x, mask, torch.zeros_like(mu), t)
-                dphi_dt = ((1.0 + self.inference_cfg_rate) * dphi_dt -
-                           self.inference_cfg_rate * cfg_dphi_dt)
+                dphi_dt = (
+                    1.0 + self.inference_cfg_rate
+                ) * dphi_dt - self.inference_cfg_rate * cfg_dphi_dt
             x = x + dt * dphi_dt
             t = t + dt
             sol.append(x)
@@ -386,11 +404,10 @@ class ConditionalCFM(nn.Module):
                 dt = t_span[step + 1] - t
 
         return sol[-1]
-    
-    def inference(self, mu, mask, n_timesteps, temperature: float=1.0):
+
+    def inference(self, mu, mask, n_timesteps, temperature: float = 1.0):
         z = torch.randn_like(mu) * temperature
         t_span = torch.linspace(0, 1, n_timesteps + 1, device=mu.device)
-        if self.t_scheduler == 'cosine':
+        if self.t_scheduler == "cosine":
             t_span = 1 - torch.cos(t_span * 0.5 * torch.pi)
         return self.solve_euler(z, t_span=t_span, mu=mu, mask=mask)
-    

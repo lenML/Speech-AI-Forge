@@ -13,11 +13,10 @@ import numpy as np
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-from loguru import logger
-from tqdm import tqdm
-
 from fish_speech.conversation import CODEBOOK_PAD_TOKEN_ID
 from fish_speech.text import clean_text, split_text
+from loguru import logger
+from tqdm import tqdm
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 torch._inductor.config.coordinate_descent_tuning = True

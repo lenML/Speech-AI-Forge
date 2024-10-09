@@ -38,7 +38,7 @@ def _decode_b14_str(b14_str: str) -> np.ndarray:
 if __name__ == "__main__":
     """
     这个脚本从 b14 code 中生成 spk
-    
+
     例子:
     python -m scripts.spk.code_to_spk --code "啊吧啊吧" --out "test.spkv1.json"
     """

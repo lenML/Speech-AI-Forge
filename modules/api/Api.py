@@ -4,7 +4,6 @@ import logging
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
 

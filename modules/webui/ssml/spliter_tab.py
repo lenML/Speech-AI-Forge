@@ -3,11 +3,7 @@ import torch
 
 from modules.utils.hf import spaces
 from modules.webui import webui_utils
-from modules.webui.webui_utils import (
-    get_styles,
-    split_long_text,
-    text_normalize,
-)
+from modules.webui.webui_utils import get_styles, split_long_text, text_normalize
 
 
 # NOTE: 因为 text_normalize 需要使用 tokenizer

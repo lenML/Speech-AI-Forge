@@ -1,10 +1,9 @@
 import logging
 from typing import List, Literal, Union
 
+import python_ms as ms
 from box import Box
 from lxml import etree
-
-import python_ms as ms
 
 
 class SSMLContext(Box):

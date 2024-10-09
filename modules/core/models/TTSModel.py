@@ -1,6 +1,5 @@
 from typing import Generator, Union
 
-
 from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.tts.InerCache import InferCache
@@ -118,7 +117,7 @@ class TTSModel(BaseZooModel):
 
         kwargs = self.get_cache_kwargs(segments=segments, context=context)
         InferCache.set_cache_val(model_id=self.model_id, value=value, **kwargs)
-    
+
     def get_ref_wav(self, segment: TTSSegment):
         spk = segment.spk
         if spk is None:

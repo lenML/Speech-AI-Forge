@@ -1,17 +1,14 @@
-from typing import Optional, Union, Tuple
+import argparse
+import dataclasses
 import os
+from dataclasses import dataclass
+from typing import Optional, Tuple, Union
 
 import torch
 from transformers import PretrainedConfig
-
 from vllm.logger import init_logger
 from vllm.transformers_utils.config import get_config
 from vllm.utils import get_cpu_memory, is_hip
-
-import argparse
-import dataclasses
-from dataclasses import dataclass
-
 
 logger = init_logger(__name__)
 
@@ -99,9 +96,9 @@ class ModelConfig:
         if os.environ.get("VLLM_USE_MODELSCOPE", "False").lower() == "true":
             # download model from ModelScope hub,
             # lazy import so that modelscope is not required for normal use.
-            from modelscope.hub.snapshot_download import (
+            from modelscope.hub.snapshot_download import (  # pylint: disable=C
                 snapshot_download,
-            )  # pylint: disable=C
+            )
 
             model_path = snapshot_download(
                 model_id=model, cache_dir=download_dir, revision=revision

@@ -16,7 +16,6 @@ from hydra.utils import instantiate
 from lightning import LightningModule
 from loguru import logger
 from omegaconf import OmegaConf
-
 from tools.file import AUDIO_EXTENSIONS, list_files, load_filelist
 
 # register eval resolver

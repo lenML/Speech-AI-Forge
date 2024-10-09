@@ -15,10 +15,9 @@ import torch
 from loguru import logger
 from pydub import AudioSegment
 from silero_vad import get_speech_timestamps, load_silero_vad, read_audio
-from tqdm import tqdm
-
 from tools.file import AUDIO_EXTENSIONS, VIDEO_EXTENSIONS, list_files
 from tools.sensevoice.auto_model import AutoModel
+from tqdm import tqdm
 
 
 def uvr5_cli(

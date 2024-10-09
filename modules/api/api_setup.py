@@ -17,8 +17,8 @@ from modules.api.impl import (
     style_api,
     sys_api,
     tts_api,
-    xtts_v2_api,
     vc_api,
+    xtts_v2_api,
 )
 from modules.utils import env
 

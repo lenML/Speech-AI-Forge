@@ -3,11 +3,11 @@ from typing import Tuple
 
 import numpy as np
 
-from modules.core.models.TTSModel import TTSModel
 from modules.core.models.tts.FireRed.FireRedInfer import (
     FireRedTTSInfer,
     FireRedTTSParams,
 )
+from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO

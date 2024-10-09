@@ -6,9 +6,8 @@ import click
 import librosa
 import torch.nn.functional as F
 import torchaudio
-from tqdm import tqdm
-
 from tools.file import AUDIO_EXTENSIONS, list_files
+from tqdm import tqdm
 
 threshold = 10 ** (-50 / 20.0)
 

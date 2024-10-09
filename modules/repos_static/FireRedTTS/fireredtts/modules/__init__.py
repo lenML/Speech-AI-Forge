@@ -1,8 +1,9 @@
 import json
+
 import torch
 import torch.nn as nn
 from fireredtts.modules.bigvgan import get_bigvgan_backend
-from fireredtts.modules.flow import get_flow_frontend, MelSpectrogramExtractor
+from fireredtts.modules.flow import MelSpectrogramExtractor, get_flow_frontend
 
 
 class Token2Wav(nn.Module):

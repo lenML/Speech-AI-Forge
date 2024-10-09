@@ -1,11 +1,11 @@
-from librosa.filters import mel as librosa_mel_fn
-from torch import nn
-from torch.nn import functional as F
-
 import math
+
 import numpy as np
 import torch
 import torchaudio
+from librosa.filters import mel as librosa_mel_fn
+from torch import nn
+from torch.nn import functional as F
 
 
 def dynamic_range_compression_torch(x, C=1, clip_val=1e-5):

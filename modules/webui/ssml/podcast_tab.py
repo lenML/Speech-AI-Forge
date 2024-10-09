@@ -1,8 +1,9 @@
+import xml.dom.minidom
+
 import gradio as gr
 import pandas as pd
 
 from modules.webui import webui_config, webui_utils
-import xml.dom.minidom
 
 
 # UPDATE NOTE: webui_utils.text_normalize 里面屏蔽了 gpu 要求，所以这个函数不需要 gpu 资源了

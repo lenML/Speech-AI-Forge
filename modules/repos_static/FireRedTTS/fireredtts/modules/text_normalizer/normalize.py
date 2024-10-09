@@ -1,15 +1,14 @@
 import re
-import regex
-import inflect
 import unicodedata
-from lingua import Language, LanguageDetectorBuilder
 from builtins import str as unicode
 
-from tn.chinese.normalizer import Normalizer as ZhNormalizer
-from tn.english.normalizer import Normalizer as EnNormalizer
-
+import inflect
+import regex
 from fireredtts.modules.text_normalizer.regex_common import *
 from fireredtts.modules.text_normalizer.utils import *
+from lingua import Language, LanguageDetectorBuilder
+from tn.chinese.normalizer import Normalizer as ZhNormalizer
+from tn.english.normalizer import Normalizer as EnNormalizer
 
 
 def preprocess_text(sentence):

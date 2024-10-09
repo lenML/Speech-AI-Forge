@@ -6,7 +6,6 @@ from modules.devices import devices
 from modules.Enhancer.ResembleEnhance import load_enhancer
 from modules.utils import env
 
-
 logger = logging.getLogger(__name__)
 
 
