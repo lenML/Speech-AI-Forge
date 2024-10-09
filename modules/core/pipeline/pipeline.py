@@ -29,15 +29,8 @@ class AudioPipeline:
     def add_module(self, module):
         self.modules.append(module)
 
-    def generate_audio() -> NP_AUDIO:
-        pass
-
     def generate(self) -> NP_AUDIO:
-        audio_data = self.generate_audio()
-        audio_data = AudioReshaper.normalize_audio(audio=audio_data, target_sr=self.audio_sr)
-        # audio_data = AudioReshaper.normalize_audio_type(audio=audio_data)
-        audio_data = self.process_np_audio(audio=audio_data)
-        return audio_data
+        pass
 
     def process_np_audio(self, audio: NP_AUDIO) -> NP_AUDIO:
         audio = self.process_audio(audio)

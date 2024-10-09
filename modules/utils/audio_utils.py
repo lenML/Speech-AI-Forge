@@ -13,13 +13,24 @@ import numpy as np
 INT16_MAX = np.iinfo(np.int16).max
 
 
-
 def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:
+    """
+    Converts bytes to librosa array.
+
+    NOTE: 注意 audio_bytes 假设为 np.int16 类型，其他类型不会报错，但是load出来时噪音
+
+    Args:
+        audio_bytes: bytes
+        sample_rate: int
+
+    Returns:
+        librosa array
+    """
     audio_np = np.frombuffer(audio_bytes, dtype=np.int16)
     byte_io = io.BytesIO()
     wavfile.write(byte_io, sample_rate, audio_np)
     byte_io.seek(0)
-    
+
     try:
         audio_data, read_sr = sf.read(byte_io, dtype='float32')
         if read_sr != sample_rate:
@@ -32,12 +43,18 @@ def bytes_to_librosa_array(audio_bytes: bytes, sample_rate: int) -> npt.NDArray:
 
 
 def audio_to_int16(audio_data: np.ndarray) -> np.ndarray:
-    if (
-        audio_data.dtype == np.float32
-        or audio_data.dtype == np.float64
-        or audio_data.dtype == np.float128
-        or audio_data.dtype == np.float16
-    ):
+    """
+    Converts audio data to int16.
+
+    NOTE: 这个转换将丢失精度
+
+    Args:
+        audio_data: np.ndarray
+
+    Returns:
+        np.ndarray
+    """
+    if np.issubdtype(audio_data.dtype, np.floating):
         audio_data = (audio_data * INT16_MAX).astype(np.int16)
     return audio_data
 

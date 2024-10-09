@@ -28,5 +28,5 @@ class InferConfig(BaseModel):
 
     no_cache: bool = False
 
-    # 开启同步生成 （主要是给gradio用）
+    # 开启同步生成 （主要是给gradio/pytest用）
     sync_gen: bool = False

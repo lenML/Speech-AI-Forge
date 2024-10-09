@@ -135,6 +135,8 @@ class TTSSpeaker:
     @staticmethod
     def from_ref_wav(ref_wav: tuple[int, np.ndarray], text="") -> "TTSSpeaker":
         sr, data = ref_wav
+        assert data.dtype != np.int16, "ref wav must be int16"
+
         spk = TTSSpeaker.empty()
         spk.add_ref(ref=DcSpkReference(text=text, wav=data.tobytes(), wav_sr=sr))
         return spk

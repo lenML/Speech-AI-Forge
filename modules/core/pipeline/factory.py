@@ -1,6 +1,7 @@
 import logging
 
 
+from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.pipeline import AudioPipeline, TTSPipeline
@@ -88,8 +89,12 @@ class FromAudioPipeline(AudioPipeline):
         super().__init__(context=ctx)
         self.audio = audio
 
-    def generate_audio(self):
-        return self.audio
+    def generate(self):
+        audio_data = self.audio
+        audio_data = AudioReshaper.normalize_audio(audio=audio_data, target_sr=self.audio_sr)
+        # audio_data = AudioReshaper.normalize_audio_type(audio=audio_data)
+        audio_data = self.process_np_audio(audio=audio_data)
+        return audio_data
 
 
 class PipelineFactory:
