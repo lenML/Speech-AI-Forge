@@ -229,8 +229,6 @@ WIP 开发中
 
 > **关于 CosyVoice**：不太确定应该使用哪个模型。整体来看，`instruct` 模型功能最多，但可能质量不是最佳。如果需要使用其他模型，请自行选择 `dl_cosyvoice_base.py`、`dl_cosyvoice_instruct.py` 或 `sft` 脚本。加载优先级为 `base` > `instruct` > `sft`，可根据文件夹存在性判断加载顺序。
 
-这样格式是否符合你的要求？
-
 ## FAQ
 
 ### 如何语音复刻？
