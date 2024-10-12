@@ -9,6 +9,8 @@ import torchaudio
 import torchaudio.compliance.kaldi as kaldi
 import whisper
 
+from modules.devices import devices
+
 
 class CosyVoiceFrontEnd:
 
@@ -24,7 +26,7 @@ class CosyVoiceFrontEnd:
     ):
         self.tokenizer = get_tokenizer()
         self.feat_extractor = feat_extractor
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = devices.get_device_for("cosy-voice")
         option = onnxruntime.SessionOptions()
         option.graph_optimization_level = (
             onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
@@ -45,7 +47,7 @@ class CosyVoiceFrontEnd:
             ],
         )
         if os.path.exists(spk2info):
-            self.spk2info = torch.load(spk2info, map_location=self.device)
+            self.spk2info = torch.load(spk2info, map_location="cpu")
         self.instruct = instruct
         self.allowed_special = allowed_special
         self.inflect_parser = inflect.engine()

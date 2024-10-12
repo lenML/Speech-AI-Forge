@@ -75,7 +75,7 @@ class FireRedTTSInfer:
             stop_audio_token=self.config["gpt"]["gpt_stop_audio_token"],
         )
 
-        sd = torch.load(self.gpt_path, map_location=device)["model"]
+        sd = torch.load(self.gpt_path, map_location="cpu")["model"]
         self.gpt.load_state_dict(sd, strict=True)
         self.gpt = self.gpt.to(device=device)
         self.gpt.eval()
