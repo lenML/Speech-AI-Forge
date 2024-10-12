@@ -3,7 +3,7 @@ import logging
 
 from modules.core.models import zoo
 from modules.devices import devices
-from modules.Enhancer.ResembleEnhance import load_enhancer
+from modules.core.models.zoo import model_zoo
 from modules.utils import env
 
 logger = logging.getLogger(__name__)
@@ -82,7 +82,11 @@ def process_model_args(args: argparse.Namespace):
 
     if preload_models:
         """
-        TODO: 需要增强 zoo
+        TODO: 增加配置加载其他模型，目前只会加载 chat_tts 和 resemble_enhance
         """
-        zoo.ChatTTS.load_chat_tts()
-        load_enhancer()
+        logger.info("Preload models at startup, load...")
+
+        model_zoo.get_chat_tts().load()
+        model_zoo.get_resemble_enhance().load()
+
+        logger.info("Preload models at startup, load done")

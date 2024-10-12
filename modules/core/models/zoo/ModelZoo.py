@@ -8,7 +8,7 @@ except:
 from typing import Dict, Union
 
 from modules.core.models.BaseZooModel import BaseZooModel
-from modules.core.models.enhancer.ResembleEnhance import ResembleEnhanceModel
+from modules.core.models.enhancer.ResembleEnhanceModel import ResembleEnhanceModel
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel

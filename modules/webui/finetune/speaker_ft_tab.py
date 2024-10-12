@@ -1,12 +1,11 @@
 import gradio as gr
 
 from modules.core.models import zoo
-from modules.core.spk import TTSSpeaker, spk_mgr
-from modules.Enhancer.ResembleEnhance import unload_enhancer
+from modules.core.spk import spk_mgr
 from modules.webui import webui_config
 from modules.webui.webui_utils import get_speaker_names
 
-from .ft_ui_utils import get_datasets_listfile, run_speaker_ft
+from .ft_ui_utils import get_datasets_listfile
 from .ProcessMonitor import ProcessMonitor
 
 
@@ -16,8 +15,7 @@ class SpeakerFt:
         self.status_str = "idle"
 
     def unload_main_thread_models(self):
-        zoo.ChatTTS.unload_chat_tts()
-        unload_enhancer()
+        zoo.model_zoo.unload_all_models()
 
     def run(
         self,
