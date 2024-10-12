@@ -37,6 +37,14 @@ class FireRedTTSModel(TTSModel):
         logger.info("FireRedTTS model loaded.")
         return self.fire_red
 
+    def unload(self) -> None:
+        if self.fire_red is None:
+            return
+        self.fire_red.unload_models()
+        self.fire_red = None
+        devices.torch_gc()
+        logger.info("FireRedTTS model unloaded.")
+
     def get_sample_rate(self):
         return 24000
 

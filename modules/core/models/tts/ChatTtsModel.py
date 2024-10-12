@@ -10,6 +10,7 @@ from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk.TTSSpeaker import TTSSpeaker
+from modules.devices import devices
 from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
 
@@ -42,8 +43,11 @@ class ChatTTSModel(TTSModel):
         return self.chat
 
     def unload(self, context: TTSPipelineContext = None) -> None:
-        unload_chat_tts(self.chat)
+        if self.chat is None:
+            return
+        unload_chat_tts()
         self.chat = None
+        devices.torch_gc()
 
     def encode(self, text: str) -> list[int]:
         self.load()

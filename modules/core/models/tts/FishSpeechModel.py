@@ -116,6 +116,8 @@ class FishSpeechModel(TTSModel):
 
     def unload(self, context: TTSPipelineContext = None) -> None:
         with self.lock:
+            if self.model is None:
+                return
             del self.model
             del self.token_decoder
             del self.vqgan
@@ -127,6 +129,7 @@ class FishSpeechModel(TTSModel):
             FishSpeechModel.model = None
             FishSpeechModel.vqgan = None
             devices.torch_gc()
+            logger.info("Unloaded FishSpeech model")
 
     def encode(self, text: str) -> list[int]:
         self.load()

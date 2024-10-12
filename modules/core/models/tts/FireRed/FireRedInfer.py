@@ -1,3 +1,4 @@
+import gc
 import json
 import os
 import time
@@ -91,6 +92,17 @@ class FireRedTTSInfer:
         self.token2wav.generator.remove_weight_norm()
         self.token2wav.eval()
         self.token2wav = self.token2wav.to(device)
+
+    def unload_models(self):
+        """卸载所有模型并释放资源。"""
+        if self.gpt is None:
+            return
+        del self.gpt
+        del self.token2wav
+        del self.speaker_extractor
+        self.gpt = None
+        self.token2wav = None
+        self.speaker_extractor = None
 
     def extract_spk_embeddings(self, audio: np.ndarray, audio_sr: int) -> torch.Tensor:
         """Extract speaker embeddings from numpy audio array.

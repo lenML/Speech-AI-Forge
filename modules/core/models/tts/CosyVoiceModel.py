@@ -137,6 +137,7 @@ class CosyVoiceTTSModel(TTSModel):
             CosyVoiceTTSModel.model = None
             CosyVoiceTTSModel.frontend = None
             devices.torch_gc()
+            self.logger.info("CosyVoice model unloaded.")
 
     def encode(self, text: str) -> list[int]:
         from whisper.tokenizer import Tokenizer

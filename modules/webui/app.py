@@ -132,7 +132,7 @@ def create_interface():
                 create_tools_tab()
 
             with gr.TabItem("System"):
-                create_system_tab()
+                create_system_tab(demo)
 
             with gr.TabItem("README"):
                 with gr.Tabs():

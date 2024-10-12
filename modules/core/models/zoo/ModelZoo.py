@@ -57,6 +57,8 @@ class ModelZoo:
                 continue
             model.unload()
 
+        devices.do_gc()
+
     @devices.after_gc()
     def reload_all_models(self, exclude=None):
         loaded_models = [model for model in self.models.values() if model.is_loaded()]
@@ -64,6 +66,8 @@ class ModelZoo:
 
         for model in loaded_models:
             model.load()
+
+        devices.do_gc()
 
     def is_not_engouh_mem(self):
         usage = devices.get_memory_usage()
