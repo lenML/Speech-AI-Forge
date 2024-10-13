@@ -1,9 +1,10 @@
-from modules.core.tn.TNPipeline import GuessLang
+from modules.core.tn.TNPipeline import GuessLang, TNPipeline
 
 from .base_tn import BaseTN
 from .whisper import specials_token as whisper_specials_token
 
 FireRedTtsTN = BaseTN.clone()
+# FireRedTtsTN = TNPipeline()
 FireRedTtsTN.freeze_tokens = [
     # TODO: 应该从 tiktoken 中取值
     "[char_rep]",
@@ -16,8 +17,13 @@ FireRedTtsTN.freeze_tokens = [
     "(confirmation)",
     "(realization)",
     "(surprise)",
+    # 特殊语气符号 (现在好像没什么用...)
+    # "@",
+    # "^",
     *whisper_specials_token,
 ]
+# NOTE: 不能用换行 因为 fire red 内部的 tn 会把换行替换成逗号
+FireRedTtsTN.SEP_CHAR = " "
 
 
 @FireRedTtsTN.block()
