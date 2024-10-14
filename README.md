@@ -219,7 +219,7 @@ WIP 开发中
 | ------------ | ---------- | ------------------------------------------------------------------------- |
 | **TTS**      | ChatTTS    | `python -m scripts.dl_chattts --source huggingface`                       |
 |              | FishSpeech | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`    |
-|              | CosyVoice  | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
+|              | CosyVoice  | `python -m scripts.dl_cosyvoice_instruct --source huggingface`            |
 |              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
 | **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
 | **CV**       | OpenVoice  | `python -m scripts.downloader.open_voice --source huggingface`            |
