@@ -486,13 +486,15 @@ class FireRedTTSInterface(TTSInterface):
         super().__init__("fire-red-tts")
         self.refine_visible = False
         self.contorl_tokens = [
-            "[elong]",
-            "[oralsii]",
-            "[tsk]",
-            "[breath]",
-            "[laugh]",
-            "(filled pause)",
-            "(confirmation)",
+            # NOTE: 貌似还不支持，据github说十月份会开源支持的新版本模型...
+            # ref: https://github.com/FireRedTeam/FireRedTTS/issues/12
+            # "[elong]",
+            # "[oralsii]",
+            # "[tsk]",
+            # "[breath]",
+            # "[laugh]",
+            # "(filled pause)",
+            # "(confirmation)",
         ]
         self.spliter_eos = " 。 "
 

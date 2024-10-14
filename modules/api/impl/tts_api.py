@@ -64,7 +64,7 @@ class TTSParams(BaseModel):
     pitch: float = Query(0, description="Pitch of the audio")
     volume_gain: float = Query(0, description="Volume gain of the audio")
 
-    stream: bool = Query(False, description="Stream the audio")
+    stream: bool = Query(False, description="Enable streaming generation")
 
     no_cache: Union[bool, Literal["on", "off"]] = Query(
         False, description="Disable cache"

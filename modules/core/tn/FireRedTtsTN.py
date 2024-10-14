@@ -7,6 +7,7 @@ FireRedTtsTN = BaseTN.clone()
 # FireRedTtsTN = TNPipeline()
 FireRedTtsTN.freeze_tokens = [
     # TODO: 应该从 tiktoken 中取值
+    # NOTE: 貌似还用不了，具体情况追踪这个 issues： https://github.com/FireRedTeam/FireRedTTS/issues/12
     "[char_rep]",
     "[word_rep]",
     "[elong]",
@@ -30,6 +31,7 @@ FireRedTtsTN.SEP_CHAR = " "
 def something_tn(text: str, guess_lang: GuessLang) -> str:
     # NOTE: 暂时用不着 留个位置
     # NOTE: FireRedTTS 的 tn 是在 tokenizer 执行时调用
+    # TODO: 最好是把内部的 TN 移出来，不然不好控制
     return text
 
 
