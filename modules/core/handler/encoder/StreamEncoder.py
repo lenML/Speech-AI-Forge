@@ -30,6 +30,10 @@ class StreamEncoder:
         self.header = None
         self.timeout = 0.1
 
+        self.channels = 1
+        self.sample_width = 2
+        self.sample_rate = 24000
+
     def set_header(
         self, *, frame_input=b"", channels=1, sample_width=2, sample_rate=24000
     ):
@@ -48,6 +52,7 @@ class StreamEncoder:
         self.p = subprocess.Popen(
             [
                 encoder,
+                "-re",
                 "-threads",
                 "4",
                 "-f",
@@ -60,11 +65,16 @@ class StreamEncoder:
                 acodec,
                 "-b:a",
                 bitrate,
+                "-flush_packets",
+                "1",
+                "-max_delay",
+                "0",
                 "-",
             ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            bufsize=0,  # 禁用缓冲
         )
         self.read_thread = threading.Thread(target=self._read_output)
         self.read_thread.daemon = True

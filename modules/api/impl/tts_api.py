@@ -65,6 +65,7 @@ class TTSParams(BaseModel):
     volume_gain: float = Query(0, description="Volume gain of the audio")
 
     stream: bool = Query(False, description="Enable streaming generation")
+    chunk_size: int = Query(64, description="Chunk size for streaming generation")
 
     no_cache: Union[bool, Literal["on", "off"]] = Query(
         False, description="Disable cache"
@@ -118,6 +119,10 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
                 status_code=422,
                 detail=f"Invalid model_id. Supported model_ids are {model_ids}",
             )
+        if params.chunk_size <= 0:
+            raise HTTPException(
+                status_code=422, detail="chunk_size must be a positive integer"
+            )
 
         calc_params = api_utils.calc_spk_style(spk=params.spk, style=params.style)
 
@@ -136,6 +141,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         prompt2 = params.prompt2 or calc_params.get("prompt2", params.prompt2)
         eos = params.eos or ""
         stream = params.stream
+        chunk_size = params.chunk_size
         no_cache = (
             params.no_cache
             if isinstance(params.no_cache, bool)
@@ -168,6 +174,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             seed=seed,
             stream=stream,
             no_cache=no_cache,
+            stream_chunk_size=chunk_size,
         )
         adjust_config = AdjustConfig(
             pitch=params.pitch,

@@ -19,7 +19,10 @@ from modules.core.handler.encoder.encoders import (
 from modules.core.handler.encoder.StreamEncoder import StreamEncoder
 from modules.core.handler.encoder.WavFile import WAVFileBytes
 from modules.core.pipeline.processor import NP_AUDIO
+import logging
 
+logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 def remove_wav_bytes_header(wav_bytes: bytes):
     wav_file = WAVFileBytes(wav_bytes=wav_bytes)
@@ -87,13 +90,20 @@ class AudioHandler:
     def enqueue_to_stream(self) -> Generator[bytes, None, None]:
         encoder = self.get_encoder()
         try:
+            logger.debug("enqueue_to_stream start")
+
             chunk_data = bytes()
             for sample_rate, audio_data in self.enqueue_stream():
                 encoder.set_header(sample_rate=sample_rate)
                 audio_bytes = read_np_to_wav(audio_data=audio_data)
+
+                logger.debug(f"write audio_bytes len: {len(audio_bytes)}")
                 encoder.write(audio_bytes)
+
                 chunk_data = encoder.read()
                 while len(chunk_data) > 0:
+                    logger.debug(f"encoder read data_1 len: {len(chunk_data)}")
+
                     yield chunk_data
                     chunk_data = encoder.read()
 
@@ -101,9 +111,12 @@ class AudioHandler:
 
             chunk_data = encoder.read()
             while len(chunk_data) > 0:
+                logger.debug(f"encoder read data_2 len: {len(chunk_data)}")
+
                 yield chunk_data
                 chunk_data = encoder.read()
         finally:
+            logger.debug("enqueue_to_stream end")
             encoder.terminate()
 
     def interrupt(self):
