@@ -25,11 +25,11 @@ def get_system_status():
     )
     return status
 
-
-def update_markdown():
-    while True:
-        yield get_system_status()
-        time.sleep(1)
+# NOTE: 这样写会抢占输出队列...
+# def update_markdown():
+#     while True:
+#         yield get_system_status()
+#         time.sleep(5)
 
 
 def create_system_tab(demo: gr.Blocks):
@@ -42,7 +42,7 @@ def create_system_tab(demo: gr.Blocks):
                 status_box = gr.Markdown(value="")
 
                 # 每秒更新一次状态
-                demo.load(fn=update_markdown, inputs=[], outputs=status_box)
+                demo.load(fn=get_system_status, inputs=[], outputs=status_box, every=5)
 
         with gr.Column(scale=5):
             with gr.Group():

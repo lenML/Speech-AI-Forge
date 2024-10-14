@@ -82,7 +82,7 @@ def create_interface():
     </script>
     """
 
-    with gr.Blocks(js=js_func, head=head_js, title="ChatTTS Forge WebUI") as demo:
+    with gr.Blocks(js=js_func, head=head_js, title="Speech-AI Forge WebUI") as demo:
         css = """
         <style>
         .big-button {

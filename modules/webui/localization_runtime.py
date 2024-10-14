@@ -13,7 +13,7 @@ class LocalizationVars:
 class ZHLocalizationVars(LocalizationVars):
     def __init__(self):
         super().__init__()
-        self.DEFAULT_TTS_TEXT = "ChatTTS Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。"
+        self.DEFAULT_TTS_TEXT = "Speech AI Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。"
         self.DEFAULT_SPEAKER_TEST_TEXT = "说话人测试 123456789。ok, test done ."
         self.DEFAULT_SPEAKER_MERAGE_TEXT = "说话人合并测试 123456789。ok, test done ."
         self.DEFAULT_SSML_TEXT = """
@@ -253,7 +253,7 @@ May the force be with you!
 class ENLocalizationVars(LocalizationVars):
     def __init__(self):
         super().__init__()
-        self.DEFAULT_TTS_TEXT = "ChatTTS Forge is a project developed around TTS generation model, implementing an API Server and a Gradio-based WebUI."
+        self.DEFAULT_TTS_TEXT = "Speech AI Forge is a project developed around TTS generation model, implementing an API Server and a Gradio-based WebUI."
         self.DEFAULT_SPEAKER_TEST_TEXT = "Speaker test 123456789. ok, test done ."
         self.DEFAULT_SPEAKER_MERAGE_TEXT = (
             "Speaker merge test 123456789. ok, test done ."
