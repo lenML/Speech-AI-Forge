@@ -50,6 +50,7 @@ class TTSInterface:
         self.default_top_k = 20
 
         self.show_style_dropdown = True
+        self.show_sampling = True
 
     def get_speaker_names(self):
         names = ["*random"] + [
@@ -165,7 +166,7 @@ class TTSInterface:
         return style_input_dropdown
 
     def create_sampling_interface(self):
-        with gr.Group():
+        with gr.Group(visible=self.show_sampling):
             gr.Markdown("🎛️Sampling")
             temperature_input = gr.Slider(
                 0.01, 2.0, value=self.default_temprature, step=0.01, label="Temperature"
@@ -567,6 +568,8 @@ class F5TtsInterface(TTSInterface):
 
         # NOTE: 这个模型不支持 instruction
         self.show_style_dropdown = False
+        # TODO: 其实有采样配置，但是和GPT模型不一样，得重新调整生成流程
+        self.show_sampling = False
 
     def create_tts_style_guide(self):
         pass
