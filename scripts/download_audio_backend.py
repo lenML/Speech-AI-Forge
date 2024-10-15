@@ -35,6 +35,8 @@ class Downloader:
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(extract_path)
 
+        os.unlink(zip_path)
+
     def install_ffmpeg_on_windows(self):
         print("windows系统，安装ffmpeg...")
 
