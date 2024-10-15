@@ -1,6 +1,6 @@
 import json
 
-from modules.core.speaker import speaker_mgr
+from modules.core.spk.SpkMgr import spk_mgr
 
 # 出处: https://github.com/2noise/ChatTTS/issues/238
 data = json.load(open("./data/slct_voice_240605.json", "r"))
@@ -12,7 +12,7 @@ for id, spk in data.items():
     name = f"spk_{id}"
     describe = spk["describe"]
     gender = spk["gender"]
-    speaker_mgr.create_speaker_from_tensor(
+    spk_mgr.create_speaker_from_tensor(
         filename=name,
         name=describe,
         describe=describe,

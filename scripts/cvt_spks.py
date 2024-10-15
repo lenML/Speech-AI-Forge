@@ -4,11 +4,10 @@
 
 import os
 
-from modules.core.speaker import speaker_mgr
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
-for fp, spk in speaker_mgr.speakers.items():
+for fp, spk in spk_mgr.speakers.items():
     print(fp)
     name = spk.name
     gender = spk.gender

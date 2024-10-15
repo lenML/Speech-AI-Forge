@@ -6,7 +6,8 @@ from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import TTSPipelineContext
-from modules.core.speaker import speaker_mgr
+
+from modules.core.spk.SpkMgr import spk_mgr
 
 context = TTSPipelineContext(
     ssml="""
@@ -23,7 +24,7 @@ context = TTSPipelineContext(
         </voice>
     </speak>
     """,
-    spk=speaker_mgr.get_speaker("Bob_ft10"),
+    spk=spk_mgr.get_speaker("Bob_ft10"),
     tts_config=TTSConfig(),
     infer_config=InferConfig(no_cache=True),
     adjust_config=AdjustConfig(),
