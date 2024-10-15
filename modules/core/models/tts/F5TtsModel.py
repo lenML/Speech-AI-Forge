@@ -29,6 +29,7 @@ import codecs
 from vocos.feature_extractors import FeatureExtractor, EncodecFeatures
 
 from modules.core.models.TTSModel import TTSModel
+from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
 
@@ -146,8 +147,7 @@ class F5TtsModel(TTSModel):
         texts = [segment.text for segment in segments]
 
         seg0 = segments[0]
-        spk_emb = self.get_spk_emb(segment=seg0, context=context) if seg0.spk else None
-        ref_wav, ref_txt = self.get_ref_wav(seg0)
+        # NOTE: 虽然用不到这些参数...但是还是列出来先
         top_P = seg0.top_p
         top_K = seg0.top_k
         temperature = seg0.temperature
@@ -161,12 +161,17 @@ class F5TtsModel(TTSModel):
         seed = seg0.infer_seed
         chunk_size = context.infer_config.stream_chunk_size
 
-        ref_audio = (sr, ref_wav)
-        gen_text_batches = [segment.text for segment in segments]
+        ref_wav, ref_txt = self.get_ref_wav(seg0)
+        if ref_wav is None:
+            # NOTE: 必须要有 reference audio
+            raise RuntimeError("Reference audio not found.")
 
-        generated_waves = self.infer_batch(
-            ref_audio=ref_audio, ref_text=ref_txt, gen_text_batches=gen_text_batches
-        )
+        ref_audio = (sr, ref_wav)
+
+        with SeedContext(seed=seg0.infer_seed):
+            generated_waves = self.infer_batch(
+                ref_audio=ref_audio, ref_text=ref_txt, gen_text_batches=texts
+            )
 
         return [(sr, generated_wave) for generated_wave in generated_waves]
 
@@ -191,6 +196,7 @@ class F5TtsModel(TTSModel):
         audio = audio.to(device)
 
         generated_waves: list[np.ndarray] = []
+        # NOTE: 这个现在用不到
         spectrograms = []
 
         for i, gen_text in enumerate(tqdm.tqdm(gen_text_batches)):
@@ -215,7 +221,6 @@ class F5TtsModel(TTSModel):
 
             # inference
             with torch.inference_mode():
-                print(audio.shape)
                 generated, _ = ema_model.sample(
                     cond=audio,
                     text=final_text_list,

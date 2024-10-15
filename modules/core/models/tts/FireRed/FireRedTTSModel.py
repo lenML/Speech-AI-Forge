@@ -12,6 +12,7 @@ from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
+from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
 
@@ -74,17 +75,18 @@ class FireRedTTSModel(TTSModel):
         # seed = seg0.infer_seed
         # chunk_size = context.infer_config.stream_chunk_size
 
-        syn_audio = model.synthesize(
-            audio=spk_wav,
-            audio_sr=self.get_sample_rate(),
-            text=seg0.text,
-            # lang="auto",
-            params=FireRedTTSParams(
-                top_p=top_P,
-                top_k=top_K,
-                temperature=temperature,
-            ),
-        )
+        with SeedContext(seed=seg0.infer_seed):
+            syn_audio = model.synthesize(
+                audio=spk_wav,
+                audio_sr=self.get_sample_rate(),
+                text=seg0.text,
+                # lang="auto",
+                params=FireRedTTSParams(
+                    top_p=top_P,
+                    top_k=top_K,
+                    temperature=temperature,
+                ),
+            )
 
         wav: np.ndarray = syn_audio.float().cpu().squeeze().numpy()
 

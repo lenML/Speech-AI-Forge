@@ -1,6 +1,6 @@
-from modules.core.tn.TNPipeline import GuessLang, TNPipeline
-
+from modules.core.tn.TNPipeline import GuessLang
 from .base_tn import BaseTN
+
 
 F5TtsTN = BaseTN.clone()
 F5TtsTN.freeze_tokens = [
@@ -11,7 +11,7 @@ F5TtsTN.SEP_CHAR = ","
 
 @F5TtsTN.block()
 def something_tn(text: str, guess_lang: GuessLang) -> str:
-    # NOTE: 暂时用不着 留个位置
+    # NOTE: 预留位置
     return text
 
 

@@ -1,14 +1,15 @@
 import copy
+from dataclasses import dataclass
 from typing import Callable, Dict, Literal, Optional
 
 from langdetect import LangDetectException, detect_langs
-from pydantic import BaseModel
 
 from modules.core.handler.datacls.tn_model import TNConfig
 from modules.utils.detect_lang import guess_lang
 
 
-class GuessLang(BaseModel):
+@dataclass(frozen=True, repr=False)
+class GuessLang:
     zh_or_en: Literal["zh", "en"]
     detected: Dict[str, float]
 
@@ -35,7 +36,8 @@ class TNBlockFn(TNBlock):
         return self.fn(text, guess_lang)
 
 
-class TNText(BaseModel):
+@dataclass(frozen=True, repr=False)
+class TNText:
     text: str
     type: Literal["normal", "freeze"]
 

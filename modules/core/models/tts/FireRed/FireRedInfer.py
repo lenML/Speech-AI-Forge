@@ -9,15 +9,13 @@ import numpy as np
 import torch
 import torchaudio
 
+from modules.core.models.tts.FireRed.FRBepTokenizer import FRBepTokenizer
 from modules.core.models.tts.FireRed.MelExtractor import MelSpectrogramExtractor
 from modules.repos_static.FireRedTTS.fireredtts.modules import Token2Wav
 from modules.repos_static.FireRedTTS.fireredtts.modules.codec.speaker import (
     SpeakerEmbedddingExtractor,
 )
 from modules.repos_static.FireRedTTS.fireredtts.modules.gpt.gpt import GPT
-from modules.repos_static.FireRedTTS.fireredtts.modules.tokenizer.tokenizer import (
-    VoiceBpeTokenizer,
-)
 from modules.repos_static.FireRedTTS.fireredtts.utils.utils import load_audio
 
 
@@ -52,7 +50,7 @@ class FireRedTTSInfer:
         assert os.path.exists(self.speaker_extractor_path)
 
         # Tokenizer
-        self.text_tokenizer: VoiceBpeTokenizer = VoiceBpeTokenizer()
+        self.text_tokenizer: FRBepTokenizer = FRBepTokenizer()
 
         # Speaker extractor
         self.speaker_extractor: SpeakerEmbedddingExtractor = SpeakerEmbedddingExtractor(
