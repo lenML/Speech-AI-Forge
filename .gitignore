@@ -180,6 +180,8 @@ cython_debug/
 /models/**/.gitignore
 /models/CosyVoice_*/**/*
 /models/whisper/**/*
+/models/F5-TTS/**/*
+/models/vocos-mel-24khz/**/*
 
 /*.pt
 

@@ -68,3 +68,11 @@ cn2an
 
 ### fire red tts
 lingua-language-detector
+
+### F5 TTS
+torchdiffeq
+x-transformers
+ema-pytorch
+funasr
+jiwer
+zhconv

@@ -374,3 +374,11 @@ xxhash==3.4.1
 yarl==1.9.4
 zhon==2.0.2
 zipp==3.19.2
+
+### F5 TTS
+torchdiffeq==0.2.4
+x-transformers==1.39.1
+ema-pytorch==0.7.0
+funasr==1.1.12
+jiwer==3.0.4
+zhconv==1.4.3
