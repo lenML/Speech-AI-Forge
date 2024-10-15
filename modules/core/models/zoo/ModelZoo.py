@@ -12,6 +12,7 @@ from modules.core.models.enhancer.ResembleEnhanceModel import ResembleEnhanceMod
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
+from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
 from modules.core.models.tts.FishSpeechModel import FishSpeechModel
 from modules.core.models.vc.OpenVoice import OpenVoiceModel
@@ -29,6 +30,7 @@ class ModelZoo:
         "fish-speech": FishSpeechModel(),
         "cosy-voice": CosyVoiceTTSModel(),
         "fire-red-tts": FireRedTTSModel(),
+        "f5-tts": F5TtsModel(),
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
@@ -112,6 +114,9 @@ class ModelZoo:
 
     def get_fire_red_tts(self) -> FireRedTTSModel:
         return self.get_model("fire-red-tts")
+
+    def get_f5_tts(self) -> F5TtsModel:
+        return self.get_model("f5-tts")
 
 
 model_zoo = ModelZoo()

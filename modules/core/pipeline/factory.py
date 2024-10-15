@@ -15,6 +15,7 @@ from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.core.tn.CosyVoiceTN import CosyVoiceTN
 from modules.core.tn.FireRedTtsTN import FireRedTtsTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
+from modules.core.tn.F5TtsTN import F5TtsTN
 from modules.core.tn.TNPipeline import TNPipeline
 from modules.data import styles_mgr
 
@@ -107,6 +108,8 @@ class PipelineFactory:
             return cls.create_cosyvoice_pipeline(ctx)
         elif model_id == "firered" or model_id == "fire-red-tts":
             return cls.create_fire_red_tts_pipeline(ctx)
+        elif model_id == "f5" or model_id == "f5-tts":
+            return cls.create_f5_tts_pipeline(ctx)
         else:
             raise Exception(f"Unknown model id: {model_id}")
 
@@ -161,6 +164,17 @@ class PipelineFactory:
         cls.setup_base_modules(pipeline=pipeline)
         pipeline.add_module(TNProcess(tn_pipeline=FireRedTtsTN))
         model = model_zoo.get_fire_red_tts()
+        pipeline.set_model(model)
+
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
+    @classmethod
+    def create_f5_tts_pipeline(cls, ctx: TTSPipelineContext):
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        pipeline.add_module(TNProcess(tn_pipeline=F5TtsTN))
+        model = model_zoo.get_f5_tts()
         pipeline.set_model(model)
 
         pipeline.audio_sr = model.get_sample_rate()
