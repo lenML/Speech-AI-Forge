@@ -221,6 +221,8 @@ WIP 开发中
 |              | FishSpeech | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`    |
 |              | CosyVoice  | `python -m scripts.dl_cosyvoice_instruct --source huggingface`            |
 |              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
+|              | F5-TTS | `python -m scripts.downloader.f5_tts --source huggingface`          |
+|              | F5-TTS(vocos) | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`          |
 | **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
 | **CV**       | OpenVoice  | `python -m scripts.downloader.open_voice --source huggingface`            |
 | **Enhancer** | 增强模型   | `python -m scripts.dl_enhance --source huggingface`                       |
@@ -328,6 +330,8 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - SenseVoice: https://github.com/FunAudioLLM/SenseVoice
 - CosyVoice: https://github.com/FunAudioLLM/CosyVoice
 - FireRedTTS: https://github.com/FireRedTeam/FireRedTTS
+- F5-TTS: https://github.com/SWivid/F5-TTS
+
 - Whisper: https://github.com/openai/whisper
 
 - ChatTTS 默认说话人: https://github.com/2noise/ChatTTS/issues/238
