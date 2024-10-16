@@ -18,6 +18,9 @@ python-ms
 # torchvision
 # torchaudio
 
+# colab
+datasets
+
 # TN
 emojiswitch
 python-dotenv
