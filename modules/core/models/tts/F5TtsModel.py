@@ -192,6 +192,7 @@ class F5TtsModel(TTSModel):
 
         rms = torch.sqrt(torch.mean(torch.square(audio)))
         if rms < target_rms:
+            rms = rms.to(audio.device)
             audio = audio * target_rms / rms
         audio = audio.to(device)
 
@@ -234,6 +235,7 @@ class F5TtsModel(TTSModel):
             generated_mel_spec = rearrange(generated, "1 n d -> 1 d n")
             generated_wave = vocos.decode(generated_mel_spec.cpu())
             if rms < target_rms:
+                rms = rms.to(generated_wave.device)
                 generated_wave = generated_wave * rms / target_rms
 
             # wav -> numpy
