@@ -42,7 +42,7 @@ def test_chat_tts_voice_clone_pipe():
     out_audio_path = "./tests/test_outputs/pipe_chat_tts_voice_clone_out1.wav"
 
     run_voice_clone_pipeline_test(
-        pipeline_func=PipelineFactory.create_cosyvoice_pipeline,
+        pipeline_func=PipelineFactory.create_chattts_pipeline,
         voice_target_path=voice_target_path,
         voice_target_text="这是一个测试文本。",
         out_audio_path=out_audio_path,

@@ -23,6 +23,7 @@ def run_voice_clone_pipeline_test(
     voice_target_text: str,
     out_audio_path: str,
     text: str = "你好，这里是音色克隆测试~",
+    eos: str = " ",
 ) -> None:
     """辅助函数：执行音色克隆测试并保存结果音频。
 
@@ -42,7 +43,7 @@ def run_voice_clone_pipeline_test(
         ctx=TTSPipelineContext(
             text=text,
             tts_config=TTSConfig(mid="cosy-voice"),
-            infer_config=InferConfig(eos=" ", sync_gen=True),
+            infer_config=InferConfig(eos=eos, sync_gen=True),
             spk=voice_spk,
         ),
     )
