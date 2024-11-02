@@ -15,6 +15,8 @@ class TTSConfig(BaseModel):
     prefix: str = ""
     emotion: str = ""
 
+    # TODO 添加 dit 配置
+
 
 class InferConfig(BaseModel):
     batch_size: int = 4

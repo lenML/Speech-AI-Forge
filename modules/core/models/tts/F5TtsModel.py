@@ -9,6 +9,7 @@ import tempfile
 from einops import rearrange
 from vocos import Vocos
 from pydub import AudioSegment, silence
+from modules.core.models.tts.F5.F5Annotation import F5Annotation
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
@@ -64,6 +65,8 @@ class F5TtsModel(TTSModel):
         self.vocos: Optional[Vocos] = None
 
         self.device = devices.get_device_for("f5-tts")
+
+        self.annotation = F5Annotation()
 
     def check_files(self) -> None:
         if not self.model_path.exists():
@@ -205,7 +208,12 @@ class F5TtsModel(TTSModel):
             if len(ref_text[-1].encode("utf-8")) == 1:
                 ref_text = ref_text + " "
             text_list = [ref_text + gen_text]
-            final_text_list = convert_char_to_pinyin(text_list)
+
+            # final_text_list = convert_char_to_pinyin(text_list)
+            final_text_list = [
+                self.annotation.convert_to_pinyin(text) for text in text_list
+            ]
+            print(final_text_list)
 
             # Calculate duration
             ref_audio_len = audio.shape[-1] // hop_length

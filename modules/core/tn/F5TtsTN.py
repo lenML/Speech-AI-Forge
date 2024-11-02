@@ -1,12 +1,16 @@
 from modules.core.tn.TNPipeline import GuessLang
 from .base_tn import BaseTN
 
+from .pinyin_ton3_list import pinyin_ton3
+
+f5_pinyin_annos = [f"({p})" for p in pinyin_ton3]
 
 F5TtsTN = BaseTN.clone()
 F5TtsTN.freeze_tokens = [
-    # TODO: 好像没有
+    # 所有拼音标注
+    *f5_pinyin_annos
 ]
-F5TtsTN.SEP_CHAR = ","
+F5TtsTN.SEP_CHAR = ""
 
 
 @F5TtsTN.block()

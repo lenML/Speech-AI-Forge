@@ -44,6 +44,10 @@ class DITInterface:
 
         self.default_content = webui_config.localization.DEFAULT_TTS_TEXT
 
+        """
+        TODO: 这里要重构，现在还是 gpt 的逻辑，dit 的参数还是没有传进来
+        """
+
         # 是否需要参考文本，某些模型不需要，直接填一个占位符然后隐藏
         self.need_ref_text = True
 
