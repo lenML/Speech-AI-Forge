@@ -178,10 +178,38 @@ def synthesize_ssml(
     return sample_rate, audio_data
 
 
+def run_tts_pipe(
+    text: str,
+    spk: Optional[TTSSpeaker],
+    tts_config: TTSConfig,
+    infer_config: InferConfig,
+    adjust_config: AdjustConfig,
+    enhancer_config: EnhancerConfig,
+    encoder_config: EncoderConfig,
+):
+
+    handler = TTSHandler(
+        text_content=text,
+        spk=spk,
+        tts_config=tts_config,
+        infer_config=infer_config,
+        adjust_config=adjust_config,
+        enhancer_config=enhancer_config,
+        encoder_config=encoder_config,
+        vc_config=VCConfig(enabled=False),
+    )
+
+    sample_rate, audio_data = handler.enqueue()
+
+    # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
+    audio_data = audio_utils.audio_to_int16(audio_data)
+    return sample_rate, audio_data
+
+
 # @torch.inference_mode()
 @spaces.GPU(duration=120)
 def tts_generate(
-    text,
+    text:str,
     temperature=0.3,
     top_p=0.7,
     top_k=20,
@@ -300,22 +328,52 @@ def tts_generate(
         bitrate="64k",
     )
 
-    handler = TTSHandler(
-        text_content=text,
+    return run_tts_pipe(
+        text=text,
         spk=spk,
         tts_config=tts_config,
         infer_config=infer_config,
         adjust_config=adjust_config,
         enhancer_config=enhancer_config,
         encoder_config=encoder_config,
-        vc_config=VCConfig(enabled=False),
     )
+    
 
-    sample_rate, audio_data = handler.enqueue()
-
-    # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
-    audio_data = audio_utils.audio_to_int16(audio_data)
-    return sample_rate, audio_data
+# @torch.inference_mode()
+@spaces.GPU(duration=120)
+def dit_tts_generate(
+    text:str,
+    spk:Optional[TTSSpeaker] = None,
+    infer_seed=-1,
+    disable_normalize=False,
+    batch_size=4,
+    # dit configs
+    nfe_step = 32,
+    cfg_strength = 2.0,
+    sway_sampling_coef = -1.0,
+    speed_scale = 1.0,
+    # enhancer
+    enable_enhance=False,
+    enable_denoise=False,
+    # spliter
+    spliter_thr: int = 100,
+    eos: str = "[uv_break]",
+    # adjuster
+    pitch: float = 0,
+    speed_rate: float = 1,
+    volume_gain_db: float = 0,
+    normalize: bool = True,
+    headroom: float = 1,
+    # refrerence audio: 这个会覆盖 spk
+    ref_audio: Optional[tuple[int, np.ndarray]] = None,
+    ref_audio_text: Optional[str] = None,
+    # dit 模型
+    model_id: str = "f5-tts",
+    progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
+):
+    """
+    dit 模型的调用函数
+    """
 
 
 @torch.inference_mode()
