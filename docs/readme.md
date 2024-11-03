@@ -9,3 +9,4 @@
 - [speaking_styles.md](./speaking_styles.md): 关于 style 相关的说明
 - [SSML.md](./SSML.md): SSML 相关的说明
 - [finetune.md](./finetune.md): 微调相关说明
+- [demo.md](./demo.md): 一些生成的demo演示
