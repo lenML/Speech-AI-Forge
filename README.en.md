@@ -99,18 +99,19 @@ Environment variable configuration:
 
 ## Model Support
 
-| Model Category   | Model Name       | Streaming Level | Multi-Language Support | Status                  |
-| ---------------- | ---------------- | --------------- | ---------------------- | ----------------------- |
-| **TTS**          | ChatTTS          | token-level     |                        | ✅                       |
-|                  | FishSpeech       | sentence-level  |                        | ✅ (SFT version in dev 🚧) |
-|                  | CosyVoice        | sentence-level  |                        | ✅                       |
-|                  | FireRedTTS       | sentence-level  |                        | ✅                       |
-|                  | GPTSoVits        | sentence-level  |                        | 🚧                       |
-| **ASR**          | Whisper          | 🚧              | ✅                     | ✅                       |
-|                  | SenseVoice       | 🚧              | ✅                     | 🚧                       |
-| **Voice Clone**  | OpenVoice        |                 |                        | ✅                       |
-|                  | RVC              |                 |                        | 🚧                       |
-| **Enhancer**     | ResembleEnhance  |                 |                        | ✅                       |
+| Model Category   | Model Name                                                                                  | Streaming Level | Multi-Language Support       | Status                  |
+| ---------------- | ------------------------------------------------------------------------------------------- | --------------- | ---------------------------- | ----------------------- |
+| **TTS**          | [ChatTTS](https://github.com/2noise/ChatTTS)                                                | token-level     | en, zh                       | ✅                       |
+|                  | [FishSpeech](https://github.com/fishaudio/fish-speech)                                       | sentence-level  | en, zh, jp, ko           | ✅ (no testing 🚧) |
+|                  | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                        | sentence-level  | en, zh, jp, yue, ko          | ✅                       |
+|                  | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                      | sentence-level  | en, zh                       | ✅                       |
+|                  | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                  | sentence-level  | en, zh                       | ✅                       |
+|                  | GPTSoVits                                                                                    | sentence-level  |                              | 🚧                       |
+| **ASR**          | [Whisper](https://github.com/openai/whisper)                                                | 🚧              | ✅                           | ✅                       |
+|                  | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                      | 🚧              | ✅                           | 🚧                       |
+| **Voice Clone**  | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                        |                 |                              | ✅                       |
+|                  | [RVC](https://github.com/svc-develop-team/RVC)                                              |                 |                              | 🚧                       |
+| **Enhancer**     | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                          |                 |                              | ✅                       |
 
 ## Model Download
 

@@ -97,20 +97,21 @@ WIP 开发中
 - api: [.env.api](./.env.api)
 
 
-## Model Support
+## 模型支持
 
-| 模型类别        | 模型名称       | 流式级别 | 支持多语言 | 实现情况           |
-| --------------- | -------------- | -------- | ---------- | ------------------ |
-| **TTS**         | ChatTTS        | token 级 |            | ✅                 |
-|                 | FishSpeech     | 句子级   |            | ✅ (SFT 开发中 🚧) |
-|                 | CosyVoice      | 句子级   |            | ✅                 |
-|                 | FireRedTTS     | 句子级   |            | ✅                 |
-|                 | GPTSoVits      | 句子级   |            | 🚧                 |
-| **ASR**         | Whisper        | 🚧       | ✅         | ✅                 |
-|                 | SenseVoice     | 🚧       | ✅         | 🚧                 |
-| **Voice Clone** | OpenVoice      |          |            | ✅                 |
-|                 | RVC            |          |            | 🚧                 |
-| **Enhancer**    | ResembleEnhance|          |            | ✅                 |
+| 模型类别        | 模型名称                                                                                       | 流式级别 | 支持多语言              | 实现情况           |
+| --------------- | ---------------------------------------------------------------------------------------------- | -------- | ----------------------- | ------------------ |
+| **TTS**         | [ChatTTS](https://github.com/2noise/ChatTTS)                                                  | token 级 | en, zh                  | ✅                 |
+|                 | [FishSpeech](https://github.com/fishaudio/fish-speech)                                         | 句子级   | en, zh, jp, ko      | ✅ (未测试 🚧) |
+|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                          | 句子级   | en, zh, jp, yue, ko     | ✅                 |
+|                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | 句子级   | en, zh                  | ✅                 |
+|                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | 句子级   | en, zh                  | ✅                 |
+|                 | GPTSoVits                                                                                      | 句子级   |                         | 🚧                 |
+| **ASR**         | [Whisper](https://github.com/openai/whisper)                                                  | 🚧       | ✅                      | ✅                 |
+|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                        | 🚧       | ✅                      | 🚧                 |
+| **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                          |          |                         | ✅                 |
+|                 | [RVC](https://github.com/svc-develop-team/RVC)                                                |          |                         | 🚧                 |
+| **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                            |          |                         | ✅                 |
 
 
 ## 模型下载
