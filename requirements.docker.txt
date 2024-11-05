@@ -11,7 +11,7 @@ vector_quantize_pytorch
 einops
 omegaconf~=2.3.0
 tqdm
-huggingface_hub>=0.22.2,<1.0
+huggingface-hub==0.23.2
 vocos==0.0.1
 transformers==4.41.2
 torch

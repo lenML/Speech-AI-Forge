@@ -11,6 +11,7 @@ pandas
 vector_quantize_pytorch
 einops
 transformers~=4.41.1
+huggingface-hub==0.23.2
 omegaconf~=2.3.0
 tqdm
 python-ms
