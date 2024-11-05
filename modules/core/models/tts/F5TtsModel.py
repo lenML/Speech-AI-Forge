@@ -213,7 +213,7 @@ class F5TtsModel(TTSModel):
             final_text_list = [
                 self.annotation.convert_to_pinyin(text) for text in text_list
             ]
-            print(final_text_list)
+            # print(final_text_list)
 
             # Calculate duration
             ref_audio_len = audio.shape[-1] // hop_length

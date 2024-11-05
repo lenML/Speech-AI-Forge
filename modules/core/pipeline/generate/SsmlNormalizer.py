@@ -30,9 +30,20 @@ class SsmlNormalizer:
         self.spliter_thr = spliter_thr
         self.context = context
 
+    def get_eoslike_arr(self):
+        # 根据模型来确定可能的 eos
+        mid = self.context.tts_config.mid
+        eos_arr = ["。", "."]
+        if mid == "chat-tts":
+            eos_arr = ["[uv_break]", "[v_break]", "[lbreak]", "[llbreak]"]
+        else:
+            # TODO 其他模型可能也需要判断
+            pass
+        return eos_arr
+
     def append_eos(self, text: str):
         text = text.strip()
-        eos_arr = ["[uv_break]", "[v_break]", "[lbreak]", "[llbreak]"]
+        eos_arr = self.get_eoslike_arr()
         has_eos = False
         for eos in eos_arr:
             if eos in text:
@@ -95,7 +106,9 @@ class SsmlNormalizer:
         top_k = to_number(attrs.top_k, int, None)
         top_p = to_number(attrs.top_p, float, None)
         temp = to_number(attrs.temp, float, None)
-        duration = to_number(attrs.duration, float, None)
+
+        duration_ms = to_number(attrs.duration, float, None)
+        speed_rate = to_number(attrs.rate, float, None)
 
         prompt1 = attrs.prompt1 or ss_params.get("prompt1")
         prompt2 = attrs.prompt2 or ss_params.get("prompt2")
@@ -113,7 +126,8 @@ class SsmlNormalizer:
             prompt2=prompt2,
             prefix=prefix,
             emotion=emotion or style,
-            duration_ms=duration,
+            duration_ms=duration_ms,
+            speed_rate=speed_rate,
         )
 
         # NOTE 每个batch的默认seed保证前后一致即使是没设置spk的情况

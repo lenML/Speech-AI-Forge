@@ -12,22 +12,24 @@ from modules.core.pipeline.processor import (
     AUDIO,
     NP_AUDIO,
     AudioProcessor,
-    PreProcessor,
+    SegmentProcessor,
     TTSPipelineContext,
 )
 from modules.utils import audio_utils
 
-
+"""
+TODO: 简化 pipeline，不要在这里做类型转换，并且增加 segment class 实现
+"""
 class AudioPipeline:
 
     def __init__(self, context: TTSPipelineContext) -> None:
-        self.modules: list[Union[AudioProcessor, PreProcessor]] = []
         self.context = context
 
         self.audio_sr = 44100
 
-    def add_module(self, module):
-        self.modules.append(module)
+    def add_module(self, module: Union[AudioProcessor, SegmentProcessor]):
+        if module not in self.context.modules:
+            self.context.modules.append(module)
 
     def generate(self) -> NP_AUDIO:
         pass
@@ -63,13 +65,13 @@ class AudioPipeline:
         return audio
 
     def process_pre(self, seg: TTSSegment):
-        for module in self.modules:
-            if isinstance(module, PreProcessor):
-                seg = module.process(segment=seg, context=self.context)
+        for module in self.context.modules:
+            if isinstance(module, SegmentProcessor):
+                seg = module.pre_process(segment=seg, context=self.context)
         return seg
 
     def process_audio(self, audio: AUDIO):
-        for module in self.modules:
+        for module in self.context.modules:
             if isinstance(module, AudioProcessor):
                 audio = module.process(audio=audio, context=self.context)
         return audio
@@ -80,9 +82,6 @@ class TTSPipeline(AudioPipeline):
     def __init__(self, context: TTSPipelineContext):
         super().__init__(context=context)
         self.model: TTSModel = None
-
-    def add_module(self, module):
-        self.modules.append(module)
 
     def set_model(self, model):
         self.model = model

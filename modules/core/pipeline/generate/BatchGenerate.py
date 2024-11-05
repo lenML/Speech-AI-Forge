@@ -6,14 +6,19 @@ import numpy as np
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.generate.dcls import TTSBatch, TTSBucket
+from modules.core.pipeline.processor import SegmentProcessor
 from modules.utils import audio_utils
 
 logger = logging.getLogger(__name__)
 
 
 class BatchGenerate:
+
     def __init__(
-        self, buckets: list[TTSBucket], context: TTSPipelineContext, model: TTSModel
+        self,
+        buckets: list[TTSBucket],
+        context: TTSPipelineContext,
+        model: TTSModel,
     ) -> None:
         self.buckets = buckets
         self.model = model
@@ -71,23 +76,19 @@ class BatchGenerate:
             audio.sr = sr
             audio.done = True
 
-            if audio.seg.duration_ms is not None:
-                # 表示需要调整时间
-                result_duration = data.size / sr * 1000
-                audio.data = audio_utils.apply_prosody_to_audio_data(
-                    sr=sr,
-                    audio_data=audio.data,
-                    rate=audio.seg.duration_ms / result_duration,
-                )
+            self.after_process(result=audio)
 
     def generate_batch_stream(self, batch: TTSBatch):
         model = self.model
         segments = [audio.seg for audio in batch.segments]
 
-        # NOTE: stream 不支持 duration_ms
+        # NOTE: stream 不支持 after_process
         for seg in segments:
             if seg.duration_ms is not None:
                 logger.warning("Not support duration_ms in stream mode")
+                break
+            if seg.speed_rate is not None:
+                logger.warning("Not support speed_rate in stream mode")
                 break
 
         for results in model.generate_batch_stream(
@@ -103,3 +104,10 @@ class BatchGenerate:
 
         for seg in batch.segments:
             seg.done = True
+
+    def after_process(self, result: TTSBatch):
+        # NOTE: 按道理说这个应该给 pipeline 来控制，但是不太好决定 segement 的处理时机，所以放在这里
+        # TODO: 最好还是不要把 module 传到 generator 中用
+        for module in self.context.modules:
+            if isinstance(module, SegmentProcessor):
+                module.after_process(result=result, context=self.context)

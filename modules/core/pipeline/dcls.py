@@ -13,7 +13,6 @@ from modules.core.spk.TTSSpeaker import TTSSpeaker
 class TTSSegment:
     _type: Literal["break", "audio"]
 
-    duration_ms: Optional[int] = None
     text: str = ""
 
     temperature: float = 0.3
@@ -29,6 +28,15 @@ class TTSSegment:
 
     spk: TTSSpeaker = None
 
+    ## (after process)
+    # speed control
+    duration_ms: Optional[int] = None
+    speed_rate: Optional[float] = None
+
+    ## NOTE: 其实还有个有这几个参数，但是应该不常用，暂时只支持单个 segment 控制速度，不支持其他调整
+    # pitch: float = 0
+    # volume_gain_db: float = 0
+
 
 @dataclass(repr=False, eq=False)
 class TTSPipelineContext:
@@ -43,6 +51,9 @@ class TTSPipelineContext:
     vc_config: VCConfig = field(default_factory=VCConfig)
 
     tn_config: TNConfig = field(default_factory=TNConfig)
+
+    # TODO 这里写类型会循环引用...
+    modules: list = field(default_factory=list)
 
     # 当调用 interrupt 时，此变量会被设置为 True
     stop: bool = False

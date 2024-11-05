@@ -4,8 +4,15 @@ from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.pipeline import AudioPipeline, TTSPipeline
-from modules.core.pipeline.processor import NP_AUDIO, PreProcessor, TTSPipelineContext
-from modules.core.pipeline.processors.Adjuster import AdjusterProcessor
+from modules.core.pipeline.processor import (
+    NP_AUDIO,
+    SegmentProcessor,
+    TTSPipelineContext,
+)
+from modules.core.pipeline.processors.Adjuster import (
+    AdjustSegmentProcessor,
+    AdjusterProcessor,
+)
 from modules.core.pipeline.processors.Enhancer import EnhancerProcessor
 from modules.core.pipeline.processors.Normalizer import AudioNormalizer
 from modules.core.pipeline.processors.VoiceClone import VoiceCloneProcessor
@@ -22,18 +29,20 @@ from modules.data import styles_mgr
 logger = logging.getLogger(__name__)
 
 
-class TNProcess(PreProcessor):
+class TNProcess(SegmentProcessor):
 
     def __init__(self, tn_pipeline: TNPipeline) -> None:
         super().__init__()
         self.tn = tn_pipeline
 
-    def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
+    def pre_process(
+        self, segment: TTSSegment, context: TTSPipelineContext
+    ) -> TTSSegment:
         segment.text = self.tn.normalize(text=segment.text, config=context.tn_config)
         return segment
 
 
-class TTSStyleProcessor(PreProcessor):
+class TTSStyleProcessor(SegmentProcessor):
     """
     计算合并 style/spk
     """
@@ -45,7 +54,9 @@ class TTSStyleProcessor(PreProcessor):
         params = styles_mgr.find_params_by_name(style)
         return params
 
-    def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
+    def pre_process(
+        self, segment: TTSSegment, context: TTSPipelineContext
+    ) -> TTSSegment:
         params = self.get_style_params(context)
         segment.prompt = (
             segment.prompt or context.tts_config.prompt or params.get("prompt", "")
@@ -123,6 +134,8 @@ class PipelineFactory:
         pipeline.add_module(AdjusterProcessor())
 
         pipeline.add_module(TTSStyleProcessor())
+
+        pipeline.add_module(AdjustSegmentProcessor())
         return pipeline
 
     @classmethod

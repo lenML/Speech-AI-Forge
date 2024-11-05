@@ -5,18 +5,38 @@ import numpy.typing as npt
 from pydub import AudioSegment
 
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
+from modules.core.pipeline.generate.dcls import SynthAudio
 from modules.utils import audio_utils as audio_utils
 
 NP_AUDIO = Tuple[int, npt.NDArray]
 AUDIO = Union[NP_AUDIO, AudioSegment]
 
 
-class PreProcessor:
-    def process(self, segment: TTSSegment, context: TTSPipelineContext) -> TTSSegment:
-        raise NotImplementedError
+class SegmentProcessor:
+    """
+    用于处理单个 segment
+    比如 tn 模块
+    比如 vc 模块
+    """
+
+    def pre_process(
+        self, segment: TTSSegment, context: TTSPipelineContext
+    ) -> TTSSegment:
+        return segment
+
+    def after_process(self, result: SynthAudio, context: TTSPipelineContext) -> None:
+        """
+        后处理 result
+        处理结果挂在 result 中即可
+        """
+        return
 
 
 class AudioProcessor:
+    """
+    后处理，或者叫做音频处理，比如 响度均衡
+    """
+
     def process(self, audio: AUDIO, context: TTSPipelineContext) -> AUDIO:
         if isinstance(audio, tuple):
             return self._process_array(audio, context)

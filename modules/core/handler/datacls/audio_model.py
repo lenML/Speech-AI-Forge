@@ -18,8 +18,6 @@ class AdjustConfig(BaseModel):
     speed_rate: float = 1
     volume_gain_db: float = 0
 
-    duration_ms: Optional[float] = None
-
     # 响度均衡
     normalize: bool = True
     headroom: float = 1
