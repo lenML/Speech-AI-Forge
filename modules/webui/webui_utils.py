@@ -209,18 +209,16 @@ def run_tts_pipe(
 # @torch.inference_mode()
 @spaces.GPU(duration=120)
 def tts_generate(
-    text:str,
+    text: str,
     temperature=0.3,
     top_p=0.7,
     top_k=20,
     spk=-1,
     infer_seed=-1,
-    use_decoder=True,
     prompt1="",
     prompt2="",
     prefix="",
     style="",
-    disable_normalize=False,
     batch_size=4,
     enable_enhance=False,
     enable_denoise=False,
@@ -323,10 +321,8 @@ def tts_generate(
         enabled=enable_denoise or enable_enhance or False,
         lambd=0.9 if enable_denoise else 0.1,
     )
-    encoder_config = EncoderConfig(
-        format=AudioFormat.mp3,
-        bitrate="64k",
-    )
+    # NOTE: 这里只是占位，其实用不到，因为webui音频编码是走的gradio逻辑，我们只生成ndarray，不会调用 encoder 逻辑
+    encoder_config = EncoderConfig()
 
     return run_tts_pipe(
         text=text,
@@ -337,7 +333,7 @@ def tts_generate(
         enhancer_config=enhancer_config,
         encoder_config=encoder_config,
     )
-    
+
 
 # @torch.inference_mode()
 @spaces.GPU(duration=120)
@@ -373,7 +369,10 @@ def dit_tts_generate(
 ):
     """
     dit 模型的调用函数
+
+    TODO: 传递dit模型参数
     """
+    pass
 
 
 @torch.inference_mode()

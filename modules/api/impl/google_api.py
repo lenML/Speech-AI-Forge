@@ -18,6 +18,7 @@ from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
+from modules.api.constants import support_bitrates
 
 class SynthesisInput(BaseModel):
     text: Union[str, None] = None
@@ -41,7 +42,10 @@ class VoiceSelectionParams(BaseModel):
 
 
 class AudioConfig(BaseModel):
+    # 编码器参数
     audioEncoding: AudioFormat = AudioFormat.mp3
+    audioBitrate: str = "64k"
+
     speakingRate: float = 1
     pitch: float = 0
     volumeGainDb: float = 0
@@ -76,9 +80,15 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     infer_seed = voice.seed or 42
     eos = voice.eos or "[uv_break]"
     audio_format = audioConfig.audioEncoding
+    audio_bitrate = audioConfig.audioBitrate
 
     if not isinstance(audio_format, AudioFormat) and isinstance(audio_format, str):
         audio_format = AudioFormat(audio_format)
+    if audio_bitrate not in support_bitrates:
+        raise HTTPException(
+            status_code=422,
+            detail=f"The specified bitrate is not supported. support bitrates: {str(support_bitrates)}",
+        )
 
     speaking_rate = audioConfig.speakingRate or 1
     pitch = audioConfig.pitch or 0
@@ -126,7 +136,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     enhancer_config = enhancerConfig
     encoder_config = EncoderConfig(
         format=audio_format,
-        bitrate="64k",
+        bitrate=audio_bitrate,
     )
 
     try:

@@ -20,6 +20,8 @@ from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
+from modules.api.constants import support_bitrates
+
 logger = logging.getLogger(__name__)
 
 model_ids = ["chat-tts", "fish-speech", "cosy-voice"]
@@ -48,7 +50,10 @@ class TTSParams(BaseModel):
     seed: int = Query(
         42, description="Seed for generate (may be overridden by style or spk)"
     )
+
     format: str = Query("mp3", description="Response audio format: [mp3,wav]")
+    bitrate: str = Query("64k", description="Response audio bitrate")
+
     prompt: str = Query("", description="Text prompt for inference")
     prompt1: str = Query("", description="Text prompt_1 for inference")
     prompt2: str = Query("", description="Text prompt_2 for inference")
@@ -104,6 +109,11 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         if params.top_k > 100:
             raise HTTPException(
                 status_code=422, detail="top_k must be less than or equal to 100"
+            )
+        if params.bitrate not in support_bitrates:
+            raise HTTPException(
+                status_code=422,
+                detail=f"The specified bitrate is not supported. support bitrates: {str(support_bitrates)}",
             )
 
         format = params.format
@@ -187,7 +197,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
         )
         encoder_config = EncoderConfig(
             format=AudioFormat(format),
-            bitrate="64k",
+            bitrate=params.bitrate,
         )
 
         vc_config = VCConfig()

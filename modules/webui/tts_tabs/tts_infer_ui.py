@@ -325,16 +325,13 @@ class TTSInterface:
     def create_generate_interface(self):
         with gr.Group():
             gr.Markdown("🔊Generate")
-            disable_normalize_input = gr.Checkbox(
-                value=False, label="Disable Normalize", visible=False
-            )
             with gr.Group():
                 enable_enhance = gr.Checkbox(value=True, label="Enable Enhance")
                 enable_de_noise = gr.Checkbox(value=False, label="Enable De-noise")
             tts_button = gr.Button(
                 "🔊Generate Audio", variant="primary", elem_classes="big-button"
             )
-        return disable_normalize_input, enable_enhance, enable_de_noise, tts_button
+        return enable_enhance, enable_de_noise, tts_button
 
     def create_tts_interface(self):
         with gr.Row():
@@ -351,9 +348,6 @@ class TTSInterface:
                     self.create_sampling_interface()
                 )
                 eos_input, spliter_thr_input = self.create_splitter_interface()
-                use_decoder_input = gr.Checkbox(
-                    value=True, label="Use Decoder", visible=False
-                )
 
             with gr.Column(scale=4):
                 text_input = self.create_text_input_interface()
@@ -381,7 +375,7 @@ class TTSInterface:
                     headroom_input,
                 ) = self.create_adjuster_interface()
                 infer_seed_input = self.create_inference_seed_interface()
-                disable_normalize_input, enable_enhance, enable_de_noise, tts_button = (
+                enable_enhance, enable_de_noise, tts_button = (
                     self.create_generate_interface()
                 )
 
@@ -407,12 +401,10 @@ class TTSInterface:
                 top_k_input,
                 spk_input_text,
                 infer_seed_input,
-                use_decoder_input,
                 prompt1_input,
                 prompt2_input,
                 prefix_input,
                 style_input_dropdown,
-                disable_normalize_input,
                 batch_size_input,
                 enable_enhance,
                 enable_de_noise,

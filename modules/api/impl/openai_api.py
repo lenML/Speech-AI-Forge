@@ -25,6 +25,8 @@ from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.data import styles_mgr
 
 
+from modules.api.constants import support_bitrates
+
 class AudioSpeechRequest(BaseModel):
     input: str  # 需要合成的文本
     model: str = "chat-tts"
@@ -50,6 +52,8 @@ class AudioSpeechRequest(BaseModel):
 
     stream: bool = False
 
+    bitrate: str = "64k"
+
 
 async def openai_speech_api(
     request: AudioSpeechRequest = Body(
@@ -63,6 +67,7 @@ async def openai_speech_api(
     eos = request.eos
     seed = request.seed
     stream = request.stream
+    audio_bitrate = request.bitrate
 
     response_format = request.response_format
     if not isinstance(response_format, AudioFormat) and isinstance(
@@ -84,6 +89,12 @@ async def openai_speech_api(
             styles_mgr.find_item_by_name(style)
     except:
         raise HTTPException(status_code=400, detail="Invalid style.")
+
+    if audio_bitrate not in support_bitrates:
+        raise HTTPException(
+            status_code=422,
+            detail=f"The specified bitrate is not supported. support bitrates: {str(support_bitrates)}",
+        )
 
     ctx_params = api_utils.calc_spk_style(spk=voice, style=style)
 
@@ -112,7 +123,7 @@ async def openai_speech_api(
     )
     encoder_config = EncoderConfig(
         format=response_format,
-        bitrate="64k",
+        bitrate=audio_bitrate,
     )
     try:
         handler = TTSHandler(
