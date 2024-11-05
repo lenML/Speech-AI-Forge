@@ -13,6 +13,7 @@ from modules.webui.localization_runtime import ENLocalizationVars, ZHLocalizatio
 from modules.webui.readme_tab import create_readme_tab
 from modules.webui.speaker_tab import create_speaker_panel
 from modules.webui.ssml.podcast_tab import create_ssml_podcast_tab
+from modules.webui.ssml.script_tab import create_script_tab
 from modules.webui.ssml.spliter_tab import create_spliter_tab
 from modules.webui.ssml.ssml_tab import create_ssml_interface
 from modules.webui.ssml.subtitle_tab import create_subtitle_tab
@@ -106,17 +107,30 @@ def create_interface():
                 with gr.Tabs() as ssml_tabs:
                     with gr.TabItem("Editor", id="ssml.editor"):
                         ssml_input = create_ssml_interface()
+                    with gr.TabItem("Script", id="ssml.script"):
+                        script_table = create_script_tab(
+                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                        )
                     with gr.TabItem("Spilter"):
                         create_spliter_tab(
-                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                            ssml_input=ssml_input,
+                            tabs1=tabs,
+                            tabs2=ssml_tabs,
+                            script_table_out=script_table,
                         )
                     with gr.TabItem("Podcast"):
                         create_ssml_podcast_tab(
-                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                            ssml_input=ssml_input,
+                            tabs1=tabs,
+                            tabs2=ssml_tabs,
+                            script_table_out=script_table,
                         )
                     with gr.TabItem("From subtitle"):
                         create_subtitle_tab(
-                            ssml_input=ssml_input, tabs1=tabs, tabs2=ssml_tabs
+                            ssml_input=ssml_input,
+                            tabs1=tabs,
+                            tabs2=ssml_tabs,
+                            script_table_out=script_table,
                         )
 
             with gr.TabItem("Speaker"):

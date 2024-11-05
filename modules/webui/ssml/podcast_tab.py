@@ -38,7 +38,40 @@ def merge_dataframe_to_ssml(msg, spk, style, df: pd.DataFrame):
     return xml_content
 
 
-def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Tabs):
+# 转换为 script tab 下面的 data 列表格式
+def transfer_to_script_data(dataframe: pd.DataFrame):
+    script_data = []
+    # table_headers = [
+    #     "index",
+    #     "type",
+    #     "duration",
+    #     "speed",
+    #     "speaker",
+    #     "text",
+    #     "style",
+    # ]
+    for i, row in dataframe.iterrows():
+        script_data.append(
+            # {
+            #     "type": "voice",
+            #     "index": row.iloc[0],
+            #     "speaker": row.iloc[1],
+            #     "text": row.iloc[2],
+            #     "style": row.iloc[3],
+            #     "duration": "",
+            #     "speed": "",
+            # }
+            [row.iloc[0], "voice", "", "", row.iloc[1], row.iloc[2], row.iloc[3]]
+        )
+    return script_data, gr.Tabs(selected="ssml"), gr.Tabs(selected="ssml.script")
+
+
+def create_ssml_podcast_tab(
+    ssml_input: gr.Textbox,
+    tabs1: gr.Tabs,
+    tabs2: gr.Tabs,
+    script_table_out: gr.DataFrame,
+):
     def get_spk_choices():
         speakers, speaker_names = webui_utils.get_speaker_names()
         speaker_names = ["-1"] + speaker_names
@@ -109,6 +142,7 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
                 )
 
             send_to_ssml_btn = gr.Button("📩Send to SSML", variant="primary")
+            send_to_script_btn = gr.Button("📩Send to Script")
 
     def add_message(msg, spk, style, sheet: pd.DataFrame):
         if not msg:
@@ -261,6 +295,15 @@ def create_ssml_podcast_tab(ssml_input: gr.Textbox, tabs1: gr.Tabs, tabs2: gr.Ta
             spk_input_dropdown,
             style_input_dropdown,
             ssml_input,
+            tabs1,
+            tabs2,
+        ],
+    )
+    send_to_script_btn.click(
+        transfer_to_script_data,
+        inputs=[script_table],
+        outputs=[
+            script_table_out,
             tabs1,
             tabs2,
         ],

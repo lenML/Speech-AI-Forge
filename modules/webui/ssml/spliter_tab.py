@@ -1,4 +1,5 @@
 import gradio as gr
+import pandas as pd
 import torch
 
 from modules.utils.hf import spaces
@@ -6,10 +7,7 @@ from modules.webui import webui_utils
 from modules.webui.webui_utils import get_styles, split_long_text, text_normalize
 
 
-# NOTE: 因为 text_normalize 需要使用 tokenizer
-@torch.inference_mode()
-@spaces.GPU(duration=120)
-def merge_dataframe_to_ssml(dataframe, spk, style, seed):
+def merge_dataframe_to_ssml(dataframe, spk, style):
     if style == "*auto":
         style = None
     if spk == "-1" or spk == -1:
@@ -22,7 +20,9 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
 
     for i, row in dataframe.iterrows():
         text = row.iloc[1]
-        text = text_normalize(text)
+
+        # NOTE: 不用 normalize 了，因为调用的时候会走tn，不需要在这里预处理，还慢
+        # text = text_normalize(text)
 
         if text.strip() == "":
             continue
@@ -38,13 +38,49 @@ def merge_dataframe_to_ssml(dataframe, spk, style, seed):
         ssml += f"{indent}{indent}{text}\n"
         ssml += f"{indent}</voice>\n"
     # 原封不动输出回去是为了触发 loadding 效果
-    return dataframe, spk, style, seed, f"<speak version='0.1'>\n{ssml}</speak>"
+    return dataframe, spk, style, f"<speak version='0.1'>\n{ssml}</speak>"
+
+
+# 转换为 script tab 下面的 data 列表格式
+def transfer_to_script_data(dataframe: pd.DataFrame, spk, style):
+    script_data = []
+    # table_headers = [
+    #     "index",
+    #     "type",
+    #     "duration",
+    #     "speed",
+    #     "speaker",
+    #     "text",
+    #     "style",
+    # ]
+    for i, row in dataframe.iterrows():
+        script_data.append(
+            # {
+            #     "index": i,
+            #     "type": "voice",
+            #     "text": row.iloc[1],
+            #     "speaker": spk or "",
+            #     "style": style or "",
+            #     "duration": "",
+            #     "speed": "",
+            # }
+            [
+                i,
+                "voice",
+                "",
+                "",
+                spk or "",
+                row.iloc[1],
+                style or "",
+            ]
+        )
+    return script_data, gr.Tabs(selected="ssml"), gr.Tabs(selected="ssml.script")
 
 
 # 长文本处理
 # 可以输入长文本，并选择切割方法，切割之后可以将拼接的SSML发送到SSML tab
 # 根据 。 句号切割，切割之后显示到 data table
-def create_spliter_tab(ssml_input, tabs1, tabs2):
+def create_spliter_tab(ssml_input, tabs1, tabs2, script_table_out):
     speakers, speaker_names = webui_utils.get_speaker_names()
     speaker_names = ["*random"] + speaker_names
 
@@ -77,21 +113,6 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
                     interactive=True,
                     show_label=False,
                     value="*auto",
-                )
-
-            with gr.Group():
-                gr.Markdown("💃Inference Seed")
-                infer_seed_input = gr.Number(
-                    value=42,
-                    label="Inference Seed",
-                    show_label=False,
-                    minimum=-1,
-                    maximum=2**32 - 1,
-                )
-                infer_seed_rand_button = gr.Button(
-                    value="🎲",
-                    # tooltip="Random Seed",
-                    variant="secondary",
                 )
 
             with gr.Group():
@@ -135,6 +156,7 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
                 )
 
                 send_btn = gr.Button("📩Send to SSML", variant="primary")
+                send_script_btn = gr.Button("📩Send to Script")
 
     spk_input_dropdown.change(
         fn=lambda x: x.startswith("*") and "-1" or x.split(":")[-1].strip(),
@@ -145,11 +167,6 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
         lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
         inputs=[spk_input_text],
         outputs=[spk_input_text],
-    )
-    infer_seed_rand_button.click(
-        lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
-        inputs=[infer_seed_input],
-        outputs=[infer_seed_input],
     )
     long_text_split_button.click(
         split_long_text,
@@ -163,25 +180,17 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
         ],
     )
 
-    infer_seed_rand_button.click(
-        lambda x: int(torch.randint(0, 2**32 - 1, (1,)).item()),
-        inputs=[infer_seed_input],
-        outputs=[infer_seed_input],
-    )
-
     send_btn.click(
         merge_dataframe_to_ssml,
         inputs=[
             long_text_output,
             spk_input_text,
             style_input_dropdown,
-            infer_seed_input,
         ],
         outputs=[
             long_text_output,
             spk_input_text,
             style_input_dropdown,
-            infer_seed_input,
             ssml_input,
         ],
     )
@@ -190,3 +199,9 @@ def create_spliter_tab(ssml_input, tabs1, tabs2):
         return gr.Tabs(selected="ssml"), gr.Tabs(selected="ssml.editor")
 
     send_btn.click(change_tab, inputs=[], outputs=[tabs1, tabs2])
+
+    send_script_btn.click(
+        transfer_to_script_data,
+        inputs=[long_text_output, spk_input_text, style_input_dropdown],
+        outputs=[script_table_out, tabs1, tabs2],
+    )
