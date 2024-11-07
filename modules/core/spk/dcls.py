@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import time
 from typing import List, Optional, Union
 
 import torch
@@ -12,6 +13,13 @@ class DcSpkMeta:
 
     author: str = ""
     version: str = ""
+
+    # 时间戳 毫秒
+    created_date: int = int(time.time() * 1000)
+    # 说话人头像 url 或者 base64
+    avatar: str = ""
+    # tag 用于 hub 中筛选
+    tags: List[str] = field(default_factory=list)
 
 
 # embedding
@@ -81,6 +89,7 @@ class DcSpkInferConfig:
 @dataclass(repr=False, eq=False)
 class DcSpk:
     id: str
+    # 这里是 speaker file 版本
     version: str = "0.1"
 
     meta: DcSpkMeta = field(default_factory=DcSpkMeta)

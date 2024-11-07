@@ -3,6 +3,7 @@ import copy
 import dataclasses
 import json
 import uuid
+import inspect
 from tempfile import _TemporaryFileWrapper
 from typing import Any, Callable, Optional, Union
 
@@ -89,7 +90,10 @@ class DcSpkDecoder(json.JSONDecoder):
             for dlcs in dclses:
                 if obj["_type"] == dlcs.__name__:
                     data = obj["data"]
-                    return dlcs(**data)
+
+                    params = inspect.signature(dlcs.__init__).parameters
+                    filtered_data = {k: v for k, v in data.items() if k in params}
+                    return dlcs(**filtered_data)
         return obj
 
 

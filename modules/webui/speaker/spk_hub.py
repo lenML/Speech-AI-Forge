@@ -4,6 +4,7 @@ import gradio as gr
 import requests
 
 from modules.core.spk import TTSSpeaker, spk_mgr
+from datetime import datetime
 
 # 远程 JSON 文件的 URL，您可以使用环境变量设置 SPKS_INDEX
 DEFAULT_SPKS_INDEX_URL = os.getenv(
@@ -12,7 +13,7 @@ DEFAULT_SPKS_INDEX_URL = os.getenv(
 )
 
 
-def fetch_speakers_data(url):
+def fetch_speakers_data(url: str):
     """
     从指定 URL 下载音色数据。
     """
@@ -26,7 +27,7 @@ def fetch_speakers_data(url):
         return None
 
 
-def filter_speakers(files, hide_tags=None, search_query=""):
+def filter_speakers(files: list[dict], hide_tags=None, search_query=""):
     """
     根据 hide_tags 和搜索关键词过滤音色数据。
     """
@@ -51,14 +52,14 @@ def filter_speakers(files, hide_tags=None, search_query=""):
     return files
 
 
-def sort_speakers(files, sort_option="newest first"):
+def sort_speakers(files: list[dict], sort_option="newest first"):
     """
     根据排序选项排序音色数据。
     """
     if sort_option == "newest first":
-        files = sorted(files, key=lambda x: x.get("created_date", ""), reverse=True)
+        files = sorted(files, key=lambda x: x.get("created_date", 0), reverse=True)
     elif sort_option == "oldest first":
-        files = sorted(files, key=lambda x: x.get("created_date", ""))
+        files = sorted(files, key=lambda x: x.get("created_date", 0))
     elif sort_option == "a-z":
         files = sorted(files, key=lambda x: x.get("name", ""))
     elif sort_option == "z-a":
@@ -67,7 +68,7 @@ def sort_speakers(files, sort_option="newest first"):
     return files
 
 
-def render_speakers_html(files):
+def render_speakers_html(files: list[dict]):
     """
     将音色数据渲染为 HTML 表格。
 
@@ -91,6 +92,8 @@ def render_speakers_html(files):
         "Gender",
         "Author",
         "Version",
+        "Tags",
+        "Created Date",
         "URL",
         "Actions",
     ]
@@ -99,34 +102,59 @@ def render_speakers_html(files):
         html_content += f"<th>{header}</th>"
 
     for file in files:
-        id = file["id"]
-        name = file["name"]
-        desc = file["desc"]
-        gender = file["gender"]
-        author = file["author"]
-        version = file["version"]
-        filename = file["filename"]
-        url = file["url"]
+        id = file.get("id", "")
+        name = file.get("name", "")
+        desc = file.get("desc", "")
+        gender = file.get("gender", "")
+        author = file.get("author", "")
+        version = file.get("version", "")
+        filename = file.get("filename", "")
+        tags = file.get("tags", [])
+        # 时间是毫秒
+        created_date = file.get("created_date", 0)
+        avatar = file.get("avatar", "")
+        url = file.get("url", "")
 
         html_content += f"<tr>"
-        datas = [id[0:5], name, desc, gender, author, version]
+        datas = [
+            id[0:5],
+            name,
+            desc,
+            gender,
+            author,
+            version,
+            ",".join([f"#{tag}" for tag in tags]),
+            datetime.fromtimestamp(created_date / 1000).strftime("%Y-%m-%d %H:%M:%S"),
+        ]
         for data in datas:
             html_content += f"<td>{data}</td>"
 
         html_content += f'<td><a href="{url}" target="_blank">{filename}</a></td>'
+        def dl_btn_html(label: str):
+            return f"<td><button onclick='download_speaker(this, \"{html.escape(url)}\")'>{label}</button></td>"
 
-        downloaded = spk_mgr.get_speaker_by_id(id) is not None
-        if downloaded:
-            html_content += f"<td>✅downloaded</td>"
+        downloaded_spk = spk_mgr.get_speaker_by_id(id)
+        if downloaded_spk is not None:
+            if downloaded_spk.version != version:
+                ver_str = version or "new"
+                html_content += dl_btn_html(f"🚀Upgrade to [{ver_str}]")
+            else:
+                html_content += dl_btn_html("🔁ReDownload")
         else:
-            html_content += f"<td><button onclick='download_speaker(this, \"{html.escape(url)}\")'>🟡Download</button></td>"
+            html_content += f"<td><button onclick='download_speaker(this, \"{html.escape(url)}\")'>🟡Download it</button></td>"
         html_content += f"</tr>"
     html_content += "</table>"
 
     return html_content
 
 
-def load_and_process_speakers(url, hide_tags, sort_option, search_query, cached_data):
+def load_and_process_speakers(
+    url: str,
+    hide_tags: list[str],
+    sort_option: str,
+    search_query: str,
+    cached_data: dict,
+):
     """
     加载音色数据，并进行过滤、排序和渲染。优先使用缓存数据。
     """
@@ -141,6 +169,22 @@ def load_and_process_speakers(url, hide_tags, sort_option, search_query, cached_
     html_content = render_speakers_html(files)
 
     return html_content, data  # 返回 HTML 内容和下载的数据（缓存用）
+
+
+def refresh_speakers(hub_url: str):
+    """
+    无视缓存
+    刷新 speakers, 也会更新 tags 列表
+    """
+    data: dict = fetch_speakers_data(hub_url)
+    if not data:
+        return "<p style='color:red;'>无法加载数据</p>", None, None
+
+    files: list[dict] = data.get("files", [])
+    html_content = render_speakers_html(files)
+    all_tags = [tag for file in files for tag in file.get("tags", [])]
+
+    return html_content, data, gr.CheckboxGroup(choices=["female", "male", *all_tags])
 
 
 def install_speaker(
@@ -192,7 +236,7 @@ def create_spk_hub_ui():
                 type="index",
             )
 
-        load_result = gr.HTML(label="Speaker List")
+        speakers_table = gr.HTML(label="Speaker List")
         cached_data = gr.State()  # 用于保存下载下来的数据
 
         # 这两个组件用来和js脚本配合 传递html中的参数
@@ -203,26 +247,26 @@ def create_spk_hub_ui():
 
         # 按钮点击事件：加载数据并渲染，使用缓存
         refresh_button.click(
-            fn=load_and_process_speakers,
-            inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[load_result, cached_data],
+            fn=refresh_speakers,
+            inputs=[spk_index_url],
+            outputs=[speakers_table, cached_data, hide_tags],
         )
 
         # 筛选和排序的变化自动刷新结果
         hide_tags.change(
             fn=load_and_process_speakers,
             inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[load_result, cached_data],
+            outputs=[speakers_table, cached_data],
         )
         sort_option.change(
             fn=load_and_process_speakers,
             inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[load_result, cached_data],
+            outputs=[speakers_table, cached_data],
         )
         search_query.change(
             fn=load_and_process_speakers,
             inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[load_result, cached_data],
+            outputs=[speakers_table, cached_data],
         )
 
         # 下载逻辑
@@ -236,5 +280,5 @@ def create_spk_hub_ui():
                 search_query,
                 cached_data,
             ],
-            outputs=[load_result, cached_data],
+            outputs=[speakers_table, cached_data],
         )
