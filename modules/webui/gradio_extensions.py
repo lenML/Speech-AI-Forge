@@ -34,8 +34,10 @@ def javascript_html():
     # head += src("https://jsd.onmicrosoft.cn/npm/marked@12.0.2")
     head += sf("js/marked.js")
     head += s(localization_js(config.runtime_env_vars.language))
-    head += sf("js/index.js")
-    head += sf("js/localization.js")
+    head += sf("js/index.js")  # 基础代码，也不知道哪些用得上总之都拿过来了
+    head += sf("js/localization.js")  # 翻译 i18n 相关
+    head += sf("js/hub.js")  # 音色相关代码，主要是结合 hub tab 使用
+    head += sf("js/gradio.js")  # 和 gradio 相关的一些函数
 
     if config.runtime_env_vars.theme:
         head += s(f"set_theme('{config.runtime_env_vars.theme}');")
