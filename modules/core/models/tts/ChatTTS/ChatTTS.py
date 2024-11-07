@@ -35,6 +35,7 @@ def do_load_chat_tts():
     )
 
     if not has_loaded:
+        chat_tts = None
         raise Exception("Failed to load ChatTTS models, please check the log")
 
     all_modules: list[torch.nn.Module] = [
