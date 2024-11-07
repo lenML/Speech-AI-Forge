@@ -33,7 +33,7 @@ if __name__ == "__main__":
     import numpy as np
 
     from modules import config
-    from modules.core.models.zoo.ChatTTS import load_chat_tts
+    from modules.core.models.tts.ChatTTS.ChatTTS import load_chat_tts
     from modules.core.spk.TTSSpeaker import TTSSpeaker
     from modules.devices import devices
 

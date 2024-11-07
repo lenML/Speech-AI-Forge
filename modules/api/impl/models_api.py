@@ -19,4 +19,5 @@ def setup(app: APIManager):
 
     @app.get("/v1/models/list", response_model=api_utils.BaseResponse)
     async def unload_models():
-        raise HTTPException(status_code=501, detail="Not implemented")
+        model_ids = zoo.model_zoo.get_model_ids()
+        return api_utils.success_response(model_ids)

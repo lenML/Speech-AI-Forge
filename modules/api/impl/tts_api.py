@@ -17,14 +17,13 @@ from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.handler.TTSHandler import TTSHandler
+from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 from modules.api.constants import support_bitrates
 
 logger = logging.getLogger(__name__)
-
-model_ids = ["chat-tts", "fish-speech", "cosy-voice"]
 
 
 class TTSParams(BaseModel):
@@ -79,7 +78,7 @@ class TTSParams(BaseModel):
     model: str = Query(
         "chat-tts",
         description="Model ID",
-        examples=model_ids,
+        examples=["chat-tts", "cosy-voice", "f5-tts"],
     )
 
 
@@ -124,6 +123,7 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
                 detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
             )
 
+        model_ids = model_zoo.get_tts_model_ids()
         if params.model not in model_ids:
             raise HTTPException(
                 status_code=422,

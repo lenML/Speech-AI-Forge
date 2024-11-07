@@ -2,12 +2,14 @@ from typing import Generator
 
 import torch
 
-from modules.core.models import zoo
-from modules.core.models.zoo.ChatTTSInfer import ChatTTSInfer
+from modules.core.models.tts.ChatTTS import ChatTTS
+from modules.core.models.tts.ChatTTS.ChatTTSInfer import ChatTTSInfer
 from modules.core.tools.SentenceSplitter import SentenceSplitter
 from modules.utils.SeedContext import SeedContext
 
-
+"""
+TODO: 应该重构一下，增加 refine model 而不是从这里调用
+"""
 @torch.inference_mode()
 def refine_text(
     text: str,
@@ -20,7 +22,7 @@ def refine_text(
     max_new_token=384,
     spliter_threshold=300,
 ) -> str:
-    chat_tts = zoo.ChatTTS.load_chat_tts()
+    chat_tts = ChatTTS.load_chat_tts()
 
     spliter = SentenceSplitter(spliter_threshold)
     sentences = spliter.parse(text)

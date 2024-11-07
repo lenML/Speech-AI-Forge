@@ -8,6 +8,7 @@ except:
 from typing import Dict, Union
 
 from modules.core.models.BaseZooModel import BaseZooModel
+from modules.core.models.TTSModel import TTSModel
 from modules.core.models.enhancer.ResembleEnhanceModel import ResembleEnhanceModel
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
@@ -51,6 +52,19 @@ class ModelZoo:
 
     def get_model(self, model_id: str) -> Union[BaseZooModel, None]:
         return self.models[model_id]
+
+    def get_tts_model_ids(self) -> list[str]:
+        ids = []
+        for id, model in self.models.items():
+            if isinstance(model, TTSModel):
+                ids.append(id)
+        return ids
+
+    def get_model_ids(self) -> list[str]:
+        ids = []
+        for id, model in self.models.items():
+            ids.append(id)
+        return ids
 
     @devices.after_gc()
     def unload_all_models(self, exclude=None):

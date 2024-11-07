@@ -25,7 +25,7 @@ def do_load_chat_tts():
     device = devices.get_device_for("chattts")
     dtype = devices.dtype
 
-    chat_tts.load(
+    has_loaded = chat_tts.load(
         compile=config.runtime_env_vars.compile,
         use_flash_attn=config.runtime_env_vars.flash_attn,
         use_vllm=config.runtime_env_vars.vllm,
@@ -33,6 +33,9 @@ def do_load_chat_tts():
         custom_path="./models/ChatTTS",
         device=device,
     )
+
+    if not has_loaded:
+        raise Exception("Failed to load ChatTTS models, please check the log")
 
     all_modules: list[torch.nn.Module] = [
         chat_tts.gpt,
