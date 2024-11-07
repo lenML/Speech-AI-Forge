@@ -38,9 +38,20 @@ class NotSeedTTSInterface(TTSInterface):
             outputs=[spk_input_text],
         )
 
-        spk_rand_button = gr.Button(value="🎲", variant="secondary", visible=False)
+        reload_button = gr.Button(value="🔄", variant="secondary")
 
-        return spk_input_text, spk_input_dropdown, spk_rand_button
+        def reload_spks():
+            self.reload_speakers()
+            names = self.get_speaker_names()
+            return gr.Dropdown(choices=names)
+
+        reload_button.click(
+            fn=reload_spks,
+            inputs=[],
+            outputs=[spk_input_dropdown],
+        )
+
+        return spk_input_text, spk_input_dropdown
 
 
 class CosyVoiceInterface(NotSeedTTSInterface):

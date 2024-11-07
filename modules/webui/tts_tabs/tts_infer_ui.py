@@ -15,15 +15,8 @@ from modules.webui.webui_utils import (
 
 class TTSInterface:
     def __init__(self, model_id="chat-tts"):
-        def spk_filter(spk: TTSSpeaker):
-            if spk.has_refs:
-                return True
-            if spk.get_token(model_id=model_id) is not None:
-                return True
-            return False
-
-        self.speakers = get_speakers(spk_filter)
-        self.speaker_names = self.get_speaker_names()
+        self.speakers: list[TTSSpeaker] = []
+        self.speaker_names: list[str] = []
         self.styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
         self.default_selected_speaker = (
@@ -51,6 +44,19 @@ class TTSInterface:
 
         self.show_style_dropdown = True
         self.show_sampling = True
+
+        self.reload_speakers()
+
+    def reload_speakers(self):
+        def spk_filter(spk: TTSSpeaker):
+            if spk.has_refs:
+                return True
+            if spk.get_token(model_id=self.model_id) is not None:
+                return True
+            return False
+
+        self.speakers = get_speakers(spk_filter)
+        self.speaker_names = self.get_speaker_names()
 
     def get_speaker_names(self):
         names = ["*random"] + [
@@ -99,6 +105,7 @@ class TTSInterface:
             show_label=False,
         )
         spk_rand_button = gr.Button(value="🎲", variant="secondary")
+        reload_button = gr.Button(value="🔄", variant="secondary")
 
         spk_input_dropdown.change(
             fn=self.get_speaker_name_from_show_name,
@@ -110,16 +117,24 @@ class TTSInterface:
             inputs=[spk_input_text],
             outputs=[spk_input_text],
         )
-        return spk_input_text, spk_input_dropdown, spk_rand_button
+        def reload_spks():
+            self.reload_speakers()
+            names = self.get_speaker_names()
+            return gr.Dropdown(choices=names)
+
+        reload_button.click(
+            fn=reload_spks,
+            inputs=[],
+            outputs=[spk_input_dropdown],
+        )
+        return spk_input_text, spk_input_dropdown
 
     def create_speaker_interface(self):
         with gr.Group():
             gr.Markdown("🗣️Speaker")
             with gr.Tabs():
                 with gr.Tab(label="Pick"):
-                    spk_input_text, spk_input_dropdown, spk_rand_button = (
-                        self.create_speaker_picker()
-                    )
+                    spk_input_text, spk_input_dropdown = self.create_speaker_picker()
 
                 with gr.Tab(label="Upload"):
                     spk_file_upload = gr.File(

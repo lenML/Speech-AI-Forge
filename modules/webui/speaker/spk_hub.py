@@ -80,6 +80,11 @@ def render_speakers_html(files: list[dict]):
       "gender": "female",
       "author": "",
       "version": "",
+      "created_date": 1730976254888,
+      "avatar": "",
+      "tags": [
+        "原神"
+      ],
       "filename": "yuanshen/mona.spkv1.json",
       "url": "https://github.com/lenML/Speech-AI-Forge-spks/raw/refs/heads/main/spks/yuanshen/mona.spkv1.json"
     }
@@ -148,30 +153,33 @@ def render_speakers_html(files: list[dict]):
     return html_content
 
 
-def load_and_process_speakers(
-    url: str,
+def rerender_table(
     hide_tags: list[str],
     sort_option: str,
     search_query: str,
     cached_data: dict,
 ):
     """
-    加载音色数据，并进行过滤、排序和渲染。优先使用缓存数据。
+    加载音色数据，并进行过滤、排序和渲染
     """
-    # 如果有缓存数据，则直接使用缓存
-    data = cached_data if cached_data else fetch_speakers_data(url)
+    data: dict = cached_data
     if not data:
-        return "<p style='color:red;'>无法加载数据</p>", None
+        return "<p style='color:red;'>无数据</p>"
 
     files = data.get("files", [])
     files = filter_speakers(files, hide_tags, search_query)
     files = sort_speakers(files, sort_option)
     html_content = render_speakers_html(files)
 
-    return html_content, data  # 返回 HTML 内容和下载的数据（缓存用）
+    return html_content
 
 
-def refresh_speakers(hub_url: str):
+def refresh_speakers(
+    hub_url: str,
+    hide_tags: list[str],
+    sort_option: str,
+    search_query: str,
+):
     """
     无视缓存
     刷新 speakers, 也会更新 tags 列表
@@ -181,15 +189,15 @@ def refresh_speakers(hub_url: str):
         return "<p style='color:red;'>无法加载数据</p>", None, None
 
     files: list[dict] = data.get("files", [])
+    files = filter_speakers(files, hide_tags, search_query)
+    files = sort_speakers(files, sort_option)
     html_content = render_speakers_html(files)
     all_tags = [tag for file in files for tag in file.get("tags", [])]
 
     return html_content, data, gr.CheckboxGroup(choices=["female", "male", *all_tags])
 
 
-def install_speaker(
-    spk_url, hub_url, hide_tags, sort_option, search_query, cached_data
-):
+def install_speaker(spk_url, hide_tags, sort_option, search_query, cached_data):
     """
     下载 speaker 文件到 ./data/speakers 目录下面
     """
@@ -201,9 +209,7 @@ def install_speaker(
         f.write(response.content)
     spk_mgr.refresh()
 
-    return load_and_process_speakers(
-        hub_url, hide_tags, sort_option, search_query, cached_data
-    )
+    return rerender_table(hide_tags, sort_option, search_query, cached_data)
 
 
 def create_spk_hub_ui():
@@ -233,7 +239,7 @@ def create_spk_hub_ui():
                 value="newest first",
                 label="Order",
                 choices=["newest first", "oldest first", "a-z", "z-a"],
-                type="index",
+                type="value",
             )
 
         speakers_table = gr.HTML(label="Speaker List")
@@ -248,25 +254,25 @@ def create_spk_hub_ui():
         # 按钮点击事件：加载数据并渲染，使用缓存
         refresh_button.click(
             fn=refresh_speakers,
-            inputs=[spk_index_url],
+            inputs=[spk_index_url, hide_tags, sort_option, search_query],
             outputs=[speakers_table, cached_data, hide_tags],
         )
 
         # 筛选和排序的变化自动刷新结果
         hide_tags.change(
-            fn=load_and_process_speakers,
-            inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[speakers_table, cached_data],
+            fn=rerender_table,
+            inputs=[hide_tags, sort_option, search_query, cached_data],
+            outputs=[speakers_table],
         )
         sort_option.change(
-            fn=load_and_process_speakers,
-            inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[speakers_table, cached_data],
+            fn=rerender_table,
+            inputs=[hide_tags, sort_option, search_query, cached_data],
+            outputs=[speakers_table],
         )
         search_query.change(
-            fn=load_and_process_speakers,
-            inputs=[spk_index_url, hide_tags, sort_option, search_query, cached_data],
-            outputs=[speakers_table, cached_data],
+            fn=rerender_table,
+            inputs=[hide_tags, sort_option, search_query, cached_data],
+            outputs=[speakers_table],
         )
 
         # 下载逻辑
@@ -274,11 +280,10 @@ def create_spk_hub_ui():
             fn=install_speaker,
             inputs=[
                 speaker_to_install,
-                spk_index_url,
                 hide_tags,
                 sort_option,
                 search_query,
                 cached_data,
             ],
-            outputs=[speakers_table, cached_data],
+            outputs=[speakers_table],
         )
