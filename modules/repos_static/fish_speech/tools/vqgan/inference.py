@@ -10,6 +10,7 @@ from hydra import compose, initialize
 from hydra.utils import instantiate
 from loguru import logger
 from omegaconf import OmegaConf
+
 from tools.file import AUDIO_EXTENSIONS
 
 # register eval resolver
@@ -23,8 +24,7 @@ def load_model(config_name, checkpoint_path, device="cuda"):
 
     model = instantiate(cfg)
     state_dict = torch.load(
-        checkpoint_path,
-        map_location=device,
+        checkpoint_path, map_location=device, mmap=True, weights_only=True
     )
     if "state_dict" in state_dict:
         state_dict = state_dict["state_dict"]
@@ -36,7 +36,7 @@ def load_model(config_name, checkpoint_path, device="cuda"):
             if "generator." in k
         }
 
-    result = model.load_state_dict(state_dict, strict=False)
+    result = model.load_state_dict(state_dict, strict=False, assign=True)
     model.eval()
     model.to(device)
 
@@ -58,7 +58,7 @@ def load_model(config_name, checkpoint_path, device="cuda"):
 @click.option("--config-name", default="firefly_gan_vq")
 @click.option(
     "--checkpoint-path",
-    default="checkpoints/fish-speech-1.2-sft/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+    default="checkpoints/fish-speech-1.4/firefly-gan-vq-fsq-8x1024-21hz-generator.pth",
 )
 @click.option(
     "--device",
@@ -102,7 +102,9 @@ def main(input_path, output_path, config_name, checkpoint_path, device):
 
     # Restore
     feature_lengths = torch.tensor([indices.shape[1]], device=device)
-    fake_audios = model.decode(indices=indices[None], feature_lengths=feature_lengths)
+    fake_audios, _ = model.decode(
+        indices=indices[None], feature_lengths=feature_lengths
+    )
     audio_time = fake_audios.shape[-1] / model.spec_transform.sample_rate
 
     logger.info(

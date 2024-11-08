@@ -12,6 +12,7 @@ import click
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from fish_speech.models.text2semantic.llama import find_multiple
 from tools.llama.generate import load_model
 
@@ -427,7 +428,7 @@ def generate_folder_name():
 @click.option(
     "--checkpoint-path",
     type=click.Path(path_type=Path, exists=True),
-    default="checkpoints/fish-speech-1.2-sft",
+    default="checkpoints/fish-speech-1.4",
 )
 @click.option(
     "--mode", type=str, default="int8", help="type of quantization to perform"
@@ -450,7 +451,7 @@ def quantize(checkpoint_path: Path, mode: str, groupsize: int, timestamp: str) -
         precision=precision,
         compile=False,
     )
-    vq_model = "firefly-gan-vq-fsq-4x1024-42hz-generator.pth"
+    vq_model = "firefly-gan-vq-fsq-8x1024-21hz-generator.pth"
     now = timestamp if timestamp != "None" else generate_folder_name()
 
     if mode == "int8":

@@ -21,9 +21,9 @@ pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
 from fish_speech.i18n import i18n
 from fish_speech.text.chn_text_norm.text import Text as ChnNormedText
-from fish_speech.utils import autocast_exclude_mps
+from fish_speech.utils import autocast_exclude_mps, set_seed
 from tools.api import decode_vq_tokens, encode_reference
-from tools.auto_rerank import batch_asr, calculate_wer, is_chinese, load_model
+from tools.file import AUDIO_EXTENSIONS, list_files
 from tools.llama.generate import (
     GenerateRequest,
     GenerateResponse,
@@ -40,9 +40,9 @@ HEADER_MD = f"""# Fish Speech
 
 {i18n("A text-to-speech model based on VQ-GAN and Llama developed by [Fish Audio](https://fish.audio).")}  
 
-{i18n("You can find the source code [here](https://github.com/fishaudio/fish-speech) and models [here](https://huggingface.co/fishaudio/fish-speech-1).")}  
+{i18n("You can find the source code [here](https://github.com/fishaudio/fish-speech) and models [here](https://huggingface.co/fishaudio/fish-speech-1.4).")}  
 
-{i18n("Related code are released under BSD-3-Clause License, and weights are released under CC BY-NC-SA 4.0 License.")}  
+{i18n("Related code and weights are released under CC BY-NC-SA 4.0 License.")}  
 
 {i18n("We are not responsible for any misuse of the model, please consider your local laws and regulations before using it.")}  
 """
@@ -71,6 +71,7 @@ def inference(
     top_p,
     repetition_penalty,
     temperature,
+    seed="0",
     streaming=False,
 ):
     if args.max_gradio_length > 0 and len(text) > args.max_gradio_length:
@@ -81,6 +82,11 @@ def inference(
                 args.max_gradio_length
             ),
         )
+
+    seed = int(seed)
+    if seed != 0:
+        set_seed(seed)
+        logger.warning(f"set seed: {seed}")
 
     # Parse reference audio aka prompt
     prompt_tokens = encode_reference(
@@ -140,7 +146,9 @@ def inference(
         segments.append(fake_audios)
 
         if streaming:
-            yield (fake_audios * 32768).astype(np.int16).tobytes(), None, None
+            wav_header = wav_chunk_header()
+            audio_data = (fake_audios * 32768).astype(np.int16).tobytes()
+            yield wav_header + audio_data, None, None
 
     if len(segments) == 0:
         return (
@@ -158,66 +166,6 @@ def inference(
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
         gc.collect()
-
-
-def inference_with_auto_rerank(
-    text,
-    enable_reference_audio,
-    reference_audio,
-    reference_text,
-    max_new_tokens,
-    chunk_length,
-    top_p,
-    repetition_penalty,
-    temperature,
-    use_auto_rerank,
-    streaming=False,
-):
-
-    max_attempts = 2 if use_auto_rerank else 1
-    best_wer = float("inf")
-    best_audio = None
-    best_sample_rate = None
-
-    for attempt in range(max_attempts):
-        audio_generator = inference(
-            text,
-            enable_reference_audio,
-            reference_audio,
-            reference_text,
-            max_new_tokens,
-            chunk_length,
-            top_p,
-            repetition_penalty,
-            temperature,
-            streaming=False,
-        )
-
-        # 获取音频数据
-        for _ in audio_generator:
-            pass
-        _, (sample_rate, audio), message = _
-
-        if audio is None:
-            return None, None, message
-
-        if not use_auto_rerank:
-            return None, (sample_rate, audio), None
-
-        asr_result = batch_asr(asr_model, [audio], sample_rate)[0]
-        wer = calculate_wer(text, asr_result["text"])
-        if wer <= 0.3 and not asr_result["huge_gap"]:
-            return None, (sample_rate, audio), None
-
-        if wer < best_wer:
-            best_wer = wer
-            best_audio = audio
-            best_sample_rate = sample_rate
-
-        if attempt == max_attempts - 1:
-            break
-
-    return None, (best_sample_rate, best_audio), None
 
 
 inference_stream = partial(inference, streaming=True)
@@ -238,14 +186,14 @@ def inference_wrapper(
     top_p,
     repetition_penalty,
     temperature,
+    seed,
     batch_infer_num,
-    if_load_asr_model,
 ):
     audios = []
     errors = []
 
     for _ in range(batch_infer_num):
-        result = inference_with_auto_rerank(
+        result = inference(
             text,
             enable_reference_audio,
             reference_audio,
@@ -255,10 +203,10 @@ def inference_wrapper(
             top_p,
             repetition_penalty,
             temperature,
-            if_load_asr_model,
+            seed,
         )
 
-        _, audio_data, error_message = result
+        _, audio_data, error_message = next(result)
 
         audios.append(
             gr.Audio(value=audio_data if audio_data else None, visible=True),
@@ -298,43 +246,11 @@ def normalize_text(user_input, use_normalization):
         return user_input
 
 
-asr_model = None
-
-
-def change_if_load_asr_model(if_load):
-    global asr_model
-
-    if if_load:
-        gr.Warning("Loading faster whisper model...")
-        if asr_model is None:
-            asr_model = load_model()
-        return gr.Checkbox(label="Unload faster whisper model", value=if_load)
-
-    if if_load is False:
-        gr.Warning("Unloading faster whisper model...")
-        del asr_model
-        asr_model = None
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            gc.collect()
-        return gr.Checkbox(label="Load faster whisper model", value=if_load)
-
-
-def change_if_auto_label(if_load, if_auto_label, enable_ref, ref_audio, ref_text):
-    if if_load and asr_model is not None:
-        if (
-            if_auto_label
-            and enable_ref
-            and ref_audio is not None
-            and ref_text.strip() == ""
-        ):
-            data, sample_rate = librosa.load(ref_audio)
-            res = batch_asr(asr_model, [data], sample_rate)[0]
-            ref_text = res["text"]
-    else:
-        gr.Warning("Whisper model not loaded!")
-
-    return gr.Textbox(value=ref_text)
+def update_examples():
+    examples_dir = Path("references")
+    examples_dir.mkdir(parents=True, exist_ok=True)
+    example_audios = list_files(examples_dir, AUDIO_EXTENSIONS, recursive=True)
+    return gr.Dropdown(choices=example_audios + [""])
 
 
 def build_app():
@@ -367,93 +283,105 @@ def build_app():
                 with gr.Row():
                     if_refine_text = gr.Checkbox(
                         label=i18n("Text Normalization"),
-                        value=True,
+                        value=False,
                         scale=1,
                     )
 
-                    if_load_asr_model = gr.Checkbox(
-                        label=i18n("Load / Unload ASR model for auto-reranking"),
-                        value=False,
-                        scale=3,
-                    )
-
                 with gr.Row():
-                    with gr.Tab(label=i18n("Advanced Config")):
-                        chunk_length = gr.Slider(
-                            label=i18n("Iterative Prompt Length, 0 means off"),
-                            minimum=0,
-                            maximum=500,
-                            value=100,
-                            step=8,
-                        )
+                    with gr.Column():
+                        with gr.Tab(label=i18n("Advanced Config")):
+                            with gr.Row():
+                                chunk_length = gr.Slider(
+                                    label=i18n("Iterative Prompt Length, 0 means off"),
+                                    minimum=50,
+                                    maximum=300,
+                                    value=200,
+                                    step=8,
+                                )
 
-                        max_new_tokens = gr.Slider(
-                            label=i18n("Maximum tokens per batch, 0 means no limit"),
-                            minimum=0,
-                            maximum=2048,
-                            value=1024,  # 0 means no limit
-                            step=8,
-                        )
+                                max_new_tokens = gr.Slider(
+                                    label=i18n(
+                                        "Maximum tokens per batch, 0 means no limit"
+                                    ),
+                                    minimum=0,
+                                    maximum=2048,
+                                    value=0,  # 0 means no limit
+                                    step=8,
+                                )
 
-                        top_p = gr.Slider(
-                            label="Top-P",
-                            minimum=0.6,
-                            maximum=0.9,
-                            value=0.7,
-                            step=0.01,
-                        )
+                            with gr.Row():
+                                top_p = gr.Slider(
+                                    label="Top-P",
+                                    minimum=0.6,
+                                    maximum=0.9,
+                                    value=0.7,
+                                    step=0.01,
+                                )
 
-                        repetition_penalty = gr.Slider(
-                            label=i18n("Repetition Penalty"),
-                            minimum=1,
-                            maximum=1.5,
-                            value=1.2,
-                            step=0.01,
-                        )
+                                repetition_penalty = gr.Slider(
+                                    label=i18n("Repetition Penalty"),
+                                    minimum=1,
+                                    maximum=1.5,
+                                    value=1.2,
+                                    step=0.01,
+                                )
 
-                        temperature = gr.Slider(
-                            label="Temperature",
-                            minimum=0.6,
-                            maximum=0.9,
-                            value=0.7,
-                            step=0.01,
-                        )
+                            with gr.Row():
+                                temperature = gr.Slider(
+                                    label="Temperature",
+                                    minimum=0.6,
+                                    maximum=0.9,
+                                    value=0.7,
+                                    step=0.01,
+                                )
+                                seed = gr.Textbox(
+                                    label="Seed",
+                                    info="0 means randomized inference, otherwise deterministic",
+                                    placeholder="any 32-bit-integer",
+                                    value="0",
+                                )
 
-                    with gr.Tab(label=i18n("Reference Audio")):
-                        gr.Markdown(
-                            i18n(
-                                "5 to 10 seconds of reference audio, useful for specifying speaker."
-                            )
-                        )
+                        with gr.Tab(label=i18n("Reference Audio")):
+                            with gr.Row():
+                                gr.Markdown(
+                                    i18n(
+                                        "5 to 10 seconds of reference audio, useful for specifying speaker."
+                                    )
+                                )
+                            with gr.Row():
+                                enable_reference_audio = gr.Checkbox(
+                                    label=i18n("Enable Reference Audio"),
+                                )
 
-                        enable_reference_audio = gr.Checkbox(
-                            label=i18n("Enable Reference Audio"),
-                        )
-                        reference_audio = gr.Audio(
-                            label=i18n("Reference Audio"),
-                            type="filepath",
-                        )
-                        with gr.Row():
-                            if_auto_label = gr.Checkbox(
-                                label=i18n("Auto Labeling"),
-                                min_width=100,
-                                scale=0,
-                                value=False,
-                            )
-                            reference_text = gr.Textbox(
-                                label=i18n("Reference Text"),
-                                lines=1,
-                                placeholder="在一无所知中，梦里的一天结束了，一个新的「轮回」便会开始。",
-                                value="",
-                            )
-                    with gr.Tab(label=i18n("Batch Inference")):
-                        batch_infer_num = gr.Slider(
-                            label="Batch infer nums",
-                            minimum=1,
-                            maximum=n_audios,
-                            step=1,
-                            value=1,
-                        )
+                            with gr.Row():
+                                example_audio_dropdown = gr.Dropdown(
+                                    label=i18n("Select Example Audio"),
+                                    choices=[""],
+                                    value="",
+                                    interactive=True,
+                                    allow_custom_value=True,
+                                )
+                            with gr.Row():
+                                reference_audio = gr.Audio(
+                                    label=i18n("Reference Audio"),
+                                    type="filepath",
+                                )
+                            with gr.Row():
+                                reference_text = gr.Textbox(
+                                    label=i18n("Reference Text"),
+                                    lines=1,
+                                    placeholder="在一无所知中，梦里的一天结束了，一个新的「轮回」便会开始。",
+                                    value="",
+                                )
+                        with gr.Tab(label=i18n("Batch Inference")):
+                            with gr.Row():
+                                batch_infer_num = gr.Slider(
+                                    label="Batch infer nums",
+                                    minimum=1,
+                                    maximum=n_audios,
+                                    step=1,
+                                    value=1,
+                                )
 
             with gr.Column(scale=3):
                 for _ in range(n_audios):
@@ -494,26 +422,26 @@ def build_app():
             fn=normalize_text, inputs=[text, if_refine_text], outputs=[refined_text]
         )
 
-        if_load_asr_model.change(
-            fn=change_if_load_asr_model,
-            inputs=[if_load_asr_model],
-            outputs=[if_load_asr_model],
-        )
+        def select_example_audio(audio_path):
+            audio_path = Path(audio_path)
+            if audio_path.is_file():
+                lab_file = Path(audio_path.with_suffix(".lab"))
 
-        if_auto_label.change(
-            fn=lambda: gr.Textbox(value=""),
-            inputs=[],
-            outputs=[reference_text],
+                if lab_file.exists():
+                    lab_content = lab_file.read_text(encoding="utf-8").strip()
+                else:
+                    lab_content = ""
+
+                return str(audio_path), lab_content, True
+            return None, "", False
+
+        # Connect the dropdown to update reference audio and text
+        example_audio_dropdown.change(
+            fn=update_examples, inputs=[], outputs=[example_audio_dropdown]
         ).then(
-            fn=change_if_auto_label,
-            inputs=[
-                if_load_asr_model,
-                if_auto_label,
-                enable_reference_audio,
-                reference_audio,
-                reference_text,
-            ],
-            outputs=[reference_text],
+            fn=select_example_audio,
+            inputs=[example_audio_dropdown],
+            outputs=[reference_audio, reference_text, enable_reference_audio],
         )
 
         # # Submit
@@ -529,8 +457,8 @@ def build_app():
                 top_p,
                 repetition_penalty,
                 temperature,
+                seed,
                 batch_infer_num,
-                if_load_asr_model,
             ],
             [stream_audio, *global_audio_list, *global_error_list],
             concurrency_limit=1,
@@ -548,9 +476,10 @@ def build_app():
                 top_p,
                 repetition_penalty,
                 temperature,
+                seed,
             ],
             [stream_audio, global_audio_list[0], global_error_list[0]],
-            concurrency_limit=10,
+            concurrency_limit=1,
         )
     return app
 
@@ -560,12 +489,12 @@ def parse_args():
     parser.add_argument(
         "--llama-checkpoint-path",
         type=Path,
-        default="checkpoints/fish-speech-1.2-sft",
+        default="checkpoints/fish-speech-1.4",
     )
     parser.add_argument(
         "--decoder-checkpoint-path",
         type=Path,
-        default="checkpoints/fish-speech-1.2-sft/firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+        default="checkpoints/fish-speech-1.4/firefly-gan-vq-fsq-8x1024-21hz-generator.pth",
     )
     parser.add_argument("--decoder-config-name", type=str, default="firefly_gan_vq")
     parser.add_argument("--device", type=str, default="cuda")
@@ -606,7 +535,7 @@ if __name__ == "__main__":
             reference_audio=None,
             reference_text="",
             max_new_tokens=0,
-            chunk_length=100,
+            chunk_length=200,
             top_p=0.7,
             repetition_penalty=1.2,
             temperature=0.7,

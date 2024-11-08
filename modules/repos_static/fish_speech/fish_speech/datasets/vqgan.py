@@ -5,9 +5,10 @@ from typing import Optional
 import librosa
 import numpy as np
 import torch
-from fish_speech.utils import RankedLogger
 from lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset
+
+from fish_speech.utils import RankedLogger
 
 logger = RankedLogger(__name__, rank_zero_only=False)
 

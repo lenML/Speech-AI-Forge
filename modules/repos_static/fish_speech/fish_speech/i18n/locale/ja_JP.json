@@ -72,7 +72,7 @@
   "Put your text here.": "ここにテキストを入力してください。",
   "Reference Audio": "リファレンスオーディオ",
   "Reference Text": "リファレンステキスト",
-  "Related code are released under BSD-3-Clause License, and weights are released under CC BY-NC-SA 4.0 License.": "関連コードはBSD-3-Clauseライセンスの下でリリースされ、重みはCC BY-NC-SA 4.0ライセンスの下でリリースされます。",
+  "Related code and weights are released under CC BY-NC-SA 4.0 License.": "関連コードと重みはCC BY-NC-SA 4.0ライセンスの下でリリースされます。",
   "Remove Selected Data": "選択したデータを削除",
   "Removed path successfully!": "パスの削除に成功しました！",
   "Repetition Penalty": "反復ペナルティ",
@@ -118,6 +118,6 @@
   "new": "新規",
   "Realtime Transform Text": "リアルタイム変換テキスト",
   "Normalization Result Preview (Currently Only Chinese)": "正規化結果プレビュー（現在は中国語のみ）",
-  "Text Normalization": "テキスト正規化"
-
+  "Text Normalization": "テキスト正規化",
+  "Select Example Audio": "サンプル音声を選択"
 }

@@ -15,9 +15,10 @@ import torch
 from loguru import logger
 from pydub import AudioSegment
 from silero_vad import get_speech_timestamps, load_silero_vad, read_audio
+from tqdm import tqdm
+
 from tools.file import AUDIO_EXTENSIONS, VIDEO_EXTENSIONS, list_files
 from tools.sensevoice.auto_model import AutoModel
-from tqdm import tqdm
 
 
 def uvr5_cli(
@@ -25,7 +26,7 @@ def uvr5_cli(
     output_folder: Path,
     audio_files: list[Path] | None = None,
     output_format: str = "flac",
-    model: str = "BS-Roformer-Viperx-1296.ckpt",
+    model: str = "BS-Roformer-Viperx-1297.ckpt",
 ):
     # ["BS-Roformer-Viperx-1297.ckpt", "BS-Roformer-Viperx-1296.ckpt", "BS-Roformer-Viperx-1053.ckpt", "Mel-Roformer-Viperx-1143.ckpt"]
     sepr = Separator(
