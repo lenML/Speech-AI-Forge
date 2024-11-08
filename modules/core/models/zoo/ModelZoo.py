@@ -61,6 +61,13 @@ class ModelZoo:
                 ids.append(id)
         return ids
 
+    def get_available_tts_model(self) -> list[TTSModel]:
+        models = []
+        for id, model in self.models.items():
+            if isinstance(model, TTSModel) and model.is_downloaded():
+                models.append(model)
+        return models
+
     def get_model_ids(self) -> list[str]:
         ids = []
         for id, model in self.models.items():

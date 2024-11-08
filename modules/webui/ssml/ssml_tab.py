@@ -1,5 +1,6 @@
 import gradio as gr
 
+from modules.core.models.zoo import ModelZoo
 from modules.webui import webui_config
 from modules.webui.webui_utils import synthesize_ssml
 
@@ -17,11 +18,19 @@ def create_ssml_interface():
                     maximum=webui_config.max_batch_size,
                     step=1,
                 )
+                models = ModelZoo.model_zoo.get_available_tts_model()
+                # 选择模型
+                selected_model = gr.Dropdown(
+                    label="Model",
+                    choices=[model.model_id for model in models],
+                    value=models[0].model_id if len(models) > 0 else None,
+                )
+
             with gr.Group():
                 gr.Markdown("🎛️Spliter")
                 eos_input = gr.Textbox(
                     label="eos",
-                    value="[uv_break]",
+                    value="。",
                 )
                 spliter_thr_input = gr.Slider(
                     label="Spliter Threshold",
@@ -114,6 +123,7 @@ def create_ssml_interface():
             volume_up_input,
             enable_loudness_normalization,
             headroom_input,
+            selected_model,
         ],
         outputs=ssml_output,
     )

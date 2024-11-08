@@ -116,6 +116,7 @@ def synthesize_ssml(
     volume_gain_db: float = 0,
     normalize: bool = True,
     headroom: float = 1,
+    model_id: str = "chat-tts",
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     try:
@@ -160,7 +161,7 @@ def synthesize_ssml(
         format=AudioFormat.mp3,
         bitrate="64k",
     )
-    tts_config = TTSConfig(mid="chat-tts")
+    tts_config = TTSConfig(mid=model_id)
 
     handler = SSMLHandler(
         ssml_content=ssml,
