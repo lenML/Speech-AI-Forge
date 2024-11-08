@@ -29,35 +29,42 @@ python webui.py
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
-- TTS: tts 模型的功能
-  - Speaker Switch: 可以切换音色
-    - 内置音色： 内置多个音色可使用， `27 ChatTTS` / `7 CosyVoice` 音色 + `1 参考音色`
-    - 音色上传： 支持上传自定义音色文件，并实时推理
-    - 参考音色： 支持上传参考音频/文本，直接使用参考音频进行 `tts` 推理
-  - Style： 风格控制内置多种风格控制
-  - Long Text： 支持超长文本推理，自动分割文本
-    - Batch Size： 可设置 `Batch size` ，对于支持 `batch` 推理的模型长文本推理速度更快
-  - Refiner: 支持 `ChatTTS` 原生文本 `refiner` ，同时支持无限长文本
-  - 分割器： 可调整分割器配置，控制分割器 `eos` 和 `分割阈值`
-  - 调节器： 支持对 `速度/音调/音量` 调整，并增加实用的 `响度均衡` 功能
-  - 人声增强： 支持使用 `Enhancer` 模型增强 `TTS` 输出结果，进一步提高输出质量
-  - 生成历史： 支持保留最近三次生成结果，方便对比
-  - 多模型： 支持多种 `TTS` 模型推理，包括 `ChatTTS` / `CosyVoice` / `FishSpeech` / `GPT-SoVITS` 等
-- SSML: 类 XML 语法的高级 TTS 合成控制工具
-  - 分割器： 在这里面可以更加细致的控制长文本分割结果
-  - PodCast： 博客工具，帮助你根据博客脚本创建 `长文本`、`多角色` 音频
-  - From subtitle： 从字幕文件创建 `SSML` 脚本
-- 音色 (说话人)：
-  - Builder： 创建音色，目前可以从 ChatTTS seed 创建音色、或者使用 Refrence Audio 创建 `参考音色`
-  - Test Voice： 试音，上传音色文件，简单测试音色
-  - ChatTTS: 针对 ChatTTS 音色的调试工具
-    - 抽卡： 使用随机种子抽卡，创建随机音色
-    - 融合： 融合不同种子创建的音色
-- ASR:
-  - Whisper: 使用 whisper 模型进行 asr
-  - SenseVoice： WIP
-- Tools： 一些实用的工具
-  - Post Process: 后处理工具，可以在这里 `剪辑`、`调整`、`增强` 音频
+- **TTS (文本转语音)**: 提供多种强大的 TTS 功能
+  - **音色切换 (Speaker Switch)**: 可选择不同音色
+    - **内置音色**: 提供多个内置音色，包括 `27 ChatTTS` / `7 CosyVoice` 音色 + `1 参考音色`
+    - **自定义音色上传**: 支持上传自定义音色文件并进行实时推理
+    - **参考音色**: 支持上传参考音频/文本，直接基于参考音频进行 TTS 推理
+  - **风格控制 (Style)**: 内置多种风格控制选项，调整语音风格
+  - **长文本推理 (Long Text)**: 支持超长文本的推理，自动分割文本
+    - **Batch Size**: 支持设置 `Batch size`，提升支持批量推理模型的长文本推理速度
+  - **Refiner**: 支持 `ChatTTS` 原生文本 `refiner`，支持无限长文本处理
+  - **分割器设置 (Splitter)**: 调整分割器配置，控制分割结束符（`eos`）和分割阈值
+  - **调节器 (Adjuster)**: 支持调整 `速度/音调/音量`，并增加 `响度均衡` 功能，优化音频输出
+  - **人声增强 (Voice Enhancer)**: 使用 `Enhancer` 模型增强 TTS 输出，提高语音质量
+  - **生成历史 (Generation History)**: 保存最近三次生成结果，便于对比和选择
+  - **多模型支持 (Multi-model Support)**: 支持多种 TTS 模型推理，包括 `ChatTTS` / `CosyVoice` / `FishSpeech` / `GPT-SoVITS` / `F5-TTS` 等
+
+- **SSML (语音合成标记语言)**: 提供高级 TTS 合成控制工具
+  - **分割器 (Splitter)**: 精细控制长文本的分割结果
+  - **Podcast**: 帮助创建 `长文本`、`多角色` 的音频，适合博客或剧本式的语音合成
+  - **From Subtitle**: 从字幕文件生成 SSML 脚本，方便一键生成语音
+  - **脚本编辑器 (Script Editor)**: 新增 SSML 脚本编辑器，支持从分割器（Podcast、来自字幕）导出并编辑 SSML 脚本，进一步优化语音生成效果
+
+- **音色管理 (Voice Management)**:
+  - **音色构建器 (Builder)**: 创建自定义音色，可从 ChatTTS seed 创建音色，或使用参考音频生成音色
+  - **试音功能 (Test Voice)**: 上传音色文件，进行简单的试音和效果评估
+  - **ChatTTS 调试工具**: 专门针对 `ChatTTS` 音色的调试工具
+    - **音色抽卡 (Random Seed)**: 使用随机种子抽取不同的音色，生成独特的语音效果
+    - **音色融合 (Blend)**: 融合不同种子创建的音色，获得新的语音效果
+  - **音色 Hub**: 从音色库中选择并下载音色到本地，访问音色仓库 [Speech-AI-Forge-spks](https://github.com/lenML/Speech-AI-Forge-spks) 获取更多音色资源
+
+- **ASR (自动语音识别)**:
+  - **Whisper**: 使用 Whisper 模型进行高质量的语音转文本（ASR）
+  - **SenseVoice**: 正在开发中的 ASR 模型，敬请期待
+
+- **工具 (Tools)**:
+  - **后处理工具 (Post Process)**: 提供音频剪辑、调整和增强等功能，优化生成的语音质量
+
 
 ### `launch.py`: API Server
 
@@ -102,7 +109,7 @@ WIP 开发中
 | 模型类别        | 模型名称                                                                                       | 流式级别 | 支持多语言              | 实现情况           |
 | --------------- | ---------------------------------------------------------------------------------------------- | -------- | ----------------------- | ------------------ |
 | **TTS**         | [ChatTTS](https://github.com/2noise/ChatTTS)                                                  | token 级 | en, zh                  | ✅                 |
-|                 | [FishSpeech](https://github.com/fishaudio/fish-speech)                                         | 句子级   | en, zh, jp, ko      | ✅ (未测试 🚧) |
+|                 | [FishSpeech](https://github.com/fishaudio/fish-speech)                                         | 句子级   | en, zh, jp, ko      | ✅ (1.4) |
 |                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                          | 句子级   | en, zh, jp, yue, ko     | ✅                 |
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | 句子级   | en, zh                  | ✅                 |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | 句子级   | en, zh                  | ✅                 |
@@ -123,7 +130,7 @@ WIP 开发中
 | 功能         | 模型       | 下载命令                                                                  |
 | ------------ | ---------- | ------------------------------------------------------------------------- |
 | **TTS**      | ChatTTS    | `python -m scripts.dl_chattts --source huggingface`                       |
-|              | FishSpeech | `python -m scripts.downloader.fish_speech_1_2sft --source huggingface`    |
+|              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
 |              | CosyVoice  | `python -m scripts.dl_cosyvoice_instruct --source huggingface`            |
 |              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
 |              | F5-TTS | `python -m scripts.downloader.f5_tts --source huggingface`          |
