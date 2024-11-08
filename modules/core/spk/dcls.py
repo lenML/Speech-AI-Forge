@@ -15,7 +15,7 @@ class DcSpkMeta:
     version: str = ""
 
     # 时间戳 毫秒
-    created_date: int = int(time.time() * 1000)
+    created_date: int = field(default_factory=lambda: int(time.time() * 1000))
     # 说话人头像 url 或者 base64
     avatar: str = ""
     # tag 用于 hub 中筛选

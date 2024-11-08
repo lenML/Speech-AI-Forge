@@ -193,6 +193,8 @@ def refresh_speakers(
     files = sort_speakers(files, sort_option)
     html_content = render_speakers_html(files)
     all_tags = [tag for file in files for tag in file.get("tags", [])]
+    # all_tags 去重
+    all_tags = list(set(all_tags))
 
     return html_content, data, gr.CheckboxGroup(choices=["female", "male", *all_tags])
 
