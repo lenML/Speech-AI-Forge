@@ -83,3 +83,6 @@ zhconv
 
 ### webui tools
 moviepy==1.0.3
+
+### downloader script
+modelscope
