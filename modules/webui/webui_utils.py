@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Optional, Union
 
 import gradio as gr
@@ -206,6 +207,13 @@ def run_tts_pipe(
     return sample_rate, audio_data
 
 
+def is_number_str(s: str):
+    if not isinstance(s, str):
+        return False
+    # 使用正则表达式匹配数字字符串，包括负数和浮点数
+    return bool(re.match(r"^[-+]?\d*\.?\d+$", s))
+
+
 # @torch.inference_mode()
 @spaces.GPU(duration=120)
 def tts_generate(
@@ -269,6 +277,9 @@ def tts_generate(
     min_n = 0.000000001
     if temperature == 0.1:
         temperature = min_n
+
+    if isinstance(spk, str) and is_number_str(spk):
+        spk = int(spk)
 
     if isinstance(spk, int):
         if model_id != "chat-tts":
