@@ -1,6 +1,7 @@
 import os
 import shutil
 import sys
+from typing import Optional
 
 from scripts.ModelDownloader import ModelDownloader
 
@@ -11,8 +12,8 @@ class BaseModelDownloader(ModelDownloader):
     ):
         super().__init__()
         self.model_name = model_name
-        self.modelscope_repo = modelscope_repo
-        self.huggingface_repo = huggingface_repo
+        self.modelscope_repo: Optional[str] = modelscope_repo
+        self.huggingface_repo: Optional[str] = huggingface_repo
         self.required_files = required_files
         self.model_dir = self.dir_path / model_name
         self.cache_dir = self.dir_path / "cache"
@@ -35,7 +36,7 @@ class BaseModelDownloader(ModelDownloader):
         snapshot_download(self.modelscope_repo, cache_dir=self.cache_dir)
 
         # Move files to the model directory
-        from_path = self.cache_dir / self.modelscope_repo
+        from_path = self.cache_dir / self.modelscope_repo.replace(".", "___")
         to_path = self.model_dir
         if sys.platform == "win32":
             for item in from_path.glob("*"):

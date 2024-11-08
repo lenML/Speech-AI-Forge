@@ -166,6 +166,6 @@ def create_tts_interface():
             f5_tts_interface.create_tts_interface()
 
         # NOTE: 现在没有SFT版本，效果很差
-        with gr.TabItem("FishSpeech", visible=webui_config.experimental):
+        with gr.TabItem("FishSpeech"):
             cosy_voice_interface = FishSpeechInterface()
             cosy_voice_interface.create_tts_interface()

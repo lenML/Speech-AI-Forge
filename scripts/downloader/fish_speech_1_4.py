@@ -5,21 +5,20 @@ from scripts.dl_base import BaseModelDownloader
 logger = logging.getLogger(__name__)
 
 
-class FishSpeechDownloader(BaseModelDownloader):
+class FishSpeech14Downloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
             "config.json",
-            "firefly-gan-vq-fsq-4x1024-42hz-generator.pth",
+            "firefly-gan-vq-fsq-8x1024-21hz-generator.pth",
             "model.pth",
             "special_tokens_map.json",
             "tokenizer.json",
             "tokenizer_config.json",
         ]
         super().__init__(
-            model_name="fish-speech-1.2-sft",
-            # 好像没有，没找到 modelscope 的库
-            modelscope_repo=None,
-            huggingface_repo="fishaudio/fish-speech-1.2-sft",
+            model_name="fish-speech-1_4",
+            modelscope_repo="AI-ModelScope/fish-speech-1.4",
+            huggingface_repo="fishaudio/fish-speech-1.4",
             required_files=required_files,
         )
 
@@ -27,13 +26,7 @@ class FishSpeechDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    print(
-        """
-        此模型已不支持，请使用 1.4 版本
-        """
-    )
-
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    FishSpeechDownloader()(source=args.source)
+    FishSpeech14Downloader()(source=args.source)

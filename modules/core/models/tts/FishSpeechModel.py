@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 class FishSpeechModel(TTSModel):
     lock = threading.Lock()
 
-    MODEL_PATH = Path("./models/fish-speech-1.2-sft")
+    MODEL_PATH = Path("./models/fish-speech-1_4")
 
     model: FISH_SPEECH_LLAMA = None
     vqgan: FireflyArchitecture = None
