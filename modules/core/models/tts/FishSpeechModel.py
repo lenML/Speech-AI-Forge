@@ -101,7 +101,7 @@ class FishSpeechModel(TTSModel):
             )
             config_name = "firefly_gan_vq"
             checkpoint_path = str(
-                self.MODEL_PATH / "firefly-gan-vq-fsq-4x1024-42hz-generator.pth"
+                self.MODEL_PATH / "firefly-gan-vq-fsq-8x1024-21hz-generator.pth"
             )
             model: FireflyArchitecture = load_vqgan_model(
                 config_name=config_name,

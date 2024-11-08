@@ -283,9 +283,13 @@ def tts_generate(
 
     if isinstance(spk, int):
         if model_id != "chat-tts":
+            # raise gr.Error("Only ChatTTS model support create speaker from seed")
+
+            # NOTE: 创建一个空的说话人，表示随机，也有的模型可能不支持空说话人，那就会在推理的时候报错
+            spk = TTSSpeaker.empty()
+        else:
             # NOTE: 只有 ChatTTS 模型支持从 seed 创建 speaker
-            raise gr.Error("Only ChatTTS model support create speaker from seed")
-        spk = ChatTtsModel.ChatTTSModel.create_speaker_from_seed(spk)
+            spk = ChatTtsModel.ChatTTSModel.create_speaker_from_seed(spk)
 
     if spk_file:
         try:

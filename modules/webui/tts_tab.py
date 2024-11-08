@@ -148,6 +148,9 @@ class FishSpeechInterface(NotSeedTTSInterface):
             + [s for s in styles if s.endswith("_p")]
         )
 
+        self.default_temprature = 0.7
+        self.default_top_p = 0.7
+
 
 def create_tts_interface():
 

@@ -16,6 +16,7 @@ from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
 from modules.core.models.tts.FishSpeechModel import FishSpeechModel
+from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.vc.OpenVoice import OpenVoiceModel
 from modules.devices import devices
 
@@ -28,7 +29,7 @@ class ModelZoo:
     models: Dict[str, BaseZooModel] = {
         # === tts ===
         "chat-tts": ChatTTSModel(),
-        "fish-speech": FishSpeechModel(),
+        "fish-speech": FishSpeech14Model(),
         "cosy-voice": CosyVoiceTTSModel(),
         "fire-red-tts": FireRedTTSModel(),
         "f5-tts": F5TtsModel(),
@@ -114,7 +115,7 @@ class ModelZoo:
     def get_cosy_voice(self) -> CosyVoiceTTSModel:
         return self.get_model("cosy-voice")
 
-    def get_fish_speech(self) -> FishSpeechModel:
+    def get_fish_speech(self) -> FishSpeech14Model:
         return self.get_model("fish-speech")
 
     def get_resemble_enhance(self) -> ResembleEnhanceModel:

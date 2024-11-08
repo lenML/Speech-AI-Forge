@@ -170,7 +170,7 @@ def speaker_editor_ui_v2():
 
             with gr.Group():
                 gr.Markdown("🔊Generate speaker.json")
-                generate_button = gr.Button("Save .json file")
+                generate_button = gr.Button("Save .json file", variant="primary")
                 output_file = gr.File(label="Save to File")
 
             # TODO
