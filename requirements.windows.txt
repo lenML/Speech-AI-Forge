@@ -81,3 +81,6 @@ ema-pytorch
 funasr
 jiwer
 zhconv
+
+### webui tools
+moviepy==1.0.3
