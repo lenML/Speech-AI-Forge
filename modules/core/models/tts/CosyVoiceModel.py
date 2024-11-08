@@ -70,6 +70,9 @@ class CosyVoiceTTSModel(TTSModel):
         self.model = CosyVoiceTTSModel.model
         self.frontend = CosyVoiceTTSModel.frontend
 
+    def is_downloaded(self) -> bool:
+        return self.model_dir.exists()
+
     def is_loaded(self) -> bool:
         return CosyVoiceTTSModel.model is not None
 

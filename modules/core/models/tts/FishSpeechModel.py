@@ -54,6 +54,9 @@ class FishSpeechModel(TTSModel):
 
         self.encoded_prefix = []
 
+    def is_downloaded(self) -> bool:
+        return self.MODEL_PATH.exists()
+
     def is_loaded(self) -> bool:
         return FishSpeechModel.model is not None
 

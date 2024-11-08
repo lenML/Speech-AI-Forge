@@ -1,6 +1,7 @@
 import gradio as gr
 import torch
 
+from modules.core.models.zoo import ModelZoo
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.webui import webui_config
 from modules.webui.webui_utils import (
@@ -349,6 +350,15 @@ class TTSInterface:
         return enable_enhance, enable_de_noise, tts_button
 
     def create_tts_interface(self):
+        """
+        首先检查模型是否已经下载可用，没有的话会显示施工提示
+        """
+        if not ModelZoo.model_zoo.get_model(self.model_id).is_downloaded():
+            gr.HTML(
+                f"<p style='color:red'>🚧Model [{self.model_id}] is not available in the Model Zoo. Please contact the author to get it. Thank you!</p>"
+            )
+            return
+
         with gr.Row():
             with gr.Column(scale=1):
                 (

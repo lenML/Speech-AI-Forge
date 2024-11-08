@@ -74,6 +74,9 @@ class F5TtsModel(TTSModel):
         if not self.vocos_path.exists():
             raise FileNotFoundError(f"Vocos model file not found: {self.vocos_path}")
 
+    def is_downloaded(self) -> bool:
+        return self.model_path.exists() and self.vocos_path.exists()
+
     def load(self) -> tuple[CFM, Vocos]:
         self.check_files()
 

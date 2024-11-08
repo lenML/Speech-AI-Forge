@@ -27,3 +27,9 @@ class BaseZooModel:
 
     def interrupt(self) -> None:
         pass
+
+    def is_downloaded(self) -> bool:
+        """
+        检查模型是否已经安装 比如在 webui 页面是否显示
+        """
+        return True

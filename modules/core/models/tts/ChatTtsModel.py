@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Generator, Union
 
 import numpy as np
@@ -35,6 +36,9 @@ class ChatTTSModel(TTSModel):
     def __init__(self) -> None:
         super().__init__("chat-tts")
         self.chat: ChatTTS.Chat = None
+
+    def is_downloaded(self) -> bool:
+        return Path("./models/ChatTTS").exists()
 
     def get_sample_rate(self) -> int:
         return 24000

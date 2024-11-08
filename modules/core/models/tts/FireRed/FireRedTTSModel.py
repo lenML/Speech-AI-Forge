@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
@@ -25,6 +26,9 @@ class FireRedTTSModel(TTSModel):
 
         self.fire_red: FireRedTTSInfer = None
         self.device = devices.get_device_for("fire-red-tts")
+
+    def is_downloaded(self) -> bool:
+        return Path("models/FireRedTTS").exists()
 
     def load(self):
         if self.fire_red:
