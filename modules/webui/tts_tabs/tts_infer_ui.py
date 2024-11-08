@@ -306,8 +306,9 @@ class TTSInterface:
             volume_up_input = gr.Slider(
                 label="Volume Gain", value=0, minimum=-20, maximum=6, step=0.1
             )
+            # NOTE: 默认关闭，因为会破坏说话人韵律，特殊情况某些音色可能需要，但是我感觉不开好点
             enable_loudness_normalization = gr.Checkbox(
-                value=True, label="Enable Loudness EQ"
+                value=False, label="Enable Loudness EQ"
             )
             headroom_input = gr.Slider(
                 label="Headroom", value=1, minimum=0, maximum=12, step=0.1

@@ -25,6 +25,8 @@ class FF14_infer:
         self.llama.unload()
         self.vqgan.unload()
 
+    @torch.no_grad()
+    @torch.inference_mode()
     def generate(
         self,
         text: str,

@@ -74,7 +74,7 @@ class FF14_vqgan:
         """
         这里假设 wav 都是 resample 并 mono 过
         """
-        ref_audio = torch.from_numpy(wav)
+        ref_audio = torch.from_numpy(wav).clone()
         ref_audio = ref_audio[None].to(self.device)
         # print(ref_audio.shape, wav.shape)
         audio_lengths = torch.tensor(
