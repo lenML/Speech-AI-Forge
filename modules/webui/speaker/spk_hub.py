@@ -1,4 +1,5 @@
 import html
+import logging
 import os
 import gradio as gr
 import requests
@@ -6,11 +7,34 @@ import requests
 from modules.core.spk import TTSSpeaker, spk_mgr
 from datetime import datetime
 
-# 远程 JSON 文件的 URL，您可以使用环境变量设置 SPKS_INDEX
-DEFAULT_SPKS_INDEX_URL = os.getenv(
-    "SPKS_INDEX",
-    "https://github.com/lenML/Speech-AI-Forge-spks/raw/refs/heads/main/index.json",
-)
+logger = logging.getLogger(__name__)
+
+
+def github_fallback_download(url: str):
+    """
+    如果url是github.com/githubusercontent.com下的地址，那么在第一次请求失败的情况，采用镜像地址再次请求
+    镜像地址： https://ghp.ci/ + (github资源url)
+    """
+    is_github_asset = "githubusercontent.com" in url or "github.com" in url
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        if is_github_asset:
+            mirror_url = f"https://ghp.ci/{url}"
+            logger.error(f"Error fetching data: {e}, try mirror url: {mirror_url}")
+            logger.warning(
+                f"Warning: Using mirror site can be slow. Consider setting up a proxy (set HTTPS_PROXY env) for GitHub requests."
+            )
+            response = requests.get(mirror_url)
+            response.raise_for_status()
+            logger.info(f"Success mirror url: {mirror_url}")
+            # NOTE: 建议设置代理请求 github 而不是使用镜像站，因为很慢
+            return response
+        else:
+            print(f"Error fetching data: {e}")
+            return None
 
 
 def fetch_speakers_data(url: str):
@@ -18,12 +42,11 @@ def fetch_speakers_data(url: str):
     从指定 URL 下载音色数据。
     """
     try:
-        response = requests.get(url)
-        response.raise_for_status()
+        response = github_fallback_download(url)
         data = response.json()
         return data
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")
+        logger.error(f"Error fetching data: {e}")
         return None
 
 
@@ -198,17 +221,15 @@ def refresh_speakers(
 
     return html_content, data, gr.CheckboxGroup(choices=["female", "male", *all_tags])
 
-
 def install_speaker(spk_url, hide_tags, sort_option, search_query, cached_data):
     """
     下载 speaker 文件到 ./data/speakers 目录下面
     """
-    response = requests.get(spk_url)
-    response.raise_for_status()
+    spk_bytes = github_fallback_download(spk_url).content
 
     filename = os.path.basename(spk_url)
     with open(f"./data/speakers/{filename}", "wb") as f:
-        f.write(response.content)
+        f.write(spk_bytes)
     spk_mgr.refresh()
 
     return rerender_table(hide_tags, sort_option, search_query, cached_data)
@@ -218,6 +239,12 @@ def create_spk_hub_ui():
     """
     加载远程的 spk hub 中的数据，并可以直接下载到本地
     """
+    # 远程 JSON 文件的 URL，您可以使用环境变量设置 SPKS_INDEX
+    DEFAULT_SPKS_INDEX_URL = os.getenv(
+        "SPKS_INDEX",
+        "https://github.com/lenML/Speech-AI-Forge-spks/raw/refs/heads/main/index.json",
+    )
+
     with gr.TabItem("Available", id="available"):
         with gr.Row():
             with gr.Column(scale=1):
