@@ -20,13 +20,6 @@ class TTSInterface:
         self.speaker_names: list[str] = []
         self.styles = ["*auto"] + [s.get("name") for s in get_styles()]
 
-        self.default_selected_speaker = (
-            self.speaker_names[1] if len(self.speaker_names) > 1 else "*random"
-        )
-        self.default_speaker_name = self.get_speaker_name_from_show_name(
-            self.default_selected_speaker
-        )
-
         self.model_id = model_id
         self.refine_visible = True
 
@@ -47,6 +40,12 @@ class TTSInterface:
         self.show_sampling = True
 
         self.reload_speakers()
+        self.default_selected_speaker = (
+            self.speaker_names[1] if len(self.speaker_names) > 1 else "*random"
+        )
+        self.default_speaker_name = self.get_speaker_name_from_show_name(
+            self.default_selected_speaker
+        )
 
     def reload_speakers(self):
         def spk_filter(spk: TTSSpeaker):
@@ -306,12 +305,12 @@ class TTSInterface:
             volume_up_input = gr.Slider(
                 label="Volume Gain", value=0, minimum=-20, maximum=6, step=0.1
             )
-            # NOTE: 默认关闭，因为会破坏说话人韵律，特殊情况某些音色可能需要，但是我感觉不开好点
+            # NOTE: 如果关闭的话容易爆音，打开的话又可能损失质量...
             enable_loudness_normalization = gr.Checkbox(
-                value=False, label="Enable Loudness EQ"
+                value=True, label="Enable Loudness EQ"
             )
             headroom_input = gr.Slider(
-                label="Headroom", value=1, minimum=0, maximum=12, step=0.1
+                label="Headroom", value=0.5, minimum=0, maximum=12, step=0.1
             )
         return (
             speed_input,
