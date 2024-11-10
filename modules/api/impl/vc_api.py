@@ -76,7 +76,10 @@ async def read_upload_file(file: UploadFile):
 def setup(app: APIManager):
 
     @app.post(
-        "/v1/vc", description="Voice cloning API", response_class=StreamingResponse
+        "/v1/vc",
+        description="Voice cloning API",
+        response_class=StreamingResponse,
+        tags=["Voice Clone"],
     )
     async def voice_clone(
         request: Request, form: VoiceCloneForm = Depends(VoiceCloneForm.as_form)
@@ -116,9 +119,7 @@ def setup(app: APIManager):
             )
             ref_spk = TTSSpeaker.from_ref_wav(ref_wav=ref_audio_wav)
 
-        vc_config = VCConfig(
-            enabled=True, mid=model, spk=ref_spk, emotion=spk_emotion, tau=tau
-        )
+        vc_config = VCConfig(enabled=True, mid=model, emotion=spk_emotion, tau=tau)
         encoder_config = EncoderConfig(
             format=AudioFormat(format),
             bitrate="64k",
@@ -126,6 +127,7 @@ def setup(app: APIManager):
 
         try:
             handler = VCHandler(
+                ref_spk=ref_spk,
                 input_audio=src_audio_wav,
                 vc_config=vc_config,
                 encoder_config=encoder_config,

@@ -22,7 +22,7 @@ class InferConfig(BaseModel):
     batch_size: int = 4
     spliter_threshold: int = 100
     # end_of_sentence
-    eos: str = "[uv_break]"
+    eos: str = "。"
     seed: int = 42
 
     stream: bool = False

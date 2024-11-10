@@ -18,7 +18,6 @@ from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.vc_model import VCConfig
-from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.models.tts import ChatTtsModel
 from modules.core.spk import TTSSpeaker, spk_mgr
@@ -163,7 +162,7 @@ def synthesize_ssml(
     )
     tts_config = TTSConfig(mid=model_id)
 
-    handler = SSMLHandler(
+    handler = TTSHandler(
         ssml_content=ssml,
         tts_config=tts_config,
         infer_config=infer_config,

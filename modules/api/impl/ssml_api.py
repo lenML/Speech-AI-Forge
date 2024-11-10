@@ -10,7 +10,7 @@ from modules.core.handler.datacls.audio_model import (
 )
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
-from modules.core.handler.SSMLHandler import SSMLHandler
+from modules.core.handler.TTSHandler import TTSHandler
 
 
 class SSMLRequest(BaseModel):
@@ -76,10 +76,9 @@ async def synthesize_ssml_api(
             format=AudioFormat(format),
             bitrate="64k",
         )
-        # TODO: 作为 SSML 默认值
         tts_config = TTSConfig(mid=model)
 
-        handler = SSMLHandler(
+        handler = TTSHandler(
             ssml_content=ssml,
             tts_config=tts_config,
             infer_config=infer_config,
@@ -102,4 +101,6 @@ async def synthesize_ssml_api(
 
 
 def setup(api_manager: APIManager):
-    api_manager.post("/v1/ssml", response_class=FileResponse)(synthesize_ssml_api)
+    api_manager.post("/v1/ssml", response_class=FileResponse, tags=["SSML"])(
+        synthesize_ssml_api
+    )

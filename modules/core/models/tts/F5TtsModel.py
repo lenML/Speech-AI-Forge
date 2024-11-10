@@ -146,6 +146,7 @@ class F5TtsModel(TTSModel):
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> list[NP_AUDIO]:
+        # TODO: 缓存
         self.load()
 
         sr = self.get_sample_rate()

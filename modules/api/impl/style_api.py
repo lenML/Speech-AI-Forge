@@ -13,4 +13,6 @@ async def create_style():
 
 
 def setup(app: APIManager):
-    app.get("/v1/styles/list", response_model=api_utils.BaseResponse)(list_styles)
+    app.get("/v1/styles/list", response_model=api_utils.BaseResponse, tags=["Style"])(
+        list_styles
+    )

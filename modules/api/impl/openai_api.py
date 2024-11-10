@@ -189,6 +189,7 @@ openai api document:
 
 > model 可填任意值
         """,
+        tags=["OpenAI API"],
     )(openai_speech_api)
 
     def pydub_to_numpy(audio_segment: AudioSegment) -> np.ndarray:
@@ -206,6 +207,7 @@ openai api document:
         # NOTE: 其实最好是不设置这个model...因为这个接口可以返回很多情况...
         # response_model=TranscriptionsResponse,
         description="Transcribes audio into the input language.",
+        tags=["OpenAI API"],
     )
     async def transcribe(
         file: UploadFile = File(...),

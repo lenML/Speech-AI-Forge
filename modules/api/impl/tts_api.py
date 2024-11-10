@@ -32,9 +32,6 @@ class TTSParams(BaseModel):
     spk: str = Query(
         "female2", description="Specific speaker by speaker name or speaker seed"
     )
-    ref_spk: Optional[str] = Query(
-        None, description="Specific speaker by speaker name or speaker seed"
-    )
 
     style: str = Query("chat", description="Specific style by style name")
     temperature: float = Query(
@@ -158,8 +155,6 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             else params.no_cache == "on"
         )
 
-        ref_spk = params.ref_spk
-
         if eos == "[uv_break]" and params.model != "chat-tts":
             eos = " "
 
@@ -200,21 +195,8 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             bitrate=params.bitrate,
         )
 
-        vc_config = VCConfig()
-        has_ref_spk = ref_spk is not None and isinstance(ref_spk, str) and ref_spk != ""
-        if has_ref_spk:
-            vc_config.enabled = True
-            try:
-                vc_config.spk = spk_mgr.get_speaker(ref_spk)
-            except Exception as e:
-                raise HTTPException(status_code=422, detail=str(e))
-
-            if not vc_config.spk.has_refs:
-                raise HTTPException(
-                    status_code=422,
-                    detail='Invalid "ref_spk", speaker has no refs data',
-                )
-
+        # NOTE: 这个接口不在支持 voice clone
+        vc_config = VCConfig(enabled=False)
         handler = TTSHandler(
             text_content=params.text,
             spk=spk,
@@ -239,4 +221,6 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
 
 
 def setup(api_manager: APIManager):
-    api_manager.get("/v1/tts", response_class=FileResponse)(synthesize_tts)
+    api_manager.get("/v1/tts", response_class=FileResponse, tags=["TTS"])(
+        synthesize_tts
+    )

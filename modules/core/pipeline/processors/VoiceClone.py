@@ -10,12 +10,12 @@ class VoiceCloneProcessor(AudioProcessor):
         vc_config = context.vc_config
         if not vc_config.enabled:
             return audio
-        if vc_config.spk is None and vc_config.spk is not None:
-            vc_config.spk = context.spk
-        if vc_config.spk is None:
-            raise ValueError("spk must be specified")
+        spk = context.spk
+        if spk is None:
+            raise ValueError("Voice clone is enabled but no spk is set")
 
         handler = VCHandler(
+            ref_spk=spk,
             input_audio=audio,
             vc_config=vc_config,
             # raw encoder

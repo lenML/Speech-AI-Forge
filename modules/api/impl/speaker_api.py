@@ -38,7 +38,9 @@ def setup(app: APIManager):
     class SpkListParams(BaseModel):
         full_data: bool = Query(False, description="Return all data")
 
-    @app.get("/v1/speakers/list", response_model=api_utils.BaseResponse)
+    @app.get(
+        "/v1/speakers/list", response_model=api_utils.BaseResponse, tags=["Speaker"]
+    )
     async def list_speakers(
         request: Request,
         parmas: SpkListParams = Depends(),
@@ -50,12 +52,16 @@ def setup(app: APIManager):
 
         return api_utils.success_response(data)
 
-    @app.post("/v1/speakers/refresh", response_model=api_utils.BaseResponse)
+    @app.post(
+        "/v1/speakers/refresh", response_model=api_utils.BaseResponse, tags=["Speaker"]
+    )
     async def refresh_speakers():
         spk_mgr.refresh()
         return api_utils.success_response(None)
 
-    @app.post("/v1/speakers/update", response_model=api_utils.BaseResponse)
+    @app.post(
+        "/v1/speakers/update", response_model=api_utils.BaseResponse, tags=["Speaker"]
+    )
     async def update_speakers(request: SpeakersUpdate):
         for config in request.speakers:
             config: dict = config
@@ -85,7 +91,9 @@ def setup(app: APIManager):
         return api_utils.success_response(None)
 
     # TODO 需要适配新版本 speaker
-    @app.post("/v1/speaker/create", response_model=api_utils.BaseResponse)
+    @app.post(
+        "/v1/speaker/create", response_model=api_utils.BaseResponse, tags=["Speaker"]
+    )
     async def create_speaker(request: CreateSpeaker):
         if (
             request.tensor
@@ -111,7 +119,9 @@ def setup(app: APIManager):
         spk_mgr.refresh()
         return api_utils.success_response(spk.to_json())
 
-    @app.post("/v1/speaker/update", response_model=api_utils.BaseResponse)
+    @app.post(
+        "/v1/speaker/update", response_model=api_utils.BaseResponse, tags=["Speaker"]
+    )
     async def update_speaker(request: UpdateSpeaker):
         speaker = spk_mgr.get_speaker_by_id(request.id)
         if speaker is None:
@@ -132,7 +142,9 @@ def setup(app: APIManager):
         spk_mgr.update_item(speaker, lambda x: x.id == speaker.id)
         return api_utils.success_response(None)
 
-    @app.post("/v1/speaker/detail", response_model=api_utils.BaseResponse)
+    @app.post(
+        "/v1/speaker/detail", response_model=api_utils.BaseResponse, tags=["Speaker"]
+    )
     async def speaker_detail(request: SpeakerDetail):
         speaker = spk_mgr.get_speaker_by_id(request.id)
         if speaker is None:

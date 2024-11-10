@@ -41,10 +41,10 @@ class SpeakerManager(FolderDatabase):
         else:
             raise ValueError("Invalid file extension for speaker file: " + file_path)
 
-    def get_speaker(self, name) -> Union[TTSSpeaker, None]:
+    def get_speaker(self, name: str) -> Union[TTSSpeaker, None]:
         return self.get_item(lambda x: x.name == name)
 
-    def get_speaker_by_id(self, id) -> Union[TTSSpeaker, None]:
+    def get_speaker_by_id(self, id: str) -> Union[TTSSpeaker, None]:
         return self.get_item(lambda x: x.id == id)
 
     def list_speakers(self) -> list[TTSSpeaker]:

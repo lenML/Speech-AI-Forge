@@ -78,7 +78,7 @@ class SynthesisRequest(BaseModel):
 def setup(app: APIManager):
     XTTSV2 = XTTS_V2_Settings()
 
-    @app.get("/v1/xtts_v2/speakers")
+    @app.get("/v1/xtts_v2/speakers", tags=["XTTS"])
     async def speakers():
         spks = spk_mgr.list_speakers()
         return [
@@ -91,7 +91,9 @@ def setup(app: APIManager):
             for spk in spks
         ]
 
-    @app.post("/v1/xtts_v2/tts_to_audio", response_class=StreamingResponse)
+    @app.post(
+        "/v1/xtts_v2/tts_to_audio", response_class=StreamingResponse, tags=["XTTS"]
+    )
     async def tts_to_audio(request: SynthesisRequest):
         text = request.text
         # speaker_wav 就是 speaker id 。。。
@@ -144,7 +146,7 @@ def setup(app: APIManager):
 
         return handler.enqueue_to_response(request=request)
 
-    @app.get("/v1/xtts_v2/tts_stream")
+    @app.get("/v1/xtts_v2/tts_stream", tags=["XTTS"])
     async def tts_stream(
         request: Request,
         text: str = Query(),
@@ -204,7 +206,7 @@ def setup(app: APIManager):
 
         return handler.enqueue_to_response(request=request)
 
-    @app.post("/v1/xtts_v2/set_tts_settings")
+    @app.post("/v1/xtts_v2/set_tts_settings", tags=["XTTS"])
     async def set_tts_settings(request: TTSSettingsRequest):
         try:
             if request.stream_chunk_size < 50:

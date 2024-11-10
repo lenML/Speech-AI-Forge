@@ -13,7 +13,6 @@ from modules.core.handler.datacls.audio_model import (
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.vc_model import VCConfig
-from modules.core.handler.SSMLHandler import SSMLHandler
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
@@ -139,47 +138,22 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
         bitrate=audio_bitrate,
     )
 
+    text_content = input.text
+    ssml_content = input.ssml
+    handler = TTSHandler(
+        text_content=text_content,
+        spk=speaker,
+        tts_config=tts_config,
+        infer_config=infer_config,
+        adjust_config=adjust_config,
+        enhancer_config=enhancer_config,
+        encoder_config=encoder_config,
+        vc_config=VCConfig(enabled=False),
+    )
     try:
-        if input.text:
-            text_content = input.text
-
-            handler = TTSHandler(
-                text_content=text_content,
-                spk=speaker,
-                tts_config=tts_config,
-                infer_config=infer_config,
-                adjust_config=adjust_config,
-                enhancer_config=enhancer_config,
-                encoder_config=encoder_config,
-                vc_config=VCConfig(enabled=False),
-            )
-            media_type = handler.get_media_type()
-
-            base64_string = handler.enqueue_to_base64()
-            return {"audioContent": f"data:{media_type};base64,{base64_string}"}
-
-        elif input.ssml:
-            ssml_content = input.ssml
-
-            handler = SSMLHandler(
-                ssml_content=ssml_content,
-                tts_config=tts_config,
-                infer_config=infer_config,
-                adjust_config=adjust_config,
-                enhancer_config=enhancer_config,
-                encoder_config=encoder_config,
-            )
-            media_type = handler.get_media_type()
-
-            base64_string = handler.enqueue_to_base64()
-
-            return {"audioContent": f"data:{media_type};base64,{base64_string}"}
-
-        else:
-            raise HTTPException(
-                status_code=422, detail="Invalid input text or ssml specified."
-            )
-
+        media_type = handler.get_media_type()
+        base64_string = handler.enqueue_to_base64()
+        return {"audioContent": f"data:{media_type};base64,{base64_string}"}
     except Exception as e:
         import logging
 
@@ -206,12 +180,14 @@ google api document: <br/>
 
 - 编码格式影响的是 audioContent 的二进制格式，所以所有format都是返回带有base64数据的json
         """,
+        tags=["Google API"],
     )(google_text_synthesize)
 
     @app.post(
         "/v1/speech:recognize",
         # response_model=None,
         description="Performs synchronous speech recognition: receive results after all audio has been sent and processed.",
+        tags=["Google API"],
     )
     async def speech_recognize():
         raise HTTPException(status_code=501, detail="Not implemented")
@@ -220,6 +196,7 @@ google api document: <br/>
         "/v1/speech:longrunningrecognize",
         # response_model=None,
         description="Performs asynchronous speech recognition: receive results via the google.longrunning.Operations interface.",
+        tags=["Google API"],
     )
     async def long_running_recognize():
         raise HTTPException(status_code=501, detail="Not implemented")

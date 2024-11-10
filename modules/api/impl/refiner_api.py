@@ -105,10 +105,14 @@ async def text_normalize_post(request: TextNormalizeRequest):
 
 
 def setup(app: APIManager):
-    app.post("/v1/prompt/refine", response_model=api_utils.BaseResponse)(
-        refiner_prompt_post
-    )
+    app.post(
+        "/v1/prompt/refine",
+        response_model=api_utils.BaseResponse,
+        tags=["Text Refiner"],
+    )(refiner_prompt_post)
 
-    app.post("/v1/text/normalize", response_model=api_utils.BaseResponse)(
-        text_normalize_post
-    )
+    app.post(
+        "/v1/text/normalize",
+        response_model=api_utils.BaseResponse,
+        tags=["Text Refiner"],
+    )(text_normalize_post)

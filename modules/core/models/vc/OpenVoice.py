@@ -133,8 +133,8 @@ class OpenVoiceModel(VCModel):
 
         return sr, output
 
-    def get_ref_audio(self, config: VCConfig) -> NP_AUDIO:
-        spk = config.spk
+    def get_ref_audio(self, ref_spk: TTSSpeaker, config: VCConfig) -> NP_AUDIO:
+        spk = ref_spk
         emotion = config.emotion
 
         if not isinstance(spk, TTSSpeaker):
@@ -148,11 +148,13 @@ class OpenVoiceModel(VCModel):
 
         return sr, wav
 
-    def convert(self, src_audio: NP_AUDIO, config: VCConfig) -> NP_AUDIO:
+    def convert(
+        self, src_audio: NP_AUDIO, ref_spk: TTSSpeaker, config: VCConfig
+    ) -> NP_AUDIO:
         if config.enabled is False:
             return src_audio
 
-        ref_audio = self.get_ref_audio(config)
+        ref_audio = self.get_ref_audio(ref_spk, config)
 
         return self.convert_audio(src_audio, ref_audio, tau=config.tau)
 

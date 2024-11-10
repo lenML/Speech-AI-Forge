@@ -1,9 +1,10 @@
 import logging
-from typing import Generator
+from typing import Generator, Optional
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
+from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.pipeline.dcls import TTSPipelineContext
@@ -15,19 +16,21 @@ logger = logging.getLogger(__name__)
 
 
 class TTSHandler(AudioHandler):
+
     def __init__(
         self,
-        text_content: str,
-        spk: TTSSpeaker,
-        tts_config: TTSConfig,
-        infer_config: InferConfig,
-        adjust_config: AdjustConfig,
-        enhancer_config: EnhancerConfig,
-        encoder_config: EncoderConfig,
-        vc_config: VCConfig,
+        *,
+        text_content: Optional[str] = None,
+        ssml_content: Optional[str] = None,
+        spk: Optional[TTSSpeaker] = None,
+        tts_config: TTSConfig = TTSConfig(),
+        infer_config: InferConfig = InferConfig(),
+        adjust_config: AdjustConfig = AdjustConfig(),
+        enhancer_config: EnhancerConfig = EnhancerConfig(),
+        encoder_config: EncoderConfig = EncoderConfig(),
+        vc_config: VCConfig = VCConfig(),
+        tn_config: TNConfig = TNConfig(),
     ):
-        assert isinstance(text_content, str), "text_content should be str"
-        assert isinstance(spk, TTSSpeaker), "spk should be Speaker"
         assert isinstance(tts_config, TTSConfig), "tts_config should be ChatTTSConfig"
         assert isinstance(
             infer_config, InferConfig
@@ -42,14 +45,17 @@ class TTSHandler(AudioHandler):
             encoder_config, EncoderConfig
         ), "encoder_config should be EncoderConfig"
         assert isinstance(vc_config, VCConfig), "vc_config should be VCConfig"
+        assert isinstance(tn_config, TNConfig), "tn_config should be TNConfig"
 
         self.text_content = text_content
+        self.ssml_content = ssml_content
         self.spk = spk
         self.tts_config = tts_config
         self.infer_config = infer_config
         self.adjest_config = adjust_config
         self.enhancer_config = enhancer_config
         self.vc_config = vc_config
+        self.tn_config = tn_config
 
         super().__init__(encoder_config=encoder_config, infer_config=infer_config)
 
@@ -64,21 +70,25 @@ class TTSHandler(AudioHandler):
 
     def build_ctx(self):
         text_content = self.text_content
+        ssml_content = self.ssml_content
         infer_config = self.infer_config
         tts_config = self.tts_config
         adjust_config = self.adjest_config
         enhancer_config = self.enhancer_config
         vc_config = self.vc_config
+        tn_config = self.tn_config
         spk = self.spk
 
         ctx = TTSPipelineContext(
             text=text_content,
+            ssml=ssml_content,
             spk=spk,
             tts_config=tts_config,
             infer_config=infer_config,
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
             vc_config=vc_config,
+            tn_config=tn_config,
         )
         return ctx
 

@@ -233,6 +233,22 @@ XTTS v2 系列 API 支持一些外部应用的调用，例如与 SillyTavern 的
 
 ![sillytavern_tts](./sillytavern_tts.png)
 
+### Forge Api v2
+为了完全提供所有功能开发的 v2 接口，可以对所有可配置内容进行设置，同时还可以直接输入base64编码的音频作为参考音频创建临时 spk 用于推理
+
+```bash
+curl http://localhost:7870/v2/tts \
+  -H "Authorization: Bearer anything_your_wanna" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Today is a wonderful day to build something people love!"
+  }' \
+  --output speech.mp3
+```
+
+#### usage
+> WIP
+
 ## playground
 
 启动 api 服务之后，在 `/playground` 下有一个非 gradio 的调试页面用于接口测试
