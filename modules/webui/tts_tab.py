@@ -151,6 +151,9 @@ class FishSpeechInterface(NotSeedTTSInterface):
         self.default_temprature = 0.7
         self.default_top_p = 0.7
 
+        # NOTE: 这个模型不支持 instruction
+        self.show_style_dropdown = False
+
 
 def create_tts_interface():
 

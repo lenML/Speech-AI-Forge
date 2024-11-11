@@ -72,8 +72,6 @@ class ForgeTextSynthesizeRequest(BaseModel):
     # input
     text: Optional[str] = None
     ssml: Optional[str] = None
-    # stream
-    stream: bool = False
 
 
 async def forge_text_synthesize(request: ForgeTextSynthesizeRequest):
