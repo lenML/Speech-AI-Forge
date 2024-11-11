@@ -75,8 +75,6 @@ def process_model_args(args: argparse.Namespace):
     devices.reset_device()
     devices.first_time_calculation()
 
-    zoo.zoo_config.debug_generate = debug_generate
-
     if compile:
         logger.info("Model compile is enabled")
 

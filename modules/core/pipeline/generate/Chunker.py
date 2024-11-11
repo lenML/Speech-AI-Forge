@@ -1,7 +1,6 @@
 import re
 from typing import List
 
-from modules.core.models import zoo
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.generate.SimpleTokenizer import RegexpTokenizer
 from modules.core.pipeline.generate.SsmlNormalizer import SsmlNormalizer

@@ -6,7 +6,6 @@ import numpy as np
 import torch
 
 from modules import config
-from modules.core.models import zoo
 from modules.devices import devices
 from modules.repos_static.ChatTTS.ChatTTS.core import Chat
 from modules.repos_static.ChatTTS.ChatTTS.model import GPT
@@ -51,7 +50,7 @@ class ChatTTSInfer:
         self.dtype = devices.dtype
         ChatTTSInfer.current_infer = self
 
-        if zoo.zoo_config.debug_generate:
+        if config.runtime_env_vars.debug_generate:
             self.logger.setLevel(logging.DEBUG)
 
     def get_tokenizer(self):

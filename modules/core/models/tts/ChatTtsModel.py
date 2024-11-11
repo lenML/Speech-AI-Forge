@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any, Generator, Union
 
@@ -19,6 +20,7 @@ from modules.devices import devices
 from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
 
+logger = logging.getLogger(__name__)
 
 class ChatTTSModel(TTSModel):
     model_id = "chat-tts"
@@ -197,3 +199,29 @@ class ChatTTSModel(TTSModel):
                 self.set_cache(segments=segments, context=context, value=audio_arr_buff)
 
             return _gen()
+
+
+if __name__ == "__main__":
+    import numpy as np
+    import soundfile as sf
+    from modules.core.spk.SpkMgr import spk_mgr
+
+    logger.setLevel(logging.DEBUG)
+
+    # 测试模型
+    tts_model = ChatTTSModel()
+    # tts_model.load()
+
+    spk = spk_mgr.get_speaker("mona")
+
+    def create_seg(text: str, seed=42):
+        return TTSSegment(_type="text", text=text, infer_seed=seed, spk=spk)
+
+    sr, audio_data = tts_model.generate(
+        segment=create_seg(
+            text="云想衣裳花想容，春风拂槛露华浓。若非群玉山头见，会向瑶台月下逢。"
+        ),
+        context=TTSPipelineContext(),
+    )
+
+    sf.write(f"test_chat_tts.wav", audio_data, sr)
