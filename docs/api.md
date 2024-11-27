@@ -241,7 +241,13 @@ curl http://localhost:7870/v2/tts \
   -H "Authorization: Bearer anything_your_wanna" \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "Today is a wonderful day to build something people love!"
+    "text": "Today is a wonderful day to build something people love!",
+    "spk": {
+      "from_ref": {
+        "wav_b64": "<你的参考音频的base64字符串>",
+        "text": "<参考音频对应的文本>"
+      }
+    }
   }' \
   --output speech.mp3
 ```
