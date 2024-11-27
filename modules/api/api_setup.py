@@ -21,7 +21,7 @@ from modules.api.impl import (
     xtts_v2_api,
 )
 from modules.api.v2 import (
-    tts_api,
+    tts_api as tts_api_v2,
     #
 )
 from modules.utils import env
@@ -46,7 +46,7 @@ def create_api(app: FastAPI, exclude=[]):
     vc_api.setup(app_mgr)
 
     # v2 apis
-    tts_api.setup(app_mgr)
+    tts_api_v2.setup(app_mgr)
 
     return app_mgr
 
