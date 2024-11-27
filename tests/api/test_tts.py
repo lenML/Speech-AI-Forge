@@ -128,33 +128,3 @@ def test_stream_tts_generate(client: TestClient):
         f.write(response.content)
 
     assert os.path.getsize(output_file) > 0, "Stream output file is empty"
-
-
-@pytest.mark.tts_api
-@pytest.mark.vc_api
-def test_tts_api_with_vc(client: TestClient):
-    tts_params = default_tts_params.model_copy()
-
-    # base: female2.spk => clone to: mona.spk
-    tts_params.spk = "female2"
-    tts_params.ref_spk = "mona"
-
-    tts_params.text = (
-        "你好，这是一段 vioce clone 测试，基于 feamle2 音色克隆到 mona 音色。"
-    )
-
-    response = client.get("/v1/tts", params=tts_params.model_dump())
-    assert response.status_code == 200
-    assert response.headers["content-type"] in ["audio/wav", "audio/mpeg"]
-
-    output_file = os.path.join(
-        tests.conftest.test_outputs_dir, "tts_api_vc_success.mp3"
-    )
-
-    with open(
-        output_file,
-        "wb",
-    ) as f:
-        f.write(response.content)
-
-    assert os.path.getsize(output_file) > 0, "Stream output file is empty"

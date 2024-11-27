@@ -142,6 +142,7 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     ssml_content = input.ssml
     handler = TTSHandler(
         text_content=text_content,
+        ssml_content=ssml_content,
         spk=speaker,
         tts_config=tts_config,
         infer_config=infer_config,
