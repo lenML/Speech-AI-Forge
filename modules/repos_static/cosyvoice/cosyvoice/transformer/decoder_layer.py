@@ -65,7 +65,7 @@ class DecoderLayer(nn.Module):
         tgt_mask: torch.Tensor,
         memory: torch.Tensor,
         memory_mask: torch.Tensor,
-        cache: Optional[torch.Tensor] = None,
+        cache: Optional[torch.Tensor] = None
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """Compute decoded features.
 
@@ -105,7 +105,8 @@ class DecoderLayer(nn.Module):
             residual = residual[:, -1:, :]
             tgt_q_mask = tgt_mask[:, -1:, :]
 
-        x = residual + self.dropout(self.self_attn(tgt_q, tgt, tgt, tgt_q_mask)[0])
+        x = residual + self.dropout(
+            self.self_attn(tgt_q, tgt, tgt, tgt_q_mask)[0])
         if not self.normalize_before:
             x = self.norm1(x)
 
@@ -114,8 +115,7 @@ class DecoderLayer(nn.Module):
             if self.normalize_before:
                 x = self.norm2(x)
             x = residual + self.dropout(
-                self.src_attn(x, memory, memory, memory_mask)[0]
-            )
+                self.src_attn(x, memory, memory, memory_mask)[0])
             if not self.normalize_before:
                 x = self.norm2(x)
 

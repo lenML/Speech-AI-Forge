@@ -13,15 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import random
 import json
 import math
-import random
 from functools import partial
 
 import torch
 import torch.distributed as dist
-from cosyvoice.utils.file_utils import read_json_lists, read_lists
 from torch.utils.data import IterableDataset
+from cosyvoice.utils.file_utils import read_lists, read_json_lists
 
 
 class Processor(IterableDataset):
@@ -37,8 +37,8 @@ class Processor(IterableDataset):
         self.source.set_epoch(epoch)
 
     def __iter__(self):
-        """Return an iterator over the source dataset processed by the
-        given processor.
+        """ Return an iterator over the source dataset processed by the
+            given processor.
         """
         assert self.source is not None
         assert callable(self.f)
@@ -72,24 +72,22 @@ class DistributedSampler:
         else:
             self.worker_id = worker_info.id
             self.num_workers = worker_info.num_workers
-        return dict(
-            rank=self.rank,
-            world_size=self.world_size,
-            worker_id=self.worker_id,
-            num_workers=self.num_workers,
-        )
+        return dict(rank=self.rank,
+                    world_size=self.world_size,
+                    worker_id=self.worker_id,
+                    num_workers=self.num_workers)
 
     def set_epoch(self, epoch):
         self.epoch = epoch
 
     def sample(self, data):
-        """Sample data according to rank/world_size/num_workers
+        """ Sample data according to rank/world_size/num_workers
 
-        Args:
-            data(List): input data list
+            Args:
+                data(List): input data list
 
-        Returns:
-            List: data list after sample
+            Returns:
+                List: data list after sample
         """
         data = list(range(len(data)))
         # force datalist even
@@ -98,12 +96,12 @@ class DistributedSampler:
                 random.Random(self.epoch).shuffle(data)
             if len(data) < self.world_size:
                 data = data * math.ceil(self.world_size / len(data))
-                data = data[: self.world_size]
-            data = data[self.rank :: self.world_size]
+                data = data[:self.world_size]
+            data = data[self.rank::self.world_size]
         if len(data) < self.num_workers:
             data = data * math.ceil(self.num_workers / len(data))
-            data = data[: self.num_workers]
-        data = data[self.worker_id :: self.num_workers]
+            data = data[:self.num_workers]
+        data = data[self.worker_id::self.num_workers]
         return data
 
 
@@ -125,40 +123,42 @@ class DataList(IterableDataset):
             yield data
 
 
-def Dataset(
-    data_list_file,
-    data_pipeline,
-    mode="train",
-    shuffle=True,
-    partition=True,
-    tts_file="",
-    prompt_utt2data="",
-):
-    """Construct dataset from arguments
+def Dataset(data_list_file,
+            data_pipeline,
+            mode='train',
+            gan=False,
+            shuffle=True,
+            partition=True,
+            tts_file='',
+            prompt_utt2data=''):
+    """ Construct dataset from arguments
 
-    We have two shuffle stage in the Dataset. The first is global
-    shuffle at shards tar/raw file level. The second is global shuffle
-    at training samples level.
+        We have two shuffle stage in the Dataset. The first is global
+        shuffle at shards tar/raw file level. The second is global shuffle
+        at training samples level.
 
-    Args:
-        data_type(str): raw/shard
-        tokenizer (BaseTokenizer): tokenizer to tokenize
-        partition(bool): whether to do data partition in terms of rank
+        Args:
+            data_type(str): raw/shard
+            tokenizer (BaseTokenizer): tokenizer to tokenize
+            partition(bool): whether to do data partition in terms of rank
     """
-    assert mode in ["train", "inference"]
+    assert mode in ['train', 'inference']
     lists = read_lists(data_list_file)
-    if mode == "inference":
+    if mode == 'inference':
         with open(tts_file) as f:
             tts_data = json.load(f)
         utt2lists = read_json_lists(prompt_utt2data)
         # filter unnecessary file in inference mode
-        lists = list(
-            set([utt2lists[utt] for utt in tts_data.keys() if utt2lists[utt] in lists])
-        )
-    dataset = DataList(lists, shuffle=shuffle, partition=partition)
-    if mode == "inference":
-        # map partial arg tts_data in inference mode
+        lists = list({utt2lists[utt] for utt in tts_data.keys() if utt2lists[utt] in lists})
+    dataset = DataList(lists,
+                       shuffle=shuffle,
+                       partition=partition)
+    if mode == 'inference':
+        # map partial arg to parquet_opener func in inference mode
         data_pipeline[0] = partial(data_pipeline[0], tts_data=tts_data)
+    if gan is True:
+        # map partial arg to padding func in gan mode
+        data_pipeline[-1] = partial(data_pipeline[-1], gan=gan)
     for func in data_pipeline:
         dataset = Processor(dataset, func, mode=mode)
     return dataset
