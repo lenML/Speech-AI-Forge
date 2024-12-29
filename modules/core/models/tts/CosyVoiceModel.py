@@ -98,7 +98,10 @@ class CosyVoiceTTSModel(TTSModel):
             device = self.device
             dtype = self.dtype
             model_dir = self.model_dir
-            instruct = True if "-Instruct" in str(model_dir) else False
+
+            # V2 完全支持 instruct 不需要区分模型
+            # instruct = True if "-Instruct" in str(model_dir) else False
+            instruct = True
 
             with open(model_dir / "cosyvoice.yaml", "r") as f:
                 configs = load_hyperpyyaml(f, overrides=self.hp_overrides)
@@ -211,7 +214,7 @@ class CosyVoiceTTSModel(TTSModel):
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def inference_instruct(
-        self, tts_texts: list[str], spk_embedding: torch.Tensor, instruct_text: str
+        self, tts_texts: list[str], prompt_speech_16k: torch.Tensor, instruct_text: str
     ):
         if self.frontend.instruct is False:
             raise ValueError(
@@ -221,8 +224,8 @@ class CosyVoiceTTSModel(TTSModel):
         for text in tts_texts:
             model_input = self.frontend.frontend_instruct2(
                 tts_text=text,
-                spk_embedding=spk_embedding,
                 instruct_text=instruct_text,
+                prompt_speech_16k=prompt_speech_16k,
                 resample_rate=self.sample_rate,
             )
             for model_output in self.model.tts(**model_input):
@@ -291,35 +294,27 @@ class CosyVoiceTTSModel(TTSModel):
 
         instruct_text = emotion or prompt2 or ""
 
-        if spk.gender == "female" or "女" in spk.gender:
-            instruct_text = f"female voice. {instruct_text}"
-        else:
-            instruct_text = f"male voice. {instruct_text}"
-
-        spk_embedding = self.spk_to_embedding(spk) if spk else None
+        # NOTE: v2 版本不需要 token 可以直接用 prompt speech
+        # spk_embedding = self.spk_to_embedding(spk) if spk else None
         ref_wav, ref_text = (
             self.spk_to_ref_wav(spk, emotion=emotion) if spk else (None, None)
         )
 
         infer_func: callable = None
-        if spk_embedding is not None:
-            # NOTE: 如果 spk_embedding 不为空，则直接使用
-            # infer_func = partial(self.inference_sft, spk_embedding=spk_embedding)
+        if instruct_text is not None:
             infer_func = partial(
                 self.inference_instruct,
-                spk_embedding=spk_embedding,
                 instruct_text=instruct_text,
+                prompt_speech_16k=torch.from_numpy(ref_wav).unsqueeze(0),
             )
         elif ref_wav is not None and ref_text:
-            # NOTE: 如果 ref_wav 和 ref_text 都不为空，则使用 zero-shot
             infer_func = partial(
                 self.inference_zero_shot,
                 prompt_text=ref_text,
                 prompt_speech_16k=torch.from_numpy(ref_wav).unsqueeze(0),
             )
         else:
-            raise ValueError("spk_embedding is None")
-            # NOTE: 否则使用 inference_instruct
+            raise ValueError("ref_wav or ref_text is None")
 
         # NOTE: 迷，不是很清楚为什么输入要 16k 输出却是 22050 ...
         sr = 22050
