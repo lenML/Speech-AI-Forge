@@ -109,7 +109,7 @@ Environment variable configuration:
 | ---------------- | ------------------------------------------------------------------------------------------- | --------------- | ---------------------------- | ----------------------- |
 | **TTS**          | [ChatTTS](https://github.com/2noise/ChatTTS)                                                | token-level     | en, zh                       | ✅                       |
 |                  | [FishSpeech](https://github.com/fishaudio/fish-speech)                                       | sentence-level  | en, zh, jp, ko           | ✅ (1.4) |
-|                  | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                        | sentence-level  | en, zh, jp, yue, ko          | ✅                       |
+|                  | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                        | sentence-level  | en, zh, jp, yue, ko          | ✅(v2)                       |
 |                  | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                      | sentence-level  | en, zh                       | ✅                       |
 |                  | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                  | sentence-level  | en, zh                       | ✅                       |
 |                  | GPTSoVits                                                                                    | sentence-level  |                              | 🚧                       |
@@ -129,7 +129,7 @@ Since Forge primarily focuses on API functionality development, automatic downlo
 | ------------ | -------------- | ------------------------------------------------------------------------- |
 | **TTS**      | ChatTTS        | `python -m scripts.dl_chattts --source huggingface`                       |
 |              | FishSpeech(1.4)     | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
-|              | CosyVoice      | `python -m scripts.downloader.dl_cosyvoice_instruct --source huggingface` |
+|              | CosyVoice(v2)      | `python -m scripts.downloader.cosyvoice2 --source huggingface` |
 |              | FireRedTTS     | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
 | **ASR**      | Whisper        | `python -m scripts.downloader.faster_whisper --source huggingface`        |
 | **CV**       | OpenVoice      | `python -m scripts.downloader.open_voice --source huggingface`            |
