@@ -21,7 +21,7 @@ from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk import TTSSpeaker
 from modules.devices import devices
-from modules.repos_static.cosyvoice.cosyvoice.cli.model import CosyVoiceModel
+from modules.repos_static.cosyvoice.cosyvoice.cli.model import CosyVoice2Model
 from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
 
@@ -44,20 +44,22 @@ class CosyVoiceTTSModel(TTSModel):
 
     load_lock = threading.Lock()
 
-    model: Optional[CosyVoiceModel] = None
+    model: Optional[CosyVoice2Model] = None
     frontend: Optional[CosyVoiceFrontEnd] = None
 
     def __init__(self) -> None:
         super().__init__("cosy-voice")
 
         paths = [
-            Path("./models/CosyVoice_300M"),
-            Path("./models/CosyVoice_300M_Instruct"),
-            Path("./models/CosyVoice_300M_SFT"),
+            Path("./models/CosyVoice2-0.5B"),
+            # NOTE: 不再支持老版本，只是为了方便检索留下关键词
+            # Path("./models/CosyVoice_300M"),
+            # Path("./models/CosyVoice_300M_Instruct"),
+            # Path("./models/CosyVoice_300M_SFT"),
         ]
         paths = [p for p in paths if p.exists()]
         if len(paths) == 0:
-            paths = [Path("./models/CosyVoice_300M")]
+            paths = [Path("./models/CosyVoice2-0.5B")]
             self.logger.info("No CosyVoice model found")
         else:
             self.logger.info(f"Found CosyVoice model: {paths}")
@@ -70,6 +72,12 @@ class CosyVoiceTTSModel(TTSModel):
         self.model = CosyVoiceTTSModel.model
         self.frontend = CosyVoiceTTSModel.frontend
 
+        self.hp_overrides = {
+            "qwen_pretrain_path": str(self.model_dir / "CosyVoice-BlankEN")
+        }
+
+        self.sample_rate = 24000
+
     def is_downloaded(self) -> bool:
         return self.model_dir.exists()
 
@@ -81,7 +89,7 @@ class CosyVoiceTTSModel(TTSModel):
 
     def load(
         self, context: TTSPipelineContext = None
-    ) -> tuple[CosyVoiceModel, CosyVoiceFrontEnd]:
+    ) -> tuple[CosyVoice2Model, CosyVoiceFrontEnd]:
         with self.load_lock:
             if CosyVoiceTTSModel.model is not None:
                 return CosyVoiceTTSModel.model, CosyVoiceTTSModel.frontend
@@ -90,23 +98,31 @@ class CosyVoiceTTSModel(TTSModel):
             device = self.device
             dtype = self.dtype
             model_dir = self.model_dir
+            instruct = True if "-Instruct" in str(model_dir) else False
 
             with open(model_dir / "cosyvoice.yaml", "r") as f:
-                configs = load_hyperpyyaml(f)
+                configs = load_hyperpyyaml(f, overrides=self.hp_overrides)
 
             frontend = CosyVoiceFrontEnd(
                 get_tokenizer=configs["get_tokenizer"],
                 feat_extractor=configs["feat_extractor"],
                 campplus_model=model_dir / "campplus.onnx",
-                speech_tokenizer_model=model_dir / "speech_tokenizer_v1.onnx",
+                speech_tokenizer_model=model_dir / "speech_tokenizer_v2.onnx",
                 spk2info=model_dir / "spk2info.pt",
-                instruct=True,
+                instruct=instruct,
                 allowed_special=configs["allowed_special"],
             )
             frontend.device = device
             self.frontend = frontend
 
-            model = CosyVoiceModel(configs["llm"], configs["flow"], configs["hift"])
+            # NOTE: 好像 voice 采样率和这个采样率不一样？
+            self.sample_rate = configs["sample_rate"]
+
+            model = CosyVoice2Model(
+                llm=configs["llm"],
+                flow=configs["flow"],
+                hift=configs["hift"],
+            )
             model.device = device
             model.load(
                 llm_model=model_dir / "llm.pt",
@@ -162,8 +178,8 @@ class CosyVoiceTTSModel(TTSModel):
             model_input = self.frontend.frontend_sft(
                 tts_text=text, spk_embedding=spk_embedding
             )
-            model_output = self.model.inference(**model_input)
-            tts_speeches.append(model_output["tts_speech"])
+            for model_output in self.model.tts(**model_input):
+                tts_speeches.append(model_output["tts_speech"])
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def inference_zero_shot(
@@ -172,10 +188,10 @@ class CosyVoiceTTSModel(TTSModel):
         tts_speeches = []
         for text in tts_texts:
             model_input = self.frontend.frontend_zero_shot(
-                text, prompt_text, prompt_speech_16k
+                text, prompt_text, prompt_speech_16k, resample_rate=self.sample_rate
             )
-            model_output = self.model.inference(**model_input)
-            tts_speeches.append(model_output["tts_speech"])
+            for model_output in self.model.tts(**model_input):
+                tts_speeches.append(model_output["tts_speech"])
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def inference_cross_lingual(
@@ -187,9 +203,11 @@ class CosyVoiceTTSModel(TTSModel):
             )
         tts_speeches = []
         for text in tts_texts:
-            model_input = self.frontend.frontend_cross_lingual(text, prompt_speech_16k)
-            model_output = self.model.inference(**model_input)
-            tts_speeches.append(model_output["tts_speech"])
+            model_input = self.frontend.frontend_cross_lingual(
+                text, prompt_speech_16k, resample_rate=self.sample_rate
+            )
+            for model_output in self.model.tts(**model_input):
+                tts_speeches.append(model_output["tts_speech"])
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def inference_instruct(
@@ -201,11 +219,14 @@ class CosyVoiceTTSModel(TTSModel):
             )
         tts_speeches = []
         for text in tts_texts:
-            model_input = self.frontend.frontend_instruct(
-                tts_text=text, spk_embedding=spk_embedding, instruct_text=instruct_text
+            model_input = self.frontend.frontend_instruct2(
+                tts_text=text,
+                spk_embedding=spk_embedding,
+                instruct_text=instruct_text,
+                resample_rate=self.sample_rate,
             )
-            model_output = self.model.inference(**model_input)
-            tts_speeches.append(model_output["tts_speech"])
+            for model_output in self.model.tts(**model_input):
+                tts_speeches.append(model_output["tts_speech"])
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def spk_to_embedding(self, spk: TTSSpeaker):
@@ -233,7 +254,7 @@ class CosyVoiceTTSModel(TTSModel):
         return wav, ref_data.text
 
     def get_sample_rate(self) -> int:
-        return 22050
+        return self.sample_rate
 
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
