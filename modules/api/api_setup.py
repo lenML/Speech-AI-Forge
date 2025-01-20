@@ -86,6 +86,7 @@ def process_api_args(args: argparse.Namespace, app: FastAPI):
 
     if cors_origin:
         api.set_cors(allow_origins=[cors_origin])
+        logger.info(f"allow CORS origin: {cors_origin}")
 
     if not no_playground:
         api.setup_playground()

@@ -31,17 +31,6 @@ from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
 
-
-def base64_to_int16_wav(base64_audio: str) -> tuple[np.ndarray, int]:
-    audio_data = base64.b64decode(base64_audio)
-    audio_io = io.BytesIO(audio_data)
-    audio: AudioSegment = AudioSegment.from_file(audio_io)
-    audio = audio.set_channels(1)
-    audio = audio.set_sample_width(2)  # 16-bit audio
-    audio_data_int16 = np.array(audio.get_array_of_samples(), dtype=np.int16)
-    return audio_data_int16, audio.frame_rate
-
-
 class SpeakerReference(BaseModel):
     wav_b64: str
     text: str

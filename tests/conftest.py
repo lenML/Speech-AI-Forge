@@ -25,7 +25,7 @@ process_model_args(args)
 config.runtime_env_vars.off_tqdm = True
 devices.reset_device()
 app_instance = create_api(fastapi.FastAPI())
-
+app_instance.set_cors()
 
 @fixture
 def client():
