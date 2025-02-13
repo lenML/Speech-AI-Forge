@@ -91,6 +91,8 @@ class BaseModelDownloader(ModelDownloader):
             cache_dir=self.cache_dir,
             local_dir=self.model_dir,
             local_dir_use_symlinks=False,
+            force_download=True,
+            ignore_patterns=[".gitattributes"],
         )
 
     def from_huggingface_just_requires(self):
