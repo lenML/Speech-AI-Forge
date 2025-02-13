@@ -5,7 +5,7 @@ from scripts.dl_base import BaseModelDownloader
 logger = logging.getLogger(__name__)
 
 
-class FasterWhisperDownloader(BaseModelDownloader):
+class VocosMel24khzDownloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
             "config.yaml",
@@ -25,4 +25,4 @@ if __name__ == "__main__":
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    FasterWhisperDownloader()(source=args.source)
+    VocosMel24khzDownloader()(source=args.source)

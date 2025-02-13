@@ -17,6 +17,7 @@ class BaseModelDownloader(ModelDownloader):
         modelscope_revision="master",
         huggingface_revision="main",
         just_download_required_files=False,
+        ignore_patterns=[".gitattributes"],
     ):
         super().__init__()
         self.model_name = model_name
@@ -28,6 +29,7 @@ class BaseModelDownloader(ModelDownloader):
         self.model_dir = self.dir_path / model_name
         self.cache_dir = self.dir_path / "cache"
         self.just_download_required_files = just_download_required_files
+        self.ignore_patterns = ignore_patterns
 
         if not self.dir_path.exists():
             self.dir_path.mkdir(parents=True)
@@ -47,7 +49,9 @@ class BaseModelDownloader(ModelDownloader):
                     revision=self.modelscope_revision,
                     cache_dir=str(self.cache_dir),
                 )
-                shutil.move(downloaded_file, self.model_dir / file)
+                target_path = self.model_dir / file
+                shutil.copy2(downloaded_file, target_path)
+                os.remove(downloaded_file)
                 self.logger.info(f"Downloaded {file} from ModelScope.")
             except Exception as e:
                 self.logger.error(f"Failed to download {file} from ModelScope: {e}")
@@ -92,7 +96,7 @@ class BaseModelDownloader(ModelDownloader):
             local_dir=self.model_dir,
             local_dir_use_symlinks=False,
             force_download=True,
-            ignore_patterns=[".gitattributes"],
+            ignore_patterns=self.ignore_patterns,
         )
 
     def from_huggingface_just_requires(self):
@@ -105,8 +109,12 @@ class BaseModelDownloader(ModelDownloader):
                     filename=file,
                     revision=self.huggingface_revision,
                     cache_dir=str(self.cache_dir),
+                    force_download=True,
+                    local_dir_use_symlinks=False,
                 )
-                shutil.move(downloaded_file, self.model_dir / file)
+                target_path = self.model_dir / file
+                shutil.copy2(downloaded_file, target_path)
+                os.remove(downloaded_file)
                 self.logger.info(f"Downloaded {file} from HuggingFace.")
             except Exception as e:
                 self.logger.error(f"Failed to download {file} from HuggingFace: {e}")
@@ -124,6 +132,14 @@ class BaseModelDownloader(ModelDownloader):
         self.logger.info(
             f"Model downloaded from HuggingFace successfully, saved at: {self.model_dir}"
         )
+
+    # 移除文件重新下载，huggingface会创建软连接导致检测的时候以为已经下载了...
+    def remove_files(self):
+        try:
+            shutil.rmtree(self.model_dir)
+            shutil.rmtree(self.cache_dir)
+        except Exception as e:
+            self.logger.error(f"Failed to delete cache directory {self.cache_dir}: {e}")
 
     def check_exist(self) -> bool:
         if not self.model_dir.exists():
