@@ -22,5 +22,5 @@ client
     },
   })
   .then((audio) => {
-    fs.writeFileSync("./example_v2.mp3", Buffer.from(audio));
+    fs.writeFileSync("./example_v2_out.mp3", Buffer.from(audio));
   });

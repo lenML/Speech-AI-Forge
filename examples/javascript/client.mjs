@@ -37,7 +37,7 @@ export class SAFClient {
     const url = this.#join(path, method === "GET" ? body : undefined);
     const resp = await fetch(url, {
       method,
-      ...(body && method === ""
+      ...(body && method === "POST"
         ? {
             headers: {
               "Content-Type": "application/json",
@@ -47,7 +47,9 @@ export class SAFClient {
         : {}),
     });
     if (resp.status !== 200) {
-      throw new Error(`Unexpected status code ${resp.status}`);
+      throw new Error(
+        `Unexpected status code ${resp.status}.\n${await resp.text()}`
+      );
     }
     return resp;
   }
