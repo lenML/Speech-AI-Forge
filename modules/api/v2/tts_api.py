@@ -5,7 +5,6 @@ tts post api
 """
 
 import base64
-import io
 import logging
 from typing import Optional
 
@@ -27,6 +26,8 @@ from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from pydub import AudioSegment
+
+from modules.utils.bytes_to_wav import convert_bytes_to_wav_bytes
 
 
 logger = logging.getLogger(__name__)
@@ -72,10 +73,11 @@ async def forge_text_synthesize(request: ForgeTextSynthesizeRequest):
         elif request.spk.from_spk_name is not None:
             spk = spk_mgr.get_speaker(request.spk.from_spk_name)
         elif request.spk.from_ref is not None:
-            wav_data, ref_sr = base64.b64decode(request.spk.from_ref.wav_b64)
+            audio_data = base64.b64decode(request.spk.from_ref.wav_b64)
+            wav_data, wav_sr = convert_bytes_to_wav_bytes(audio_bytes=audio_data)
             ref_text = request.spk.from_ref.text
             spk = TTSSpeaker.from_ref_wav_bytes(
-                ref_wav=(ref_sr, wav_data),
+                ref_wav=(wav_sr, wav_data),
                 text=ref_text,
             )
     if spk is None:
