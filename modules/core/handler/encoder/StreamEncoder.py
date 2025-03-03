@@ -128,12 +128,11 @@ class StreamEncoder:
     def write(self, data: bytes):
         if self.p is None:
             raise Exception("Encoder is not open")
+        # print("write:", len(data))
         self.p.stdin.write(data)
         self.p.stdin.flush()
 
     def read(self) -> bytes:
-        if self.p is None:
-            return b""
         try:
             data = self.output_queue.get(timeout=self.timeout)
             # print("read: ", len(data))
@@ -143,10 +142,10 @@ class StreamEncoder:
 
     def read_all(self) -> bytes:
         data = b""
-        if self.p is None:
-            return data
 
         def is_end():
+            if self.p is None:
+                return True
             if not isinstance(self.p, subprocess.Popen):
                 return True
             return self.p.poll() is not None
@@ -171,7 +170,6 @@ class StreamEncoder:
         except subprocess.TimeoutExpired:
             self.p.terminate()  # 超时则强制结束
             self.p.wait()  # 确保进程已结束
-        self.p = None
 
     def terminate(self):
         if self.p is None:

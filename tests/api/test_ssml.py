@@ -22,7 +22,7 @@ def test_synthesize_ssml_empty_ssml(client):
     response = client.post(
         "/v1/ssml", json={"ssml": "", "format": "mp3", "batch_size": 4}
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json() == {"detail": "SSML content is required."}
 
 
@@ -32,7 +32,7 @@ def test_synthesize_ssml_invalid_batch_size(client):
         "/v1/ssml",
         json={"ssml": ssml_content, "format": "mp3", "batch_size": 0},
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json() == {"detail": "Batch size must be greater than 0."}
 
 

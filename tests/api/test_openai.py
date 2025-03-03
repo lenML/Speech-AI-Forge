@@ -24,7 +24,7 @@ def test_openai_speech_api(client, input_text, voice):
         assert "Invalid voice" in response.json().get("detail", "")
     else:
         assert response.status_code == 200
-        assert response.headers["Content-Type"] == "audio/mpeg"
+        assert response.headers["Content-Type"] == "audio/wav"
         with open(
             os.path.join(
                 tests.conftest.test_outputs_dir,

@@ -160,22 +160,21 @@ class OpenVoiceModel(VCModel):
 
 
 if __name__ == "__main__":
-    import librosa
+    import soundfile as sf
     from scipy.io import wavfile
 
     model = OpenVoiceModel()
     model.load()
 
-    sr = model.sampling_rate
-
     src_audio_path = "./tests/test_inputs/cosyvoice_out1.wav"
     ref_audio_path = "./tests/test_inputs/chattts_out1.wav"
 
-    src_audio, _ = librosa.load(src_audio_path, sr=sr)
-    ref_audio, _ = librosa.load(ref_audio_path, sr=sr)
+    src_audio, sr1 = sf.read(src_audio_path, dtype="int16")
+    ref_audio, sr2 = sf.read(ref_audio_path, dtype="int16")
+    ref_spk = TTSSpeaker.from_ref_wav(ref_wav=(sr2, ref_audio))
 
     sr, output = model.convert(
-        src_audio=(sr, src_audio), ref_audio=(sr, ref_audio), config=VCConfig()
+        src_audio=(sr1, src_audio), ref_spk=ref_spk, config=VCConfig()
     )
 
     wavfile.write("./openvoice_output.wav", sr, output)

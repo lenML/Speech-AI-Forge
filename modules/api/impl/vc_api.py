@@ -125,6 +125,11 @@ def setup(app: APIManager):
             bitrate="64k",
         )
 
+        if ref_spk is None:
+            raise HTTPException(
+                status_code=422, detail="Either ref_audio or ref_spk should be provided"
+            )
+
         try:
             handler = VCHandler(
                 ref_spk=ref_spk,
