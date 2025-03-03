@@ -1,4 +1,6 @@
-from time import sleep
+import logging
+import threading
+from time import sleep, time
 from typing import Generator, Literal, Union
 
 from pydub import AudioSegment
@@ -79,6 +81,8 @@ class AudioPipeline:
 
 class TTSPipeline(AudioPipeline):
 
+    logger = logging.getLogger(__name__)
+
     def __init__(self, context: TTSPipelineContext):
         super().__init__(context=context)
         self.model: TTSModel = None
@@ -97,23 +101,37 @@ class TTSPipeline(AudioPipeline):
         )
         return synth
 
-    def generate(self) -> NP_AUDIO:
+    def get_timeout(self):
+        # 从配置读取，默认 5 分钟
+        timeout = self.context.infer_config.timeout
+        if timeout is None or not isinstance(timeout, (int, float)) or timeout < 0:
+            timeout = 60.0 * 5
+        return timeout
+
+    def generate(self, timeout: Union[float, None] = None) -> NP_AUDIO:
         synth = self.create_synth()
         synth.start_generate()
-        synth.wait_done()
+        synth.wait_done(timeout=timeout or self.get_timeout())
         audio = synth.sr(), synth.read()
         return self.process_np_audio(audio)
 
-    def generate_stream(self) -> Generator[NP_AUDIO, None, None]:
+    def generate_stream(
+        self, timeout: Union[float, None] = None
+    ) -> Generator[NP_AUDIO, None, None]:
         synth = self.create_synth()
         synth.start_generate()
+        event = threading.Event()
+        start_time = time()
+        timeout = timeout or self.get_timeout()
         while not synth.is_done():
+            if time() - start_time > timeout:
+                self.logger.error("Stream generation timed out")
+                break
             data = synth.read()
             if data.size > 0:
                 audio = synth.sr(), data
                 yield self.process_np_audio(audio)
-            # TODO: replace with threading.Event
-            sleep(0.1)
+            event.wait(0.1)
         data = synth.read()
         if data.size > 0:
             audio = synth.sr(), data

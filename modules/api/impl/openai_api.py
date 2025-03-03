@@ -31,7 +31,7 @@ class AudioSpeechRequest(BaseModel):
     input: str  # 需要合成的文本
     model: str = "chat-tts"
     voice: str = "female2"
-    response_format: AudioFormat = "mp3"
+    response_format: AudioFormat = "raw"
     speed: float = Field(1, ge=0.1, le=10, description="Speed of the audio")
     seed: int = 42
 

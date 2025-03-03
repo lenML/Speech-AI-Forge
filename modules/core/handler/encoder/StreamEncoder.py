@@ -1,4 +1,5 @@
 import io
+import os
 import queue
 import subprocess
 import threading
@@ -7,6 +8,10 @@ from time import sleep
 
 import pydub
 import pydub.utils
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def wave_header_chunk(frame_input=b"", channels=1, sample_width=2, sample_rate=24000):
@@ -21,18 +26,19 @@ def wave_header_chunk(frame_input=b"", channels=1, sample_width=2, sample_rate=2
 
 
 class StreamEncoder:
+
     def __init__(self) -> None:
         self.encoder = pydub.utils.get_encoder_name()
         self.p: subprocess.Popen = None
         self.output_queue = queue.Queue()
         self.read_thread = None
-        self.chunk_size = 1024
         self.header = None
         self.timeout = 0.1
 
         self.channels = 1
         self.sample_width = 2
         self.sample_rate = 24000
+        self.stderr_thread = None
 
     def set_header(
         self, *, frame_input=b"", channels=1, sample_width=2, sample_rate=24000
@@ -45,6 +51,10 @@ class StreamEncoder:
         self.header = header_bytes
         self.write(header_bytes)
 
+        logger.info(
+            f"StreamEncoder header set, channels: {channels}, sample_width: {sample_width}, sample_rate: {sample_rate}"
+        )
+
     def open(
         self, format: str = "mp3", acodec: str = "libmp3lame", bitrate: str = "320k"
     ):
@@ -54,9 +64,13 @@ class StreamEncoder:
                 encoder,
                 "-re",
                 "-threads",
-                "4",
+                str(os.cpu_count() or 4),
                 "-f",
-                "wav",
+                "s16le",  # 指定输入格式为 16 位 PCM
+                "-ar",
+                str(self.sample_rate),  # 输入采样率
+                "-ac",
+                "1",  # 输入单声道
                 "-i",
                 "pipe:0",
                 "-f",
@@ -74,17 +88,40 @@ class StreamEncoder:
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            bufsize=0,  # 禁用缓冲
+            # NOTE: 这里设置为0可以低延迟解码，但是容易阻塞影响ffmpeg效率，所以最好还是设置上，因为编码相较于生成其实多不了多少时间
+            bufsize=65536,
         )
         self.read_thread = threading.Thread(target=self._read_output)
         self.read_thread.daemon = True
         self.read_thread.start()
+        self.stderr_thread = threading.Thread(target=self._read_stderr)
+        self.stderr_thread.daemon = True
+        self.stderr_thread.start()
+
+        logger.info(
+            f"StreamEncoder opened, encoder: {encoder}, format: {format}, acodec: {acodec}, bitrate: {bitrate}, sample_rate: {self.sample_rate}, channels: {self.channels}, sample_width: {self.sample_width}"
+        )
 
     def _read_output(self):
+        buffer_size = 65536
+        stdout_buffer = io.BufferedReader(self.p.stdout, buffer_size=buffer_size)
         while self.p:
-            data: bytes = self.p.stdout.read(self.chunk_size)
-            if data:
+            peeked_data = stdout_buffer.peek(buffer_size)
+            if peeked_data:
+                data = stdout_buffer.read1(len(peeked_data))
+                # logger.debug(f"Read {len(data)} bytes dynamically from stdout")
                 self.output_queue.put(data)
+                # print("queue: ", len(data))
+            else:
+                # 无数据时短暂休眠
+                sleep(self.timeout)
+        stdout_buffer.close()
+
+    def _read_stderr(self):
+        while self.p and self.p.stderr:
+            line = self.p.stderr.readline()
+            if line:
+                logger.debug(f"FFmpeg stderr: {line.decode().strip()}")
             else:
                 sleep(self.timeout)
 
@@ -96,16 +133,18 @@ class StreamEncoder:
 
     def read(self) -> bytes:
         if self.p is None:
-            raise Exception("Encoder is not open")
+            return b""
         try:
-            return self.output_queue.get(timeout=self.timeout)
+            data = self.output_queue.get(timeout=self.timeout)
+            # print("read: ", len(data))
+            return data
         except queue.Empty:
             return b""
 
     def read_all(self) -> bytes:
-        if self.p is None:
-            raise Exception("Encoder is not open")
         data = b""
+        if self.p is None:
+            return data
 
         def is_end():
             if not isinstance(self.p, subprocess.Popen):
@@ -116,6 +155,7 @@ class StreamEncoder:
             try:
                 while not is_end() or not self.output_queue.empty():
                     data += self.output_queue.get(timeout=self.timeout)
+                    # print("read_all: ", len(data))
             except queue.Empty:
                 pass
             sleep(self.timeout)
@@ -126,7 +166,12 @@ class StreamEncoder:
             return
         if not self.p.stdin.closed:
             self.p.stdin.close()
-        self.p.wait()
+        try:
+            self.p.wait(timeout=10)  # 等待最多10秒
+        except subprocess.TimeoutExpired:
+            self.p.terminate()  # 超时则强制结束
+            self.p.wait()  # 确保进程已结束
+        self.p = None
 
     def terminate(self):
         if self.p is None:

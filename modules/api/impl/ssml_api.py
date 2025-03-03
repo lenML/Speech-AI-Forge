@@ -15,7 +15,7 @@ from modules.core.handler.TTSHandler import TTSHandler
 
 class SSMLRequest(BaseModel):
     ssml: str
-    format: AudioFormat = "mp3"
+    format: AudioFormat = "raw"
 
     # NOTE: 🤔 也许这个值应该配置成系统变量？ 传进来有点奇怪
     batch_size: int = 4
@@ -51,20 +51,21 @@ async def synthesize_ssml_api(
 
         if batch_size < 1:
             raise HTTPException(
-                status_code=400, detail="Batch size must be greater than 0."
+                status_code=422, detail="Batch size must be greater than 0."
             )
 
         if spliter_thr < 50:
             raise HTTPException(
-                status_code=400, detail="Spliter threshold must be greater than 50."
+                status_code=422, detail="Spliter threshold must be greater than 50."
             )
 
         if not ssml or ssml == "":
-            raise HTTPException(status_code=400, detail="SSML content is required.")
+            raise HTTPException(status_code=422, detail="SSML content is required.")
 
-        if format not in ["mp3", "wav"]:
+        if format not in AudioFormat.__members__:
             raise HTTPException(
-                status_code=400, detail="Format must be 'mp3' or 'wav'."
+                status_code=422,
+                detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
             )
 
         infer_config = InferConfig(

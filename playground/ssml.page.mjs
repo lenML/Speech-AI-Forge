@@ -199,7 +199,8 @@ const SSMLHistory = () => {
                   <audio controls>
                     <source
                       src=${item.url}
-                      type="audio/${item.params.format}"
+                      type="audio/${{ raw: "wav" }[item.params.format] ||
+                      item.params.format}"
                     />
                   </audio>
                 </td>
@@ -231,6 +232,9 @@ const SSMLForm = () => {
           },
         ],
       });
+    } catch(err) {
+      alert(err);
+      console.error(err);
     } finally {
       useStore.set({ loading: false });
     }

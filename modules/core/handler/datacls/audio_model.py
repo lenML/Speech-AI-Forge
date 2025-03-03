@@ -24,7 +24,9 @@ class AdjustConfig(BaseModel):
 
 
 class EncoderConfig(BaseModel):
+    # NOTE: 默认格式设置为 raw ，即不需要编码的格式
+    # NOTE: raw 格式为 pcm 数据流，应该以 wav 格式解码
+    format: AudioFormat = AudioFormat.raw
     # 32k / 64k / 96k / 128k / 192k / 256k / 320k
     bitrate: str = "64k"
-    format: AudioFormat = AudioFormat.mp3
     acodec: Optional[str] = None

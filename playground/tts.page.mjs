@@ -325,6 +325,7 @@ export const TTSPage = () => {
     try {
       await synthesizeTTS();
     } catch (error) {
+      alert(error);
       console.error("Error synthesizing TTS:", error);
     } finally {
       setUI({ loading: false });
@@ -509,7 +510,9 @@ export const TTSPage = () => {
                       <audio controls>
                         <source
                           src=${item.url}
-                          type="audio/${item.params.format}"
+                          type="audio/${{
+                            raw: "wav",
+                          }[item.params.format] || item.params.format}"
                         />
                       </audio>
                     </td>

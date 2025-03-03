@@ -43,18 +43,22 @@ class BatchGenerate:
     def generate(self):
         self.model.reset()
         stream = self.context.infer_config.stream
-        for batch in self.batches:
-            is_break = batch.segments[0].seg._type == "break"
-            if is_break:
-                self.generate_break(batch)
-                continue
 
-            if stream:
-                self.generate_batch_stream(batch)
-            else:
-                self.generate_batch(batch)
+        try:
+            for batch in self.batches:
+                is_break = batch.segments[0].seg._type == "break"
+                if is_break:
+                    self.generate_break(batch)
+                    continue
 
-        self.done.set()
+                if stream:
+                    self.generate_batch_stream(batch)
+                else:
+                    self.generate_batch(batch)
+        except Exception as e:
+            logger.error(f"error: {e}")
+        finally:
+            self.done.set()
 
     def generate_break(self, batch: TTSBatch):
         for seg in batch.segments:
@@ -102,6 +106,7 @@ class BatchGenerate:
                 audio.data = np.concatenate([audio.data, data], axis=0)
                 audio.sr = sr
 
+        # NOTE: 这里在最后设置 done 是因为流式生成的时候，目前不知道单个segment是否结束
         for seg in batch.segments:
             seg.done = True
 

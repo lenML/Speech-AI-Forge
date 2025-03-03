@@ -47,7 +47,7 @@ class TTSParams(BaseModel):
         42, description="Seed for generate (may be overridden by style or spk)"
     )
 
-    format: str = Query("mp3", description="Response audio format: [mp3,wav]")
+    format: str = Query("raw", description="Response audio format: [mp3,wav,raw]")
     bitrate: str = Query("64k", description="Response audio bitrate")
 
     prompt: str = Query("", description="Text prompt for inference")

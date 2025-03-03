@@ -42,7 +42,7 @@ class VoiceSelectionParams(BaseModel):
 
 class AudioConfig(BaseModel):
     # 编码器参数
-    audioEncoding: AudioFormat = AudioFormat.mp3
+    audioEncoding: AudioFormat = AudioFormat.raw
     audioBitrate: str = "64k"
 
     speakingRate: float = 1
