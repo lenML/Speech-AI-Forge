@@ -1,4 +1,6 @@
+import asyncio
 import threading
+from time import time
 from typing import Union
 
 from modules.core.models.TTSModel import TTSModel
@@ -30,8 +32,12 @@ class BatchSynth:
 
         self.thread1 = None
 
-    def wait_done(self, timeout: Union[float, None] = None):
-        self.generator.done.wait(timeout=timeout)
+    async def wait_done(self, timeout: int):
+        start_time = time()
+        while not self.generator.done.wait(0.5):
+            if time() - start_time > timeout:
+                raise asyncio.TimeoutError
+            await asyncio.sleep(0.5)
 
     def is_done(self):
         return self.generator.is_done()

@@ -1,7 +1,8 @@
+import asyncio
 import logging
 import threading
 from time import sleep, time
-from typing import Generator, Literal, Union
+from typing import AsyncGenerator, Generator, Literal, Union
 
 from pydub import AudioSegment
 
@@ -108,19 +109,18 @@ class TTSPipeline(AudioPipeline):
             timeout = 60.0 * 5
         return timeout
 
-    def generate(self, timeout: Union[float, None] = None) -> NP_AUDIO:
+    async def generate(self, timeout: Union[float, None] = None) -> NP_AUDIO:
         synth = self.create_synth()
         synth.start_generate()
-        synth.wait_done(timeout=timeout or self.get_timeout())
+        await synth.wait_done(timeout=timeout or self.get_timeout())
         audio = synth.sr(), synth.read()
         return self.process_np_audio(audio)
 
-    def generate_stream(
+    async def generate_stream(
         self, timeout: Union[float, None] = None
-    ) -> Generator[NP_AUDIO, None, None]:
+    ) -> AsyncGenerator[NP_AUDIO, None]:
         synth = self.create_synth()
         synth.start_generate()
-        event = threading.Event()
         start_time = time()
         timeout = timeout or self.get_timeout()
         while not synth.is_done():
@@ -131,7 +131,7 @@ class TTSPipeline(AudioPipeline):
             if data.size > 0:
                 audio = synth.sr(), data
                 yield self.process_np_audio(audio)
-            event.wait(0.1)
+            await asyncio.sleep(0.1)
         data = synth.read()
         if data.size > 0:
             audio = synth.sr(), data

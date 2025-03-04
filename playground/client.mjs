@@ -125,6 +125,9 @@ class APIClient {
         {
           ssml,
           format,
+          batch_size: 4, // 默认 最大不超过 6gb
+          // batch_size: 12, // 最长 500 token 的话大概 4gb
+          // batch_size: 30, // 最长 500 token 的话大概 16gb
         },
         {
           responseType: "blob", // Important for handling binary data

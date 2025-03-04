@@ -138,11 +138,13 @@ def setup(app: APIManager):
                 encoder_config=encoder_config,
             )
 
-            return handler.enqueue_to_response(request=request)
+            handler.set_current_request(request=request)
+            return await handler.enqueue_to_response()
         except Exception as e:
             import logging
 
             logging.exception(e)
+            handler.interrupt()
 
             if isinstance(e, HTTPException):
                 raise e

@@ -329,7 +329,8 @@ class CosyVoiceTTSModel(TTSModel):
             wav = result["tts_speech"].float().cpu().numpy().squeeze()
             results.append((sr, wav))
 
-        self.set_cache(segments=segments, context=context, value=results)
+        if not context.stop:
+            self.set_cache(segments=segments, context=context, value=results)
         yield results
 
 

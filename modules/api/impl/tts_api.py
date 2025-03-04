@@ -207,8 +207,8 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
             encoder_config=encoder_config,
             vc_config=vc_config,
         )
-
-        return handler.enqueue_to_response(request=request)
+        handler.set_current_request(request=request)
+        return await handler.enqueue_to_response()
     except Exception as e:
         import logging
 

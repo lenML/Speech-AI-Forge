@@ -17,7 +17,7 @@ from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
 
-
+# TODO: 这个模型没有写cache
 class FireRedTTSModel(TTSModel):
     model_id = "fire-red-tts"
 

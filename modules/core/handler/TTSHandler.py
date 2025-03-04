@@ -1,5 +1,5 @@
 import logging
-from typing import Generator, Optional
+from typing import AsyncGenerator, Generator, Optional
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
@@ -96,8 +96,10 @@ class TTSHandler(AudioHandler):
         self.ctx.stop = True
         self.pipeline.model.interrupt()
 
-    def enqueue(self) -> NP_AUDIO:
-        return self.pipeline.generate()
+    async def enqueue(self) -> NP_AUDIO:
+        timeout = self.ctx.infer_config.timeout
+        return await self.pipeline.generate(timeout=timeout)
 
-    def enqueue_stream(self) -> Generator[NP_AUDIO, None, None]:
-        return self.pipeline.generate_stream()
+    async def enqueue_stream(self) -> AsyncGenerator[NP_AUDIO, None]:
+        timeout = self.ctx.infer_config.timeout
+        return await self.pipeline.generate_stream(timeout=timeout)

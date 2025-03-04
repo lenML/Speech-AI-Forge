@@ -114,7 +114,8 @@ class FishSpeech14Model(TTSModel):
                 )
 
             ret.append((sr, generated))
-        self.set_cache(segments=segments, context=context, value=ret)
+        if not context.stop:
+            self.set_cache(segments=segments, context=context, value=ret)
         yield ret
 
 

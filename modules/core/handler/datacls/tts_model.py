@@ -32,5 +32,5 @@ class InferConfig(BaseModel):
 
     # 开启同步生成 （主要是给gradio/pytest用）
     sync_gen: bool = False
-    # 超时设置 默认为 60 * 5 五分钟
-    timeout: int = 60 * 5
+    # 超时设置 默认为 60 * 15 十五分钟
+    timeout: int = 60 * 15

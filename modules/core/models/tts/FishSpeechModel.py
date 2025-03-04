@@ -195,7 +195,8 @@ class FishSpeechModel(TTSModel):
 
             self.encoded_prefix.append(decoded)
             ret.append((sr, generated))
-        self.set_cache(segments=segments, context=context, value=ret)
+        if not context.stop:
+            self.set_cache(segments=segments, context=context, value=ret)
         yield ret
 
 

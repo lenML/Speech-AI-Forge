@@ -51,7 +51,7 @@ F5TTS_model_cfg = dict(
     dim=1024, depth=22, heads=16, ff_mult=2, text_dim=512, conv_layers=4
 )
 
-
+# TODO: 这个模型还没写 cache
 class F5TtsModel(TTSModel):
     load_lock = threading.Lock()
 

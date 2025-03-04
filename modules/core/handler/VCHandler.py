@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import AsyncGenerator, Generator
 
 from modules.core.handler.AudioHandler import AudioHandler
 from modules.core.handler.datacls.audio_model import EncoderConfig
@@ -45,13 +45,13 @@ class VCHandler(AudioHandler):
 
         raise Exception(f"Model {model_id} is not supported")
 
-    def enqueue(self) -> NP_AUDIO:
+    async def enqueue(self) -> NP_AUDIO:
         result = self.model.convert(
             src_audio=self.input_audio, config=self.vc_config, ref_spk=self.ref_spk
         )
         return result
 
-    def enqueue_stream(self) -> Generator[NP_AUDIO, None, None]:
+    async def enqueue_stream(self) -> AsyncGenerator[NP_AUDIO, None]:
         raise NotImplementedError(
             "Method 'enqueue_stream' not implemented in VCHandler"
         )

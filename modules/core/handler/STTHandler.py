@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import AsyncGenerator, Generator
 
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
@@ -25,11 +25,11 @@ class STTHandler:
 
         raise Exception(f"Model {model_id} is not supported")
 
-    def enqueue(self) -> TranscribeResult:
+    async def enqueue(self) -> TranscribeResult:
         result = self.model.transcribe(audio=self.input_audio, config=self.stt_config)
         return result
 
-    def enqueue_stream(self) -> Generator[TranscribeResult, None, None]:
+    async def enqueue_stream(self) -> AsyncGenerator[TranscribeResult, None]:
         raise NotImplementedError(
             "Method 'enqueue_stream' must be implemented by subclass"
         )

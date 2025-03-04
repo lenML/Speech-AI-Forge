@@ -38,6 +38,7 @@ class ChatTTSModel(TTSModel):
     def __init__(self) -> None:
         super().__init__("chat-tts")
         self.chat: ChatTTS.Chat = None
+        self.current_infer: ChatTTSInfer = None
 
     def is_downloaded(self) -> bool:
         return Path("./models/ChatTTS").exists()
@@ -82,10 +83,9 @@ class ChatTTSModel(TTSModel):
     def get_infer(self, context: TTSPipelineContext):
         return ChatTTSInfer(self.load())
 
-    current_infer: ChatTTSInfer = None
-
     def interrupt(self, context: TTSPipelineContext = None) -> None:
-        self.current_infer.interrupt()
+        if self.current_infer is not None:
+            self.current_infer.interrupt()
 
     def generate_batch_base(
         self, segments: list[TTSSegment], context: TTSPipelineContext, stream=False
@@ -155,7 +155,8 @@ class ChatTTSModel(TTSModel):
                     for data in results
                 ]
 
-                self.set_cache(segments=segments, context=context, value=audio_arr)
+                if not context.stop:
+                    self.set_cache(segments=segments, context=context, value=audio_arr)
                 return audio_arr
         else:
 
@@ -196,7 +197,10 @@ class ChatTTSModel(TTSModel):
                                 sr1, before = audio_arr_buff[i]
                                 buff = np.concatenate([before, data], axis=0)
                                 audio_arr_buff[i] = (sr1, buff)
-                self.set_cache(segments=segments, context=context, value=audio_arr_buff)
+                if not context.stop:
+                    self.set_cache(
+                        segments=segments, context=context, value=audio_arr_buff
+                    )
 
             return _gen()
 

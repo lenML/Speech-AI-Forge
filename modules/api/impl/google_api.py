@@ -153,12 +153,14 @@ async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
     )
     try:
         media_type = handler.get_media_type()
-        base64_string = handler.enqueue_to_base64()
+        handler.set_current_request(request=request)
+        base64_string = await handler.enqueue_to_base64()
         return {"audioContent": f"data:{media_type};base64,{base64_string}"}
     except Exception as e:
         import logging
 
         logging.exception(e)
+        handler.interrupt()
 
         if isinstance(e, HTTPException):
             raise e

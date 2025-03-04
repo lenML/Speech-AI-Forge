@@ -1,4 +1,4 @@
-from fastapi import Body, HTTPException
+from fastapi import Body, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 
@@ -13,7 +13,7 @@ from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.TTSHandler import TTSHandler
 
 
-class SSMLRequest(BaseModel):
+class SSMLParams(BaseModel):
     ssml: str
     format: AudioFormat = "raw"
 
@@ -34,20 +34,19 @@ class SSMLRequest(BaseModel):
 
 
 async def synthesize_ssml_api(
-    request: SSMLRequest = Body(
-        ..., description="JSON body with SSML string and format"
-    )
+    request: Request,
+    params: SSMLParams = Body(..., description="JSON body with SSML string and format"),
 ):
     try:
-        ssml = request.ssml
-        format = request.format.lower()
-        batch_size = request.batch_size
-        eos = request.eos
-        stream = request.stream
-        spliter_thr = request.spliter_thr
-        enhancer = request.enhancer
-        adjuster = request.adjuster
-        model = request.model
+        ssml = params.ssml
+        format = params.format.lower()
+        batch_size = params.batch_size
+        eos = params.eos
+        stream = params.stream
+        spliter_thr = params.spliter_thr
+        enhancer = params.enhancer
+        adjuster = params.adjuster
+        model = params.model
 
         if batch_size < 1:
             raise HTTPException(
@@ -88,12 +87,14 @@ async def synthesize_ssml_api(
             encoder_config=encoder_config,
         )
 
-        return handler.enqueue_to_response(request=request)
+        handler.set_current_request(request=request)
+        return await handler.enqueue_to_response()
 
     except Exception as e:
         import logging
 
         logging.exception(e)
+        handler.interrupt()
 
         if isinstance(e, HTTPException):
             raise e

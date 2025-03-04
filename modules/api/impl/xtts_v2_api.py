@@ -144,7 +144,8 @@ def setup(app: APIManager):
             vc_config=VCConfig(enabled=False),
         )
 
-        return handler.enqueue_to_response(request=request)
+        handler.set_current_request(request=request)
+        return await handler.enqueue_to_response()
 
     @app.get("/v1/xtts_v2/tts_stream", tags=["XTTS"])
     async def tts_stream(

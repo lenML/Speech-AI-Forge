@@ -137,12 +137,14 @@ async def openai_speech_api(
             vc_config=VCConfig(enabled=False),
         )
 
-        return handler.enqueue_to_response(request=request)
+        handler.set_current_request(request=request)
+        return await handler.enqueue_to_response()
 
     except Exception as e:
         import logging
 
         logging.exception(e)
+        handler.interrupt()
 
         if isinstance(e, HTTPException):
             raise e
@@ -250,6 +252,8 @@ openai api document:
             import logging
 
             logging.exception(e)
+            # TODO: STT 也应该支持 interupt
+            # handler.interrupt()
 
             if isinstance(e, HTTPException):
                 raise e
