@@ -7,6 +7,7 @@ import numpy as np
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 
+from modules.core.handler.cancellation import cancel_on_disconnect
 from modules.core.handler.datacls.audio_model import AudioFormat, EncoderConfig
 from modules.core.handler.datacls.tts_model import InferConfig
 from modules.core.handler.encoder.encoders import (
@@ -65,15 +66,6 @@ class AudioHandler:
         if self.current_request is not None:
             raise ValueError("current_request has been set")
         self.current_request = request
-
-        asyncio.create_task(self.monitor_disconnect(request))
-
-    async def monitor_disconnect(self, request: Request):
-        """后台协程，监听 request 是否断开"""
-        while not await request.is_disconnected():
-            await asyncio.sleep(0.1)
-        logger.debug("request is disconnected")
-        self.interrupt()
 
     def get_encoder(self) -> StreamEncoder:
         encoder_config = self.encoder_config
@@ -140,8 +132,6 @@ class AudioHandler:
         pass
 
     async def enqueue_to_stream_with_request(self) -> AsyncGenerator[bytes, None]:
-        if self.current_request is None:
-            raise ValueError("current_request is not set")
         gen1 = self.enqueue_to_stream()
         async for chunk in gen1:
             if await self.current_request.is_disconnected():
@@ -171,19 +161,27 @@ class AudioHandler:
         encoder.terminate()
 
     async def enqueue_to_bytes(self) -> bytes:
+        if self.current_request is None:
+            raise ValueError("current_request is not set")
+
         encoder = self.get_encoder()
 
-        try:
-            sample_rate, audio_data = await self.enqueue()
-            audio_bytes = read_np_to_wav(audio_data=audio_data)
-            encoder.set_header(sample_rate=sample_rate)
-            encoder.write(audio_bytes)
-            encoder.close()
-            buffer = encoder.read_all()
-        finally:
-            encoder.terminate()
+        # NOTE: 这里的逻辑类似 goto
+        async with cancel_on_disconnect(self.current_request):
+            try:
+                sample_rate, audio_data = await self.enqueue()
+                audio_bytes = read_np_to_wav(audio_data=audio_data)
+                encoder.set_header(sample_rate=sample_rate)
+                encoder.write(audio_bytes)
+                encoder.close()
+                buffer = encoder.read_all()
+            finally:
+                encoder.terminate()
+            return buffer
 
-        return buffer
+        logger.debug(f"disconnected")
+        self.interrupt()
+        raise ConnectionAbortedError()
 
     async def enqueue_to_buffer(self) -> io.BytesIO:
         audio_bytes = await self.enqueue_to_bytes()

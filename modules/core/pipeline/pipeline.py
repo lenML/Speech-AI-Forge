@@ -112,7 +112,10 @@ class TTSPipeline(AudioPipeline):
     async def generate(self, timeout: Union[float, None] = None) -> NP_AUDIO:
         synth = self.create_synth()
         synth.start_generate()
-        await synth.wait_done(timeout=timeout or self.get_timeout())
+        await synth.wait_done(
+            timeout=timeout or self.get_timeout(),
+            query_stop_fn=lambda: self.context.stop,
+        )
         audio = synth.sr(), synth.read()
         return self.process_np_audio(audio)
 
@@ -124,6 +127,10 @@ class TTSPipeline(AudioPipeline):
         start_time = time()
         timeout = timeout or self.get_timeout()
         while not synth.is_done():
+            if self.context.stop:
+                # 如果先stop后generate，有可能走到这里
+                self.model.interrupt()
+                raise ConnectionAbortedError()
             if time() - start_time > timeout:
                 self.logger.error("Stream generation timed out")
                 break

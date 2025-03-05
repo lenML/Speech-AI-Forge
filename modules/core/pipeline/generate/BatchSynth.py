@@ -32,11 +32,15 @@ class BatchSynth:
 
         self.thread1 = None
 
-    async def wait_done(self, timeout: int):
+    async def wait_done(
+        self, timeout: int, query_stop_fn: Union[None, callable] = None
+    ):
         start_time = time()
-        while not self.generator.done.wait(0.5):
+        while not self.generator.done.is_set():
+            if query_stop_fn is not None and query_stop_fn():
+                raise ConnectionAbortedError()
             if time() - start_time > timeout:
-                raise asyncio.TimeoutError
+                raise asyncio.TimeoutError()
             await asyncio.sleep(0.5)
 
     def is_done(self):
