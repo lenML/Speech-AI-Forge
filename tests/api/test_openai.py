@@ -3,7 +3,7 @@ import os
 import pytest
 
 import tests.conftest
-from modules.api.impl.openai_api import AudioSpeechRequest
+from modules.api.impl.openai_api import AudioSpeechParams
 
 
 @pytest.mark.parametrize(
@@ -16,7 +16,7 @@ from modules.api.impl.openai_api import AudioSpeechRequest
 )
 @pytest.mark.openai_api
 def test_openai_speech_api(client, input_text, voice):
-    request = AudioSpeechRequest(input=input_text, voice=voice)
+    request = AudioSpeechParams(input=input_text, voice=voice)
     response = client.post("/v1/audio/speech", json=request.model_dump())
 
     if voice == "unknown_voice":
@@ -37,7 +37,7 @@ def test_openai_speech_api(client, input_text, voice):
 
 @pytest.mark.openai_api
 def test_openai_speech_api_with_invalid_style(client):
-    request = AudioSpeechRequest(
+    request = AudioSpeechParams(
         input="Test text", voice="female2", style="invalid_style"
     )
     response = client.post("/v1/audio/speech", json=request.model_dump())

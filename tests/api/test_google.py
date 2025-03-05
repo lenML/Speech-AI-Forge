@@ -7,7 +7,7 @@ import tests.conftest
 from modules.api.impl.google_api import (
     AudioConfig,
     EnhancerConfig,
-    GoogleTextSynthesizeRequest,
+    GoogleTextSynthesizeParams,
     SynthesisInput,
     VoiceSelectionParams,
 )
@@ -15,7 +15,7 @@ from modules.api.impl.google_api import (
 
 @pytest.fixture
 def body():
-    req = GoogleTextSynthesizeRequest(
+    req = GoogleTextSynthesizeParams(
         input=SynthesisInput(),
         voice=VoiceSelectionParams(),
         audioConfig=AudioConfig(),
@@ -35,7 +35,7 @@ def body():
 )
 @pytest.mark.google_api
 def test_google_text_synthesize_success(
-    client, body: GoogleTextSynthesizeRequest, enable_enhancer, speed
+    client, body: GoogleTextSynthesizeParams, enable_enhancer, speed
 ):
     body.enhancerConfig.enabled = enable_enhancer
     body.audioConfig.speakingRate = speed
@@ -65,7 +65,7 @@ def test_google_text_synthesize_success(
 )
 @pytest.mark.google_api
 def test_google_text_synthesize_ssml_success(
-    client, body: GoogleTextSynthesizeRequest, enable_enhancer, speed
+    client, body: GoogleTextSynthesizeParams, enable_enhancer, speed
 ):
     body.input.text = None
     body.input.ssml = """
@@ -102,9 +102,7 @@ def test_google_text_synthesize_missing_input(
 
 
 @pytest.mark.google_api
-def test_google_text_synthesize_invalid_voice(
-    client, body: GoogleTextSynthesizeRequest
-):
+def test_google_text_synthesize_invalid_voice(client, body: GoogleTextSynthesizeParams):
     body.voice.name = "invalid_voice"
 
     response = client.post("/v1/text:synthesize", json=body.model_dump())
@@ -114,7 +112,7 @@ def test_google_text_synthesize_invalid_voice(
 
 @pytest.mark.google_api
 def test_google_text_synthesize_invalid_audio_encoding(
-    client, body: GoogleTextSynthesizeRequest
+    client, body: GoogleTextSynthesizeParams
 ):
     body.audioConfig.audioEncoding = "invalid_format"
 

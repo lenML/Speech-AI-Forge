@@ -63,8 +63,10 @@ class AudioHandler:
         )
 
     def set_current_request(self, request: Request):
-        if self.current_request is not None:
-            raise ValueError("current_request has been set")
+        assert self.current_request is None, "current_request has been set"
+        assert isinstance(
+            request, Request
+        ), f"request should be Request, but got {type(request)}"
         self.current_request = request
 
     def get_encoder(self) -> StreamEncoder:

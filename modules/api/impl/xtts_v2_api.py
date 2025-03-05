@@ -67,7 +67,7 @@ class TTSSettingsRequest(BaseModel):
     style: str = None
 
 
-class SynthesisRequest(BaseModel):
+class SynthesisParams(BaseModel):
     text: str
     speaker_wav: str
 
@@ -94,11 +94,11 @@ def setup(app: APIManager):
     @app.post(
         "/v1/xtts_v2/tts_to_audio", response_class=StreamingResponse, tags=["XTTS"]
     )
-    async def tts_to_audio(request: SynthesisRequest):
-        text = request.text
+    async def tts_to_audio(request: Request, params: SynthesisParams):
+        text = params.text
         # speaker_wav 就是 speaker id 。。。
-        voice_id = request.speaker_wav
-        language = request.language
+        voice_id = params.speaker_wav
+        language = params.language
 
         spk = spk_mgr.get_speaker_by_id(voice_id) or spk_mgr.get_speaker(voice_id)
         if spk is None:

@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from pydantic import BaseModel
 
 from modules.api import utils as api_utils
@@ -53,7 +53,7 @@ class AudioConfig(BaseModel):
     spliterThreshold: int = 100
 
 
-class GoogleTextSynthesizeRequest(BaseModel):
+class GoogleTextSynthesizeParams(BaseModel):
     input: SynthesisInput
     voice: VoiceSelectionParams
     audioConfig: AudioConfig
@@ -64,11 +64,11 @@ class GoogleTextSynthesizeResponse(BaseModel):
     audioContent: str
 
 
-async def google_text_synthesize(request: GoogleTextSynthesizeRequest):
-    input = request.input
-    voice = request.voice
-    audioConfig = request.audioConfig
-    enhancerConfig = request.enhancerConfig
+async def google_text_synthesize(params: GoogleTextSynthesizeParams, request: Request):
+    input = params.input
+    voice = params.voice
+    audioConfig = params.audioConfig
+    enhancerConfig = params.enhancerConfig
 
     # 提取参数
 

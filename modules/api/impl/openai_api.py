@@ -2,7 +2,7 @@ import io
 from typing import List, Optional
 
 import numpy as np
-from fastapi import Body, File, Form, HTTPException, UploadFile
+from fastapi import Body, File, Form, HTTPException, Request, UploadFile
 from numpy import clip
 from pydantic import BaseModel, Field
 from pydub import AudioSegment
@@ -27,7 +27,8 @@ from modules.data import styles_mgr
 
 from modules.api.constants import support_bitrates
 
-class AudioSpeechRequest(BaseModel):
+
+class AudioSpeechParams(BaseModel):
     input: str  # 需要合成的文本
     model: str = "chat-tts"
     voice: str = "female2"
@@ -56,28 +57,29 @@ class AudioSpeechRequest(BaseModel):
 
 
 async def openai_speech_api(
-    request: AudioSpeechRequest = Body(
+    request: Request,
+    params: AudioSpeechParams = Body(
         ..., description="JSON body with model, input text, and voice"
-    )
+    ),
 ):
-    model = request.model
-    input_text = request.input
-    voice = request.voice
-    style = request.style
-    eos = request.eos
-    seed = request.seed
-    stream = request.stream
-    audio_bitrate = request.bitrate
+    model = params.model
+    input_text = params.input
+    voice = params.voice
+    style = params.style
+    eos = params.eos
+    seed = params.seed
+    stream = params.stream
+    audio_bitrate = params.bitrate
 
-    response_format = request.response_format
+    response_format = params.response_format
     if not isinstance(response_format, AudioFormat) and isinstance(
         response_format, str
     ):
         response_format = AudioFormat(response_format)
 
-    batch_size = request.batch_size
-    spliter_threshold = request.spliter_threshold
-    speed = request.speed
+    batch_size = params.batch_size
+    spliter_threshold = params.spliter_threshold
+    speed = params.speed
     speed = clip(speed, 0.1, 10)
 
     if not input_text:
@@ -104,9 +106,9 @@ async def openai_speech_api(
 
     tts_config = TTSConfig(
         style=style,
-        temperature=request.temperature,
-        top_k=request.top_k,
-        top_p=request.top_p,
+        temperature=params.temperature,
+        top_k=params.top_k,
+        top_p=params.top_p,
         mid=model,
     )
     infer_config = InferConfig(
@@ -118,8 +120,8 @@ async def openai_speech_api(
     )
     adjust_config = AdjustConfig(speaking_rate=speed)
     enhancer_config = EnhancerConfig(
-        enabled=request.enhance or request.denoise or False,
-        lambd=0.9 if request.denoise else 0.1,
+        enabled=params.enhance or params.denoise or False,
+        lambd=0.9 if params.denoise else 0.1,
     )
     encoder_config = EncoderConfig(
         format=response_format,
