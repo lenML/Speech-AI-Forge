@@ -102,7 +102,7 @@ def create_whisper_asr_tab():
             output = gr.Textbox(label="Transcript")
             output_file = gr.File(label="Download")
 
-    def submit(
+    async def submit(
         audio_input,
         format_select,
         prompt_input,
@@ -140,7 +140,7 @@ def create_whisper_asr_tab():
                 max_words_per_line=max_words_per_line_input,
             ),
         )
-        audio = handler.enqueue()
+        audio = await handler.enqueue()
 
         with NamedTemporaryFile(delete=False, suffix=f".{format_select}") as tmp_file:
             tmp_file.write(audio.text.encode("utf-8"))

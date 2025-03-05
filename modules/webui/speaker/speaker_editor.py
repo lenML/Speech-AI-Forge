@@ -12,7 +12,7 @@ from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def test_spk_voice(
+async def test_spk_voice(
     spk_file,
     text: str,
     model: str,
@@ -24,7 +24,7 @@ def test_spk_voice(
     if spk_file == "" or spk_file is None:
         return None
     spk = TTSSpeaker.from_file(spk_file)
-    return tts_generate(
+    return await tts_generate(
         spk=spk,
         text=text,
         model_id=model,

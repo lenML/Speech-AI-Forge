@@ -101,9 +101,8 @@ def segments_length_limit(
     return ret_segments
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
-def synthesize_ssml(
+async def synthesize_ssml(
     ssml: str,
     batch_size=4,
     enable_enhance=False,
@@ -171,7 +170,7 @@ def synthesize_ssml(
         encoder_config=encoder_config,
     )
 
-    sample_rate, audio_data = handler.enqueue()
+    sample_rate, audio_data = await handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio_utils.audio_to_int16(audio_data)
@@ -179,7 +178,7 @@ def synthesize_ssml(
     return sample_rate, audio_data
 
 
-def run_tts_pipe(
+async def run_tts_pipe(
     text: str,
     spk: Optional[TTSSpeaker],
     tts_config: TTSConfig,
@@ -200,7 +199,7 @@ def run_tts_pipe(
         vc_config=VCConfig(enabled=False),
     )
 
-    sample_rate, audio_data = handler.enqueue()
+    sample_rate, audio_data = await handler.enqueue()
 
     # NOTE: 这里必须要加，不然 gradio 没法解析成 mp3 格式
     audio_data = audio_utils.audio_to_int16(audio_data)
@@ -215,8 +214,9 @@ def is_number_str(s: str):
 
 
 # @torch.inference_mode()
+# NOTE: async funciton 没法用 inference_mode
 @spaces.GPU(duration=120)
-def tts_generate(
+async def tts_generate(
     text: str,
     temperature=0.3,
     top_p=0.7,
@@ -339,7 +339,7 @@ def tts_generate(
     # NOTE: 这里只是占位，其实用不到，因为webui音频编码是走的gradio逻辑，我们只生成ndarray，不会调用 encoder 逻辑
     encoder_config = EncoderConfig()
 
-    return run_tts_pipe(
+    return await run_tts_pipe(
         text=text,
         spk=spk,
         tts_config=tts_config,
@@ -397,7 +397,6 @@ def text_normalize(text: str) -> str:
     )
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 def refine_text(
     text: str,
@@ -424,7 +423,6 @@ def refine_text(
     )
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 def split_long_text(long_text_input, spliter_threshold=100, eos=""):
     # TODO 传入 tokenizer

@@ -74,13 +74,13 @@ def create_spk_from_seed(
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def test_spk_voice(
+async def test_spk_voice(
     seed: int,
     text: str,
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     spk = ChatTTSModel.create_speaker_from_seed(seed)
-    return tts_generate(spk=spk, text=text, progress=progress)
+    return await tts_generate(spk=spk, text=text, progress=progress)
 
 
 def random_speaker():

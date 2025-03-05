@@ -21,7 +21,7 @@ from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def test_spk_voice(
+async def test_spk_voice(
     spk_file,
     text: str,
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
@@ -29,7 +29,7 @@ def test_spk_voice(
     if spk_file == "" or spk_file is None:
         return None
     spk = TTSSpeaker.from_file(spk_file)
-    return tts_generate(spk=spk, text=text, progress=progress)
+    return await tts_generate(spk=spk, text=text, progress=progress)
 
 
 @torch.inference_mode()

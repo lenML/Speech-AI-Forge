@@ -75,7 +75,7 @@ def merge_spk(
 
 @torch.inference_mode()
 @spaces.GPU(duration=120)
-def merge_and_test_spk_voice(
+async def merge_and_test_spk_voice(
     spk_a,
     spk_a_w,
     spk_b,
@@ -97,7 +97,7 @@ def merge_and_test_spk_voice(
         spk_d,
         spk_d_w,
     )
-    return tts_generate(spk=merged_spk, text=test_text, progress=progress)
+    return await tts_generate(spk=merged_spk, text=test_text, progress=progress)
 
 
 @torch.inference_mode()

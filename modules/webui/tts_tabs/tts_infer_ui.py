@@ -79,14 +79,14 @@ class TTSInterface:
             return spk_show_name.split(":")[-1].strip()
         return spk_show_name
 
-    def tts_generate_with_history(
+    async def tts_generate_with_history(
         self,
         audio_history: list,
         progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
         *args,
         **kwargs,
     ):
-        audio = tts_generate(model_id=self.model_id, *args, **kwargs)
+        audio = await tts_generate(model_id=self.model_id, *args, **kwargs)
         mp3_1 = audio
         mp3_2 = audio_history[-1] if len(audio_history) > 0 else None
         mp3_3 = audio_history[-2] if len(audio_history) > 1 else None

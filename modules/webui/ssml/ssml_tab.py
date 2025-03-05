@@ -125,7 +125,7 @@ def create_ssml_interface():
             headroom_input,
             selected_model,
         ],
-        outputs=ssml_output,
+        outputs=[ssml_output],
     )
 
     return ssml_input
