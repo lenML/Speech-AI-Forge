@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def github_fallback_download(url: str):
     """
     如果url是github.com/githubusercontent.com下的地址，那么在第一次请求失败的情况，采用镜像地址再次请求
-    镜像地址： https://ghp.ci/ + (github资源url)
+    镜像地址： https://ghfast.top/ + (github资源url)
     """
     is_github_asset = "githubusercontent.com" in url or "github.com" in url
     try:
@@ -22,7 +22,7 @@ def github_fallback_download(url: str):
         return response
     except requests.exceptions.RequestException as e:
         if is_github_asset:
-            mirror_url = f"https://ghp.ci/{url}"
+            mirror_url = f"https://ghfast.top/{url}"
             logger.error(f"Error fetching data: {e}, try mirror url: {mirror_url}")
             logger.warning(
                 f"Warning: Using mirror site can be slow. Consider setting up a proxy (set HTTPS_PROXY env) for GitHub requests."
