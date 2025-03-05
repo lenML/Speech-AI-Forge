@@ -56,7 +56,7 @@ class AudioHandler:
     async def enqueue(self) -> NP_AUDIO:
         raise NotImplementedError("Method 'enqueue' must be implemented by subclass")
 
-    async def enqueue_stream(self) -> AsyncGenerator[NP_AUDIO, None]:
+    def enqueue_stream(self) -> AsyncGenerator[NP_AUDIO, None]:
         raise NotImplementedError(
             "Method 'enqueue_stream' must be implemented by subclass"
         )
@@ -109,7 +109,7 @@ class AudioHandler:
             logger.debug("enqueue_to_stream start")
 
             chunk_data = bytes()
-            async for sample_rate, audio_data in await self.enqueue_stream():
+            async for sample_rate, audio_data in self.enqueue_stream():
                 encoder.set_header(sample_rate=sample_rate)
                 audio_bytes = read_np_to_wav(audio_data=audio_data)
 
@@ -140,6 +140,8 @@ class AudioHandler:
         pass
 
     async def enqueue_to_stream_with_request(self) -> AsyncGenerator[bytes, None]:
+        if self.current_request is None:
+            raise ValueError("current_request is not set")
         gen1 = self.enqueue_to_stream()
         async for chunk in gen1:
             if await self.current_request.is_disconnected():
@@ -156,7 +158,7 @@ class AudioHandler:
     async def enqueue_to_stream_join(self) -> AsyncGenerator[bytes, None]:
         encoder = self.get_encoder()
         chunk_data = bytes()
-        async for sample_rate, audio_data in await self.enqueue_stream():
+        async for sample_rate, audio_data in self.enqueue_stream():
             encoder.set_header(sample_rate=sample_rate)
             audio_bytes = read_np_to_wav(audio_data=audio_data)
             encoder.write(audio_bytes)

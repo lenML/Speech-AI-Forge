@@ -100,6 +100,6 @@ class TTSHandler(AudioHandler):
         timeout = self.ctx.infer_config.timeout
         return await self.pipeline.generate(timeout=timeout)
 
-    async def enqueue_stream(self) -> AsyncGenerator[NP_AUDIO, None]:
+    def enqueue_stream(self) -> AsyncGenerator[NP_AUDIO, None]:
         timeout = self.ctx.infer_config.timeout
-        return await self.pipeline.generate_stream(timeout=timeout)
+        return self.pipeline.generate_stream(timeout=timeout)

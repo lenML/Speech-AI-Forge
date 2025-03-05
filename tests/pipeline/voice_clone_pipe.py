@@ -17,7 +17,7 @@ PipelineFunc = Callable[
 ]  # Type hint for pipeline function
 
 
-def run_voice_clone_pipeline_test(
+async def run_voice_clone_pipeline_test(
     pipeline_func: PipelineFunc,
     voice_target_path: str,
     voice_target_text: str,
@@ -48,7 +48,7 @@ def run_voice_clone_pipeline_test(
         ),
     )
 
-    audio_sr, audio_data = pipe.generate()  # Tuple[int, np.ndarray]
+    audio_sr, audio_data = await pipe.generate()  # Tuple[int, np.ndarray]
     assert audio_data.dtype == np.float32
     assert audio_data.size != 0
 

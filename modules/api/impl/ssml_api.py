@@ -37,56 +37,56 @@ async def synthesize_ssml_api(
     request: Request,
     params: SSMLParams = Body(..., description="JSON body with SSML string and format"),
 ):
+    ssml = params.ssml
+    format = params.format.lower()
+    batch_size = params.batch_size
+    eos = params.eos
+    stream = params.stream
+    spliter_thr = params.spliter_thr
+    enhancer = params.enhancer
+    adjuster = params.adjuster
+    model = params.model
+
+    if batch_size < 1:
+        raise HTTPException(
+            status_code=422, detail="Batch size must be greater than 0."
+        )
+
+    if spliter_thr < 50:
+        raise HTTPException(
+            status_code=422, detail="Spliter threshold must be greater than 50."
+        )
+
+    if not ssml or ssml == "":
+        raise HTTPException(status_code=422, detail="SSML content is required.")
+
+    if format not in AudioFormat.__members__:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
+        )
+
+    infer_config = InferConfig(
+        batch_size=batch_size, spliter_threshold=spliter_thr, eos=eos, stream=stream
+    )
+    adjust_config = adjuster
+    enhancer_config = enhancer
+    encoder_config = EncoderConfig(
+        format=AudioFormat(format),
+        bitrate="64k",
+    )
+    tts_config = TTSConfig(mid=model)
+
+    handler = TTSHandler(
+        ssml_content=ssml,
+        tts_config=tts_config,
+        infer_config=infer_config,
+        adjust_config=adjust_config,
+        enhancer_config=enhancer_config,
+        encoder_config=encoder_config,
+    )
+
     try:
-        ssml = params.ssml
-        format = params.format.lower()
-        batch_size = params.batch_size
-        eos = params.eos
-        stream = params.stream
-        spliter_thr = params.spliter_thr
-        enhancer = params.enhancer
-        adjuster = params.adjuster
-        model = params.model
-
-        if batch_size < 1:
-            raise HTTPException(
-                status_code=422, detail="Batch size must be greater than 0."
-            )
-
-        if spliter_thr < 50:
-            raise HTTPException(
-                status_code=422, detail="Spliter threshold must be greater than 50."
-            )
-
-        if not ssml or ssml == "":
-            raise HTTPException(status_code=422, detail="SSML content is required.")
-
-        if format not in AudioFormat.__members__:
-            raise HTTPException(
-                status_code=422,
-                detail=f"Invalid format. Supported formats are {AudioFormat.__members__}",
-            )
-
-        infer_config = InferConfig(
-            batch_size=batch_size, spliter_threshold=spliter_thr, eos=eos, stream=stream
-        )
-        adjust_config = adjuster
-        enhancer_config = enhancer
-        encoder_config = EncoderConfig(
-            format=AudioFormat(format),
-            bitrate="64k",
-        )
-        tts_config = TTSConfig(mid=model)
-
-        handler = TTSHandler(
-            ssml_content=ssml,
-            tts_config=tts_config,
-            infer_config=infer_config,
-            adjust_config=adjust_config,
-            enhancer_config=enhancer_config,
-            encoder_config=encoder_config,
-        )
-
         handler.set_current_request(request=request)
         return await handler.enqueue_to_response()
 

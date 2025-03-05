@@ -11,7 +11,7 @@ from tests.pipeline.voice_clone_pipe import run_voice_clone_pipeline_test
 
 
 @pytest.mark.pipe_chat_tts
-def test_chat_tts_pipe():
+async def test_chat_tts_pipe():
     out_audio_path = "./tests/test_outputs/pipe_chat_tts_out1.wav"
 
     pipe0 = PipelineFactory.create_chattts_pipeline(
@@ -24,7 +24,7 @@ def test_chat_tts_pipe():
         ),
     )
 
-    audio_sr, audio_data = pipe0.generate()
+    audio_sr, audio_data = await pipe0.generate()
     assert audio_data.size != 0
     save_audio(
         #
@@ -37,11 +37,11 @@ def test_chat_tts_pipe():
 
 
 @pytest.mark.pipe_chat_tts
-def test_chat_tts_voice_clone_pipe():
+async def test_chat_tts_voice_clone_pipe():
     voice_target_path = "./tests/test_inputs/chattts_out1.wav"
     out_audio_path = "./tests/test_outputs/pipe_chat_tts_voice_clone_out1.wav"
 
-    run_voice_clone_pipeline_test(
+    await run_voice_clone_pipeline_test(
         pipeline_func=PipelineFactory.create_chattts_pipeline,
         voice_target_path=voice_target_path,
         voice_target_text="这是一个测试文本。",

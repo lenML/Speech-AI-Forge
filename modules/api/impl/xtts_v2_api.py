@@ -205,7 +205,8 @@ def setup(app: APIManager):
             vc_config=VCConfig(enabled=False),
         )
 
-        return handler.enqueue_to_response(request=request)
+        handler.set_current_request(request=request)
+        return await handler.enqueue_to_response()
 
     @app.post("/v1/xtts_v2/set_tts_settings", tags=["XTTS"])
     async def set_tts_settings(request: TTSSettingsRequest):

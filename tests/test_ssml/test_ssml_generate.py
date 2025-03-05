@@ -15,7 +15,7 @@ from tests.pipeline.misc import load_audio, load_audio_wav, save_audio
 from tests.pipeline.voice_clone_pipe import run_voice_clone_pipeline_test
 
 
-def run_ssml_pipeline(ssml: str, filename="ssml_test.wav"):
+async def run_ssml_pipeline(ssml: str, filename="ssml_test.wav"):
     out_audio_path = f"./tests/test_outputs/{filename}"
 
     pipe0 = PipelineFactory.create_chattts_pipeline(
@@ -28,7 +28,7 @@ def run_ssml_pipeline(ssml: str, filename="ssml_test.wav"):
         ),
     )
 
-    audio_sr, audio_data = pipe0.generate()
+    audio_sr, audio_data = await pipe0.generate()
     assert audio_data.size != 0
     save_audio(
         #
