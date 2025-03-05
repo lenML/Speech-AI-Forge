@@ -8,7 +8,7 @@ import base64
 import logging
 from typing import Optional
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from fastapi.responses import FileResponse
 import numpy as np
 from pydantic import BaseModel, Field
@@ -47,7 +47,7 @@ class SpeakerConfig(BaseModel):
     from_ref: Optional[SpeakerReference] = None
 
 
-class ForgeTextSynthesizeRequest(BaseModel):
+class V2TtsParams(BaseModel):
 
     # audio
     adjuct: Optional[AdjustConfig] = None
@@ -64,18 +64,18 @@ class ForgeTextSynthesizeRequest(BaseModel):
     ssml: Optional[str] = None
 
 
-async def forge_text_synthesize(request: ForgeTextSynthesizeRequest):
+async def forge_text_synthesize(params: V2TtsParams, request: Request):
     # spk
     spk = None
-    if request.spk is not None:
-        if request.spk.from_spk_id is not None:
-            spk = spk_mgr.get_speaker_by_id(request.spk.from_spk_id)
-        elif request.spk.from_spk_name is not None:
-            spk = spk_mgr.get_speaker(request.spk.from_spk_name)
-        elif request.spk.from_ref is not None:
-            audio_data = base64.b64decode(request.spk.from_ref.wav_b64)
+    if params.spk is not None:
+        if params.spk.from_spk_id is not None:
+            spk = spk_mgr.get_speaker_by_id(params.spk.from_spk_id)
+        elif params.spk.from_spk_name is not None:
+            spk = spk_mgr.get_speaker(params.spk.from_spk_name)
+        elif params.spk.from_ref is not None:
+            audio_data = base64.b64decode(params.spk.from_ref.wav_b64)
             wav_data, wav_sr = convert_bytes_to_wav_bytes(audio_bytes=audio_data)
-            ref_text = request.spk.from_ref.text
+            ref_text = params.spk.from_ref.text
             spk = TTSSpeaker.from_ref_wav_bytes(
                 ref_wav=(wav_sr, wav_data),
                 text=ref_text,
@@ -85,8 +85,8 @@ async def forge_text_synthesize(request: ForgeTextSynthesizeRequest):
         pass
 
     # input
-    text = request.text
-    ssml = request.ssml
+    text = params.text
+    ssml = params.ssml
 
     if text is None and ssml is None:
         raise HTTPException(
@@ -100,13 +100,13 @@ async def forge_text_synthesize(request: ForgeTextSynthesizeRequest):
         )
 
     # configs
-    tts_config = request.tts or TTSConfig()
-    infer_config = request.infer or InferConfig()
-    vc_config = request.vc or VCConfig()
-    tn_config = request.tn or TNConfig()
-    enhancer_config = request.enhance or EnhancerConfig()
-    encoder_config = request.encoder or EncoderConfig()
-    adjust_config = request.adjuct or AdjustConfig()
+    tts_config = params.tts or TTSConfig()
+    infer_config = params.infer or InferConfig()
+    vc_config = params.vc or VCConfig()
+    tn_config = params.tn or TNConfig()
+    enhancer_config = params.enhance or EnhancerConfig()
+    encoder_config = params.encoder or EncoderConfig()
+    adjust_config = params.adjuct or AdjustConfig()
 
     handler = TTSHandler(
         ssml_content=ssml,
