@@ -20,7 +20,7 @@ class ResembleEnhanceDownloader(ModelDownloader):
             self.model_dir.mkdir(parents=True)
 
     def from_modelscope(self):
-        url = "https://modelscope.cn/api/v1/studio/insummer/ResembleEnhance/repo?Revision=master&FilePath=resemble_enhance%2Fmodel_repo%2Fenhancer_stage2%2Fds%2FG%2Fdefault%2Fmp_rank_00_model_states.pt"
+        url = "https://modelscope.cn/models/dragonlittle/resemble-enhance/resolve/master/mp_rank_00_model_states.pt"
         self._download_file(url, self.model_dir / "mp_rank_00_model_states.pt")
         logger.info(
             f"Model downloaded from ModelScope successfully, saved at: {self.model_dir}"
