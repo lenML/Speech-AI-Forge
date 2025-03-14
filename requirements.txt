@@ -60,7 +60,7 @@ inflect
 matcha-tts
 
 # whisper
-faster_whisper
+faster_whisper==1.0.3
 
 # webui
 pysubs2
