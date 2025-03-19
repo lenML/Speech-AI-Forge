@@ -13,8 +13,12 @@ def spk_to_tensor(spk: str):
     spk = spk.split(" : ")[1].strip() if " : " in spk else spk
     if spk == "None" or spk == "":
         return None
-    return spk_mgr.get_speaker(spk).emb
-
+    token = spk_mgr.get_speaker(spk).get_token("chat-tts")
+    if token is None:
+        return None
+    # 取出第一个 embedding
+    # NOTE: 因为有的模型可能是多token表示voice，但是这里chattts是单token表示语义
+    return token.tokens[0]
 
 def get_speaker_show_name(spk: TTSSpeaker):
     if spk.gender == "*" or spk.gender == "":
@@ -50,30 +54,36 @@ def merge_spk(
         )
     )
 
+    desc = ""
+
     total_weight = 0
     if tensor_a is not None:
         merge_tensor += spk_a_w * tensor_a
         total_weight += spk_a_w
+        desc += f"{spk_a_w} : {spk_a}\n"
     if tensor_b is not None:
         merge_tensor += spk_b_w * tensor_b
         total_weight += spk_b_w
+        desc += f"{spk_b_w} : {spk_b}\n"
     if tensor_c is not None:
         merge_tensor += spk_c_w * tensor_c
         total_weight += spk_c_w
+        desc += f"{spk_c_w} : {spk_c}\n"
     if tensor_d is not None:
         merge_tensor += spk_d_w * tensor_d
         total_weight += spk_d_w
+        desc += f"{spk_d_w} : {spk_d}\n"
 
     if total_weight > 0:
         merge_tensor /= total_weight
 
     merged_spk = TTSSpeaker.from_token(tokens=[merge_tensor], model_id="chat-tts")
-    merged_spk.name = "<MIX>"
+    merged_spk.set_name("<MIXED>")
+    merged_spk.set_desc(desc)
 
     return merged_spk
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 async def merge_and_test_spk_voice(
     spk_a,
@@ -100,7 +110,6 @@ async def merge_and_test_spk_voice(
     return await tts_generate(spk=merged_spk, text=test_text, progress=progress)
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 def merge_spk_to_file(
     spk_a,
