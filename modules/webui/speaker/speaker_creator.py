@@ -52,7 +52,6 @@ names_list = [
 ]
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 def create_spk_from_seed(
     seed: int, name: str, gender: str, desc: str, author: str, version: str
@@ -72,7 +71,6 @@ def create_spk_from_seed(
     return tmp_file_path
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 async def test_spk_voice(
     seed: int,

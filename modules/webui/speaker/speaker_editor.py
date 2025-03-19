@@ -1,16 +1,12 @@
-import json
-import tempfile
-
 import gradio as gr
-import torch
 
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.hf import spaces
 from modules.webui import webui_config
-from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate
+from modules.webui.webui_utils import SPK_FILE_EXTS, get_spk_emotions, tts_generate
+from modules.core.models.zoo.ModelZoo import model_zoo
 
 
-@torch.inference_mode()
 @spaces.GPU(duration=120)
 async def test_spk_voice(
     spk_file,
@@ -19,6 +15,7 @@ async def test_spk_voice(
     temperature: float,
     top_p: int,
     top_k: int,
+    spk_emotion: str,
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     if spk_file == "" or spk_file is None:
@@ -33,67 +30,73 @@ async def test_spk_voice(
         top_p=top_p,
         progress=progress,
         eos="。",
+        spk_emotion=spk_emotion,
     )
 
 
+def create_test_voice_card(
+    spk_file,
+    model_id_select,
+    temperature_input,
+    top_p_input,
+    top_k_input,
+    spk_emotion,
+):
+    with gr.Group():
+        gr.Markdown("🎤Test voice")
+        with gr.Row():
+            test_voice_btn = gr.Button("Test Voice", variant="secondary")
+
+            with gr.Column(scale=4):
+                test_text = gr.Textbox(
+                    label="Test Text",
+                    placeholder="Please input test text",
+                    value=webui_config.localization.DEFAULT_SPEAKER_TEST_TEXT,
+                )
+                with gr.Row():
+                    with gr.Column(scale=4):
+                        output_audio = gr.Audio(label="Output Audio", format="mp3")
+
+    test_voice_btn.click(
+        fn=test_spk_voice,
+        inputs=[
+            spk_file,
+            test_text,
+            model_id_select,
+            temperature_input,
+            top_p_input,
+            top_k_input,
+            spk_emotion,
+        ],
+        outputs=[output_audio],
+    )
+
+    return test_voice_btn
+
+
+# 读取 spk 并 更新 info
+def load_spk_file_to_info(spk_file):
+    if spk_file == "" or spk_file is None:
+        return "None"
+    spk = TTSSpeaker.from_file(spk_file)
+    name = spk.name
+    gender = spk.gender
+    desc = spk.desc
+    version = spk.version
+    author = spk.author
+
+    rows = [
+        f"💌 Speaker info",
+        f"- Name: {name}",
+        f"- Gender: {gender}",
+        f"- Author: {author}",
+        f"- Version: {version}",
+        f"- Description: {desc}",
+    ]
+    return "\n".join(rows)
+
+
 def speaker_editor_ui():
-    def create_test_voice_card(
-        spk_file,
-        model_id_select,
-        temperature_input,
-        top_p_input,
-        top_k_input,
-    ):
-        with gr.Group():
-            gr.Markdown("🎤Test voice")
-            with gr.Row():
-                test_voice_btn = gr.Button("Test Voice", variant="secondary")
-
-                with gr.Column(scale=4):
-                    test_text = gr.Textbox(
-                        label="Test Text",
-                        placeholder="Please input test text",
-                        value=webui_config.localization.DEFAULT_SPEAKER_TEST_TEXT,
-                    )
-                    with gr.Row():
-                        with gr.Column(scale=4):
-                            output_audio = gr.Audio(label="Output Audio", format="mp3")
-
-        test_voice_btn.click(
-            fn=test_spk_voice,
-            inputs=[
-                spk_file,
-                test_text,
-                model_id_select,
-                temperature_input,
-                top_p_input,
-                top_k_input,
-            ],
-            outputs=[output_audio],
-        )
-
-        return test_voice_btn
-
-    # 读取 spk 并 更新 info
-    def load_spk_file_to_info(spk_file):
-        if spk_file == "" or spk_file is None:
-            return "None"
-        spk = TTSSpeaker.from_file(spk_file)
-        name = spk.name
-        gender = spk.gender
-        desc = spk.desc
-        version = spk.version
-        author = spk.author
-
-        rows = [
-            f"💌 Speaker info",
-            f"- Name: {name}",
-            f"- Gender: {gender}",
-            f"- Author: {author}",
-            f"- Version: {version}",
-            f"- Description: {desc}",
-        ]
-        return "\n".join(rows)
 
     # TODO 也许需要写个说明？
     # gr.Markdown("SPEAKER_CREATOR_GUIDE")
@@ -104,17 +107,25 @@ def speaker_editor_ui():
                 gr.Markdown("💼Speaker file")
                 spk_file = gr.File(label="*.json file", file_types=SPK_FILE_EXTS)
                 spk_info = gr.Markdown("None")
+                spk_emotion = gr.Dropdown(["default"], value="default", label="Emotion")
 
                 spk_file.change(
                     fn=load_spk_file_to_info,
                     inputs=spk_file,
                     outputs=spk_info,
                 )
+                spk_file.change(
+                    fn=lambda file: gr.Dropdown(choices=get_spk_emotions(file)),
+                    inputs=[spk_file],
+                    outputs=[spk_emotion],
+                )
 
             with gr.Group():
                 # 模型选择
                 model_id_select = gr.Dropdown(
-                    label="Model", choices=["chat-tts", "cosy-voice"], value="chat-tts"
+                    label="Model",
+                    choices=model_zoo.get_tts_model_ids(),
+                    value="chat-tts",
                 )
 
             with gr.Group():
@@ -133,6 +144,7 @@ def speaker_editor_ui():
                 temperature_input=temperature_input,
                 top_p_input=top_p_input,
                 top_k_input=top_k_input,
+                spk_emotion=spk_emotion,
             )
 
             btn1 = create_test_voice_card(**kwargs)

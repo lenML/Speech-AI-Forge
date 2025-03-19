@@ -65,6 +65,17 @@ def get_speaker_names(
     return speakers, speaker_names
 
 
+def get_spk_emotions(file):
+    if file is None:
+        return ["default"]
+    try:
+        spk: TTSSpeaker = TTSSpeaker.from_file(file)
+        return spk.get_emotions()
+    except Exception as e:
+        logger.error(f"load spk emotions failed: {e}")
+        return ["default"]
+
+
 def get_styles():
     return styles_mgr.list_items()
 
@@ -240,6 +251,7 @@ async def tts_generate(
     headroom: float = 1,
     ref_audio: Optional[tuple[int, np.ndarray]] = None,
     ref_audio_text: Optional[str] = None,
+    spk_emotion="default",
     model_id: str = "chat-tts",
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):

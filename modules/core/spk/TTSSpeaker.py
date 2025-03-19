@@ -225,6 +225,15 @@ class TTSSpeaker:
             return self._data.recommend_config
         return None
 
+    def get_emotions(self) -> list[str]:
+        emotions = ["default"]
+        # 遍历 ref_wav 使用 emotion
+        for ref in self._data.refs:
+            if ref.emotion:
+                emotions.append(ref.emotion)
+        emotions = list(set(emotions))
+        return emotions
+
     def set_name(self, name: str) -> None:
         self._data.meta.name = name
 

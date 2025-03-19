@@ -9,6 +9,7 @@ from modules.webui.webui_utils import (
     get_speakers,
     get_styles,
     load_spk_info,
+    get_spk_emotions,
     refine_text,
     tts_generate,
 )
@@ -137,13 +138,22 @@ class TTSInterface:
                     spk_input_text, spk_input_dropdown = self.create_speaker_picker()
 
                 with gr.Tab(label="Upload"):
-                    spk_file_upload = gr.File(
-                        label="Speaker (Upload)", file_types=SPK_FILE_EXTS
-                    )
+                    with gr.Group():
+                        spk_file_upload = gr.File(
+                            label="Speaker (Upload)", file_types=SPK_FILE_EXTS
+                        )
+                        spk_emotion = gr.Dropdown(
+                            ["default"], value="default", label="Emotion"
+                        )
                     gr.Markdown("📝Speaker info")
                     infos = gr.Markdown("empty", elem_classes=["no-translate"])
                     spk_file_upload.change(
                         fn=load_spk_info, inputs=[spk_file_upload], outputs=[infos]
+                    )
+                    spk_file_upload.change(
+                        fn=lambda file: gr.Dropdown(choices=get_spk_emotions(file)),
+                        inputs=[spk_file_upload],
+                        outputs=[spk_emotion],
                     )
 
                 with gr.Tab(label="Refrence"):
@@ -166,6 +176,7 @@ class TTSInterface:
             spk_file_upload,
             ref_audio_upload,
             ref_text_input,
+            spk_emotion,
         )
 
     def create_tts_style_guide(self):
@@ -367,6 +378,7 @@ class TTSInterface:
                     spk_file_upload,
                     ref_audio_upload,
                     ref_text_input,
+                    spk_emotion,
                 ) = self.create_speaker_interface()
                 style_input_dropdown = self.create_style_interface()
                 temperature_input, top_p_input, top_k_input, batch_size_input = (
@@ -443,6 +455,7 @@ class TTSInterface:
                 headroom_input,
                 ref_audio_upload,
                 ref_text_input,
+                spk_emotion,
             ],
             outputs=[tts_output1, tts_output2, tts_output3, audio_history],
         )

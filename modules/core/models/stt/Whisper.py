@@ -84,11 +84,11 @@ class WhisperModel(STTModel):
         if WhisperModel.model is None:
             return
         with self.lock:
-            del self.model
             self.model = None
             WhisperModel.unload()
             del WhisperModel.model
             WhisperModel.model = None
+            del self.model
 
     def resample_audio(self, audio: NP_AUDIO):
         sr, data = audio
