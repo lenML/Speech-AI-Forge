@@ -103,7 +103,8 @@ curl http://localhost:7870/v1/audio/speech \
     "model": "chattts",
     "input": "Today is a wonderful day to build something people love! [lbreak]",
     "voice": "female2",
-    "style": "chat"
+    "style": "chat",
+    "response_format": "mp3"
   }' \
   --output speech.mp3
 ```
