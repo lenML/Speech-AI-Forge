@@ -119,7 +119,7 @@
 curl http://localhost:7870/v2/tts \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "你好，欢迎使用 Speech AI Forge。",
+    "text": "Hello, welcome to the Speech AI Forge project.",
     "spk": {
       "from_spk_name": "mona"
     },
@@ -135,6 +135,12 @@ curl http://localhost:7870/v2/tts \
     "enhance": {
       "enabled": true,
       "model": "resemble-enhance"
+    },
+    "tts": {
+      "mid": "cosy-voice",
+      "temperature": 0.3,
+      "top_p": 0.75,
+      "top_k": 20
     }
   }' \
   --output speech.mp3
