@@ -24,6 +24,9 @@ export interface ITTSParams {
 }
 
 export interface ITTSParamsV2 {
+  text?: string;
+  texts?: string[];
+  ssml?: string;
   adjuct?: {
     pitch?: number;
     speed_rate?: number;
@@ -84,6 +87,4 @@ export interface ITTSParamsV2 {
       text: string;
     };
   };
-  text?: string;
-  ssml?: string;
 }

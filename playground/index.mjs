@@ -107,18 +107,18 @@ const AppContent = styled.div`
 function fallbackRender({ error, resetErrorBoundary }) {
   return html`<div role="alert">
     <p>Something went wrong:</p>
-    <pre style=${{ color: "red" }}>${error.message}</pre>
+    <pre style=${{ color: "red" }}>${JSON.stringify(error.message)}</pre>
     <button onClick=${resetErrorBoundary}>reset</button>
   </div>`;
 }
 
 const App = () => {
+  // NOTE: 不知道为啥... ErrorBoundary 莫名用不了...
   return html`
     <${PageNav} />
     <${AppContent} className="pg-scrollbar">
-      <${ErrorBoundary} fallbackRender=${fallbackRender}>
-        <${Content} />
-      <//>
+      <!-- <${ErrorBoundary} fallbackRender=${fallbackRender}> <//> -->
+      <${Content} />
     <//>
   `;
 };

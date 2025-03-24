@@ -13,7 +13,11 @@ const client = new SAFClient();
 
 client
   .tts_v2({
+    // 输入参数 text/ssml/texts 均可，任选其一
     text: "你好，欢迎使用 Speech AI Forge 项目。",
+    // texts: ["xxx","yyy"],
+    // ssml: "<voice> xxx </voice>",
+
     spk: {
       from_ref: {
         wav_b64: fs.readFileSync(ref_wav_filepath).toString("base64"),
