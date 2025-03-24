@@ -21,6 +21,7 @@ class TTSHandler(AudioHandler):
         self,
         *,
         text_content: Optional[str] = None,
+        batch_content: Optional[list[str]] = None,
         ssml_content: Optional[str] = None,
         spk: Optional[TTSSpeaker] = None,
         tts_config: TTSConfig = TTSConfig(),
@@ -48,6 +49,7 @@ class TTSHandler(AudioHandler):
         assert isinstance(tn_config, TNConfig), "tn_config should be TNConfig"
 
         self.text_content = text_content
+        self.batch_content = batch_content
         self.ssml_content = ssml_content
         self.spk = spk
         self.tts_config = tts_config
@@ -70,6 +72,7 @@ class TTSHandler(AudioHandler):
 
     def build_ctx(self):
         text_content = self.text_content
+        batch_content = self.batch_content
         ssml_content = self.ssml_content
         infer_config = self.infer_config
         tts_config = self.tts_config
@@ -81,6 +84,7 @@ class TTSHandler(AudioHandler):
 
         ctx = TTSPipelineContext(
             text=text_content,
+            texts=batch_content,
             ssml=ssml_content,
             spk=spk,
             tts_config=tts_config,

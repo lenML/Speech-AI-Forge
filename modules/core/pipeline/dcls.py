@@ -40,7 +40,12 @@ class TTSSegment:
 
 @dataclass(repr=False, eq=False)
 class TTSPipelineContext:
+    # text/ssml/texts 都是输入文本
+    # 1. 只会使用其中一个，且必须有一个值
+    # 2. text/ssml 均会启动自动 chunker 分割
+    # 3. texts 不使用分割策略，传入什么文本就让模型合成什么文本
     text: Optional[str] = None
+    texts: Optional[list[str]] = None
     ssml: Optional[str] = None
 
     spk: Optional[TTSSpeaker] = None

@@ -10,7 +10,6 @@ from typing import Optional
 
 from fastapi import HTTPException, Request
 from fastapi.responses import FileResponse
-import numpy as np
 from pydantic import BaseModel, Field
 
 from modules.api.Api import APIManager
@@ -25,7 +24,6 @@ from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
-from pydub import AudioSegment
 
 from modules.utils.bytes_to_wav import convert_bytes_to_wav_bytes
 
@@ -61,6 +59,7 @@ class V2TtsParams(BaseModel):
     spk: Optional[SpeakerConfig] = None
     # input
     text: Optional[str] = None
+    texts: Optional[list[str]] = None
     ssml: Optional[str] = None
 
 
@@ -86,14 +85,15 @@ async def forge_text_synthesize(params: V2TtsParams, request: Request):
 
     # input
     text = params.text
+    texts = params.texts
     ssml = params.ssml
 
-    if text is None and ssml is None:
+    if text is None and ssml is None and texts is None:
         raise HTTPException(
             status_code=400,
             detail="text or ssml must be set",
         )
-    if text is not None and ssml is not None:
+    if text is not None and (ssml is not None or texts is not None):
         raise HTTPException(
             status_code=400,
             detail="text and ssml cannot be set at the same time",
@@ -110,6 +110,7 @@ async def forge_text_synthesize(params: V2TtsParams, request: Request):
 
     handler = TTSHandler(
         ssml_content=ssml,
+        batch_content=texts,
         text_content=text,
         spk=spk,
         tts_config=tts_config,
