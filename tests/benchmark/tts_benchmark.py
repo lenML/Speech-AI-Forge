@@ -176,7 +176,7 @@ def run_tts_benchmark(
     unload_models()
 
     segment = audio_utils.ndarray_to_segment(audio_data, sr)
-    duration = segment.duration_seconds * batch_size
+    duration = segment.duration_seconds
 
     pt = end_time - start_time
     rtf = pt / duration
@@ -189,7 +189,7 @@ def run_tts_benchmark(
     print(f"Use CPU:         {use_cpu}")
     print(f"GPU MEM:         {gpu_mem_gb:.2f} GB")
     print(f"CPU MEM:         {cpu_mem_gb:.2f} GB")
-    print(f"Duration:        {duration} seconds")
+    print(f"Audio Duration:  {duration} seconds")
     print(f"Processing time: {pt:.2f} seconds")
     print(f"RTF:             {rtf:.2f}")
 
