@@ -1,88 +1,98 @@
 numpy==1.26.4
-scipy
-lxml
-pydub
-fastapi
-soundfile
-omegaconf
-pypinyin
-vocos
-pandas
-vector_quantize_pytorch
-einops
-transformers~=4.41.1
+scipy==1.11.4
+lxml==5.2.2
+pydub==0.25.1
+fastapi==0.111.0
+soundfile==0.12.1
+omegaconf==2.3.0
+pypinyin==0.51.0
+vocos==0.1.0
+pandas==2.1.3
+vector_quantize_pytorch==1.14.24
+einops==0.8.0
+transformers==4.41.2
 huggingface-hub==0.23.2
-omegaconf~=2.3.0
-tqdm
-python-ms
-# torch
-# torchvision
-# torchaudio
+tqdm==4.66.3
+python-ms==1.1.0
 
 # colab
-datasets
+datasets==2.20.0
 
 # TN
-emojiswitch
-python-dotenv
-zhon
+emojiswitch==0.0.3
+python-dotenv==1.0.1
+zhon==2.0.2
 mistune==3.0.2
 
 # gradio
 gradio==4.44.0
 gradio_client==1.3.0
+## NOTE: pydantic 不要升到 2.11 会报错！
+pydantic==2.8.2 
+pydantic-core==2.20.1
 
 # audio_denoiser
-python-box
-ftfy
-librosa
-pyrubberband
-pybase16384
-cachetools
-langdetect
-WeTextProcessing
+python-box==7.1.1
+ftfy==6.2.0
+librosa==0.10.1
+pyrubberband==0.3.0
+pybase16384==0.3.8
+cachetools==5.3.3
+langdetect==1.0.9
+WeTextProcessing; sys_platform=="linux"
 
 #### fish-speech
-hydra-core
-loguru
-lightning
-natsort
-pyrootutils
-loralib
-wandb
-
+hydra-core==1.3.2
+loguru==0.7.2
+lightning==2.3.3
+natsort==8.4.0
+pyrootutils==1.0.4
+loralib==0.1.2
+wandb==0.17.4
+# NOTE: 安装这个是为了保证没有 Import error 其实是用不到的，所以版本可能不对
+accelerate==1.6.0
 
 ### cosyvoice
-hyperpyyaml
-openai-whisper
-onnxruntime
-inflect
-matcha-tts
+hyperpyyaml==1.2.2
+openai-whisper==20231117
+onnxruntime==1.18.1
+inflect==7.3.1
+unidecode==1.3.8
+# NOTE: 这个似乎不需要
+# matcha-tts
 
 # whisper
 faster_whisper==1.0.3
 
 # webui
-pysubs2
+pysubs2==1.7.3
 
 # OpenVoice
-eng-to-ipa
-jieba
-cn2an
+eng-to-ipa==0.0.2
+jieba==0.42.1
+cn2an==0.5.22
 
 ### fire red tts
-lingua-language-detector
+lingua-language-detector==2.0.2
+diffusers==0.32.2
 
 ### F5 TTS
-torchdiffeq
-x-transformers
-ema-pytorch
-funasr
-jiwer
-zhconv
+torchdiffeq==0.2.4
+x-transformers==1.39.1
+ema-pytorch==0.7.0
+funasr==1.1.12
+jiwer==3.0.4
+zhconv==1.4.3
+tomli==2.2.1
 
 ### webui tools
 moviepy==1.0.3
 
 ### downloader script
-modelscope
+modelscope==1.20.0
+
+### PyTorch Dependencies (using custom source for CUDA)
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.3.1+cu121
+torchvision==0.18.1+cu121
+torchaudio==2.3.1+cu121

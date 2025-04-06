@@ -146,7 +146,7 @@ apt-get install rubberband-cli
 > （如果直接运行某些情况可能会安装 cpu 版本，具体应该指定什么版本请自行确定）
 
 ```bash
-pip3 install torch torchvision torchaudio --index-url https://mirror.sjtu.edu.cn/pytorch-wheels/cu121
+pip3 install torch==2.3.1 torchvision torchaudio --index-url https://mirror.sjtu.edu.cn/pytorch-wheels/cu121
 ```
 
 如果上面无法安装 cuda 版本，可以参考下面的指令安装指定版本 torch (linux)
@@ -165,14 +165,6 @@ pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%
 
 ```bash
 python -m pip install -r requirements.txt
-```
-
-对于 windows 环境，请使用 `requirements.windows.txt`
-
-> 因为有类似 `pynini` 这样的可选依赖库不支持在 windows 环境安装
-
-```bash
-python -m pip install -r requirements.windows.txt
 ```
 
 ## 6. 其他

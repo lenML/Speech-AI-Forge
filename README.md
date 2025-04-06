@@ -17,7 +17,7 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 ## Installation and Running
 
-首先，确保 [相关依赖](./docs/dependencies.md) 已经正确安装
+首先，确保 [相关依赖](./docs/dependencies.md) 已经正确安装，并查看 [模型下载](#模型下载) 下载所需模型
 
 启动：
 
@@ -140,8 +140,6 @@ WIP 开发中
 | **Enhancer** | 增强模型   | `python -m scripts.dl_enhance --source huggingface`                       |
 
 > **注意**：如果需要使用 ModelScope 下载模型，请使用 `--source modelscope`。部分模型可能无法使用 ModelScope 下载。
-
-> **关于 CosyVoice**：不太确定应该使用哪个模型。整体来看，`instruct` 模型功能最多，但可能质量不是最佳。如果需要使用其他模型，请自行选择 `dl_cosyvoice_base.py`、`dl_cosyvoice_instruct.py` 或 `sft` 脚本。加载优先级为 `base` > `instruct` > `sft`，可根据文件夹存在性判断加载顺序。
 
 ## FAQ
 
