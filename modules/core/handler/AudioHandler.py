@@ -32,7 +32,7 @@ def remove_wav_bytes_header(wav_bytes: bytes):
     return wav_file.get_body_data()
 
 
-def read_np_to_wav(audio_data: np.ndarray) -> bytes:
+def covert_to_s16le(audio_data: np.ndarray) -> bytes:
     audio_data: np.ndarray = audio_data / np.max(np.abs(audio_data))
     audio_data = (audio_data * 32767).astype(np.int16)
     return audio_data.tobytes()
@@ -104,8 +104,10 @@ class AudioHandler:
 
             chunk_data = bytes()
             async for sample_rate, audio_data in self.enqueue_stream():
-                encoder.set_header(sample_rate=sample_rate)
-                audio_bytes = read_np_to_wav(audio_data=audio_data)
+                encoder.set_header(
+                    sample_rate=sample_rate, sample_width=audio_data.dtype.itemsize
+                )
+                audio_bytes = covert_to_s16le(audio_data=audio_data)
 
                 logger.debug(f"write audio_bytes len: {len(audio_bytes)}")
                 encoder.write(audio_bytes)
@@ -151,8 +153,10 @@ class AudioHandler:
         encoder = self.get_encoder()
         chunk_data = bytes()
         async for sample_rate, audio_data in self.enqueue_stream():
-            encoder.set_header(sample_rate=sample_rate)
-            audio_bytes = read_np_to_wav(audio_data=audio_data)
+            encoder.set_header(
+                sample_rate=sample_rate, sample_width=audio_data.dtype.itemsize
+            )
+            audio_bytes = covert_to_s16le(audio_data=audio_data)
             encoder.write(audio_bytes)
 
         encoder.close()
@@ -172,8 +176,10 @@ class AudioHandler:
         async with cancel_on_disconnect(self.current_request):
             try:
                 sample_rate, audio_data = await self.enqueue()
-                audio_bytes = read_np_to_wav(audio_data=audio_data)
-                encoder.set_header(sample_rate=sample_rate)
+                audio_bytes = covert_to_s16le(audio_data=audio_data)
+                encoder.set_header(
+                    sample_rate=sample_rate, sample_width=audio_data.dtype.itemsize
+                )
                 encoder.write(audio_bytes)
                 encoder.close()
                 buffer = encoder.read_all()

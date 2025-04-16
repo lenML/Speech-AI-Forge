@@ -65,12 +65,15 @@ class StreamEncoder:
                 "-re",
                 "-threads",
                 str(os.cpu_count() or 4),
+                # NOTE: 指定输入格式为 16 位 PCM
+                # NOTE: 其实文件头里面有写，但是没有文件名，所以需要手动指定
                 "-f",
-                "s16le",  # 指定输入格式为 16 位 PCM
-                "-ar",
-                str(self.sample_rate),  # 输入采样率
-                "-ac",
-                "1",  # 输入单声道
+                "s16le",
+                # NOTE: 不要在这里传递 ar/ac ，我们写在wav文件头上，这里会覆盖掉文件头读取的数据
+                # "-ar",
+                # str(self.sample_rate),  # 输入采样率
+                # "-ac",
+                # "1",  # 输入单声道
                 "-i",
                 "pipe:0",
                 "-f",
