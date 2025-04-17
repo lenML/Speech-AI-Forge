@@ -10,3 +10,6 @@ class VCModel(BaseZooModel):
         self, src_audio: NP_AUDIO, ref_spk: TTSSpeaker, config: VCConfig
     ) -> NP_AUDIO:
         raise NotImplementedError
+
+    def get_sample_rate(self) -> int:
+        raise NotImplementedError

@@ -43,21 +43,47 @@ class StreamEncoder:
     def set_header(
         self, *, frame_input=b"", channels=1, sample_width=2, sample_rate=24000
     ):
-        if self.header:
-            return
-        header_bytes = wave_header_chunk(
-            frame_input, channels, sample_width, sample_rate
-        )
-        self.header = header_bytes
-        self.write(header_bytes)
+        """
+        基本上只需要改 sample_rate 因为我们输入的都是 pcm s16le (int16)
+        """
+        self.channels = channels
+        self.sample_width = sample_width
+        self.sample_rate = sample_rate
 
         logger.info(
             f"StreamEncoder header set, channels: {channels}, sample_width: {sample_width}, sample_rate: {sample_rate}"
         )
 
+    def write_header_data(self):
+        if self.header:
+            return
+        header_bytes = wave_header_chunk(
+            channels=self.channels,
+            sample_width=self.sample_width,
+            sample_rate=self.sample_rate,
+        )
+        self.header = header_bytes
+        self.write(header_bytes)
+
+        logger.info(
+            f"StreamEncoder header written, channels: {self.channels}, sample_width: {self.sample_width}, sample_rate: {self.sample_rate}"
+        )
+
     def open(
-        self, format: str = "mp3", acodec: str = "libmp3lame", bitrate: str = "320k"
+        self,
+        format: str = "mp3",
+        acodec: str = "libmp3lame",
+        bitrate: str = "320k",
+        input_dtype: str = "s16le",  # s16le or s32le
     ):
+        """
+        打开编码器
+
+        :param format: 输出格式
+        :param acodec: 输出编码器
+        :param bitrate: 输出比特率
+        :param input_dtype: 输入数据类型 s16le or s32le
+        """
         encoder = self.encoder
         self.p = subprocess.Popen(
             [
@@ -66,14 +92,12 @@ class StreamEncoder:
                 "-threads",
                 str(os.cpu_count() or 4),
                 # NOTE: 指定输入格式为 16 位 PCM
-                # NOTE: 其实文件头里面有写，但是没有文件名，所以需要手动指定
                 "-f",
-                "s16le",
-                # NOTE: 不要在这里传递 ar/ac ，我们写在wav文件头上，这里会覆盖掉文件头读取的数据
-                # "-ar",
-                # str(self.sample_rate),  # 输入采样率
-                # "-ac",
-                # "1",  # 输入单声道
+                input_dtype,
+                "-ar",
+                str(self.sample_rate),  # 输入采样率
+                "-ac",
+                str(self.channels),  # 输入单声道
                 "-i",
                 "pipe:0",
                 "-f",

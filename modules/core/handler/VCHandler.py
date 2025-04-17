@@ -32,7 +32,7 @@ class VCHandler(AudioHandler):
         if self.model is None:
             raise Exception(f"Model {self.vc_config.mid} is not supported")
 
-    def get_model(self):
+    def get_model(self) -> VCModel:
         model_id = (
             self.vc_config.mid.lower()
             .replace(" ", "")
@@ -55,3 +55,6 @@ class VCHandler(AudioHandler):
         raise NotImplementedError(
             "Method 'enqueue_stream' not implemented in VCHandler"
         )
+
+    def get_sample_rate(self):
+        return self.model.get_sample_rate()

@@ -100,6 +100,9 @@ class TTSHandler(AudioHandler):
         self.ctx.stop = True
         self.pipeline.model.interrupt()
 
+    def get_sample_rate(self):
+        return self.pipeline.model.get_sample_rate()
+
     async def enqueue(self) -> NP_AUDIO:
         timeout = self.ctx.infer_config.timeout
         return await self.pipeline.generate(timeout=timeout)

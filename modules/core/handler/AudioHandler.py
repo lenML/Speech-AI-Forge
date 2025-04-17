@@ -62,6 +62,11 @@ class AudioHandler:
             "Method 'enqueue_stream' must be implemented by subclass"
         )
 
+    def get_sample_rate(self) -> int:
+        raise NotImplementedError(
+            "Method 'get_sample_rate' must be implemented by subclass"
+        )
+
     def set_current_request(self, request: Request):
         assert self.current_request is None, "current_request has been set"
         assert isinstance(
@@ -93,7 +98,9 @@ class AudioHandler:
         else:
             raise ValueError(f"Unsupported audio format: {format}")
 
+        encoder.set_header(sample_rate=self.get_sample_rate())
         encoder.open(bitrate=bitrate, acodec=acodec)
+        encoder.write_header_data()
 
         return encoder
 
@@ -104,9 +111,6 @@ class AudioHandler:
 
             chunk_data = bytes()
             async for sample_rate, audio_data in self.enqueue_stream():
-                encoder.set_header(
-                    sample_rate=sample_rate, sample_width=audio_data.dtype.itemsize
-                )
                 audio_bytes = covert_to_s16le(audio_data=audio_data)
 
                 logger.debug(f"write audio_bytes len: {len(audio_bytes)}")
@@ -153,9 +157,6 @@ class AudioHandler:
         encoder = self.get_encoder()
         chunk_data = bytes()
         async for sample_rate, audio_data in self.enqueue_stream():
-            encoder.set_header(
-                sample_rate=sample_rate, sample_width=audio_data.dtype.itemsize
-            )
             audio_bytes = covert_to_s16le(audio_data=audio_data)
             encoder.write(audio_bytes)
 
@@ -166,26 +167,30 @@ class AudioHandler:
 
         encoder.terminate()
 
+    async def _enqueue_to_bytes(self) -> bytes:
+        """
+        为了测试拆分的函数
+        这个函数不依赖 current_request 状态
+        """
+        encoder = self.get_encoder()
+        buffer = bytes()
+        try:
+            sample_rate, audio_data = await self.enqueue()
+            audio_bytes = covert_to_s16le(audio_data=audio_data)
+            encoder.write(audio_bytes)
+            encoder.close()
+            buffer = encoder.read_all()
+        finally:
+            encoder.terminate()
+        return buffer
+
     async def enqueue_to_bytes(self) -> bytes:
         if self.current_request is None:
             raise ValueError("current_request is not set")
 
-        encoder = self.get_encoder()
-
         # NOTE: 这里的逻辑类似 goto
         async with cancel_on_disconnect(self.current_request):
-            try:
-                sample_rate, audio_data = await self.enqueue()
-                audio_bytes = covert_to_s16le(audio_data=audio_data)
-                encoder.set_header(
-                    sample_rate=sample_rate, sample_width=audio_data.dtype.itemsize
-                )
-                encoder.write(audio_bytes)
-                encoder.close()
-                buffer = encoder.read_all()
-            finally:
-                encoder.terminate()
-            return buffer
+            return self._enqueue_to_bytes()
 
         logger.debug(f"disconnected")
         self.interrupt()

@@ -59,6 +59,9 @@ class OpenVoiceModel(VCModel):
         hps = self.model.hps
         return hps.data.sampling_rate
 
+    def get_sample_rate(self):
+        return self.sampling_rate
+
     def audio_to_se(self, audio: NP_AUDIO) -> torch.Tensor:
         hps = self.model.hps
         device = self.device
