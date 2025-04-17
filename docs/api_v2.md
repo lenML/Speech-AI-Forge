@@ -30,14 +30,14 @@
 | `spk.from_ref.wav_b64` | `string` | 参考音频（Base64 编码） |
 | `spk.from_ref.text` | `string` | 参考音频对应文本 |
 
-#### **3. 语音调整（adjuct）**
+#### **3. 语音调整（adjust）**
 | 参数名 | 类型 | 说明 |
 |--------|------|------|
-| `adjuct.pitch` | `number` | 音调调整（默认 `0`） |
-| `adjuct.speed_rate` | `number` | 语速调整（默认 `1`） |
-| `adjuct.volume_gain_db` | `number` | 音量调整（默认 `0`） |
-| `adjuct.normalize` | `boolean` | 是否归一化音量（默认 `false`） |
-| `adjuct.headroom` | `number` | 归一化动态余量（默认 `1`） |
+| `adjust.pitch` | `number` | 音调调整（默认 `0`） |
+| `adjust.speed_rate` | `number` | 语速调整（默认 `1`） |
+| `adjust.volume_gain_db` | `number` | 音量调整（默认 `0`） |
+| `adjust.normalize` | `boolean` | 是否归一化音量（默认 `false`） |
+| `adjust.headroom` | `number` | 归一化动态余量（默认 `1`） |
 
 #### **4. 编码设置（encoder）**
 | 参数名 | 类型 | 说明 |
@@ -123,7 +123,7 @@ curl http://localhost:7870/v2/tts \
     "spk": {
       "from_spk_name": "mona"
     },
-    "adjuct": {
+    "adjust": {
       "pitch": 0,
       "speed_rate": 1
     },

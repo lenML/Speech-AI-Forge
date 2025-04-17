@@ -30,7 +30,7 @@ client
     // },
 
     // 控制音调调节
-    adjuct: {
+    adjust: {
       pitch: 0,
       speed_rate: 1,
       volume_gain_db: 0,

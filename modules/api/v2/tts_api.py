@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from modules.api.Api import APIManager
+from modules.api.v2.dcls import SpeakerConfig
 from modules.core.handler.datacls.audio_model import (
     AdjustConfig,
     EncoderConfig,
@@ -30,25 +31,10 @@ from modules.utils.bytes_to_wav import convert_bytes_to_wav_bytes
 
 logger = logging.getLogger(__name__)
 
-class SpeakerReference(BaseModel):
-    wav_b64: str
-    text: str
-
-
-class SpeakerConfig(BaseModel):
-    """
-    任选其中一种形式指定 spk
-    """
-
-    from_spk_id: Optional[str] = None
-    from_spk_name: Optional[str] = None
-    from_ref: Optional[SpeakerReference] = None
-
-
 class V2TtsParams(BaseModel):
 
     # audio
-    adjuct: Optional[AdjustConfig] = None
+    adjust: Optional[AdjustConfig] = None
     encoder: Optional[EncoderConfig] = None
     enhance: Optional[EnhancerConfig] = None
     infer: Optional[InferConfig] = None
@@ -106,7 +92,7 @@ async def forge_text_synthesize(params: V2TtsParams, request: Request):
     tn_config = params.tn or TNConfig()
     enhancer_config = params.enhance or EnhancerConfig()
     encoder_config = params.encoder or EncoderConfig()
-    adjust_config = params.adjuct or AdjustConfig()
+    adjust_config = params.adjust or AdjustConfig()
 
     handler = TTSHandler(
         ssml_content=ssml,

@@ -27,7 +27,7 @@ export interface ITTSParamsV2 {
   text?: string;
   texts?: string[];
   ssml?: string;
-  adjuct?: {
+  adjust?: {
     pitch?: number;
     speed_rate?: number;
     volume_gain_db?: number;
