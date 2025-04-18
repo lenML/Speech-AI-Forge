@@ -190,7 +190,7 @@ class AudioHandler:
 
         # NOTE: 这里的逻辑类似 goto
         async with cancel_on_disconnect(self.current_request):
-            return self._enqueue_to_bytes()
+            return await self._enqueue_to_bytes()
 
         logger.debug(f"disconnected")
         self.interrupt()
