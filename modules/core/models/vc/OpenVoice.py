@@ -56,8 +56,12 @@ class OpenVoiceModel(VCModel):
 
     @property
     def sampling_rate(self) -> int:
-        hps = self.model.hps
-        return hps.data.sampling_rate
+        # hps = self.model.hps
+        # return hps.data.sampling_rate
+
+        # 因为这里有可能在 load 之前调用，所以直接写死了
+        # 22050 来自 models/OpenVoiceV2/converter/config.json
+        return 22050
 
     def get_sample_rate(self):
         return self.sampling_rate
