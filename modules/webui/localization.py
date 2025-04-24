@@ -16,7 +16,11 @@ def localization_js(filename):
     global current_translation
 
     if isinstance(filename, str):
-        full_name = os.path.abspath(os.path.join(localization_root, filename + ".json"))
+        if filename.find(":")>0:
+            filename = filename.split(":")
+            full_name = os.path.abspath(os.path.join(localization_root, filename[0] + ".json"))
+        else:
+            full_name = os.path.abspath(os.path.join(localization_root, filename + ".json"))
         if os.path.exists(full_name):
             try:
                 with open(full_name, encoding="utf-8") as f:
