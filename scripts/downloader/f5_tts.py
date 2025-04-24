@@ -56,7 +56,8 @@ class F5TTSDownloader(BaseModelDownloader):
         """从 ModelScope 下载指定文件，并显示进度条"""
         self.ensure_dir()
 
-        url = "https://www.modelscope.cn/models/SWivid/F5-TTS_Emilia-ZH-EN/resolve/master/F5TTS_Base/model_1200000.safetensors"
+        # url = "https://www.modelscope.cn/models/SWivid/F5-TTS_Emilia-ZH-EN/resolve/master/F5TTS_Base/model_1200000.safetensors"
+        url = "https://www.modelscope.cn/models/AI-ModelScope/F5-TTS/resolve/master/F5TTS_Base/model_1200000.safetensors"
         dest_path = self.model_dir / "F5TTS_Base" / "model_1200000.safetensors"
 
         self._download_with_progress(url, dest_path)
