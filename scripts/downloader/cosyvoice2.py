@@ -10,7 +10,7 @@ class CosyVoice2Downloader(BaseModelDownloader):
         required_files = [
             "campplus.onnx",
             "configuration.json",
-            "cosyvoice.yaml",
+            "cosyvoice2.yaml",
             "flow.pt",
             "hift.pt",
             "llm.pt",
