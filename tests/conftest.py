@@ -23,6 +23,8 @@ setup_model_args(parser)
 args, unknown = parser.parse_known_args()
 process_model_args(args)
 config.runtime_env_vars.off_tqdm = True
+# 使用cpu测试
+# config.runtime_env_vars.use_cpu = "all"
 devices.reset_device()
 app_instance = create_api(fastapi.FastAPI())
 app_instance.set_cors()
