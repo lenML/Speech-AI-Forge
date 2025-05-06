@@ -17,8 +17,7 @@ class FishSpeechDownloader(BaseModelDownloader):
         ]
         super().__init__(
             model_name="fish-speech-1.2-sft",
-            # 好像没有，没找到 modelscope 的库
-            modelscope_repo=None,
+            modelscope_repo="fishaudio/fish-speech-1.2-sft",
             huggingface_repo="fishaudio/fish-speech-1.2-sft",
             required_files=required_files,
         )

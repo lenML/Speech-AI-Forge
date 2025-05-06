@@ -13,7 +13,7 @@ class OpenVoiceDownloader(BaseModelDownloader):
         ]
         super().__init__(
             model_name="OpenVoiceV2",
-            modelscope_repo=None,
+            modelscope_repo="myshell-ai/OpenVoiceV2",
             huggingface_repo="myshell-ai/OpenVoiceV2",
             required_files=required_files,
         )
