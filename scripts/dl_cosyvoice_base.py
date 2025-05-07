@@ -5,7 +5,7 @@ from scripts.dl_base import BaseModelDownloader
 logger = logging.getLogger(__name__)
 
 
-class CosyVoiceInstructDownloader(BaseModelDownloader):
+class CosyVoiceBaseDownloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
             "campplus.onnx",
@@ -14,8 +14,7 @@ class CosyVoiceInstructDownloader(BaseModelDownloader):
             "flow.pt",
             "hift.pt",
             "llm.pt",
-            "speech_tokenizer_v1.onnx",
-            "spk2info.pt",
+            "speech_tokenizer_v1.onnx"
         ]
         super().__init__(
             model_name="CosyVoice_300M",
@@ -30,4 +29,4 @@ if __name__ == "__main__":
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    CosyVoiceInstructDownloader()(source=args.source)
+    CosyVoiceBaseDownloader()(source=args.source)
