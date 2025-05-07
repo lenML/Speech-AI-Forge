@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 class FireRedTTSDownloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
-            "fireredtts_gpt.pt",
-            "fireredtts_speaker.bin",
-            "fireredtts_token2wav.pt",
+            "gpt.pt",
+            "speaker.bin",
+            "token2wav.pt",
         ]
         super().__init__(
             model_name="FireRedTTS",
