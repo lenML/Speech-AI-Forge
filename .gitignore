@@ -181,10 +181,12 @@ cython_debug/
 /models/**/.huggingface
 /models/**/.gitattributes
 /models/**/.gitignore
+# NOTE: 为什么这样一个一个写？ A：因为有的模型可能需要一些内容保存到库里...比如resemble-enhance 的 yaml 配置文件
 /models/CosyVoice_*/**/*
 /models/whisper/**/*
 /models/F5-TTS/**/*
 /models/vocos-mel-24khz/**/*
+/models/Index-TTS/**/*
 
 /*.pt
 
@@ -208,3 +210,6 @@ test*.srt
 test*.tsv
 
 .DS_Store
+
+# index tts 的测试音频 官方repo里面拷贝过来的
+!tests/demo/index_tts/sample_prompt.wav

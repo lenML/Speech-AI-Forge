@@ -9,6 +9,7 @@ paths = [
     REPO_DIR("fish_speech"),
     REPO_DIR("FireRedTTS"),
     REPO_DIR("F5TTS"),
+    REPO_DIR("index_tts"),
 ]
 
 

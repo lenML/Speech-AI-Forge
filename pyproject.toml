@@ -1,2 +1,7 @@
+# NOTE: 写一下为什么没用 poetry
+# 使用 poetry 安装依赖在linux上没有问题，但是windows上安装pytorch会有莫名其妙的hash错误...无法解决
+# 可能切换pytorch版本可以解决，但是可能导致新的问题...
+# 所以 poetry 的好处一点没粘上还可能有坏处
+
 [tool.isort]
 profile = "black"

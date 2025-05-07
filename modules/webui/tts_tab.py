@@ -90,15 +90,6 @@ class FireRedTTSInterface(NotSeedTTSInterface):
         ]
         self.spliter_eos = " 。 "
 
-        # NOTE: 只使用 _p 结尾的 因为没有 prompt 在这个模型中没用
-        styles: list[str] = [s.get("name") for s in get_styles()]
-        self.styles = (
-            ["*auto"]
-            # NOTE: _p_en 在前面，因为对中文指令识别一般
-            + [s for s in styles if s.endswith("_p_en")]
-            + [s for s in styles if s.endswith("_p")]
-        )
-
         # NOTE: 这个模型不需要参考文本
         self.need_ref_text = False
         self.show_style_dropdown = False
@@ -116,15 +107,6 @@ class F5TtsInterface(NotSeedTTSInterface):
         self.contorl_tokens = []
         self.spliter_eos = " 。 "
 
-        # NOTE: 只使用 _p 的 因为没有 prompt 在这个模型中没用
-        styles: list[str] = [s.get("name") for s in get_styles()]
-        self.styles = (
-            ["*auto"]
-            # NOTE: _p_en 在前面，因为对中文指令识别一般
-            + [s for s in styles if s.endswith("_p_en")]
-            + [s for s in styles if s.endswith("_p")]
-        )
-
         # NOTE: 这个模型不支持 instruction
         self.show_style_dropdown = False
         # TODO: 其实有采样配置，但是和GPT模型不一样，得重新调整生成流程
@@ -139,15 +121,24 @@ class FishSpeechInterface(NotSeedTTSInterface):
         self.contorl_tokens = []
         self.spliter_eos = " 。 "
 
-        # NOTE: 只使用 _p 的 因为没有 prompt 在这个模型中没用
-        styles: list[str] = [s.get("name") for s in get_styles()]
-        self.styles = (
-            ["*auto"]
-            # NOTE: _p_en 在前面，因为对中文指令识别一般
-            + [s for s in styles if s.endswith("_p_en")]
-            + [s for s in styles if s.endswith("_p")]
-        )
+        self.default_temprature = 0.7
+        self.default_top_p = 0.7
 
+        # NOTE: 这个模型不支持 instruction
+        self.show_style_dropdown = False
+
+
+class IndexTTSInterface(NotSeedTTSInterface):
+
+    def __init__(self):
+        super().__init__("index-tts")
+        self.refine_visible = False
+        self.contorl_tokens = []
+        self.spliter_eos = " 。 "
+
+        self.styles = ["*auto"]
+
+        # TODO: 这些配置目前其实不支持，需要实现 index-tts infer
         self.default_temprature = 0.7
         self.default_top_p = 0.7
 
@@ -170,6 +161,9 @@ def create_tts_interface():
         with gr.TabItem("F5TTS"):
             f5_tts_interface = F5TtsInterface()
             f5_tts_interface.create_tts_interface()
+        with gr.TabItem("IndexTTS"):
+            index_tts_interface = IndexTTSInterface()
+            index_tts_interface.create_tts_interface()
 
         # NOTE: 现在没有SFT版本，效果很差
         with gr.TabItem("FishSpeech"):

@@ -113,6 +113,7 @@ WIP 开发中
 |                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                          | 句子级   | en, zh, jp, yue, ko     | ✅(v2)                 |
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | 句子级   | en, zh                  | ✅                 |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | 句子级   | en, zh                  | ✅                 |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                                           | 句子级   | en, zh                  | ✅                 |
 |                 | GPTSoVits                                                                                      | 句子级   |                         | 🚧                 |
 | **ASR**         | [Whisper](https://github.com/openai/whisper)                                                  | 🚧       | ✅                      | ✅                 |
 |                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                        | 🚧       | ✅                      | 🚧                 |
@@ -133,6 +134,7 @@ WIP 开发中
 |              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
 |              | CosyVoice(v2)  | `python -m scripts.downloader.cosyvoice2 --source huggingface`            |
 |              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
+|              | Index-TTS | `python -m scripts.downloader.index_tts --source huggingface`          |
 |              | F5-TTS | `python -m scripts.downloader.f5_tts --source huggingface`          |
 |              | F5-TTS(vocos) | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`          |
 | **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
