@@ -5,7 +5,7 @@ from scripts.dl_base import BaseModelDownloader
 logger = logging.getLogger(__name__)
 
 
-class CosyVoice2Downloader(BaseModelDownloader):
+class IndexTTSDownloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
             "bigvgan_discriminator.pth",
@@ -25,12 +25,9 @@ class CosyVoice2Downloader(BaseModelDownloader):
         )
         self.logger = logger
 
-        self.blank_dir = self.model_dir / "Index-TTS"
-        self.blank_dir.mkdir(parents=True, exist_ok=True)
-
 
 if __name__ == "__main__":
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    CosyVoice2Downloader()(source=args.source)
+    IndexTTSDownloader()(source=args.source)

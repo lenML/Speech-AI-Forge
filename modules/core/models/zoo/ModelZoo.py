@@ -15,8 +15,8 @@ from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
-from modules.core.models.tts.FishSpeechModel import FishSpeechModel
 from modules.core.models.tts.IndexTTS.IndexTTSModel import IndexTTSModel
+from modules.core.models.tts.SparkTTS.SparkTTSModel import SparkTTSModel
 from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.vc.OpenVoice import OpenVoiceModel
 from modules.devices import devices
@@ -35,6 +35,7 @@ class ModelZoo:
         "fire-red-tts": FireRedTTSModel(),
         "f5-tts": F5TtsModel(),
         "index-tts": IndexTTSModel(),
+        "spark-tts": SparkTTSModel(),
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
@@ -144,6 +145,9 @@ class ModelZoo:
 
     def get_index_tts(self) -> IndexTTSModel:
         return self.get_model("index-tts")
+
+    def get_spark_tts(self) -> SparkTTSModel:
+        return self.get_model("spark-tts")
 
 
 model_zoo = ModelZoo()

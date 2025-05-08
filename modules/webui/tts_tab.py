@@ -146,6 +146,24 @@ class IndexTTSInterface(NotSeedTTSInterface):
         self.show_style_dropdown = False
 
 
+class SparkTTSInterface(NotSeedTTSInterface):
+
+    def __init__(self):
+        super().__init__("spark-tts")
+        self.refine_visible = False
+        self.contorl_tokens = []
+        self.spliter_eos = " 。 "
+
+        self.styles = ["*auto"]
+
+        self.default_temprature = 0.8
+        self.default_top_p = 0.95
+        self.default_top_k = 50
+
+        # NOTE: 这个模型不支持 instruction
+        self.show_style_dropdown = False
+
+
 def create_tts_interface():
 
     with gr.Tabs():
@@ -164,8 +182,9 @@ def create_tts_interface():
         with gr.TabItem("IndexTTS"):
             index_tts_interface = IndexTTSInterface()
             index_tts_interface.create_tts_interface()
-
-        # NOTE: 现在没有SFT版本，效果很差
+        with gr.TabItem("SparkTTS"):
+            spark_tts_interface = SparkTTSInterface()
+            spark_tts_interface.create_tts_interface()
         with gr.TabItem("FishSpeech"):
             cosy_voice_interface = FishSpeechInterface()
             cosy_voice_interface.create_tts_interface()

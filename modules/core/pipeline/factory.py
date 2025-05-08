@@ -24,6 +24,7 @@ from modules.core.tn.FireRedTtsTN import FireRedTtsTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
 from modules.core.tn.F5TtsTN import F5TtsTN
 from modules.core.tn.IndexTTSTN import IndexTTSTN
+from modules.core.tn.SparkTTSTN import SparkTTSTN
 from modules.core.tn.TNPipeline import TNPipeline
 from modules.data import styles_mgr
 
@@ -110,7 +111,7 @@ class FromAudioPipeline(AudioPipeline):
 class PipelineFactory:
     @classmethod
     def create(cls, ctx: TTSPipelineContext) -> TTSPipeline:
-        model_id = ctx.tts_config.mid
+        model_id = ctx.tts_config.mid.lower()
 
         if model_id == "chattts" or model_id == "chat-tts":
             return cls.create_chattts_pipeline(ctx)
@@ -124,6 +125,8 @@ class PipelineFactory:
             return cls.create_f5_tts_pipeline(ctx)
         elif model_id == "indextts" or model_id == "index-tts":
             return cls.create_index_tts_pipeline(ctx)
+        elif model_id == "sparktts" or model_id == "spark-tts":
+            return cls.create_spark_tts_pipeline(ctx)
         else:
             raise Exception(f"Unknown model id: {model_id}")
 
@@ -202,6 +205,17 @@ class PipelineFactory:
         cls.setup_base_modules(pipeline=pipeline)
         pipeline.add_module(TNProcess(tn_pipeline=IndexTTSTN))
         model = model_zoo.get_index_tts()
+        pipeline.set_model(model)
+
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
+    @classmethod
+    def create_spark_tts_pipeline(cls, ctx: TTSPipelineContext):
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        pipeline.add_module(TNProcess(tn_pipeline=SparkTTSTN))
+        model = model_zoo.get_spark_tts()
         pipeline.set_model(model)
 
         pipeline.audio_sr = model.get_sample_rate()

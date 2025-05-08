@@ -15,7 +15,7 @@ class DownloadProgressBar(tqdm):
         self.update(b * bsize - self.n)
 
 
-class F5TTSDownloader(BaseModelDownloader):
+class F5TTSV1Downloader(BaseModelDownloader):
     # TODO: 验证文件完整性
     MODEL_SHA256 = "4180310f91d592cee4bc14998cd37c781f779cf105e8ca8744d9bd48ca7046ae"
 
@@ -75,4 +75,4 @@ if __name__ == "__main__":
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    F5TTSDownloader()(source=args.source)
+    F5TTSV1Downloader()(source=args.source)
