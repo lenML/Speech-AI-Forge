@@ -87,6 +87,9 @@ class IndexTTSModel(TTSModel):
         # NOTE: 这个模型不需要 ref_txt
         sr = self.get_sample_rate()
         ref_wav, ref_txt = self.get_ref_wav(seg0)
+        if ref_wav is None:
+            # NOTE: 必须要有 reference audio
+            raise RuntimeError("Reference audio not found.")
         prompt_wav = io.BytesIO()
         sf.write(prompt_wav, ref_wav, sr, format="WAV")
         prompt_wav.seek(0)
