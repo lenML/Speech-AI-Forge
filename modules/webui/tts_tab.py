@@ -10,6 +10,11 @@ from modules.webui.webui_utils import (
 # 没有 seed/style/examples 配置的ui
 class NotSeedTTSInterface(TTSInterface):
 
+    def __init__(self, model_id="chat-tts"):
+        super().__init__(model_id)
+
+        self.no_seed = True
+
     def create_tts_style_guide(self):
         pass
 
@@ -18,41 +23,6 @@ class NotSeedTTSInterface(TTSInterface):
 
     def create_examples_interface(self, text_input):
         return None
-
-    def create_speaker_picker(self):
-        spk_input_dropdown = gr.Dropdown(
-            choices=self.speaker_names,
-            interactive=True,
-            value=self.default_selected_speaker,
-            show_label=False,
-        )
-        spk_input_text = gr.Textbox(
-            label="Speaker (Text or Seed)",
-            value=self.default_speaker_name,
-            show_label=False,
-            visible=False,
-        )
-        spk_input_dropdown.change(
-            fn=self.get_speaker_name_from_show_name,
-            inputs=[spk_input_dropdown],
-            outputs=[spk_input_text],
-        )
-
-        reload_button = gr.Button(value="🔄", variant="secondary")
-
-        def reload_spks():
-            self.reload_speakers()
-            names = self.get_speaker_names()
-            return gr.Dropdown(choices=names)
-
-        reload_button.click(
-            fn=reload_spks,
-            inputs=[],
-            outputs=[spk_input_dropdown],
-        )
-
-        return spk_input_text, spk_input_dropdown
-
 
 class CosyVoiceInterface(NotSeedTTSInterface):
 
@@ -162,6 +132,13 @@ class SparkTTSInterface(NotSeedTTSInterface):
 
         # NOTE: 这个模型不支持 instruction
         self.show_style_dropdown = False
+
+
+class ChatTTSInterface(TTSInterface):
+    def __init__(self, model_id="chat-tts"):
+        super().__init__(model_id)
+
+        self.support_seed_speaker = True
 
 
 def create_tts_interface():

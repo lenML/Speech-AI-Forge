@@ -76,6 +76,13 @@ def get_spk_emotions(file):
         return ["default"]
 
 
+def get_spk_emotions_from_name(spk_name: str) -> list[str]:
+    spk = spk_mgr.get_speaker(spk_name)
+    if spk is not None:
+        return spk.get_emotions()
+    return ["default"]
+
+
 def get_styles():
     return styles_mgr.list_items()
 
@@ -251,7 +258,10 @@ async def tts_generate(
     headroom: float = 1,
     ref_audio: Optional[tuple[int, np.ndarray]] = None,
     ref_audio_text: Optional[str] = None,
-    spk_emotion="default",
+    # 这个是非上传音色的 emotion
+    spk_emotion1="default",
+    # 这个是上传音色的 emotion
+    spk_emotion2="default",
     model_id: str = "chat-tts",
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
@@ -259,6 +269,8 @@ async def tts_generate(
         batch_size = int(batch_size)
     except Exception:
         batch_size = 4
+
+    spk_emotion = spk_emotion1
 
     max_len = webui_config.tts_max
     text = text.strip()[0:max_len]
@@ -306,6 +318,8 @@ async def tts_generate(
     if spk_file:
         try:
             spk: TTSSpeaker = TTSSpeaker.from_file(spk_file)
+            # 如果读取文件，那么就使用 emotion2 这个是 UI 顺序决定的
+            spk_emotion = spk_emotion2
         except Exception:
             raise gr.Error("Failed to load speaker file")
 
@@ -328,6 +342,7 @@ async def tts_generate(
         prefix=prefix,
         prompt1=prompt1,
         prompt2=prompt2,
+        emotion=spk_emotion,
     )
     infer_config = InferConfig(
         batch_size=batch_size,

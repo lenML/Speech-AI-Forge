@@ -10,6 +10,7 @@ from modules.webui.webui_utils import (
     get_styles,
     load_spk_info,
     get_spk_emotions,
+    get_spk_emotions_from_name,
     refine_text,
     tts_generate,
 )
@@ -47,6 +48,9 @@ class TTSInterface:
         self.default_speaker_name = self.get_speaker_name_from_show_name(
             self.default_selected_speaker
         )
+
+        # 是否支持 seed （其实目前就 chattts 支持 seed speaker...）
+        self.support_seed_speaker = False
 
     def reload_speakers(self):
         def spk_filter(spk: TTSSpeaker):
@@ -105,7 +109,10 @@ class TTSInterface:
             value=self.default_selected_speaker,
             show_label=False,
         )
-        spk_rand_button = gr.Button(value="🎲", variant="secondary")
+        spk_rand_button = gr.Button(
+            value="🎲", variant="secondary", visible=self.support_seed_speaker
+        )
+        spk_emotion = gr.Dropdown(["default"], value="default", label="Emotion")
         reload_button = gr.Button(value="🔄", variant="secondary")
 
         spk_input_dropdown.change(
@@ -128,21 +135,32 @@ class TTSInterface:
             inputs=[],
             outputs=[spk_input_dropdown],
         )
-        return spk_input_text, spk_input_dropdown
+        spk_input_dropdown.change(
+            fn=lambda show_name: gr.Dropdown(
+                choices=get_spk_emotions_from_name(
+                    self.get_speaker_name_from_show_name(show_name)
+                )
+            ),
+            inputs=[spk_input_dropdown],
+            outputs=[spk_emotion],
+        )
+        return spk_input_text, spk_input_dropdown, spk_emotion
 
     def create_speaker_interface(self):
         with gr.Group():
             gr.Markdown("🗣️Speaker")
             with gr.Tabs():
                 with gr.Tab(label="Pick"):
-                    spk_input_text, spk_input_dropdown = self.create_speaker_picker()
+                    spk_input_text, spk_input_dropdown, spk_emotion1 = (
+                        self.create_speaker_picker()
+                    )
 
                 with gr.Tab(label="Upload"):
                     with gr.Group():
                         spk_file_upload = gr.File(
                             label="Speaker (Upload)", file_types=SPK_FILE_EXTS
                         )
-                        spk_emotion = gr.Dropdown(
+                        spk_emotion2 = gr.Dropdown(
                             ["default"], value="default", label="Emotion"
                         )
                     gr.Markdown("📝Speaker info")
@@ -153,7 +171,7 @@ class TTSInterface:
                     spk_file_upload.change(
                         fn=lambda file: gr.Dropdown(choices=get_spk_emotions(file)),
                         inputs=[spk_file_upload],
-                        outputs=[spk_emotion],
+                        outputs=[spk_emotion2],
                     )
 
                 with gr.Tab(label="Refrence"):
@@ -176,7 +194,8 @@ class TTSInterface:
             spk_file_upload,
             ref_audio_upload,
             ref_text_input,
-            spk_emotion,
+            spk_emotion1,
+            spk_emotion2,
         )
 
     def create_tts_style_guide(self):
@@ -378,7 +397,8 @@ class TTSInterface:
                     spk_file_upload,
                     ref_audio_upload,
                     ref_text_input,
-                    spk_emotion,
+                    spk_emotion1,
+                    spk_emotion2,
                 ) = self.create_speaker_interface()
                 style_input_dropdown = self.create_style_interface()
                 temperature_input, top_p_input, top_k_input, batch_size_input = (
@@ -455,7 +475,8 @@ class TTSInterface:
                 headroom_input,
                 ref_audio_upload,
                 ref_text_input,
-                spk_emotion,
+                spk_emotion1,
+                spk_emotion2,
             ],
             outputs=[tts_output1, tts_output2, tts_output3, audio_history],
         )

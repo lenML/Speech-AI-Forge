@@ -53,6 +53,9 @@ class TTSModel(BaseZooModel):
     def get_cache_kwargs(self, segments: list[TTSSegment], context: TTSPipelineContext):
         texts = [segment.text for segment in segments]
 
+        # NOTE: 这里感觉有点蛋疼...如果增加新属性，都得改这里，但是如果改用 JSON 直接作为 cache key 的话，又可能太长了...
+        # TODO: 得换个好点的方法
+
         seg0 = segments[0]
         spk = seg0.spk
         spk_id = spk.id if spk else None
@@ -64,6 +67,7 @@ class TTSModel(BaseZooModel):
         prompt1 = seg0.prompt1
         prompt2 = seg0.prompt2
         prefix = seg0.prefix
+        emotion = seg0.emotion
         # use_decoder = seg0.use_decoder
         seed = seg0.infer_seed
         chunk_size = context.infer_config.stream_chunk_size
@@ -81,6 +85,7 @@ class TTSModel(BaseZooModel):
             prefix=prefix,
             stream_chunk_size=chunk_size,
             seed=seed,
+            emotion=emotion,
         )
         return kwargs
 
