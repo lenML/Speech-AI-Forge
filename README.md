@@ -114,11 +114,11 @@ WIP 开发中
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | 句子级   | en, zh                  | ✅                 |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | 句子级   | en, zh                  | ✅(v0.6/v1)                 |
 |                 | [Index-TTS](https://github.com/index-tts/index-tts)                                           | 句子级   | en, zh                  | ✅                 |
-|                 | GPTSoVits                                                                                      | 句子级   |                         | 🚧                 |
+|                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)                                           | 句子级   | en, zh                  | ✅                 |
+|                 | ~~GPTSoVits~~                                                                                      | 句子级   |                         | 🚧                 |
 | **ASR**         | [Whisper](https://github.com/openai/whisper)                                                  | 🚧       | ✅                      | ✅                 |
 |                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                        | 🚧       | ✅                      | 🚧                 |
 | **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                          |          |                         | ✅                 |
-|                 | [RVC](https://github.com/svc-develop-team/RVC)                                                |          |                         | 🚧                 |
 | **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                            |          |                         | ✅                 |
 
 
@@ -135,6 +135,7 @@ WIP 开发中
 |              | CosyVoice(v2)  | `python -m scripts.downloader.cosyvoice2 --source huggingface`            |
 |              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
 |              | Index-TTS | `python -m scripts.downloader.index_tts --source huggingface`          |
+|              | Spark-TTS | `python -m scripts.downloader.spark_tts --source huggingface`          |
 |              | F5-TTS(v0.6) | `python -m scripts.downloader.f5_tts --source huggingface`          |
 |              | F5-TTS(v1) | `python -m scripts.downloader.f5_tts_v1 --source huggingface`          |
 |              | F5-TTS(vocos) | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`          |
