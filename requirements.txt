@@ -58,8 +58,10 @@ openai-whisper==20231117
 onnxruntime==1.18.1
 inflect==7.3.1
 unidecode==1.3.8
-# NOTE: 这个似乎不需要
+# NOTE: 这个需要，否则无法启动CosyVoice服务
 # matcha-tts
+matcha-tts==0.0.7.2
+
 
 # whisper
 faster_whisper==1.0.3
