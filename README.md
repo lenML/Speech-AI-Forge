@@ -245,6 +245,8 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - CosyVoice: https://github.com/FunAudioLLM/CosyVoice
 - FireRedTTS: https://github.com/FireRedTeam/FireRedTTS
 - F5-TTS: https://github.com/SWivid/F5-TTS
+- Index-TTS: https://github.com/index-tts/index-tts
+- Spark-TTS: https://github.com/SparkAudio/Spark-TTS
 
 - Whisper: https://github.com/openai/whisper
 
