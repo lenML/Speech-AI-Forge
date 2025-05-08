@@ -15,7 +15,6 @@ from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
 
-# TODO: 这个模型还没写 cache
 class F5TtsModel(TTSModel):
     load_lock = threading.Lock()
 
@@ -40,7 +39,6 @@ class F5TtsModel(TTSModel):
         self.device = devices.get_device_for("f5-tts")
         self.dtype = devices.dtype
 
-        # TODO: 支持拼音标注
         self.annotation = F5Annotation()
 
     def check_files(self) -> None:
@@ -92,7 +90,10 @@ class F5TtsModel(TTSModel):
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> list[NP_AUDIO]:
-        # TODO: 缓存
+        cached = self.get_cache(segments=segments, context=context)
+        if cached is not None:
+            return cached
+
         self.load()
 
         sr = self.get_sample_rate()
@@ -130,7 +131,10 @@ class F5TtsModel(TTSModel):
                 speed=1,
             )
 
-        return [(sr, wav) for wav, sr, _ in generated_waves]
+        results = [(sr, wav) for wav, sr, _ in generated_waves]
+        if not context.stop:
+            self.set_cache(segments=segments, context=context, value=results)
+        return results
 
     def generate_batch_stream(
         self, segments: list[TTSSegment], context: TTSPipelineContext
