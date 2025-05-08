@@ -55,8 +55,8 @@ class BatchGenerate:
                     self.generate_batch_stream(batch)
                 else:
                     self.generate_batch(batch)
-        except Exception as e:
-            logger.error(f"error: {e}")
+        # except Exception as e:
+        #     logger.error(f"error: {e}")
         finally:
             self.done.set()
 

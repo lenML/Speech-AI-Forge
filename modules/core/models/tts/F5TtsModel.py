@@ -1,55 +1,19 @@
+import io
 import logging
-import re
 import threading
 from typing import Generator, Optional
-import torch
-import torchaudio
-import numpy as np
-import tempfile
-from einops import rearrange
-from vocos import Vocos
-from pydub import AudioSegment, silence
 from modules.core.models.tts.F5.F5Annotation import F5Annotation
+from modules.core.models.tts.F5.F5ttsApi import F5TTS
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
-from modules.repos_static.F5TTS.f5_tts.model import CFM, UNetT, DiT, MMDiT
-from modules.repos_static.F5TTS.f5_tts.model.utils import (
-    load_checkpoint,
-    get_tokenizer,
-    convert_char_to_pinyin,
-    save_spectrogram,
-)
-from transformers import pipeline
 import soundfile as sf
-import tomli
-import argparse
-import tqdm
 from pathlib import Path
-import codecs
-from vocos.feature_extractors import FeatureExtractor, EncodecFeatures
 
 from modules.core.models.TTSModel import TTSModel
 from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
-
-# --------------------- Settings -------------------- #
-
-target_sample_rate = 24000
-n_mel_channels = 100
-hop_length = 256
-target_rms = 0.1
-nfe_step = 32  # 16, 32
-cfg_strength = 2.0
-ode_method = "euler"
-sway_sampling_coef = -1.0
-speed = 1.0
-# fix_duration = 27  # None or float (duration in seconds)
-fix_duration = None
-F5TTS_model_cfg = dict(
-    dim=1024, depth=22, heads=16, ff_mult=2, text_dim=512, conv_layers=4
-)
 
 # TODO: 这个模型还没写 cache
 class F5TtsModel(TTSModel):
@@ -58,14 +22,25 @@ class F5TtsModel(TTSModel):
     def __init__(self) -> None:
         super().__init__("f5-tts")
 
-        self.model_path = Path("models/F5-TTS/F5TTS_Base/model_1200000.safetensors")
-        self.vocos_path = Path("models/vocos-mel-24khz")
+        v0_6_model_path = Path("./models/F5-TTS/F5TTS_Base/model_1200000.safetensors")
+        v1_model_path = Path("./models/F5-TTS/F5TTS_v1_Base/model_1200000.safetensors")
 
-        self.model: Optional[CFM] = None
-        self.vocos: Optional[Vocos] = None
+        self.model_path = v1_model_path
+        self.model_version = "F5TTS_v1_Base"
+        self.vocos_path = Path("./models/vocos-mel-24khz")
 
+        if not v1_model_path.exists() and v0_6_model_path.exists():
+            logger.warning(
+                "F5-TTS v1 model not found, using v0.6.2 model instead. Please update your model."
+            )
+            self.model_path = v0_6_model_path
+            self.model_version = "F5TTS_Base"
+
+        self.model: Optional[F5TTS] = None
         self.device = devices.get_device_for("f5-tts")
+        self.dtype = devices.dtype
 
+        # TODO: 支持拼音标注
         self.annotation = F5Annotation()
 
     def check_files(self) -> None:
@@ -77,71 +52,42 @@ class F5TtsModel(TTSModel):
     def is_downloaded(self) -> bool:
         return self.model_path.exists() and self.vocos_path.exists()
 
-    def load(self) -> tuple[CFM, Vocos]:
+    def load(self) -> F5TTS:
         self.check_files()
 
         with self.load_lock:
             if self.model is None:
-                self.model = self._load_f5()
-                self.vocos = self._load_vocos()
-        return self.model, self.vocos
+                self.model = F5TTS(
+                    model=self.model_version,
+                    vocoder_local_path=str(self.vocos_path),
+                    device=self.device,
+                    dtype=self.dtype,
+                    # TODO: 下面这两个也许可以配置一下？
+                    ode_method="euler",
+                    use_ema=True,
+                )
+        return self.model
 
-    def _load_f5(self):
-        logger.info("Loading F5-TTS model...")
-        ckpt_path = self.model_path
-        model_cls = DiT
-        model_cfg = F5TTS_model_cfg
-        device = self.device
-
-        vocab_char_map, vocab_size = get_tokenizer("Emilia_ZH_EN", "pinyin")
-        model = CFM(
-            transformer=model_cls(
-                **model_cfg, text_num_embeds=vocab_size, mel_dim=n_mel_channels
-            ),
-            mel_spec_kwargs=dict(
-                target_sample_rate=target_sample_rate,
-                n_mel_channels=n_mel_channels,
-                hop_length=hop_length,
-            ),
-            odeint_kwargs=dict(
-                method=ode_method,
-            ),
-            vocab_char_map=vocab_char_map,
-        ).to(device)
-
-        model = load_checkpoint(model, str(ckpt_path), str(device), use_ema=True)
-        logger.info("Loaded F5-TTS model.")
-        return model
-
-    def _load_vocos(self):
-        logger.info("Loading Vocos model...")
-        config_path = self.vocos_path / "config.yaml"
-        model_path = self.vocos_path / "pytorch_model.bin"
-        model = Vocos.from_hparams(config_path)
-        state_dict = torch.load(model_path, map_location="cpu")
-        if isinstance(model.feature_extractor, EncodecFeatures):
-            encodec_parameters = {
-                "feature_extractor.encodec." + key: value
-                for key, value in model.feature_extractor.encodec.state_dict().items()
-            }
-            state_dict.update(encodec_parameters)
-        model.load_state_dict(state_dict)
-        model.eval()
-        logger.info("Loaded Vocos model.")
-        return model
-
+    @devices.after_gc()
     def unload(self) -> None:
         if self.model is None:
             return
         del self.model
-        del self.vocos
         self.model = None
-        self.vocos = None
-        devices.do_gc()
         logger.info("F5-TTS model unloaded.")
 
     def get_sample_rate(self) -> int:
-        return target_sample_rate
+        # 来自 modules/repos_static/F5TTS/f5_tts/configs/F5TTS_v1_Base.yaml
+        return 24000
+
+    def get_ref_bytesio(self, seg: TTSSegment) -> tuple[io.BytesIO, str]:
+        ref_wav, ref_txt = self.get_ref_wav(seg)
+        if ref_wav is None:
+            raise RuntimeError("Reference audio not found.")
+        ref_wav_bytesio = io.BytesIO()
+        sf.write(ref_wav_bytesio, ref_wav, self.get_sample_rate(), format="WAV")
+        ref_wav_bytesio.seek(0)
+        return ref_wav_bytesio, ref_txt
 
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
@@ -155,9 +101,9 @@ class F5TtsModel(TTSModel):
 
         seg0 = segments[0]
         # NOTE: 虽然用不到这些参数...但是还是列出来先
-        top_P = seg0.top_p
-        top_K = seg0.top_k
-        temperature = seg0.temperature
+        # top_P = seg0.top_p
+        # top_K = seg0.top_k
+        # temperature = seg0.temperature
         # repetition_penalty = seg0.repetition_penalty
         # max_new_token = seg0.max_new_token
         prompt = seg0.prompt
@@ -168,99 +114,30 @@ class F5TtsModel(TTSModel):
         seed = seg0.infer_seed
         chunk_size = context.infer_config.stream_chunk_size
 
-        ref_wav, ref_txt = self.get_ref_wav(seg0)
-        if ref_wav is None:
-            # NOTE: 必须要有 reference audio
-            raise RuntimeError("Reference audio not found.")
+        ref_bytesio, ref_txt = self.get_ref_bytesio(seg0)
 
-        ref_audio = (sr, ref_wav)
-
-        with SeedContext(seed=seg0.infer_seed):
-            generated_waves = self.infer_batch(
-                ref_audio=ref_audio, ref_text=ref_txt, gen_text_batches=texts
+        with SeedContext(seed=seed):
+            generated_waves = self.model.infer_batch(
+                ref_file=ref_bytesio,
+                ref_text=ref_txt,
+                gen_text_batches=texts,
+                # TODO: 增加 diffusion 模型使用的参数，目前下面这些是写死的，需要增加 speaker 配置可以支持其他参数
+                target_rms=0.1,
+                cross_fade_duration=0.15,
+                sway_sampling_coef=-1,
+                cfg_strength=2,
+                nfe_step=32,
+                speed=1,
             )
 
-        return [(sr, generated_wave) for generated_wave in generated_waves]
-
-    def infer_batch(
-        self, ref_audio: NP_AUDIO, ref_text: str, gen_text_batches: list[str]
-    ):
-        device = self.device
-        ema_model = self.model
-        vocos = self.vocos
-        sr, audio = ref_audio
-
-        if ema_model is None:
-            raise RuntimeError("F5-TTS model not loaded.")
-        if vocos is None:
-            raise RuntimeError("Vocos model not loaded.")
-
-        audio = torch.Tensor(audio).unsqueeze(0).to(device)
-
-        rms = torch.sqrt(torch.mean(torch.square(audio)))
-        if rms < target_rms:
-            rms = rms.to(audio.device)
-            audio = audio * target_rms / rms
-        audio = audio.to(device)
-
-        generated_waves: list[np.ndarray] = []
-        # NOTE: 这个现在用不到
-        spectrograms = []
-
-        for i, gen_text in enumerate(tqdm.tqdm(gen_text_batches)):
-            # Prepare the text
-            if len(ref_text[-1].encode("utf-8")) == 1:
-                ref_text = ref_text + " "
-            text_list = [ref_text + gen_text]
-
-            # final_text_list = convert_char_to_pinyin(text_list)
-            final_text_list = [
-                self.annotation.convert_to_pinyin(text) for text in text_list
-            ]
-            # print(final_text_list)
-
-            # Calculate duration
-            ref_audio_len = audio.shape[-1] // hop_length
-            zh_pause_punc = r"。，、；：？！"
-            ref_text_len = len(ref_text.encode("utf-8")) + 3 * len(
-                re.findall(zh_pause_punc, ref_text)
-            )
-            gen_text_len = len(gen_text.encode("utf-8")) + 3 * len(
-                re.findall(zh_pause_punc, gen_text)
-            )
-            duration = ref_audio_len + int(
-                ref_audio_len / ref_text_len * gen_text_len / speed
-            )
-
-            # inference
-            with torch.inference_mode():
-                generated, _ = ema_model.sample(
-                    cond=audio,
-                    text=final_text_list,
-                    duration=duration,
-                    steps=nfe_step,
-                    cfg_strength=cfg_strength,
-                    sway_sampling_coef=sway_sampling_coef,
-                )
-
-            generated = generated[:, ref_audio_len:, :]
-            generated_mel_spec = rearrange(generated, "1 n d -> 1 d n")
-            generated_wave = vocos.decode(generated_mel_spec.cpu())
-            if rms < target_rms:
-                rms = rms.to(generated_wave.device)
-                generated_wave = generated_wave * rms / target_rms
-
-            # wav -> numpy
-            generated_wave = generated_wave.squeeze().cpu().numpy()
-
-            generated_waves.append(generated_wave)
-            spectrograms.append(generated_mel_spec[0].cpu().numpy())
-
-        return generated_waves
+        return [(sr, wav) for wav, sr, _ in generated_waves]
 
     def generate_batch_stream(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> Generator[list[NP_AUDIO], None, None]:
-        # NOTE: 不支持 stream
-        generated_waves = self.generate_batch(segments=segments, context=context)
-        yield generated_waves
+        # NOTE: F5ttsApi 里面有一个 infer_batch_stream ，但是和我们想象的 batch stream 不太一样，是通过多线程实现的...并且逻辑也和我们的 batch 不太一样，所以，约等于暂时无法 batch
+
+        results = []
+        for segment in segments:
+            results.append(self.generate_batch([segment], context))
+        yield results
