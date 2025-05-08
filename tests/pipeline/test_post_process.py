@@ -7,7 +7,7 @@ from tests.pipeline.misc import load_audio, save_audio
 
 
 @pytest.mark.post_process
-async def test_process_audio():
+def test_process_audio():
     src_audio_path = "./tests/test_inputs/cosyvoice_out1.wav"
     out_audio_path = "./tests/test_outputs/post_process_out1.wav"
 
@@ -25,7 +25,7 @@ async def test_process_audio():
         ),
     )
 
-    audio_sr, audio_data = await pipe0.generate()
+    audio_sr, audio_data = pipe0.generate()
     assert audio_data.size != 0
     save_audio(
         #

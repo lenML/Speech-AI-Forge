@@ -17,6 +17,7 @@ from modules import config
 from modules.api.api_setup import create_api
 from modules.devices import devices
 from modules.models_setup import process_model_args, setup_model_args
+from modules.core.models.zoo.ModelZoo import model_zoo
 
 parser = argparse.ArgumentParser(description="Test")
 setup_model_args(parser)
@@ -32,6 +33,21 @@ app_instance.set_cors()
 @fixture
 def client():
     yield TestClient(app_instance.app)
+
+
+@fixture(
+    autouse=True,
+    scope="module",
+)
+def after_each_test():
+    yield  # 等待测试完成
+    # NOTE: 测试机器 vram 不足的情况，可以开启这个 fixture
+    # NOTE: 全部模型加载大概要 16gb 显存左右，开启卸载之后基本在 8gb 左右
+    # 清空模型
+    # try:
+    #     model_zoo.unload_all_models()
+    # except Exception as e:
+    #     pass
 
 
 test_inputs_dir = os.path.dirname(__file__) + "/test_inputs"

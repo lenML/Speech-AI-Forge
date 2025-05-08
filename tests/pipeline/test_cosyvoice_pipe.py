@@ -11,6 +11,7 @@ from tests.pipeline.voice_clone_pipe import run_voice_clone_pipeline_test
 
 
 @pytest.mark.pipe_cosyvoice
+@pytest.mark.asyncio
 async def test_cosy_voice_clone_pipe():
     voice_target_path = "./tests/test_inputs/chattts_out1.wav"
     out_audio_path = "./tests/test_outputs/pipe_cosyvoice_voice_clone_out1.wav"
