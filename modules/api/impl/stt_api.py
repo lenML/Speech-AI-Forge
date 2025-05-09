@@ -15,7 +15,7 @@ from modules.core.handler.STTHandler import STTHandler
 class TranscriptionsForm(BaseModel):
     file: UploadFile
 
-    model: str
+    model: str = "whisper"
 
     prompt: Optional[str] = None
     prefix: Optional[str] = None
@@ -146,7 +146,7 @@ def setup(app: APIManager):
             beam_size=beam_size,
             patience=patience,
             length_penalty=length_penalty,
-            response_format=response_format,
+            format=response_format,
             highlight_words=highlight_words,
             max_line_count=max_line_count,
             max_line_width=max_line_width,
@@ -156,7 +156,7 @@ def setup(app: APIManager):
         try:
             handler = STTHandler(input_audio=input_audio, stt_config=sst_config)
 
-            result = handler.enqueue()
+            result = await handler.enqueue()
             return api_utils.success_response(result.__dict__)
         except Exception as e:
             import logging

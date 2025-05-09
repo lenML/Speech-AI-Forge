@@ -15,10 +15,9 @@ class ResultWriter:
     always_include_hours: bool = True
     decimal_marker: str = "."
 
-    subtitles: list[SubtitleSegment] = []
-
     def __init__(self, output: TextIO = None):
         self.output: TextIO = output or io.StringIO()
+        self.subtitles: list[SubtitleSegment] = []
 
     def __call__(
         self, result: WhisperTranscribeResult, options: Optional[dict] = None, **kwargs
