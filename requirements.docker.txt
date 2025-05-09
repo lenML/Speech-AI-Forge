@@ -57,7 +57,7 @@ hyperpyyaml
 openai-whisper
 onnxruntime
 inflect
-matcha-tts
+matcha-tts==0.0.6.0
 
 # whisper
 faster_whisper
