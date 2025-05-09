@@ -133,6 +133,8 @@ async def synthesize_ssml(
     normalize: bool = True,
     headroom: float = 1,
     model_id: str = "chat-tts",
+    remove_silence: bool = False,
+    remove_silence_threshold=-42,
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
     try:
@@ -168,6 +170,8 @@ async def synthesize_ssml(
         volume_gain_db=volume_gain_db,
         normalize=normalize,
         headroom=headroom,
+        remove_silence=remove_silence,
+        remove_silence_threshold=remove_silence_threshold,
     )
     enhancer_config = EnhancerConfig(
         enabled=enable_denoise or enable_enhance or False,
@@ -256,6 +260,8 @@ async def tts_generate(
     volume_gain_db: float = 0,
     normalize: bool = True,
     headroom: float = 1,
+    remove_silence=False,
+    remove_silence_threshold=-42,
     ref_audio: Optional[tuple[int, np.ndarray]] = None,
     ref_audio_text: Optional[str] = None,
     # 这个是非上传音色的 emotion
@@ -358,6 +364,8 @@ async def tts_generate(
         volume_gain_db=volume_gain_db,
         normalize=normalize,
         headroom=headroom,
+        remove_silence=remove_silence,
+        remove_silence_threshold=remove_silence_threshold,
     )
     enhancer_config = EnhancerConfig(
         enabled=enable_denoise or enable_enhance or False,

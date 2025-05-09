@@ -347,12 +347,26 @@ class TTSInterface:
             headroom_input = gr.Slider(
                 label="Headroom", value=0.5, minimum=0, maximum=12, step=0.1
             )
+
+            enable_remove_silence = gr.Checkbox(
+                value=False, label="Enable Remove Silence"
+            )
+            # 默认 -42
+            remove_silence_threshold_input = gr.Slider(
+                label="Remove Silence Threshold",
+                value=-42,
+                minimum=-60,
+                maximum=0,
+                step=1,
+            )
         return (
             speed_input,
             pitch_input,
             volume_up_input,
             enable_loudness_normalization,
             headroom_input,
+            enable_remove_silence,
+            remove_silence_threshold_input,
         )
 
     def create_inference_seed_interface(self):
@@ -435,6 +449,8 @@ class TTSInterface:
                     volume_up_input,
                     enable_loudness_normalization,
                     headroom_input,
+                    enable_remove_silence,
+                    remove_silence_threshold_input,
                 ) = self.create_adjuster_interface()
                 infer_seed_input = self.create_inference_seed_interface()
                 enable_enhance, enable_de_noise, tts_button = (
@@ -478,6 +494,8 @@ class TTSInterface:
                 volume_up_input,
                 enable_loudness_normalization,
                 headroom_input,
+                enable_remove_silence,
+                remove_silence_threshold_input,
                 ref_audio_upload,
                 ref_text_input,
                 spk_emotion1,

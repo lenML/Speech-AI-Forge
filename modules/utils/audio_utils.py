@@ -2,6 +2,7 @@ import io
 import sys
 from io import BytesIO
 
+import librosa
 import numpy as np
 import numpy.typing as npt
 import pyrubberband as pyrb
@@ -169,6 +170,30 @@ def apply_normalize(
 def silence_np(duration_s: float, sample_rate: int = 24000) -> tuple[int, np.ndarray]:
     silence = AudioSegment.silent(duration=duration_s * 1000, frame_rate=sample_rate)
     return pydub_to_np(silence)
+
+
+def remove_silence_edges(
+    audio: np.ndarray, silence_threshold: float = -42
+) -> np.ndarray:
+    """
+    去除音频两端的静音区域。
+
+    参数:
+    - audio: 一维 ndarray，音频波形
+    - silence_threshold: 静音阈值（单位 dB），低于该值将被认为是静音
+    - sr: 采样率（用于能量计算，默认 22050）
+
+    返回:
+    - 去除静音后的音频 ndarray
+    """
+    # 计算非静音区间
+    intervals = librosa.effects.split(audio, top_db=-silence_threshold)
+
+    if len(intervals) == 0:
+        return np.array([])  # 全是静音
+
+    start, end = intervals[0][0], intervals[-1][1]
+    return audio[start:end]
 
 
 if __name__ == "__main__":

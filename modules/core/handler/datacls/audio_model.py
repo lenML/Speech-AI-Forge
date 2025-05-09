@@ -22,6 +22,9 @@ class AdjustConfig(BaseModel):
     normalize: bool = True
     headroom: float = 1
 
+    # 移除静音 （只支持非流式）
+    remove_silence: bool = False
+    remove_silence_threshold: float = -42
 
 class EncoderConfig(BaseModel):
     # NOTE: 默认格式设置为 raw ，即不需要编码的格式

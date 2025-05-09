@@ -20,6 +20,13 @@ class AdjusterProcessor(AudioProcessor):
             volume=adjust_config.volume_gain_db,
             sr=sample_rate,
         )
+
+        if adjust_config.remove_silence:
+            audio_data = audio_utils.remove_silence_edges(
+                audio=audio_data,
+                silence_threshold=adjust_config.remove_silence_threshold,
+            )
+
         return sample_rate, audio_data
 
 

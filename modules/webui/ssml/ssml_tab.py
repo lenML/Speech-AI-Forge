@@ -150,6 +150,18 @@ def create_ssml_interface():
                     step=0.1,
                 )
 
+                enable_remove_silence = gr.Checkbox(
+                    value=False, label="Enable Remove Silence"
+                )
+                # 默认 -42
+                remove_silence_threshold_input = gr.Slider(
+                    label="Remove Silence Threshold",
+                    value=-42,
+                    minimum=-60,
+                    maximum=0,
+                    step=1,
+                )
+
             with gr.Group():
                 gr.Markdown("💪🏼Enhance")
                 enable_enhance = gr.Checkbox(value=True, label="Enable Enhance")
@@ -195,6 +207,8 @@ def create_ssml_interface():
             enable_loudness_normalization,
             headroom_input,
             selected_model,
+            enable_remove_silence,
+            remove_silence_threshold_input,
         ],
         outputs=[ssml_output],
     )
