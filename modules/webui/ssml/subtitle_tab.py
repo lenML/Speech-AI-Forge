@@ -2,6 +2,7 @@ import xml.dom.minidom
 
 import gradio as gr
 import pysubs2
+import tempfile
 
 from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment
 from modules.webui import webui_utils
@@ -12,11 +13,14 @@ def read_subtitle_file_to_segs(file: str, spk: str):
         spk = spk.split(":")[-1].strip()
 
     subs = pysubs2.load(file, encoding="utf-8")
+    # subs 根据 start 排序 从小到大
+    subs_list = sorted(subs, key=lambda x: x.start)
+
     ts = 0
 
     segs = []
 
-    for line in subs:
+    for line in subs_list:
         start = line.start
         end = line.end
         if ts != start:
@@ -45,6 +49,8 @@ def read_subtitle_file(file: str, spk: str):
         spk = spk.split(":")[-1].strip()
 
     subs = pysubs2.load(file, encoding="utf-8")
+    # subs 根据 start 排序 从小到大
+    subs_list = sorted(subs, key=lambda x: x.start)
 
     ts = 0
     document = xml.dom.minidom.Document()
@@ -54,7 +60,7 @@ def read_subtitle_file(file: str, spk: str):
 
     document.appendChild(root)
 
-    for line in subs:
+    for line in subs_list:
         start = line.start
         end = line.end
         if ts != start:
@@ -134,6 +140,24 @@ def read_subtitle_to_table(file: str, spk: str):
     return data
 
 
+def read_subtitle_text_to_table(text: str, format: str, spk: str):
+    # 存为临时文件，然后调用之前的函数
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{format}") as tmp_file:
+        tmp_file.write(text.encode("utf-8"))
+        tmp_file_path = tmp_file.name
+
+    return read_subtitle_to_table(tmp_file_path, spk)
+
+
+def read_subtitle_text_to_ssml(text: str, format: str, spk: str):
+    # 存为临时文件，然后调用之前的函数
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{format}") as tmp_file:
+        tmp_file.write(text.encode("utf-8"))
+        tmp_file_path = tmp_file.name
+
+    return read_subtitle_file(tmp_file_path, spk)
+
+
 # 输入字幕文件，转为 ssml 格式发送到 ssml
 def create_subtitle_tab(
     ssml_input: gr.Textbox,
@@ -156,20 +180,27 @@ def create_subtitle_tab(
                 )
 
         with gr.Column(scale=2):
-            file_upload = gr.File(label="Upload file", file_types=[".srt", ".ass", ""])
+            # 从文件上传
+            with gr.TabItem("From File"):
+                file_upload = gr.File(
+                    label="Upload file", file_types=[".srt", ".ass", ""]
+                )
 
-            send_ssml_btn = gr.Button("📩Send to SSML", variant="primary")
-            send_script_btn = gr.Button("📩Send to Script")
+                send_ssml_btn = gr.Button("📩Send to SSML", variant="primary")
+                send_script_btn = gr.Button("📩Send to Script")
+            # 从文本上传
+            with gr.TabItem("From Text"):
+                text_input = gr.Textbox(
+                    label="Content", lines=10, placeholder="Type here..."
+                )
+                text_format = gr.Dropdown(
+                    choices=["srt", "vtt", "lrc", "ass"],
+                    label="Format",
+                    value="srt",
+                )
 
-        # with gr.Column(scale=3):
-        #     text_input = gr.Textbox(label="Content")
-        #     text_format = gr.Dropdown(
-        #         choices=["txt", "srt", "vtt", "tsv", "json"],
-        #         label="Format",
-        #         value="srt",
-        #     )
-
-        #     send_text_btn = gr.Button(value="Send to SSML")
+                send_text_btn = gr.Button(value="Send to SSML", variant="primary")
+                send_text_script_btn = gr.Button("📩Send to Script")
 
     send_ssml_btn.click(
         fn=read_subtitle_file,
@@ -181,6 +212,16 @@ def create_subtitle_tab(
         inputs=[file_upload, spk_input_dropdown],
         outputs=[script_table_out],
     )
+    send_text_btn.click(
+        fn=read_subtitle_text_to_ssml,
+        inputs=[text_input, text_format, spk_input_dropdown],
+        outputs=[ssml_input],
+    )
+    send_text_script_btn.click(
+        fn=read_subtitle_text_to_table,
+        inputs=[text_input, text_format, spk_input_dropdown],
+        outputs=[script_table_out],
+    )
 
     def to_ssml_tab():
         return gr.Tabs(selected="ssml"), gr.Tabs(selected="ssml.editor")
@@ -190,3 +231,5 @@ def create_subtitle_tab(
 
     send_ssml_btn.click(to_ssml_tab, inputs=[], outputs=[tabs1, tabs2])
     send_script_btn.click(to_script_tab, inputs=[], outputs=[tabs1, tabs2])
+    send_text_btn.click(to_ssml_tab, inputs=[], outputs=[tabs1, tabs2])
+    send_text_script_btn.click(to_script_tab, inputs=[], outputs=[tabs1, tabs2])
