@@ -1,0 +1,16 @@
+{
+  "stream_chunk_size": 100,
+  "temperature": 0.3,
+  "speed": 1,
+  "length_penalty": 0.5,
+  "repetition_penalty": 1.2,
+  "top_k": 20,
+  "top_p": 0.7,
+  "enable_text_splitting": true,
+  "batch_size": 4,
+  "eos": " 。 ",
+  "infer_seed": 42,
+  "spliter_threshold": 100,
+  "model_name": "cosy-voice",
+  "enable_enhancer": false
+}

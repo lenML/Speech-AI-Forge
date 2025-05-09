@@ -94,6 +94,7 @@ class ModelZoo:
 
     def is_not_engouh_mem(self):
         usage = devices.get_memory_usage()
+        # TODO: 这里其实应该至少基于评估模型文件大小来判断...
         return usage.free_mb < (2 * 1024)
 
     def load_model(self, model_id: str):

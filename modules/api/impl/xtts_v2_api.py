@@ -15,6 +15,7 @@ from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.models.zoo.ModelZoo import model_zoo
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class XTTS_V2_Settings:
 
         # 下面是额外配置 xtts_v2 中不包含的，但是本系统需要的
         self.batch_size = 4
-        self.eos = "[uv_break]"
+        self.eos = " 。 "
         self.infer_seed = 42
         self.use_decoder = True
         self.prompt1 = ""
@@ -43,6 +44,40 @@ class XTTS_V2_Settings:
         self.prefix = ""
         self.spliter_threshold = 100
         self.style = ""
+
+        self.enable_enhancer = False
+
+        self.model_name = "cosy-voice"
+
+        self.load_xtts_v2_config_json()
+        self.ensure_model_name_available()
+
+    def load_xtts_v2_config_json(self):
+        """
+        读取根目录下的 xttsv2.config.json 中的值覆盖默认配置
+        """
+        import json
+        import os
+
+        config_path = os.path.join(os.getcwd(), "xttsv2.config.json")
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                self.__dict__.update(config)
+                logger.info(f"Loaded xttsv2 config: {config}")
+        else:
+            logger.warning(f"xttsv2 config file not found: {config_path}")
+
+    def ensure_model_name_available(self):
+        available_tts_models = model_zoo.get_available_tts_model()
+        available_tts_models_ids = [model.model_id for model in available_tts_models]
+        # 如果 model_name 不可用，则提示并切换为第一个可用的模型
+        if self.model_name not in available_tts_models_ids:
+            model_name = available_tts_models_ids[0]
+            logger.warning(
+                f"model_name {self.model_name} not available, use {model_name} instead"
+            )
+            self.model_name = model_name
 
 
 class TTSSettingsRequest(BaseModel):
@@ -105,6 +140,7 @@ def setup(app: APIManager):
             raise HTTPException(status_code=400, detail="Invalid speaker id")
 
         tts_config = TTSConfig(
+            mid=XTTSV2.model_name,
             style=XTTSV2.style,
             temperature=XTTSV2.temperature,
             top_k=XTTSV2.top_k,
@@ -123,11 +159,7 @@ def setup(app: APIManager):
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,
         )
-        # TODO: support enhancer
-        enhancer_config = EnhancerConfig(
-            # enabled=params.enhance or params.denoise or False,
-            # lambd=0.9 if params.denoise else 0.1,
-        )
+        enhancer_config = EnhancerConfig(enabled=XTTSV2.enable_enhancer)
         encoder_config = EncoderConfig(
             format=AudioFormat.raw,
         )
@@ -140,7 +172,7 @@ def setup(app: APIManager):
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
             encoder_config=encoder_config,
-            # NOTE: 这里不支持是因为 xtts 接口不太好加参数
+            # NOTE: 这个不需要，我们通过 spk 指定音色
             vc_config=VCConfig(enabled=False),
         )
 
@@ -184,11 +216,7 @@ def setup(app: APIManager):
         adjust_config = AdjustConfig(
             speed_rate=XTTSV2.speed,
         )
-        # TODO: support enhancer
-        enhancer_config = EnhancerConfig(
-            # enabled=params.enhance or params.denoise or False,
-            # lambd=0.9 if params.denoise else 0.1,
-        )
+        enhancer_config = EnhancerConfig(enabled=XTTSV2.enable_enhancer)
         encoder_config = EncoderConfig(
             format=AudioFormat.raw,
         )
@@ -201,7 +229,7 @@ def setup(app: APIManager):
             adjust_config=adjust_config,
             enhancer_config=enhancer_config,
             encoder_config=encoder_config,
-            # NOTE: 这里不支持是因为 xtts 接口不太好加参数
+            # NOTE: 不需要我们通过 spk 指定音色
             vc_config=VCConfig(enabled=False),
         )
 
