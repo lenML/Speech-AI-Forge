@@ -15,6 +15,19 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 | **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                  |
 | **本地部署** | 查看环境准备部分         | [本地部署](#InstallationandRunning)                                                                                                                                |
 
+## Breaking change logs
+
+- 250508: Support Spark-TTS #223
+- 250507: Support F5TTS-TTS-v1 model #231
+- 250505: Support Index-TTS #229
+- 241111: Add `v2/tts` API #187
+- 241109: Support fishspeech #191
+- 241015: Support F5TTS v0.6.2 #176
+- 241009: Support FireRedTTS #165
+- 240813: Support OpenVoice #100
+- 240801: Add ASR API #92
+- 240723: Support CosyVoice #90
+
 ## Installation and Running
 
 首先，确保 [相关依赖](./docs/dependencies.md) 已经正确安装，并查看 [模型下载](#模型下载) 下载所需模型

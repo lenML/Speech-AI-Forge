@@ -15,6 +15,19 @@ You can experience and deploy Speech-AI-Forge through the following methods:
 | **Container Deployment** | See the docker section                  | [Docker](#docker)                                                                                                                                                     |
 | **Local Deployment**     | See the environment preparation section | [Local Deployment](#InstallationandRunning)                                                                                                                           |
 
+## Breaking change logs
+
+- 250508: Support Spark-TTS #223
+- 250507: Support F5TTS-TTS-v1 model #231
+- 250505: Support Index-TTS #229
+- 241111: Add `v2/tts` API #187
+- 241109: Support fishspeech #191
+- 241015: Support F5TTS v0.6.2 #176
+- 241009: Support FireRedTTS #165
+- 240813: Support OpenVoice #100
+- 240801: Add ASR API #92
+- 240723: Support CosyVoice #90
+
 ## Installation and Running
 
 First, ensure that the [relevant dependencies](./docs/dependencies.md) have been correctly installed.
@@ -109,15 +122,16 @@ Environment variable configuration:
 | ---------------- | ------------------------------------------------------------------------------------------- | --------------- | ---------------------------- | ----------------------- |
 | **TTS**          | [ChatTTS](https://github.com/2noise/ChatTTS)                                                | token-level     | en, zh                       | ✅                       |
 |                  | [FishSpeech](https://github.com/fishaudio/fish-speech)                                       | sentence-level  | en, zh, jp, ko           | ✅ (1.4) |
-|                  | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                        | sentence-level  | en, zh, jp, yue, ko          | ✅(v2)                       |
-|                  | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                      | sentence-level  | en, zh                       | ✅                       |
-|                  | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                  | sentence-level  | en, zh                       | ✅                       |
-|                  | GPTSoVits                                                                                    | sentence-level  |                              | 🚧                       |
-| **ASR**          | [Whisper](https://github.com/openai/whisper)                                                | 🚧              | ✅                           | ✅                       |
-|                  | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                      | 🚧              | ✅                           | 🚧                       |
-| **Voice Clone**  | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                        |                 |                              | ✅                       |
-|                  | [RVC](https://github.com/svc-develop-team/RVC)                                              |                 |                              | 🚧                       |
-| **Enhancer**     | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                          |                 |                              | ✅                       |
+|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                          | sentence-level   | en, zh, jp, yue, ko     | ✅(v2)                 |
+|                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | sentence-level   | en, zh                  | ✅                 |
+|                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | sentence-level   | en, zh                  | ✅(v0.6/v1)                 |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                                           | sentence-level   | en, zh                  | ✅                 |
+|                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)                                           | sentence-level   | en, zh                  | ✅                 |
+|                 | ~~GPTSoVits~~                                                                                      | sentence-level   |                         | 🚧                 |
+| **ASR**         | [Whisper](https://github.com/openai/whisper)                                                  | 🚧       | ✅                      | ✅                 |
+|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                        | 🚧       | ✅                      | 🚧                 |
+| **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                          |          |                         | ✅                 |
+| **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                            |          |                         | ✅                 |
 
 ## Model Download
 
@@ -126,14 +140,19 @@ Since Forge primarily focuses on API functionality development, automatic downlo
 ### Download Script
 
 | Function     | Model          | Download Command                                                          |
-| ------------ | -------------- | ------------------------------------------------------------------------- |
-| **TTS**      | ChatTTS        | `python -m scripts.dl_chattts --source huggingface`                       |
-|              | FishSpeech(1.4)     | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
-|              | CosyVoice(v2)      | `python -m scripts.downloader.cosyvoice2 --source huggingface` |
-|              | FireRedTTS     | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
-| **ASR**      | Whisper        | `python -m scripts.downloader.faster_whisper --source huggingface`        |
-| **CV**       | OpenVoice      | `python -m scripts.downloader.open_voice --source huggingface`            |
-| **Enhancer** | Enhancer Model | `python -m scripts.dl_enhance --source huggingface`                       |
+| ------------ | ---------- | ------------------------------------------------------------------------- |
+| **TTS**      | ChatTTS    | `python -m scripts.dl_chattts --source huggingface`                       |
+|              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
+|              | CosyVoice(v2)  | `python -m scripts.downloader.cosyvoice2 --source huggingface`            |
+|              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
+|              | Index-TTS | `python -m scripts.downloader.index_tts --source huggingface`          |
+|              | Spark-TTS | `python -m scripts.downloader.spark_tts --source huggingface`          |
+|              | F5-TTS(v0.6) | `python -m scripts.downloader.f5_tts --source huggingface`          |
+|              | F5-TTS(v1) | `python -m scripts.downloader.f5_tts_v1 --source huggingface`          |
+|              | F5-TTS(vocos) | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`          |
+| **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
+| **CV**       | OpenVoice  | `python -m scripts.downloader.open_voice --source huggingface`            |
+| **Enhancer** | Enhancer   | `python -m scripts.dl_enhance --source huggingface`                       |
 
 > **Note**: If you need to use ModelScope to download models, use `--source modelscope`. Some models may not be available for download using ModelScope.
 
@@ -225,6 +244,11 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - FishSpeech: https://github.com/fishaudio/fish-speech
 - SenseVoice: https://github.com/FunAudioLLM/SenseVoice
 - CosyVoice: https://github.com/FunAudioLLM/CosyVoice
+- FireRedTTS: https://github.com/FireRedTeam/FireRedTTS
+- F5-TTS: https://github.com/SWivid/F5-TTS
+- Index-TTS: https://github.com/index-tts/index-tts
+- Spark-TTS: https://github.com/SparkAudio/Spark-TTS
+
 - Whisper: https://github.com/openai/whisper
 
 - ChatTTS 默认说话人: https://github.com/2noise/ChatTTS/issues/238
