@@ -5,17 +5,16 @@ from scripts.dl_base import BaseModelDownloader
 logger = logging.getLogger(__name__)
 
 
-class FireRedTTSDownloader(BaseModelDownloader):
+class VocosMel24khzDownloader(BaseModelDownloader):
     def __init__(self):
         required_files = [
-            "gpt.pt",
-            "speaker.bin",
-            "token2wav.pt",
+            "config.yaml",
+            "pytorch_model.bin",
         ]
         super().__init__(
-            model_name="FireRedTTS",
-            modelscope_repo="pengzhendong/FireRedTTS",
-            huggingface_repo="fireredteam/FireRedTTS",
+            model_name="vocos-mel-24khz",
+            modelscope_repo="pengzhendong/vocos-mel-24khz",
+            huggingface_repo="charactr/vocos-mel-24khz",
             required_files=required_files,
         )
 
@@ -26,4 +25,4 @@ if __name__ == "__main__":
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    FireRedTTSDownloader()(source=args.source)
+    VocosMel24khzDownloader()(source=args.source)
