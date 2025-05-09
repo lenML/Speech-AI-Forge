@@ -122,6 +122,26 @@ class WriteSRT(ResultWriter):
             print(f"{i}\n{start} --> {end}\n{text}\n", file=file, flush=True)
 
 
+class WriteLRC(ResultWriter):
+    always_include_hours: bool = False
+    decimal_marker: str = "."
+
+    def write_result(
+        self,
+        segments: Iterable[SubtitleSegment],
+        file: TextIO,
+        options: Optional[dict] = None,
+        **kwargs,
+    ):
+        for segment in segments:
+            start = segment.start_s
+            minutes = int(start // 60)
+            seconds = start % 60
+            timestamp = f"[{minutes:02}:{seconds:05.2f}]"
+            text = segment.text.strip()
+            print(f"{timestamp}{text}", file=file, flush=True)
+
+
 class WriteTSV(ResultWriter):
     """
     Write a transcript to a file in TSV (tab-separated values) format containing lines like:
@@ -172,6 +192,7 @@ def get_writer(output_format: str) -> ResultWriter:
         "vtt": WriteVTT,
         "srt": WriteSRT,
         "tsv": WriteTSV,
+        "lrc": WriteLRC,
         "json": WriteJSON,
     }
 
