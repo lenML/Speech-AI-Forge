@@ -58,6 +58,10 @@ openai-whisper
 onnxruntime
 inflect
 
+### matcha tts
+conformer==0.3.2
+wget==3.2
+
 # whisper
 faster_whisper
 

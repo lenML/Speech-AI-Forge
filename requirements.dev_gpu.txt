@@ -366,13 +366,15 @@ websocket-client==1.8.0
 websockets==11.0.3
 Werkzeug==3.0.3
 WeTextProcessing==1.0.3
-wget==3.2
-widgetsnbextension==4.0.11
 xformers==0.0.23.post1
 xxhash==3.4.1
 yarl==1.9.4
 zhon==2.0.2
 zipp==3.19.2
+
+### matcha tts
+conformer==0.3.2
+wget==3.2
 
 ### F5 TTS
 torchdiffeq==0.2.4
