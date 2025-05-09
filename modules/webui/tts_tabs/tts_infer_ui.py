@@ -27,7 +27,7 @@ class TTSInterface:
 
         self.contorl_tokens = ["[laugh]", "[uv_break]", "[v_break]", "[lbreak]"]
 
-        self.spliter_eos = "[uv_break]"
+        self.spliter_eos = " 。 "
 
         self.default_content = webui_config.localization.DEFAULT_TTS_TEXT
 
@@ -112,7 +112,9 @@ class TTSInterface:
         spk_rand_button = gr.Button(
             value="🎲", variant="secondary", visible=self.support_seed_speaker
         )
-        spk_emotion = gr.Dropdown(["default"], value="default", label="Emotion")
+        spk_emotion = gr.Dropdown(
+            ["default"], value="default", label="Emotion", visible=False
+        )
         reload_button = gr.Button(value="🔄", variant="secondary")
 
         spk_input_dropdown.change(
@@ -135,12 +137,15 @@ class TTSInterface:
             inputs=[],
             outputs=[spk_input_dropdown],
         )
+        def reload_emotions(show_name: str):
+            emotions = get_spk_emotions_from_name(
+                self.get_speaker_name_from_show_name(show_name)
+            )
+            # 如果 emotion 大于1才显示 （因为总有一个默认值 default）
+            return gr.Dropdown(choices=emotions, visible=len(emotions) > 1)
+
         spk_input_dropdown.change(
-            fn=lambda show_name: gr.Dropdown(
-                choices=get_spk_emotions_from_name(
-                    self.get_speaker_name_from_show_name(show_name)
-                )
-            ),
+            fn=reload_emotions,
             inputs=[spk_input_dropdown],
             outputs=[spk_emotion],
         )

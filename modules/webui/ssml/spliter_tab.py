@@ -92,9 +92,11 @@ def create_spliter_tab(ssml_input, tabs1, tabs2, script_table_out):
             with gr.Group():
                 gr.Markdown("🗣️Speaker")
                 spk_input_text = gr.Textbox(
-                    label="Speaker (Text or Seed)",
+                    label="Speaker",
                     value="female2",
                     show_label=False,
+                    # NOTE: 由于 rand 功能不显示，所以这个也不用显示只作为一个值传递...
+                    visible=False,
                 )
                 spk_input_dropdown = gr.Dropdown(
                     choices=speaker_names,
@@ -105,6 +107,8 @@ def create_spliter_tab(ssml_input, tabs1, tabs2, script_table_out):
                 spk_rand_button = gr.Button(
                     value="🎲",
                     variant="secondary",
+                    # NOTE: 不想支持这个功能了，容易产生歧义也没什么用
+                    visible=False,
                 )
             with gr.Group():
                 gr.Markdown("🎭Style")

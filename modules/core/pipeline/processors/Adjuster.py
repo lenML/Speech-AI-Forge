@@ -42,9 +42,8 @@ class AdjustSegmentProcessor(SegmentProcessor):
         if no_speed_rate and no_duration_ms:
             return
 
-        duration_s = duration_ms / 1000 if duration_ms is not None else None
-
-        if duration_s is not None:
+        if duration_ms is not None:
+            duration_s = duration_ms / 1000
             speed_rate = segment_duration / duration_s
 
         if speed_rate == 1:

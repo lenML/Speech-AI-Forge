@@ -16,33 +16,43 @@ def read_subtitle_file_to_segs(file: str, spk: str):
     # subs 根据 start 排序 从小到大
     subs_list = sorted(subs, key=lambda x: x.start)
 
-    ts = 0
+    cursor = 0
 
     segs = []
 
     for line in subs_list:
         start = line.start
         end = line.end
-        if ts != start:
-            break_duration = start - ts
-            break_duration = round(break_duration)
-            segs.append(SSMLBreak(break_duration))
 
-        duration = end - start
-        if duration > 0:
-            seg = SSMLSegment(text=line.text)
-            if spk != "*random":
-                seg.attrs.spk = spk
-            seg.attrs.duration = f"{duration}ms"
-            segs.append(seg)
-        else:
-            pass
-        ts = end
+        # 如果当前字幕的起始时间早于前一条的结束时间（即有重叠）
+        if start < cursor:
+            # 裁剪掉前面的重叠部分
+            start = cursor
+            if start >= end:
+                continue  # 完全被前一个覆盖，跳过
+
+        # 插入 break
+        if start > cursor:
+            segs.append(SSMLBreak(round(start - cursor)))
+
+        text = line.text.strip()
+        if not text:
+            cursor = end
+            continue
+
+        seg = SSMLSegment(text=text)
+        # NOTE: 这种随机 spk 应该要废弃...
+        if spk != "*random":
+            seg.attrs.spk = spk
+        seg.attrs.duration = f"{end - start}ms"
+        segs.append(seg)
+
+        cursor = end
 
     return segs
 
 
-def read_subtitle_file(file: str, spk: str):
+def read_subtitle_file_to_ssml(file: str, spk: str):
     if not file:
         raise gr.Error("Please upload a subtitle file")
     if spk != "*random" and ":" in spk:
@@ -52,7 +62,7 @@ def read_subtitle_file(file: str, spk: str):
     # subs 根据 start 排序 从小到大
     subs_list = sorted(subs, key=lambda x: x.start)
 
-    ts = 0
+    cursor = 0
     document = xml.dom.minidom.Document()
 
     root = document.createElement("speak")
@@ -63,9 +73,18 @@ def read_subtitle_file(file: str, spk: str):
     for line in subs_list:
         start = line.start
         end = line.end
-        if ts != start:
+
+        # 如果当前字幕的起始时间早于前一条的结束时间（即有重叠）
+        if start < cursor:
+            # 裁剪掉前面的重叠部分
+            start = cursor
+            if start >= end:
+                continue  # 完全被前一个覆盖，跳过
+
+        # 插入 break
+        if start > cursor:
             break_node = document.createElement("break")
-            break_duration = start - ts
+            break_duration = start - cursor
             break_duration = round(break_duration)
             if break_duration > 0:
                 break_node.setAttribute("time", str(break_duration) + "ms")
@@ -73,18 +92,25 @@ def read_subtitle_file(file: str, spk: str):
             else:
                 # TODO: logging
                 pass
+
+        text = line.text.strip()
+        if not text:
+            cursor = end
+            continue
+
         duration = end - start
-        if duration > 0:
-            voice_node = document.createElement("voice")
-            voice_node.setAttribute("duration", str(duration) + "ms")
-        else:
+        if duration < 0:
             # TODO: logging
-            pass
+            continue
+        voice_node = document.createElement("voice")
+        voice_node.setAttribute("duration", str(duration) + "ms")
+        # NOTE: 这种随机 spk 应该废弃
         if spk != "*random":
             voice_node.setAttribute("spk", spk)
-        voice_node.appendChild(document.createTextNode(line.text))
+        voice_node.appendChild(document.createTextNode(text))
         root.appendChild(voice_node)
-        ts = end
+
+        cursor = end
 
     xml_content = document.toprettyxml(indent=" " * 2)
     return xml_content
@@ -155,7 +181,7 @@ def read_subtitle_text_to_ssml(text: str, format: str, spk: str):
         tmp_file.write(text.encode("utf-8"))
         tmp_file_path = tmp_file.name
 
-    return read_subtitle_file(tmp_file_path, spk)
+    return read_subtitle_file_to_ssml(tmp_file_path, spk)
 
 
 # 输入字幕文件，转为 ssml 格式发送到 ssml
@@ -203,7 +229,7 @@ def create_subtitle_tab(
                 send_text_script_btn = gr.Button("📩Send to Script")
 
     send_ssml_btn.click(
-        fn=read_subtitle_file,
+        fn=read_subtitle_file_to_ssml,
         inputs=[file_upload, spk_input_dropdown],
         outputs=[ssml_input],
     )
