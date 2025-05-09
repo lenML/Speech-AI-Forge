@@ -26,6 +26,12 @@ class SparkTTSModel(TTSModel):
         self.device = devices.get_device_for(model_id)
         self.dtype = devices.dtype
 
+    def is_downloaded(self) -> bool:
+        return self.model_path.exists()
+
+    def is_loaded(self):
+        return self.model is not None
+
     def check_files(self) -> None:
         if not self.model_path.exists():
             raise FileNotFoundError(f"Model file not found: {self.model_path}")

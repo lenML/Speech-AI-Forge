@@ -41,6 +41,12 @@ class F5TtsModel(TTSModel):
 
         self.annotation = F5Annotation()
 
+    def is_downloaded(self):
+        return self.model_path.exists() and self.vocos_path.exists()
+
+    def is_loaded(self):
+        return self.model is not None
+
     def check_files(self) -> None:
         if not self.model_path.exists():
             raise FileNotFoundError(f"Model file not found: {self.model_path}")

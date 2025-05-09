@@ -14,6 +14,8 @@ from modules import config
 from modules.core.models.tts.FishSpeechInfer import FishSpeechInfer
 from modules.core.models.TTSModel import TTSModel
 from modules.core.models.tts.fishspeech.FF14_infer import FF14_infer
+from modules.core.models.tts.fishspeech.FF14_llama import FF14_llama
+from modules.core.models.tts.fishspeech.FF14_vqgan import FF14_vqgan
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
@@ -47,6 +49,9 @@ class FishSpeech14Model(TTSModel):
         super().__init__(model_id)
 
         self.model: Optional[FF14_infer] = None
+
+    def is_downloaded(self):
+        return FF14_llama.MODEL_PATH.exists() and FF14_vqgan.MODEL_PATH.exists()
 
     def load(self) -> None:
         with self.lock:

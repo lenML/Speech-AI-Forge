@@ -19,9 +19,6 @@ class BaseZooModel:
     def unload(self) -> None:
         pass
 
-    def check_exists(self) -> bool:
-        return False
-
     def download(self) -> None:
         pass
 

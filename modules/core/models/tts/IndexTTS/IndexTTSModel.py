@@ -29,6 +29,12 @@ class IndexTTSModel(TTSModel):
         self.bpe_path = os.path.join(self.model_dir, self.cfg.dataset["bpe_model"])
         self.tokenizer: TextTokenizer = None
 
+    def is_downloaded(self):
+        return os.path.exists(self.model_dir)
+
+    def is_loaded(self):
+        return self.tts is not None
+
     def load_tokenizer(self):
         if self.tokenizer is None:
             self.tokenizer = TextTokenizer(self.bpe_path)
