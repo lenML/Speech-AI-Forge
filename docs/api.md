@@ -206,56 +206,6 @@ curl -X POST "http://localhost:7870/v1/text:synthesize" \
     }'
 ```
 
-### XTTS v2 API
-
-XTTS v2 系列 API 支持一些外部应用的调用，例如与 SillyTavern 的集成。
-
-#### 支持的 API 列表
-
-| 方法 | 路径                       | 描述                        |
-| ---- | -------------------------- | --------------------------- |
-| GET  | `/v1/xtts_v2/speakers`     | 获取可用的发音人列表        |
-| POST | `/v1/xtts_v2/tts_to_audio` | 将文本转化为音频文件        |
-| GET  | `/v1/xtts_v2/tts_stream`   | 获取 TTS 实时音频流         |
-| POST | `/v1/xtts_v2/set_tts_settings` | 设置 TTS 参数配置       |
-
-具体的调用参数可以在启动服务后访问 `/docs` 端点查看。
-
-#### 如何连接到 SillyTavern？
-
-通过 `/v1/xtts_v2` 系列 API，可以轻松将 ChatTTS-Forge 连接到 SillyTavern 中。以下是配置指南：
-
-1. 打开 SillyTavern 的插件扩展界面。
-2. 进入 `TTS` 插件的配置部分。
-3. 将 `TTS Provider` 切换为 `XTTSv2`。
-4. 勾选 `Enabled` 启用。
-5. 选择并配置 `Voice` 语音。
-6. **关键步骤**：将 `Provider Endpoint` 设置为 `http://localhost:7870/v1/xtts_v2`。
-
-![sillytavern_tts](./sillytavern_tts.png)
-
-### Forge Api v2
-为了完全提供所有功能开发的 v2 接口，可以对所有可配置内容进行设置，同时还可以直接输入base64编码的音频作为参考音频创建临时 spk 用于推理
-
-```bash
-curl http://localhost:7870/v2/tts \
-  -H "Authorization: Bearer anything_your_wanna" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "text": "Today is a wonderful day to build something people love!",
-    "spk": {
-      "from_ref": {
-        "wav_b64": "<你的参考音频的base64字符串>",
-        "text": "<参考音频对应的文本>"
-      }
-    }
-  }' \
-  --output speech.mp3
-```
-
-#### usage
-> WIP
-
 ## playground
 
 启动 api 服务之后，在 `/playground` 下有一个非 gradio 的调试页面用于接口测试
