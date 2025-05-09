@@ -27,12 +27,19 @@ class IndexTTSModel(TTSModel):
         self.model_dir = "./models/Index-TTS"
         self.cfg = OmegaConf.load(self.cfg_path)
         self.bpe_path = os.path.join(self.model_dir, self.cfg.dataset["bpe_model"])
-        self.tokenizer = TextTokenizer(self.bpe_path)
+        self.tokenizer: TextTokenizer = None
+
+    def load_tokenizer(self):
+        if self.tokenizer is None:
+            self.tokenizer = TextTokenizer(self.bpe_path)
+        return self.tokenizer
 
     def encode(self, text):
+        self.load_tokenizer()
         return self.tokenizer.encode(text)
 
     def decode(self, ids):
+        self.load_tokenizer()
         return self.tokenizer.decode(ids)
 
     def get_sample_rate(self):
