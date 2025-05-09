@@ -17,16 +17,17 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 ## Breaking change logs
 
-- 250508: Support Spark-TTS #223
-- 250507: Support F5TTS-TTS-v1 model #231
-- 250505: Support Index-TTS #229
-- 241111: Add `v2/tts` API #187
-- 241109: Support fishspeech #191
-- 241015: Support F5TTS v0.6.2 #176
-- 241009: Support FireRedTTS #165
-- 240813: Support OpenVoice #100
-- 240801: Add ASR API #92
-- 240723: Support CosyVoice #90
+- 250508: Support Spark-TTS [#223](https://github.com/lenML/Speech-AI-Forge/issues/223)
+- 250507: Support F5TTS-TTS-v1 model [#231](https://github.com/lenML/Speech-AI-Forge/issues/231)
+- 250505: Support Index-TTS [#229](https://github.com/lenML/Speech-AI-Forge/issues/229)
+- 241111: Add `v2/tts` API [#187](https://github.com/lenML/Speech-AI-Forge/issues/187)
+- 241109: Support fishspeech [#191](https://github.com/lenML/Speech-AI-Forge/issues/191)
+- 241015: Support F5TTS v0.6.2 [#176](https://github.com/lenML/Speech-AI-Forge/issues/176)
+- 241009: Support FireRedTTS [#165](https://github.com/lenML/Speech-AI-Forge/issues/165)
+- 240813: Support OpenVoice [#100](https://github.com/lenML/Speech-AI-Forge/issues/100)
+- 240801: Add ASR API [#92](https://github.com/lenML/Speech-AI-Forge/issues/92)
+- 240723: Support CosyVoice [#90](https://github.com/lenML/Speech-AI-Forge/issues/90)
+
 
 ## Installation and Running
 
