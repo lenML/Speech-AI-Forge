@@ -147,7 +147,7 @@ curl http://localhost:7870/v2/tts \
 ```
 
 #### 代码示例
-可查看 ../examples/javascript/tts_v2_full.mjs 文件
+可查看 ../examples/javascript/demo_tts_v2_full.mjs 文件
 
 ---
 

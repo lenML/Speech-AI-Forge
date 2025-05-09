@@ -1,4 +1,4 @@
-import { SAFClient } from "./client.mjs";
+import { TtsClient } from "./TtsClient.mjs";
 import fs from "fs";
 
 const [ref_wav_filepath, ref_text] = process.argv.slice(2);
@@ -9,7 +9,7 @@ if (!ref_wav_filepath || !ref_text) {
   process.exit(1);
 }
 
-const client = new SAFClient();
+const client = new TtsClient();
 
 client
   .tts_v2({

@@ -1,4 +1,4 @@
-export class SAFClient {
+export class TtsClient {
   BASE_URL = "http://localhost:7870/";
 
   /**
