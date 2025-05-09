@@ -385,7 +385,7 @@ class TTSInterface:
         """
         if not ModelZoo.model_zoo.get_model(self.model_id).is_downloaded():
             gr.HTML(
-                f"<p style='color:red'>🚧Model [{self.model_id}] is not available in the Model Zoo. Please contact the author to get it. Thank you!</p>"
+                f"<p style='color:red'>🚧Model [{self.model_id}] is not available in the Model Zoo. Please contact the server owner to get it. Thank you!</p>"
             )
             return
 
