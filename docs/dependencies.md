@@ -141,6 +141,8 @@ apt-get install rubberband-cli
 
 ### pytorch
 
+建议版本: `torch==2.3.1+cu121`
+
 由于 pytroch 安装与你的本机环境有关，请自行安装对应版本，下面是一个简单的安装脚本
 
 > （如果直接运行某些情况可能会安装 cpu 版本，具体应该指定什么版本请自行确定）
@@ -160,6 +162,13 @@ pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%
 ### flash attn (可选)
 
 详见: https://github.com/Dao-AILab/flash-attention
+
+### xformers （可选）
+几乎没用，因为tts模型不是所有模块都能支持，这里提供一个和 `torch==2.3.1+cu121` 兼容的版本，方便配置
+
+```bash
+pip3 install -U xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu121  --no-deps
+```
 
 ### 其余依赖
 
