@@ -25,8 +25,6 @@ class IndexTTSModel(TTSModel):
         self.dtype = devices.dtype
         self.cfg_path = "./modules/repos_static/index_tts/checkpoints/config.yaml"
         self.model_dir = "./models/Index-TTS"
-        self.cfg = OmegaConf.load(self.cfg_path)
-        self.bpe_path = os.path.join(self.model_dir, self.cfg.dataset["bpe_model"])
         self.tokenizer: TextTokenizer = None
 
     def is_downloaded(self):
@@ -37,7 +35,9 @@ class IndexTTSModel(TTSModel):
 
     def load_tokenizer(self):
         if self.tokenizer is None:
-            self.tokenizer = TextTokenizer(self.bpe_path)
+            cfg = OmegaConf.load(self.cfg_path)
+            bpe_path = os.path.join(self.model_dir, cfg.dataset["bpe_model"])
+            self.tokenizer = TextTokenizer(bpe_path)
         return self.tokenizer
 
     def encode(self, text):
