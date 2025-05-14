@@ -56,6 +56,11 @@ def setup_model_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Preload all models at startup",
     )
+    parser.add_argument(
+        "--ftc",
+        action="store_true",
+        help="Enable first time calculation",
+    )
 
 
 def process_model_args(args: argparse.Namespace):
@@ -69,11 +74,15 @@ def process_model_args(args: argparse.Namespace):
     off_tqdm = env.get_and_update_env(args, "off_tqdm", False, bool)
     debug_generate = env.get_and_update_env(args, "debug_generate", False, bool)
     preload_models = env.get_and_update_env(args, "preload_models", False, bool)
+    enable_ftc = env.get_and_update_env(args, "ftc", False, bool)
 
     # TODO: 需要等 zoo 模块实现
     # generate_audio.setup_lru_cache()
     devices.reset_device()
-    devices.first_time_calculation()
+    if enable_ftc:
+        # 默认关闭，因为调用这个会导致冷启动变慢，同时会占用几百mb的显存...
+        # 收益不大，只有在 benchmark 的时候或者特别情况才需要
+        devices.first_time_calculation()
 
     if compile:
         logger.info("Model compile is enabled")

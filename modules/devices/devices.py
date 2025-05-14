@@ -165,6 +165,11 @@ def first_time_calculation():
     just do any calculation with pytorch layers - the first time this is done it allocaltes about 700MB of memory and
     spends about 2.7 seconds doing that, at least wih NVidia.
     """
+    if device.type == "cpu":
+        return
+
+    if not torch.cuda.is_available():
+        return
 
     x = torch.zeros((1, 1)).to(device, dtype)
     linear = torch.nn.Linear(1, 1).to(device, dtype)
