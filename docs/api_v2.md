@@ -38,6 +38,8 @@
 | `adjust.volume_gain_db` | `number` | 音量调整（默认 `0`） |
 | `adjust.normalize` | `boolean` | 是否归一化音量（默认 `false`） |
 | `adjust.headroom` | `number` | 归一化动态余量（默认 `1`） |
+| `adjust.remove_silence` | `boolean` | 是否移除音频两端的静音部分（默认 `false`） |
+| `adjust.remove_silence_threshold` | `number` | 静音阈值（默认 `-42`） |
 
 #### **4. 编码设置（encoder）**
 | 参数名 | 类型 | 说明 |
