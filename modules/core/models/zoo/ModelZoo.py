@@ -5,6 +5,7 @@ try:
 except:
     pass
 
+import logging
 from typing import Dict, Union
 
 from modules.core.models.BaseZooModel import BaseZooModel
@@ -21,6 +22,8 @@ from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Mod
 from modules.core.models.vc.OpenVoice import OpenVoiceModel
 from modules.devices import devices
 
+
+logger = logging.getLogger(__name__)
 
 class ModelZoo:
     """
@@ -83,6 +86,7 @@ class ModelZoo:
             if model == exclude:
                 continue
             model.unload()
+            logger.info(f"Model {model.model_id} unloaded")
 
     @devices.after_gc()
     def reload_all_models(self, exclude=None):
@@ -102,8 +106,10 @@ class ModelZoo:
         if model is None:
             raise ValueError(f"Model {model_id} not found")
         if self.auto_unload and self.is_not_engouh_mem():
+            logger.info("Not enough memory, auto unload other models")
             self.unload_all_models(model)
         model.load()
+        logger.info(f"Model {model_id} loaded")
         return model
 
     @devices.after_gc()
@@ -112,6 +118,7 @@ class ModelZoo:
         if model is None:
             raise ValueError(f"Model {model_id} not found")
         model.unload()
+        logger.info(f"Model {model_id} unloaded")
         return model
 
     # --------------- getters --------------
