@@ -159,74 +159,7 @@ Since Forge primarily focuses on API functionality development, automatic downlo
 
 ## FAQ
 
-### How to perform voice cloning?
-
-Currently, voice cloning is supported across various models, and formats like reference audio in `skpv1` are also adapted. Here are a few methods to use voice cloning:
-
-1. **In the WebUI**: You can upload reference audio in the voice selection section, which is the simplest way to use the voice cloning feature.
-2. **Using the API**: When using the API, you need to use a voice (i.e., a speaker) for voice cloning. First, you need to create a speaker file (e.g., `.spkv1.json`) with the required voice, and when calling the API, set the `spk` parameter to the speaker's name to enable cloning.
-3. **Voice Clone**: The system now also supports voice cloning using the voice clone model. When using the API, configure the appropriate `reference` to utilize this feature. (Currently, only OpenVoice is supported for voice cloning, so there’s no need to specify the model name.)
-
-For related discussions, see issue #118.
-
-### The generated result with a reference audio `spk` file is full of noise?
-
-This is likely caused by an issue with the uploaded audio configuration. You can try the following solutions:
-
-1. **Update**: Update the code and dependency versions. Most importantly, update Gradio (it's recommended to use the latest version if possible).
-2. **Process the audio**: Use ffmpeg or other software to edit the audio, convert it to mono, and then upload it. You can also try converting it to WAV format.
-3. **Check the text**: Make sure there are no unsupported characters in the reference text. It's also recommended to end the reference text with a `"。"` (this is a quirk of the model 😂).
-4. **Create with Colab**: Consider using the Colab environment to create the `spk` file to minimize environment-related issues.
-5. **TTS Test**: Currently, in the WebUI TTS page, you can upload reference audio directly. You can first test the audio and text, make adjustments, and then generate the `spk` file.
-
-### Can I train models?
-
-Not at the moment. This repository mainly provides a framework for inference services. There are plans to add some training-related features, but they are not a priority.
-
-### How can I optimize inference speed?
-
-This repository focuses on integrating and developing engineering solutions, so model inference optimizations largely depend on upstream repositories or community implementations. If you have good optimization ideas, feel free to submit an issue or PR.
-
-For now, the most practical optimization is to enable multiple workers. When running the `launch.py` script, you can start with the `--workers N` option to increase service throughput.
-
-There are also other potential speed-up optimizations that are not yet fully implemented. If interested, feel free to explore:
-
-1. **Compile**: Models support compile acceleration, which can provide around a 30% speed increase, but the compilation process is slow.
-2. **Flash Attention**: Flash attention acceleration is supported (using the `--flash_attn` option), but it is still not perfect.
-3. **vllm**: Not yet implemented, pending updates from upstream repositories.
-
-### What are Prompt1 and Prompt2?
-
-> Only for ChatTTS
-
-Both Prompt1 and Prompt2 are system prompts, but the difference lies in their insertion points. Through testing, it was found that the current model is very sensitive to the first `[Stts]` token, so two prompts are required:
-
-- Prompt1 is inserted before the first `[Stts]`.
-- Prompt2 is inserted after the first `[Stts]`.
-
-### What is Prefix?
-
-> Only for ChatTTS
-
-Prefix is mainly used to control the model's generation capabilities, similar to refine prompts in official examples. The prefix should only include special non-lexical tokens, such as `[laugh_0]`, `[oral_0]`, `[speed_0]`, `[break_0]`, etc.
-
-### What is the difference with `_p` in the Style?
-
-In the Style settings, those with `_p` use both prompt + prefix, while those without `_p` use only the prefix.
-
-### Why is it so slow when `--compile` is enabled?
-
-Since inference padding has not yet been implemented, changing the shape during each inference may trigger torch to recompile.
-
-> For now, it’s not recommended to enable this option.
-
-### Why is it so slow in Colab, only 2 it/s?
-
-Please ensure that you are using a GPU instead of a CPU.
-
-- Click on the menu bar **Edit**.
-- Select **Notebook Settings**.
-- Choose **Hardware Accelerator** => T4 GPU.
+[Goto Discussion Page](https://github.com/lenML/Speech-AI-Forge/discussions/242)
 
 # Documents
 
