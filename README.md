@@ -241,8 +241,9 @@ https://pan.baidu.com/s/1Q1vQV5Gs0VhU5J76dZBK4Q?pwd=d7xu
 https://github.com/lenML/Speech-AI-Forge/discussions/65
 
 # Documents
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lenML/Speech-AI-Forge)
 
-在这里可以找到 [更多文档](./docs/readme.md)
+[Learn About Documents](https://github.com/lenML/Speech-AI-Forge/issues/240)
 
 # Contributing
 

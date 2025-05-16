@@ -230,7 +230,9 @@ Please ensure that you are using a GPU instead of a CPU.
 
 # Documents
 
-find more documents from [here](./docs/readme.md)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lenML/Speech-AI-Forge)
+
+[Learn About Documents](https://github.com/lenML/Speech-AI-Forge/issues/240)
 
 # Contributing
 
