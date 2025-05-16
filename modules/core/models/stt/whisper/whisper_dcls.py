@@ -20,4 +20,6 @@ class WhisperSegment:
 @dataclass(repr=False, eq=False, frozen=True)
 class WhisperTranscribeResult:
     segments: Iterable[Segment]
-    info: TranscriptionInfo
+    language: str
+    # 这个duration的主要作用是用来做 pregress
+    duration: float

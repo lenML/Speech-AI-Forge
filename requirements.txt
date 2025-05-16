@@ -65,6 +65,7 @@ wget==3.2
 
 # whisper
 faster_whisper==1.0.3
+stable-ts==2.19.0
 
 # webui
 pysubs2==1.7.3

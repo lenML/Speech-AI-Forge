@@ -390,3 +390,6 @@ moviepy==1.0.3
 
 ### downloader script
 modelscope==1.20.0
+
+### whisper
+stable-ts==2.19.0

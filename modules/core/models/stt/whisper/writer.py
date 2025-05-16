@@ -36,7 +36,7 @@ class ResultWriter:
             decimal_marker=self.decimal_marker,
         )
 
-        total_duration = result.info.duration
+        total_duration = result.duration
         tqdm_bar = tqdm.tqdm(total=int(total_duration), desc="Transcribing")
 
         def _iter():

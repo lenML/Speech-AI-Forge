@@ -9,12 +9,16 @@ class STTOutputFormat(str, Enum):
     vtt = "vtt"
     srt = "srt"
     tsv = "tsv"
+    lrc = "lrc"
     json = "json"
 
 
 class STTConfig(BaseModel):
     # model id
     mid: str = "whisper.large"
+
+    # 参考文本、文稿匹配
+    refrence_transcript: Optional[str] = None
 
     prompt: Optional[Union[str, List[int]]] = None
     prefix: Optional[Union[str, List[int]]] = None

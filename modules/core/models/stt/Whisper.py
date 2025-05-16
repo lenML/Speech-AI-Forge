@@ -3,12 +3,15 @@ import threading
 from pathlib import Path
 from typing import Optional
 
+import jieba
 import librosa
 import numpy as np
 import torch
 from faster_whisper import WhisperModel as FasterWhisperModel
+from faster_whisper.transcribe import Segment, TranscriptionInfo, Word
 from whisper import audio
 from whisper.tokenizer import get_tokenizer
+import stable_whisper
 
 from modules import config as global_config
 from modules.core.handler.datacls.stt_model import STTConfig
@@ -17,6 +20,7 @@ from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
+from modules.utils.detect_lang import guess_lang
 from modules.utils.monkey_tqdm import disable_tqdm
 
 # ref https://platform.openai.com/docs/api-reference/audio/createTranscription#audio-createtranscription-temperature
@@ -29,6 +33,59 @@ number_tokens = [
     if all(c in "0123456789" for c in whisper_tokenizer.decode([i]).removeprefix(" "))
 ]
 
+
+def st_word2fw_word(word: stable_whisper.WordTiming) -> Word:
+    return Word(
+        start=word.start, end=word.end, word=word.word, probability=word.probability
+    )
+
+
+def st_result2result(
+    result: stable_whisper.WhisperResult, duration: int
+) -> WhisperTranscribeResult:
+    segments = [
+        Segment(
+            id=seg.id,
+            seek=seg.seek,
+            start=seg.start,
+            end=seg.end,
+            text=seg.text,
+            tokens=seg.tokens,
+            temperature=seg.temperature,
+            avg_logprob=seg.avg_logprob,
+            compression_ratio=seg.compression_ratio,
+            no_speech_prob=seg.no_speech_prob,
+            words=[st_word2fw_word(w) for w in seg.words],
+        )
+        for seg in result.segments
+    ]
+    language = result.language
+
+    return WhisperTranscribeResult(
+        segments=segments, language=language, duration=duration
+    )
+
+
+def get_audio_duration(audio: NP_AUDIO) -> float:
+    sr, data = audio
+    return data.shape[0] / sr
+
+
+def wordify_transcript(content: str) -> str:
+    """
+    每一行都使用 jieba 分词，并且使用空格连接，为对齐过程提供分词语义
+    """
+    lines = content.split("\n")
+    new_lines = []
+    for line in lines:
+        new_lines.append(" ".join(jieba.lcut(line)))
+    return "\n".join(new_lines)
+
+
+model_dir_mapping = {
+    "large": Path("./models/faster-whisper-large-v3"),
+    "turbo": Path("./models/faster-whisper-large-v3-turbo-ct2"),
+}
 
 class WhisperModel(STTModel):
     SAMPLE_RATE = audio.SAMPLE_RATE
@@ -47,7 +104,11 @@ class WhisperModel(STTModel):
 
         self.model_size = model_ver[1] if len(model_ver) > 1 else "large"
         # self.model_dir = Path("./models/whisper")
-        self.model_dir = Path("./models/faster-whisper-large-v3")
+        self.model_dir = (
+            model_dir_mapping[self.model_size]
+            if self.model_size in model_dir_mapping
+            else model_dir_mapping["large"]
+        )
 
         self.device = devices.get_device_for("whisper")
         self.dtype = devices.dtype
@@ -60,15 +121,16 @@ class WhisperModel(STTModel):
             with self.lock:
                 self.logger.info(f"Loading Whisper model [{self.model_size}]...")
 
-                # WhisperModel.model = FasterWhisperModel(
-                #     model_size_or_path=self.model_size,
-                #     download_root=str(self.model_dir),
-                #     device=self.device.type,
-                #     compute_type=(
-                #         "float16" if self.dtype == torch.float16 else "float32"
-                #     ),
-                # )
                 WhisperModel.model = FasterWhisperModel(
+                    model_size_or_path=str(self.model_dir),
+                    download_root=str(self.model_dir),
+                    device=self.device.type,
+                    compute_type=(
+                        "float16" if self.dtype == torch.float16 else "float32"
+                    ),
+                    local_files_only=True,
+                )
+                WhisperModel.model = stable_whisper.load_faster_whisper(
                     model_size_or_path=str(self.model_dir),
                     local_files_only=True,
                     device=self.device.type,
@@ -149,23 +211,38 @@ class WhisperModel(STTModel):
 
         model = self.load()
 
-        segments, info = model.transcribe(
-            audio=audio_data,
-            language=language,
-            initial_prompt=prompt,
-            prefix=prefix,
-            # sample_len=sample_len,
-            temperature=tempperature or DEFAULT_TEMPERATURE,
-            best_of=best_of or 1,
-            beam_size=beam_size or 5,
-            patience=patience or 1,
-            length_penalty=length_penalty or 1,
-            word_timestamps=True,
-            suppress_tokens=[-1] + number_tokens,
-            # fp16=self.dtype == torch.float16,
-        )
-
-        return WhisperTranscribeResult(segments=segments, info=info)
+        # 这里必须 disable tqdm ，因为 stable_whisper 似乎会抛出 gradio 不支持的 progress...
+        with disable_tqdm(
+            enabled=global_config.runtime_env_vars.is_webui
+            or global_config.runtime_env_vars.off_tqdm
+        ):
+            result = model.transcribe(
+                audio=audio_data,
+                language=language,
+                initial_prompt=prompt,
+                prefix=prefix,
+                # sample_len=sample_len,
+                temperature=tempperature or DEFAULT_TEMPERATURE,
+                best_of=best_of or 1,
+                beam_size=beam_size or 5,
+                patience=patience or 1,
+                length_penalty=length_penalty or 1,
+                word_timestamps=True,
+                suppress_tokens=[-1] + number_tokens,
+                # fp16=self.dtype == torch.float16,
+            )
+        if isinstance(result, tuple):
+            # 兼容原始 faster_whisper
+            segments, info = result
+            language = info.language
+            return WhisperTranscribeResult(
+                segments=segments, language=language, duration=get_audio_duration(audio)
+            )
+        elif isinstance(result, stable_whisper.WhisperResult):
+            result = st_result2result(result, get_audio_duration(audio))
+            return result
+        else:
+            raise ValueError(f"Unknown result type: {type(result)}")
 
     def convert_result_with_format(
         self, config: STTConfig, result: WhisperTranscribeResult
@@ -186,13 +263,117 @@ class WhisperModel(STTModel):
         return TranscribeResult(
             text=output,
             segments=writer.subtitles,
-            info=result.info._asdict(),
+            language=result.language,
         )
 
-    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> TranscribeResult:
-        result = self.transcribe_to_result(audio=audio, config=config)
+    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> str:
+        has_ref = config.refrence_transcript.strip() != ""
+        if has_ref:
+            result = self.force_align(audio=audio, config=config)
+        else:
+            result = self.transcribe_to_result(audio=audio, config=config)
         result_formated = self.convert_result_with_format(config=config, result=result)
         return result_formated
+
+    def force_align_after_refine(
+        self, result: stable_whisper.WhisperResult, refrence_transcript: str
+    ) -> stable_whisper.WhisperResult:
+        """
+        根据传入的 refrence_transcript 再次 refine
+
+        这里 refine 的目标是基于换行分割、合并 segment
+        """
+        refrence_segments = refrence_transcript.split("\n")
+        refrence_segments = [s for s in refrence_segments if s.strip() != ""]
+        refrence_segments = [s for s in refrence_segments if len(s) > 0]
+        is_chinese = guess_lang(refrence_transcript) == "zh"
+
+        words: list[stable_whisper.WordTiming] = []
+        for seg in result.segments:
+            for w in seg.words:
+                if is_chinese:
+                    w.word = w.word.strip()
+                words.append(w)
+        word_index = 0
+
+        def next_word():
+            nonlocal word_index
+            index = word_index
+            word_index += 1
+            return words[index] if index < len(words) else None
+
+        refined_segments = []
+        for ref_seg in refrence_segments:
+            seg_words: list[stable_whisper.WordTiming] = []
+            ref_buf = ref_seg.strip()
+            while ref_buf != "":
+                w = next_word()
+                if w is None:
+                    break
+                word = w.word.strip()
+                if ref_buf.startswith(word):
+                    seg_words.append(w)
+                    ref_buf = ref_buf[len(word) :].strip()
+                else:
+                    break
+            if len(seg_words) == 0:
+                continue
+            start = seg_words[0].start
+            end = seg_words[-1].end
+            seq = "" if is_chinese else " "
+            real_text = seq.join([w.word.strip() for w in seg_words])
+            segment = stable_whisper.Segment(
+                start=start,
+                end=end,
+                text=real_text,
+                words=seg_words,
+            )
+            refined_segments.append(segment)
+
+        result.segments = refined_segments
+        return result
+
+    def force_align(
+        self, audio: NP_AUDIO, config: STTConfig
+    ) -> WhisperTranscribeResult:
+        """
+        文稿匹配
+        """
+        model = self.load()
+        prompt = config.prompt
+        prefix = config.prefix
+
+        language = config.language
+        # 似乎都用不到...因为对齐的时候好像不需要模型输出？
+        tempperature = config.temperature
+        sample_len = config.sample_len
+        best_of = config.best_of
+        beam_size = config.beam_size
+        patience = config.patience
+        length_penalty = config.length_penalty
+        refrence_transcript = config.refrence_transcript
+        refrence_transcript = wordify_transcript(refrence_transcript)
+
+        _, audio_data = self.normalize_audio(audio=audio)
+        # 这里必须 disable tqdm ，因为 stable_whisper 似乎会抛出 gradio 不支持的 progress...
+        with disable_tqdm(
+            enabled=global_config.runtime_env_vars.is_webui
+            or global_config.runtime_env_vars.off_tqdm
+        ):
+            # Perform alignment
+            # NOTE: 下面这个三个函数是 stable_st 注入的
+            aligned_result = model.align(
+                audio=audio_data, text=refrence_transcript, language=language
+            )
+            aligned_words = model.align_words(
+                audio=audio_data, result=aligned_result, language=language
+            )
+            result = model.refine(audio=audio_data, result=aligned_words)
+            result = self.force_align_after_refine(
+                result=result, refrence_transcript=refrence_transcript
+            )
+        result = st_result2result(result, get_audio_duration(audio))
+        return result
 
 
 if __name__ == "__main__":

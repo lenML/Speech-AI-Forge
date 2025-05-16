@@ -10,8 +10,7 @@ from modules.core.pipeline.processor import NP_AUDIO
 class TranscribeResult:
     text: str
     segments: list
-
-    info: dict
+    language: str
 
 
 class STTModel(BaseZooModel):

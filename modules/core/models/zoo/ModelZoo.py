@@ -43,6 +43,7 @@ class ModelZoo:
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
         "whisper": WhisperModel("whisper.large"),
+        "whisper.turbo": WhisperModel("whisper.turbo"),
         # "whisper.large": WhisperModel("whisper.large"),
         # "whisper.medium": WhisperModel("whisper.medium"),
         # "whisper.small": WhisperModel("whisper.small"),
@@ -137,6 +138,9 @@ class ModelZoo:
 
     def get_whisper(self) -> WhisperModel:
         return self.get_model("whisper")
+
+    def get_whisper_turbo(self) -> WhisperModel:
+        return self.get_model("whisper.turbo")
 
     def get_open_voice(self) -> OpenVoiceModel:
         return self.get_model("open-voice")

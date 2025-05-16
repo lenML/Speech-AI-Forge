@@ -17,10 +17,10 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.tuna.tsinghua.edu.cn/@g /etc/apt/sour
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /etc/apt/sources.list.d/cuda.list
 
 # Copy the requirements file for Python dependencies
-COPY requirements.docker.txt ./requirements.docker.txt
+COPY requirements.txt ./requirements.txt
 
 # Install Python dependencies using Tsinghua's PyPI mirror and clean up cache to reduce image size
-RUN pip install --no-cache-dir -r requirements.docker.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Set the default command (modify as needed based on your application)
 CMD ["bash"]

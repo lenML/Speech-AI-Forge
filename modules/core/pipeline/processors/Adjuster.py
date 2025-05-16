@@ -33,6 +33,9 @@ class AdjusterProcessor(AudioProcessor):
 class AdjustSegmentProcessor(SegmentProcessor):
     """
     对单个 segment 结果进行 adjust
+
+    NOTE: 我已经忘记单个和整个adjust的区别在哪了...似乎是vc模型才会调用这里处理？
+    TODO: 最好整合一下逻辑，不然有点混乱说实话...
     """
 
     def after_process(self, result: SynthAudio, context: TTSPipelineContext) -> None:

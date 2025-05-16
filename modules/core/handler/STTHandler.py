@@ -21,7 +21,7 @@ class STTHandler:
     def get_model(self):
         model_id = self.stt_config.mid.lower()
         if model_id.startswith("whisper"):
-            return model_zoo.get_model(model_id="whisper")
+            return model_zoo.get_model(model_id=model_id)
 
         raise Exception(f"Model {model_id} is not supported")
 

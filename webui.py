@@ -166,6 +166,7 @@ if __name__ == "__main__":
     )
 
     parser = argparse.ArgumentParser(description="Gradio App")
+    config.runtime_env_vars.is_webui = True
 
     setup_webui_args(parser)
     setup_model_args(parser)
