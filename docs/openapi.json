@@ -1,1 +1,3019 @@
-{"openapi": "3.1.0", "info": {"title": "Speech-AI Forge API", "description": "\n🍦 Speech-AI-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。<br/>\n🍦 Speech-AI-Forge is a project developed around the TTS generation model ChatTTS, implementing an API Server and a Gradio-based WebUI.\n\n项目地址: [https://github.com/lenML/Speech-AI-Forge](https://github.com/lenML/Speech-AI-Forge)\n\n> 所有生成音频的 POST api都无法在此页面调试，调试建议使用 playground <br/>\n> All audio generation POST APIs cannot be debugged on this page, it is recommended to use playground for debugging\n\n> 如果你不熟悉本系统，建议从这个一键脚本开始，在colab中尝试一下：<br/>\n> [https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb)\n            ", "version": "0.1.0"}, "paths": {"/v1/ping": {"get": {"tags": ["System"], "summary": "Ping", "operationId": "ping_v1_ping_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/versions": {"get": {"tags": ["System"], "summary": "Get Versions", "operationId": "get_versions_v1_versions_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/audio_formats": {"get": {"tags": ["System"], "summary": "Get Audio Formats", "operationId": "get_audio_formats_v1_audio_formats_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/models/reload": {"get": {"tags": ["Models"], "summary": "Reload Models", "operationId": "reload_models_v1_models_reload_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/models/unload": {"get": {"tags": ["Models"], "summary": "Unload Models", "operationId": "unload_models_v1_models_unload_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/models/list": {"get": {"tags": ["Models"], "summary": "Unload Models", "operationId": "unload_models_v1_models_list_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/styles/list": {"get": {"tags": ["Style"], "summary": "List Styles", "operationId": "list_styles_v1_styles_list_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/speakers/list": {"get": {"tags": ["Speaker"], "summary": "List Speakers", "operationId": "list_speakers_v1_speakers_list_get", "parameters": [{"name": "full_data", "in": "query", "required": false, "schema": {"type": "boolean", "default": false, "title": "Full Data"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/speakers/refresh": {"post": {"tags": ["Speaker"], "summary": "Refresh Speakers", "operationId": "refresh_speakers_v1_speakers_refresh_post", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}}}}, "/v1/speakers/update": {"post": {"tags": ["Speaker"], "summary": "Update Speakers", "operationId": "update_speakers_v1_speakers_update_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SpeakersUpdate"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/speaker/create": {"post": {"tags": ["Speaker"], "summary": "Create Speaker", "operationId": "create_speaker_v1_speaker_create_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateSpeaker"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/speaker/update": {"post": {"tags": ["Speaker"], "summary": "Update Speaker", "operationId": "update_speaker_v1_speaker_update_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/UpdateSpeaker"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/speaker/detail": {"post": {"tags": ["Speaker"], "summary": "Speaker Detail", "operationId": "speaker_detail_v1_speaker_detail_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SpeakerDetail"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/tts": {"get": {"tags": ["TTS"], "summary": "Synthesize Tts", "operationId": "synthesize_tts_v1_tts_get", "parameters": [{"name": "text", "in": "query", "required": true, "schema": {"type": "string", "title": "Text"}}, {"name": "spk", "in": "query", "required": false, "schema": {"type": "string", "default": "female2", "title": "Spk"}}, {"name": "style", "in": "query", "required": false, "schema": {"type": "string", "default": "chat", "title": "Style"}}, {"name": "temperature", "in": "query", "required": false, "schema": {"type": "number", "default": 0.3, "title": "Temperature"}}, {"name": "top_p", "in": "query", "required": false, "schema": {"type": "number", "default": 0.5, "title": "Top P"}}, {"name": "top_k", "in": "query", "required": false, "schema": {"type": "integer", "default": 20, "title": "Top K"}}, {"name": "seed", "in": "query", "required": false, "schema": {"type": "integer", "default": 42, "title": "Seed"}}, {"name": "format", "in": "query", "required": false, "schema": {"type": "string", "default": "raw", "title": "Format"}}, {"name": "bitrate", "in": "query", "required": false, "schema": {"type": "string", "default": "64k", "title": "Bitrate"}}, {"name": "prompt", "in": "query", "required": false, "schema": {"type": "string", "default": "", "title": "Prompt"}}, {"name": "prompt1", "in": "query", "required": false, "schema": {"type": "string", "default": "", "title": "Prompt1"}}, {"name": "prompt2", "in": "query", "required": false, "schema": {"type": "string", "default": "", "title": "Prompt2"}}, {"name": "prefix", "in": "query", "required": false, "schema": {"type": "string", "default": "", "title": "Prefix"}}, {"name": "bs", "in": "query", "required": false, "schema": {"type": "string", "default": "8", "title": "Bs"}}, {"name": "thr", "in": "query", "required": false, "schema": {"type": "string", "default": "100", "title": "Thr"}}, {"name": "eos", "in": "query", "required": false, "schema": {"type": "string", "default": "[uv_break]", "title": "Eos"}}, {"name": "enhance", "in": "query", "required": false, "schema": {"type": "boolean", "default": false, "title": "Enhance"}}, {"name": "denoise", "in": "query", "required": false, "schema": {"type": "boolean", "default": false, "title": "Denoise"}}, {"name": "speed", "in": "query", "required": false, "schema": {"type": "number", "default": 1.0, "title": "Speed"}}, {"name": "pitch", "in": "query", "required": false, "schema": {"type": "number", "default": 0, "title": "Pitch"}}, {"name": "volume_gain", "in": "query", "required": false, "schema": {"type": "number", "default": 0, "title": "Volume Gain"}}, {"name": "stream", "in": "query", "required": false, "schema": {"type": "boolean", "default": false, "title": "Stream"}}, {"name": "chunk_size", "in": "query", "required": false, "schema": {"type": "integer", "default": 64, "title": "Chunk Size"}}, {"name": "no_cache", "in": "query", "required": false, "schema": {"anyOf": [{"type": "boolean"}, {"enum": ["on", "off"], "type": "string"}], "default": false, "title": "No Cache"}}, {"name": "model", "in": "query", "required": false, "schema": {"type": "string", "default": "chat-tts", "title": "Model"}}], "responses": {"200": {"description": "Successful Response"}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/ssml": {"post": {"tags": ["SSML"], "summary": "Synthesize Ssml Api", "operationId": "synthesize_ssml_api_v1_ssml_post", "requestBody": {"content": {"application/json": {"schema": {"allOf": [{"$ref": "#/components/schemas/SSMLParams"}], "title": "Params", "description": "JSON body with SSML string and format"}}}, "required": true}, "responses": {"200": {"description": "Successful Response"}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/text:synthesize": {"post": {"tags": ["Google API"], "summary": "Google Text Synthesize", "description": "google api document: <br/>\n[https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize](https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize)\n\n- 多个属性在本系统中无用仅仅是为了兼容google api\n- voice 中的 topP, topK, temperature 为本系统中的参数\n- voice.name 即 speaker name （或者speaker seed）\n- voice.seed 为 infer seed （可在webui中测试具体作用）\n\n- 编码格式影响的是 audioContent 的二进制格式，所以所有format都是返回带有base64数据的json", "operationId": "google_text_synthesize_v1_text_synthesize_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/GoogleTextSynthesizeParams"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GoogleTextSynthesizeResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/speech:recognize": {"post": {"tags": ["Google API"], "summary": "Speech Recognize", "description": "Performs synchronous speech recognition: receive results after all audio has been sent and processed.", "operationId": "speech_recognize_v1_speech_recognize_post", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}}}}, "/v1/speech:longrunningrecognize": {"post": {"tags": ["Google API"], "summary": "Long Running Recognize", "description": "Performs asynchronous speech recognition: receive results via the google.longrunning.Operations interface.", "operationId": "long_running_recognize_v1_speech_longrunningrecognize_post", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}}}}, "/v1/audio/speech": {"post": {"tags": ["OpenAI API"], "summary": "Openai Speech Api", "description": "openai api document: \n[https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)\n\n以下属性为本系统自定义属性，不在openai文档中：\n- batch_size: 是否开启batch合成，小于等于1表示不使用batch （不推荐）\n- spliter_threshold: 开启batch合成时，句子分割的阈值\n- style: 风格\n\n> model 可填任意值", "operationId": "openai_speech_api_v1_audio_speech_post", "requestBody": {"content": {"application/json": {"schema": {"allOf": [{"$ref": "#/components/schemas/AudioSpeechParams"}], "title": "Params", "description": "JSON body with model, input text, and voice"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/audio/transcriptions": {"post": {"tags": ["OpenAI API"], "summary": "Transcribe", "description": "Transcribes audio into the input language.", "operationId": "transcribe_v1_audio_transcriptions_post", "requestBody": {"content": {"multipart/form-data": {"schema": {"$ref": "#/components/schemas/Body_transcribe_v1_audio_transcriptions_post"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/prompt/refine": {"post": {"tags": ["Text Refiner"], "summary": "Refiner Prompt Post", "description": "This endpoint receives a prompt and returns the refined result", "operationId": "refiner_prompt_post_v1_prompt_refine_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/RefineTextRequest"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/text/normalize": {"post": {"tags": ["Text Refiner"], "summary": "Text Normalize Post", "description": "This endpoint receives a text and returns the normalized text", "operationId": "text_normalize_post_v1_text_normalize_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/TextNormalizeRequest"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/BaseResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/xtts_v2/speakers": {"get": {"tags": ["XTTS"], "summary": "Speakers", "operationId": "speakers_v1_xtts_v2_speakers_get", "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}}}}, "/v1/xtts_v2/tts_to_audio": {"post": {"tags": ["XTTS"], "summary": "Tts To Audio", "operationId": "tts_to_audio_v1_xtts_v2_tts_to_audio_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/SynthesisParams"}}}, "required": true}, "responses": {"200": {"description": "Successful Response"}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/xtts_v2/tts_stream": {"get": {"tags": ["XTTS"], "summary": "Tts Stream", "operationId": "tts_stream_v1_xtts_v2_tts_stream_get", "parameters": [{"name": "text", "in": "query", "required": true, "schema": {"type": "string", "title": "Text"}}, {"name": "speaker_wav", "in": "query", "required": true, "schema": {"type": "string", "title": "Speaker Wav"}}, {"name": "language", "in": "query", "required": false, "schema": {"type": "string", "default": "cn", "title": "Language"}}, {"name": "no_cache", "in": "query", "required": false, "schema": {"type": "boolean", "default": false, "title": "No Cache"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/xtts_v2/set_tts_settings": {"post": {"tags": ["XTTS"], "summary": "Set Tts Settings", "operationId": "set_tts_settings_v1_xtts_v2_set_tts_settings_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/TTSSettingsRequest"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/stt/transcribe": {"post": {"tags": ["STT"], "summary": "Transcribe", "description": "Transcribes audio into the input language.", "operationId": "transcribe_v1_stt_transcribe_post", "requestBody": {"content": {"multipart/form-data": {"schema": {"$ref": "#/components/schemas/Body_transcribe_v1_stt_transcribe_post"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/TranscriptionsResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/stt/stream": {"post": {"tags": ["STT"], "summary": "Transcribe Stream", "description": "Transcribes audio into the input language in real-time.", "operationId": "transcribe_stream_v1_stt_stream_post", "requestBody": {"content": {"multipart/form-data": {"schema": {"$ref": "#/components/schemas/Body_transcribe_stream_v1_stt_stream_post"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v1/vc": {"post": {"tags": ["Voice Clone"], "summary": "Voice Clone", "description": "Voice cloning API", "operationId": "voice_clone_v1_vc_post", "parameters": [{"name": "ref_spk", "in": "query", "required": false, "schema": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Ref Spk"}}, {"name": "spk_emotion", "in": "query", "required": false, "schema": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Spk Emotion"}}, {"name": "model", "in": "query", "required": false, "schema": {"type": "string", "default": "open-voice", "title": "Model"}}, {"name": "tau", "in": "query", "required": false, "schema": {"type": "number", "default": 0.3, "title": "Tau"}}, {"name": "format", "in": "query", "required": false, "schema": {"type": "string", "default": "mp3", "title": "Format"}}], "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"$ref": "#/components/schemas/Body_voice_clone_v1_vc_post"}}}}, "responses": {"200": {"description": "Successful Response"}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/v2/tts": {"post": {"tags": ["Forge V2"], "summary": "Forge Text Synthesize", "operationId": "forge_text_synthesize_v2_tts_post", "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/V2TtsParams"}}}, "required": true}, "responses": {"200": {"description": "Successful Response"}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}}, "components": {"schemas": {"AdjustConfig": {"properties": {"pitch": {"type": "number", "title": "Pitch", "default": 0}, "speed_rate": {"type": "number", "title": "Speed Rate", "default": 1}, "volume_gain_db": {"type": "number", "title": "Volume Gain Db", "default": 0}, "normalize": {"type": "boolean", "title": "Normalize", "default": true}, "headroom": {"type": "number", "title": "Headroom", "default": 1}, "remove_silence": {"type": "boolean", "title": "Remove Silence", "default": false}, "remove_silence_threshold": {"type": "number", "title": "Remove Silence Threshold", "default": -42}}, "type": "object", "title": "AdjustConfig"}, "AudioConfig": {"properties": {"audioEncoding": {"allOf": [{"$ref": "#/components/schemas/AudioFormat"}], "default": "raw"}, "audioBitrate": {"type": "string", "title": "Audiobitrate", "default": "64k"}, "speakingRate": {"type": "number", "title": "Speakingrate", "default": 1}, "pitch": {"type": "number", "title": "Pitch", "default": 0}, "volumeGainDb": {"type": "number", "title": "Volumegaindb", "default": 0}, "sampleRateHertz": {"type": "integer", "title": "Sampleratehertz", "default": 24000}, "batchSize": {"type": "integer", "title": "Batchsize", "default": 4}, "spliterThreshold": {"type": "integer", "title": "Spliterthreshold", "default": 100}}, "type": "object", "title": "AudioConfig"}, "AudioFormat": {"type": "string", "enum": ["mp3", "wav", "ogg", "acc", "flac", "raw"], "title": "AudioFormat"}, "AudioSpeechParams": {"properties": {"input": {"type": "string", "title": "Input"}, "model": {"type": "string", "title": "Model", "default": "chat-tts"}, "voice": {"type": "string", "title": "Voice", "default": "female2"}, "response_format": {"allOf": [{"$ref": "#/components/schemas/AudioFormat"}], "default": "raw"}, "speed": {"type": "number", "maximum": 10.0, "minimum": 0.1, "title": "Speed", "description": "Speed of the audio", "default": 1}, "seed": {"type": "integer", "title": "Seed", "default": 42}, "temperature": {"type": "number", "title": "Temperature", "default": 0.3}, "top_k": {"type": "integer", "title": "Top K", "default": 20}, "top_p": {"type": "number", "title": "Top P", "default": 0.7}, "style": {"type": "string", "title": "Style", "default": ""}, "batch_size": {"type": "integer", "maximum": 20.0, "minimum": 1.0, "title": "Batch Size", "description": "Batch size", "default": 1}, "spliter_threshold": {"type": "number", "maximum": 1024.0, "minimum": 10.0, "title": "Spliter Threshold", "description": "Threshold for sentence spliter", "default": 100}, "eos": {"type": "string", "title": "Eos", "default": "[uv_break]"}, "enhance": {"type": "boolean", "title": "Enhance", "default": false}, "denoise": {"type": "boolean", "title": "Denoise", "default": false}, "stream": {"type": "boolean", "title": "Stream", "default": false}, "bitrate": {"type": "string", "title": "Bitrate", "default": "64k"}}, "type": "object", "required": ["input"], "title": "AudioSpeechParams"}, "BaseResponse": {"properties": {"message": {"type": "string", "title": "Message"}, "data": {"title": "Data"}}, "type": "object", "required": ["message", "data"], "title": "BaseResponse"}, "Body_transcribe_stream_v1_stt_stream_post": {"properties": {"file": {"type": "string", "format": "binary", "title": "File"}, "model": {"type": "string", "title": "Model", "default": "whisper.large"}, "prompt": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Prompt"}, "prefix": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Prefix"}, "language": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Language"}, "temperature": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Temperature"}, "sample_len": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Sample Len"}, "best_of": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Best Of"}, "beam_size": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Beam Size"}, "patience": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Patience"}, "length_penalty": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Length Penalty"}, "format": {"anyOf": [{"$ref": "#/components/schemas/STTOutputFormat"}, {"type": "null"}], "default": "txt"}, "highlight_words": {"anyOf": [{"type": "boolean"}, {"type": "null"}], "title": "Highlight Words", "default": false}, "max_line_count": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Max Line Count"}, "max_line_width": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Max Line Width"}, "max_words_per_line": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Max Words Per Line"}}, "type": "object", "required": ["file"], "title": "Body_transcribe_stream_v1_stt_stream_post"}, "Body_transcribe_v1_audio_transcriptions_post": {"properties": {"file": {"type": "string", "format": "binary", "title": "File"}, "model": {"type": "string", "title": "Model", "default": "whisper.large"}, "language": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Language"}, "prompt": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Prompt"}, "response_format": {"type": "string", "title": "Response Format", "default": "txt"}, "temperature": {"type": "number", "title": "Temperature", "default": 0}, "timestamp_granularities": {"items": {"type": "string"}, "type": "array", "title": "Timestamp Granularities", "default": ["segment"]}}, "type": "object", "required": ["file"], "title": "Body_transcribe_v1_audio_transcriptions_post"}, "Body_transcribe_v1_stt_transcribe_post": {"properties": {"file": {"type": "string", "format": "binary", "title": "File"}, "model": {"type": "string", "title": "Model", "default": "whisper.large"}, "prompt": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Prompt"}, "prefix": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Prefix"}, "language": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Language"}, "temperature": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Temperature"}, "sample_len": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Sample Len"}, "best_of": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Best Of"}, "beam_size": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Beam Size"}, "patience": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Patience"}, "length_penalty": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Length Penalty"}, "format": {"anyOf": [{"$ref": "#/components/schemas/STTOutputFormat"}, {"type": "null"}], "default": "txt"}, "highlight_words": {"anyOf": [{"type": "boolean"}, {"type": "null"}], "title": "Highlight Words", "default": false}, "max_line_count": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Max Line Count"}, "max_line_width": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Max Line Width"}, "max_words_per_line": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Max Words Per Line"}}, "type": "object", "required": ["file"], "title": "Body_transcribe_v1_stt_transcribe_post"}, "Body_voice_clone_v1_vc_post": {"properties": {"src_audio": {"type": "string", "format": "binary", "title": "Src Audio"}, "ref_audio": {"anyOf": [{"type": "string", "format": "binary"}, {"type": "null"}], "title": "Ref Audio"}}, "type": "object", "required": ["src_audio"], "title": "Body_voice_clone_v1_vc_post"}, "CreateSpeaker": {"properties": {"name": {"type": "string", "title": "Name"}, "gender": {"type": "string", "title": "Gender"}, "describe": {"type": "string", "title": "Describe"}, "tensor": {"items": {}, "type": "array", "title": "Tensor"}, "seed": {"type": "integer", "title": "Seed"}}, "type": "object", "required": ["name", "gender", "describe"], "title": "CreateSpeaker"}, "EncoderConfig": {"properties": {"format": {"allOf": [{"$ref": "#/components/schemas/AudioFormat"}], "default": "raw"}, "bitrate": {"type": "string", "title": "Bitrate", "default": "64k"}, "acodec": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Acodec"}}, "type": "object", "title": "EncoderConfig"}, "EnhancerConfig": {"properties": {"enabled": {"type": "boolean", "title": "Enabled", "default": false}, "model": {"type": "string", "title": "Model", "default": "resemble-enhance"}, "nfe": {"type": "integer", "title": "Nfe", "default": 32}, "solver": {"type": "string", "enum": ["midpoint", "rk4", "euler"], "title": "Solver", "default": "midpoint"}, "lambd": {"type": "number", "title": "Lambd", "default": 0.5}, "tau": {"type": "number", "title": "Tau", "default": 0.5}}, "type": "object", "title": "EnhancerConfig"}, "GoogleTextSynthesizeParams": {"properties": {"input": {"$ref": "#/components/schemas/SynthesisInput"}, "voice": {"$ref": "#/components/schemas/VoiceSelectionParams"}, "audioConfig": {"$ref": "#/components/schemas/AudioConfig"}, "enhancerConfig": {"allOf": [{"$ref": "#/components/schemas/EnhancerConfig"}]}}, "type": "object", "required": ["input", "voice", "audioConfig"], "title": "GoogleTextSynthesizeParams"}, "GoogleTextSynthesizeResponse": {"properties": {"audioContent": {"type": "string", "title": "Audiocontent"}}, "type": "object", "required": ["audioContent"], "title": "GoogleTextSynthesizeResponse"}, "HTTPValidationError": {"properties": {"detail": {"items": {"$ref": "#/components/schemas/ValidationError"}, "type": "array", "title": "Detail"}}, "type": "object", "title": "HTTPValidationError"}, "InferConfig": {"properties": {"batch_size": {"type": "integer", "title": "Batch Size", "default": 4}, "spliter_threshold": {"type": "integer", "title": "Spliter Threshold", "default": 100}, "eos": {"type": "string", "title": "Eos", "default": "。"}, "seed": {"type": "integer", "title": "Seed", "default": 42}, "stream": {"type": "boolean", "title": "Stream", "default": false}, "stream_chunk_size": {"type": "integer", "title": "Stream Chunk Size", "default": 64}, "no_cache": {"type": "boolean", "title": "No Cache", "default": false}, "sync_gen": {"type": "boolean", "title": "Sync Gen", "default": false}, "timeout": {"type": "integer", "title": "Timeout", "default": 900}}, "type": "object", "title": "InferConfig"}, "RefineTextRequest": {"properties": {"text": {"type": "string", "title": "Text"}, "prompt": {"type": "string", "title": "Prompt", "default": "[oral_2][laugh_0][break_6]"}, "seed": {"type": "integer", "title": "Seed", "default": -1}, "top_P": {"type": "number", "title": "Top P", "default": 0.7}, "top_K": {"type": "integer", "title": "Top K", "default": 20}, "temperature": {"type": "number", "title": "Temperature", "default": 0.7}, "repetition_penalty": {"type": "number", "title": "Repetition Penalty", "default": 1.0}, "max_new_token": {"type": "integer", "title": "Max New Token", "default": 384}, "spliter_threshold": {"type": "integer", "title": "Spliter Threshold", "default": 300}, "normalize": {"type": "boolean", "title": "Normalize", "default": true}}, "type": "object", "required": ["text"], "title": "RefineTextRequest"}, "SSMLParams": {"properties": {"ssml": {"type": "string", "title": "Ssml"}, "format": {"allOf": [{"$ref": "#/components/schemas/AudioFormat"}], "default": "raw"}, "batch_size": {"type": "integer", "title": "Batch Size", "default": 4}, "eos": {"type": "string", "title": "Eos", "default": "[uv_break]"}, "model": {"type": "string", "title": "Model", "default": "chat-tts"}, "spliter_thr": {"type": "integer", "title": "Spliter Thr", "default": 100}, "enhancer": {"allOf": [{"$ref": "#/components/schemas/EnhancerConfig"}], "default": {"enabled": false, "model": "resemble-enhance", "nfe": 32, "solver": "midpoint", "lambd": 0.5, "tau": 0.5}}, "adjuster": {"allOf": [{"$ref": "#/components/schemas/AdjustConfig"}], "default": {"pitch": 0.0, "speed_rate": 1.0, "volume_gain_db": 0.0, "normalize": true, "headroom": 1.0, "remove_silence": false, "remove_silence_threshold": -42.0}}, "stream": {"type": "boolean", "title": "Stream", "default": false}}, "type": "object", "required": ["ssml"], "title": "SSMLParams"}, "STTOutputFormat": {"type": "string", "enum": ["txt", "vtt", "srt", "tsv", "json"], "title": "STTOutputFormat"}, "SpeakerConfig": {"properties": {"from_spk_id": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "From Spk Id"}, "from_spk_name": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "From Spk Name"}, "from_ref": {"anyOf": [{"$ref": "#/components/schemas/SpeakerReference"}, {"type": "null"}]}}, "type": "object", "title": "SpeakerConfig", "description": "任选其中一种形式指定 spk"}, "SpeakerDetail": {"properties": {"id": {"type": "string", "title": "Id"}, "with_emb": {"type": "boolean", "title": "With Emb", "default": false}}, "type": "object", "required": ["id"], "title": "SpeakerDetail"}, "SpeakerReference": {"properties": {"wav_b64": {"type": "string", "title": "Wav B64"}, "text": {"type": "string", "title": "Text"}}, "type": "object", "required": ["wav_b64", "text"], "title": "SpeakerReference"}, "SpeakersUpdate": {"properties": {"speakers": {"items": {}, "type": "array", "title": "Speakers"}}, "type": "object", "required": ["speakers"], "title": "SpeakersUpdate"}, "SynthesisInput": {"properties": {"text": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Text"}, "ssml": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Ssml"}}, "type": "object", "title": "SynthesisInput"}, "SynthesisParams": {"properties": {"text": {"type": "string", "title": "Text"}, "speaker_wav": {"type": "string", "title": "Speaker Wav"}, "language": {"type": "string", "title": "Language", "default": "cn"}}, "type": "object", "required": ["text", "speaker_wav"], "title": "SynthesisParams"}, "TNConfig": {"properties": {"enabled": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "title": "Enabled"}, "disabled": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "title": "Disabled"}}, "type": "object", "title": "TNConfig"}, "TTSConfig": {"properties": {"mid": {"type": "string", "title": "Mid", "default": "chat-tts"}, "style": {"type": "string", "title": "Style", "default": ""}, "temperature": {"type": "number", "title": "Temperature", "default": 0.3}, "top_p": {"type": "number", "title": "Top P", "default": 0.7}, "top_k": {"type": "integer", "title": "Top K", "default": 20}, "prompt": {"type": "string", "title": "Prompt", "default": ""}, "prompt1": {"type": "string", "title": "Prompt1", "default": ""}, "prompt2": {"type": "string", "title": "Prompt2", "default": ""}, "prefix": {"type": "string", "title": "Prefix", "default": ""}, "emotion": {"type": "string", "title": "Emotion", "default": ""}}, "type": "object", "title": "TTSConfig"}, "TTSSettingsRequest": {"properties": {"stream_chunk_size": {"type": "integer", "title": "Stream Chunk Size"}, "temperature": {"type": "number", "title": "Temperature"}, "speed": {"type": "number", "title": "Speed"}, "length_penalty": {"type": "number", "title": "Length Penalty"}, "repetition_penalty": {"type": "number", "title": "Repetition Penalty"}, "top_p": {"type": "number", "title": "Top P"}, "top_k": {"type": "integer", "title": "Top K"}, "enable_text_splitting": {"type": "boolean", "title": "Enable Text Splitting"}, "batch_size": {"type": "integer", "title": "Batch Size"}, "eos": {"type": "string", "title": "Eos"}, "infer_seed": {"type": "integer", "title": "Infer Seed"}, "use_decoder": {"type": "boolean", "title": "Use Decoder"}, "prompt1": {"type": "string", "title": "Prompt1"}, "prompt2": {"type": "string", "title": "Prompt2"}, "prefix": {"type": "string", "title": "Prefix"}, "spliter_threshold": {"type": "integer", "title": "Spliter Threshold"}, "style": {"type": "string", "title": "Style"}}, "type": "object", "required": ["stream_chunk_size", "temperature", "speed", "length_penalty", "repetition_penalty", "top_p", "top_k", "enable_text_splitting"], "title": "TTSSettingsRequest"}, "TextNormalizeRequest": {"properties": {"text": {"type": "string", "title": "Text"}, "pipe_id": {"type": "string", "enum": ["chat-tts", "cosy-voice", "fish-speech"], "title": "Pipe Id", "default": "chat-tts"}, "config": {"anyOf": [{"$ref": "#/components/schemas/TNConfig"}, {"type": "null"}]}}, "type": "object", "required": ["text"], "title": "TextNormalizeRequest"}, "TranscriptionsResponse": {"properties": {"message": {"type": "string", "title": "Message"}, "data": {"$ref": "#/components/schemas/TranscriptionsResponseData"}}, "type": "object", "required": ["message", "data"], "title": "TranscriptionsResponse"}, "TranscriptionsResponseData": {"properties": {"text": {"type": "string", "title": "Text"}, "segments": {"items": {}, "type": "array", "title": "Segments"}, "info": {"type": "object", "title": "Info"}}, "type": "object", "required": ["text", "segments", "info"], "title": "TranscriptionsResponseData"}, "UpdateSpeaker": {"properties": {"id": {"type": "string", "title": "Id"}, "name": {"type": "string", "title": "Name"}, "gender": {"type": "string", "title": "Gender"}, "describe": {"type": "string", "title": "Describe"}, "tensor": {"items": {}, "type": "array", "title": "Tensor"}}, "type": "object", "required": ["id", "name", "gender", "describe", "tensor"], "title": "UpdateSpeaker"}, "V2TtsParams": {"properties": {"adjust": {"anyOf": [{"$ref": "#/components/schemas/AdjustConfig"}, {"type": "null"}]}, "encoder": {"anyOf": [{"$ref": "#/components/schemas/EncoderConfig"}, {"type": "null"}]}, "enhance": {"anyOf": [{"$ref": "#/components/schemas/EnhancerConfig"}, {"type": "null"}]}, "infer": {"anyOf": [{"$ref": "#/components/schemas/InferConfig"}, {"type": "null"}]}, "vc": {"anyOf": [{"$ref": "#/components/schemas/VCConfig"}, {"type": "null"}]}, "tn": {"anyOf": [{"$ref": "#/components/schemas/TNConfig"}, {"type": "null"}]}, "tts": {"$ref": "#/components/schemas/TTSConfig"}, "spk": {"anyOf": [{"$ref": "#/components/schemas/SpeakerConfig"}, {"type": "null"}]}, "text": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Text"}, "texts": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "title": "Texts"}, "ssml": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Ssml"}}, "type": "object", "title": "V2TtsParams"}, "VCConfig": {"properties": {"enabled": {"type": "boolean", "title": "Enabled", "default": false}, "mid": {"type": "string", "title": "Mid", "default": "open-voice"}, "emotion": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Emotion"}, "tau": {"type": "number", "title": "Tau", "default": 0.3}}, "type": "object", "title": "VCConfig"}, "ValidationError": {"properties": {"loc": {"items": {"anyOf": [{"type": "string"}, {"type": "integer"}]}, "type": "array", "title": "Location"}, "msg": {"type": "string", "title": "Message"}, "type": {"type": "string", "title": "Error Type"}}, "type": "object", "required": ["loc", "msg", "type"], "title": "ValidationError"}, "VoiceSelectionParams": {"properties": {"languageCode": {"type": "string", "title": "Languagecode", "default": "ZH-CN"}, "name": {"type": "string", "title": "Name", "default": "female2"}, "style": {"type": "string", "title": "Style", "default": ""}, "temperature": {"type": "number", "title": "Temperature", "default": 0.3}, "topP": {"type": "number", "title": "Topp", "default": 0.7}, "topK": {"type": "integer", "title": "Topk", "default": 20}, "seed": {"type": "integer", "title": "Seed", "default": 42}, "eos": {"type": "string", "title": "Eos", "default": "[uv_break]"}, "model": {"type": "string", "title": "Model", "default": "chat-tts"}}, "type": "object", "title": "VoiceSelectionParams"}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Speech-AI Forge API",
+    "description": "\n🍦 Speech-AI-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。<br/>\n🍦 Speech-AI-Forge is a project developed around the TTS generation model ChatTTS, implementing an API Server and a Gradio-based WebUI.\n\n项目地址: [https://github.com/lenML/Speech-AI-Forge](https://github.com/lenML/Speech-AI-Forge)\n\n> 所有生成音频的 POST api都无法在此页面调试，调试建议使用 playground <br/>\n> All audio generation POST APIs cannot be debugged on this page, it is recommended to use playground for debugging\n\n> 如果你不熟悉本系统，建议从这个一键脚本开始，在colab中尝试一下：<br/>\n> [https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb)\n            ",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/ping": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Ping",
+        "operationId": "ping_v1_ping_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/versions": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Get Versions",
+        "operationId": "get_versions_v1_versions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/audio_formats": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Get Audio Formats",
+        "operationId": "get_audio_formats_v1_audio_formats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/reload": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Reload Models",
+        "operationId": "reload_models_v1_models_reload_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/unload": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Unload Models",
+        "operationId": "unload_models_v1_models_unload_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/list": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Unload Models",
+        "operationId": "unload_models_v1_models_list_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/styles/list": {
+      "get": {
+        "tags": [
+          "Style"
+        ],
+        "summary": "List Styles",
+        "operationId": "list_styles_v1_styles_list_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speakers/list": {
+      "get": {
+        "tags": [
+          "Speaker"
+        ],
+        "summary": "List Speakers",
+        "operationId": "list_speakers_v1_speakers_list_get",
+        "parameters": [
+          {
+            "name": "full_data",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Full Data"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speakers/refresh": {
+      "post": {
+        "tags": [
+          "Speaker"
+        ],
+        "summary": "Refresh Speakers",
+        "operationId": "refresh_speakers_v1_speakers_refresh_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speakers/update": {
+      "post": {
+        "tags": [
+          "Speaker"
+        ],
+        "summary": "Update Speakers",
+        "operationId": "update_speakers_v1_speakers_update_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeakersUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speaker/create": {
+      "post": {
+        "tags": [
+          "Speaker"
+        ],
+        "summary": "Create Speaker",
+        "operationId": "create_speaker_v1_speaker_create_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSpeaker"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speaker/update": {
+      "post": {
+        "tags": [
+          "Speaker"
+        ],
+        "summary": "Update Speaker",
+        "operationId": "update_speaker_v1_speaker_update_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSpeaker"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speaker/detail": {
+      "post": {
+        "tags": [
+          "Speaker"
+        ],
+        "summary": "Speaker Detail",
+        "operationId": "speaker_detail_v1_speaker_detail_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeakerDetail"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tts": {
+      "get": {
+        "tags": [
+          "TTS"
+        ],
+        "summary": "Synthesize Tts",
+        "operationId": "synthesize_tts_v1_tts_get",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Text"
+            }
+          },
+          {
+            "name": "spk",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "female2",
+              "title": "Spk"
+            }
+          },
+          {
+            "name": "style",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "chat",
+              "title": "Style"
+            }
+          },
+          {
+            "name": "temperature",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 0.3,
+              "title": "Temperature"
+            }
+          },
+          {
+            "name": "top_p",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 0.5,
+              "title": "Top P"
+            }
+          },
+          {
+            "name": "top_k",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "title": "Top K"
+            }
+          },
+          {
+            "name": "seed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 42,
+              "title": "Seed"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "raw",
+              "title": "Format"
+            }
+          },
+          {
+            "name": "bitrate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "64k",
+              "title": "Bitrate"
+            }
+          },
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Prompt"
+            }
+          },
+          {
+            "name": "prompt1",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Prompt1"
+            }
+          },
+          {
+            "name": "prompt2",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Prompt2"
+            }
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Prefix"
+            }
+          },
+          {
+            "name": "bs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "8",
+              "title": "Bs"
+            }
+          },
+          {
+            "name": "thr",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "100",
+              "title": "Thr"
+            }
+          },
+          {
+            "name": "eos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "[uv_break]",
+              "title": "Eos"
+            }
+          },
+          {
+            "name": "enhance",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Enhance"
+            }
+          },
+          {
+            "name": "denoise",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Denoise"
+            }
+          },
+          {
+            "name": "speed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 1.0,
+              "title": "Speed"
+            }
+          },
+          {
+            "name": "pitch",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 0,
+              "title": "Pitch"
+            }
+          },
+          {
+            "name": "volume_gain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 0,
+              "title": "Volume Gain"
+            }
+          },
+          {
+            "name": "stream",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Stream"
+            }
+          },
+          {
+            "name": "chunk_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 64,
+              "title": "Chunk Size"
+            }
+          },
+          {
+            "name": "no_cache",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "enum": [
+                    "on",
+                    "off"
+                  ],
+                  "type": "string"
+                }
+              ],
+              "default": false,
+              "title": "No Cache"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "chat-tts",
+              "title": "Model"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ssml": {
+      "post": {
+        "tags": [
+          "SSML"
+        ],
+        "summary": "Synthesize Ssml Api",
+        "operationId": "synthesize_ssml_api_v1_ssml_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/SSMLParams"
+                  }
+                ],
+                "title": "Params",
+                "description": "JSON body with SSML string and format"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/text:synthesize": {
+      "post": {
+        "tags": [
+          "Google API"
+        ],
+        "summary": "Google Text Synthesize",
+        "description": "google api document: <br/>\n[https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize](https://cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize)\n\n- 多个属性在本系统中无用仅仅是为了兼容google api\n- voice 中的 topP, topK, temperature 为本系统中的参数\n- voice.name 即 speaker name （或者speaker seed）\n- voice.seed 为 infer seed （可在webui中测试具体作用）\n\n- 编码格式影响的是 audioContent 的二进制格式，所以所有format都是返回带有base64数据的json",
+        "operationId": "google_text_synthesize_v1_text_synthesize_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleTextSynthesizeParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleTextSynthesizeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speech:recognize": {
+      "post": {
+        "tags": [
+          "Google API"
+        ],
+        "summary": "Speech Recognize",
+        "description": "Performs synchronous speech recognition: receive results after all audio has been sent and processed.",
+        "operationId": "speech_recognize_v1_speech_recognize_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/speech:longrunningrecognize": {
+      "post": {
+        "tags": [
+          "Google API"
+        ],
+        "summary": "Long Running Recognize",
+        "description": "Performs asynchronous speech recognition: receive results via the google.longrunning.Operations interface.",
+        "operationId": "long_running_recognize_v1_speech_longrunningrecognize_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/audio/speech": {
+      "post": {
+        "tags": [
+          "OpenAI API"
+        ],
+        "summary": "Openai Speech Api",
+        "description": "openai api document: \n[https://platform.openai.com/docs/guides/text-to-speech](https://platform.openai.com/docs/guides/text-to-speech)\n\n以下属性为本系统自定义属性，不在openai文档中：\n- batch_size: 是否开启batch合成，小于等于1表示不使用batch （不推荐）\n- spliter_threshold: 开启batch合成时，句子分割的阈值\n- style: 风格\n\n> model 可填任意值",
+        "operationId": "openai_speech_api_v1_audio_speech_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AudioSpeechParams"
+                  }
+                ],
+                "title": "Params",
+                "description": "JSON body with model, input text, and voice"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/audio/transcriptions": {
+      "post": {
+        "tags": [
+          "OpenAI API"
+        ],
+        "summary": "Transcribe",
+        "description": "Transcribes audio into the input language.",
+        "operationId": "transcribe_v1_audio_transcriptions_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_v1_audio_transcriptions_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/prompt/refine": {
+      "post": {
+        "tags": [
+          "Text Refiner"
+        ],
+        "summary": "Refiner Prompt Post",
+        "description": "This endpoint receives a prompt and returns the refined result",
+        "operationId": "refiner_prompt_post_v1_prompt_refine_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefineTextRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/text/normalize": {
+      "post": {
+        "tags": [
+          "Text Refiner"
+        ],
+        "summary": "Text Normalize Post",
+        "description": "This endpoint receives a text and returns the normalized text",
+        "operationId": "text_normalize_post_v1_text_normalize_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TextNormalizeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/xtts_v2/speakers": {
+      "get": {
+        "tags": [
+          "XTTS"
+        ],
+        "summary": "Speakers",
+        "operationId": "speakers_v1_xtts_v2_speakers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/xtts_v2/tts_to_audio": {
+      "post": {
+        "tags": [
+          "XTTS"
+        ],
+        "summary": "Tts To Audio",
+        "operationId": "tts_to_audio_v1_xtts_v2_tts_to_audio_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SynthesisParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/xtts_v2/tts_stream": {
+      "get": {
+        "tags": [
+          "XTTS"
+        ],
+        "summary": "Tts Stream",
+        "operationId": "tts_stream_v1_xtts_v2_tts_stream_get",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Text"
+            }
+          },
+          {
+            "name": "speaker_wav",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Speaker Wav"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "cn",
+              "title": "Language"
+            }
+          },
+          {
+            "name": "no_cache",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "No Cache"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/xtts_v2/set_tts_settings": {
+      "post": {
+        "tags": [
+          "XTTS"
+        ],
+        "summary": "Set Tts Settings",
+        "operationId": "set_tts_settings_v1_xtts_v2_set_tts_settings_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TTSSettingsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stt/transcribe": {
+      "post": {
+        "tags": [
+          "STT"
+        ],
+        "summary": "Transcribe",
+        "description": "Transcribes audio into the input language.",
+        "operationId": "transcribe_v1_stt_transcribe_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_v1_stt_transcribe_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stt/stream": {
+      "post": {
+        "tags": [
+          "STT"
+        ],
+        "summary": "Transcribe Stream",
+        "description": "Transcribes audio into the input language in real-time.",
+        "operationId": "transcribe_stream_v1_stt_stream_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_transcribe_stream_v1_stt_stream_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vc": {
+      "post": {
+        "tags": [
+          "Voice Clone"
+        ],
+        "summary": "Voice Clone",
+        "description": "Voice cloning API",
+        "operationId": "voice_clone_v1_vc_post",
+        "parameters": [
+          {
+            "name": "ref_spk",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ref Spk"
+            }
+          },
+          {
+            "name": "spk_emotion",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Spk Emotion"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "open-voice",
+              "title": "Model"
+            }
+          },
+          {
+            "name": "tau",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "default": 0.3,
+              "title": "Tau"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "mp3",
+              "title": "Format"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_voice_clone_v1_vc_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/tts": {
+      "post": {
+        "tags": [
+          "Forge V2"
+        ],
+        "summary": "Forge Text Synthesize",
+        "operationId": "forge_text_synthesize_v2_tts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/V2TtsParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdjustConfig": {
+        "properties": {
+          "pitch": {
+            "type": "number",
+            "title": "Pitch",
+            "default": 0
+          },
+          "speed_rate": {
+            "type": "number",
+            "title": "Speed Rate",
+            "default": 1
+          },
+          "volume_gain_db": {
+            "type": "number",
+            "title": "Volume Gain Db",
+            "default": 0
+          },
+          "normalize": {
+            "type": "boolean",
+            "title": "Normalize",
+            "default": true
+          },
+          "headroom": {
+            "type": "number",
+            "title": "Headroom",
+            "default": 1
+          },
+          "remove_silence": {
+            "type": "boolean",
+            "title": "Remove Silence",
+            "default": false
+          },
+          "remove_silence_threshold": {
+            "type": "number",
+            "title": "Remove Silence Threshold",
+            "default": -42
+          }
+        },
+        "type": "object",
+        "title": "AdjustConfig"
+      },
+      "AudioConfig": {
+        "properties": {
+          "audioEncoding": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AudioFormat"
+              }
+            ],
+            "default": "raw"
+          },
+          "audioBitrate": {
+            "type": "string",
+            "title": "Audiobitrate",
+            "default": "64k"
+          },
+          "speakingRate": {
+            "type": "number",
+            "title": "Speakingrate",
+            "default": 1
+          },
+          "pitch": {
+            "type": "number",
+            "title": "Pitch",
+            "default": 0
+          },
+          "volumeGainDb": {
+            "type": "number",
+            "title": "Volumegaindb",
+            "default": 0
+          },
+          "sampleRateHertz": {
+            "type": "integer",
+            "title": "Sampleratehertz",
+            "default": 24000
+          },
+          "batchSize": {
+            "type": "integer",
+            "title": "Batchsize",
+            "default": 4
+          },
+          "spliterThreshold": {
+            "type": "integer",
+            "title": "Spliterthreshold",
+            "default": 100
+          }
+        },
+        "type": "object",
+        "title": "AudioConfig"
+      },
+      "AudioFormat": {
+        "type": "string",
+        "enum": [
+          "mp3",
+          "wav",
+          "ogg",
+          "acc",
+          "flac",
+          "raw"
+        ],
+        "title": "AudioFormat"
+      },
+      "AudioSpeechParams": {
+        "properties": {
+          "input": {
+            "type": "string",
+            "title": "Input"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "chat-tts"
+          },
+          "voice": {
+            "type": "string",
+            "title": "Voice",
+            "default": "female2"
+          },
+          "response_format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AudioFormat"
+              }
+            ],
+            "default": "raw"
+          },
+          "speed": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.1,
+            "title": "Speed",
+            "description": "Speed of the audio",
+            "default": 1
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed",
+            "default": 42
+          },
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "default": 0.3
+          },
+          "top_k": {
+            "type": "integer",
+            "title": "Top K",
+            "default": 20
+          },
+          "top_p": {
+            "type": "number",
+            "title": "Top P",
+            "default": 0.7
+          },
+          "style": {
+            "type": "string",
+            "title": "Style",
+            "default": ""
+          },
+          "batch_size": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Batch Size",
+            "description": "Batch size",
+            "default": 1
+          },
+          "spliter_threshold": {
+            "type": "number",
+            "maximum": 1024.0,
+            "minimum": 10.0,
+            "title": "Spliter Threshold",
+            "description": "Threshold for sentence spliter",
+            "default": 100
+          },
+          "eos": {
+            "type": "string",
+            "title": "Eos",
+            "default": "[uv_break]"
+          },
+          "enhance": {
+            "type": "boolean",
+            "title": "Enhance",
+            "default": false
+          },
+          "denoise": {
+            "type": "boolean",
+            "title": "Denoise",
+            "default": false
+          },
+          "stream": {
+            "type": "boolean",
+            "title": "Stream",
+            "default": false
+          },
+          "bitrate": {
+            "type": "string",
+            "title": "Bitrate",
+            "default": "64k"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input"
+        ],
+        "title": "AudioSpeechParams"
+      },
+      "BaseResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "data": {
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message",
+          "data"
+        ],
+        "title": "BaseResponse"
+      },
+      "Body_transcribe_stream_v1_stt_stream_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "whisper.large"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "prefix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefix"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "sample_len": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Len"
+          },
+          "best_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Of"
+          },
+          "beam_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beam Size"
+          },
+          "patience": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patience"
+          },
+          "length_penalty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length Penalty"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/STTOutputFormat"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "txt"
+          },
+          "highlight_words": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Highlight Words",
+            "default": false
+          },
+          "max_line_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Line Count"
+          },
+          "max_line_width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Line Width"
+          },
+          "max_words_per_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Words Per Line"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_transcribe_stream_v1_stt_stream_post"
+      },
+      "Body_transcribe_v1_audio_transcriptions_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "whisper.large"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "response_format": {
+            "type": "string",
+            "title": "Response Format",
+            "default": "txt"
+          },
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "default": 0
+          },
+          "timestamp_granularities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Timestamp Granularities",
+            "default": [
+              "segment"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_transcribe_v1_audio_transcriptions_post"
+      },
+      "Body_transcribe_v1_stt_transcribe_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "whisper.large"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt"
+          },
+          "prefix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefix"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "sample_len": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Len"
+          },
+          "best_of": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Of"
+          },
+          "beam_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beam Size"
+          },
+          "patience": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patience"
+          },
+          "length_penalty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length Penalty"
+          },
+          "format": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/STTOutputFormat"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "txt"
+          },
+          "highlight_words": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Highlight Words",
+            "default": false
+          },
+          "max_line_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Line Count"
+          },
+          "max_line_width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Line Width"
+          },
+          "max_words_per_line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Words Per Line"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_transcribe_v1_stt_transcribe_post"
+      },
+      "Body_voice_clone_v1_vc_post": {
+        "properties": {
+          "src_audio": {
+            "type": "string",
+            "format": "binary",
+            "title": "Src Audio"
+          },
+          "ref_audio": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "binary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Audio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "src_audio"
+        ],
+        "title": "Body_voice_clone_v1_vc_post"
+      },
+      "CreateSpeaker": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "describe": {
+            "type": "string",
+            "title": "Describe"
+          },
+          "tensor": {
+            "items": {},
+            "type": "array",
+            "title": "Tensor"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "gender",
+          "describe"
+        ],
+        "title": "CreateSpeaker"
+      },
+      "EncoderConfig": {
+        "properties": {
+          "format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AudioFormat"
+              }
+            ],
+            "default": "raw"
+          },
+          "bitrate": {
+            "type": "string",
+            "title": "Bitrate",
+            "default": "64k"
+          },
+          "acodec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acodec"
+          }
+        },
+        "type": "object",
+        "title": "EncoderConfig"
+      },
+      "EnhancerConfig": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "resemble-enhance"
+          },
+          "nfe": {
+            "type": "integer",
+            "title": "Nfe",
+            "default": 32
+          },
+          "solver": {
+            "type": "string",
+            "enum": [
+              "midpoint",
+              "rk4",
+              "euler"
+            ],
+            "title": "Solver",
+            "default": "midpoint"
+          },
+          "lambd": {
+            "type": "number",
+            "title": "Lambd",
+            "default": 0.5
+          },
+          "tau": {
+            "type": "number",
+            "title": "Tau",
+            "default": 0.5
+          }
+        },
+        "type": "object",
+        "title": "EnhancerConfig"
+      },
+      "GoogleTextSynthesizeParams": {
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/SynthesisInput"
+          },
+          "voice": {
+            "$ref": "#/components/schemas/VoiceSelectionParams"
+          },
+          "audioConfig": {
+            "$ref": "#/components/schemas/AudioConfig"
+          },
+          "enhancerConfig": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EnhancerConfig"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "input",
+          "voice",
+          "audioConfig"
+        ],
+        "title": "GoogleTextSynthesizeParams"
+      },
+      "GoogleTextSynthesizeResponse": {
+        "properties": {
+          "audioContent": {
+            "type": "string",
+            "title": "Audiocontent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "audioContent"
+        ],
+        "title": "GoogleTextSynthesizeResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InferConfig": {
+        "properties": {
+          "batch_size": {
+            "type": "integer",
+            "title": "Batch Size",
+            "default": 4
+          },
+          "spliter_threshold": {
+            "type": "integer",
+            "title": "Spliter Threshold",
+            "default": 100
+          },
+          "eos": {
+            "type": "string",
+            "title": "Eos",
+            "default": "。"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed",
+            "default": 42
+          },
+          "stream": {
+            "type": "boolean",
+            "title": "Stream",
+            "default": false
+          },
+          "stream_chunk_size": {
+            "type": "integer",
+            "title": "Stream Chunk Size",
+            "default": 64
+          },
+          "no_cache": {
+            "type": "boolean",
+            "title": "No Cache",
+            "default": false
+          },
+          "sync_gen": {
+            "type": "boolean",
+            "title": "Sync Gen",
+            "default": false
+          },
+          "timeout": {
+            "type": "integer",
+            "title": "Timeout",
+            "default": 900
+          }
+        },
+        "type": "object",
+        "title": "InferConfig"
+      },
+      "RefineTextRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt",
+            "default": "[oral_2][laugh_0][break_6]"
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed",
+            "default": -1
+          },
+          "top_P": {
+            "type": "number",
+            "title": "Top P",
+            "default": 0.7
+          },
+          "top_K": {
+            "type": "integer",
+            "title": "Top K",
+            "default": 20
+          },
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "default": 0.7
+          },
+          "repetition_penalty": {
+            "type": "number",
+            "title": "Repetition Penalty",
+            "default": 1.0
+          },
+          "max_new_token": {
+            "type": "integer",
+            "title": "Max New Token",
+            "default": 384
+          },
+          "spliter_threshold": {
+            "type": "integer",
+            "title": "Spliter Threshold",
+            "default": 300
+          },
+          "normalize": {
+            "type": "boolean",
+            "title": "Normalize",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "RefineTextRequest"
+      },
+      "SSMLParams": {
+        "properties": {
+          "ssml": {
+            "type": "string",
+            "title": "Ssml"
+          },
+          "format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AudioFormat"
+              }
+            ],
+            "default": "raw"
+          },
+          "batch_size": {
+            "type": "integer",
+            "title": "Batch Size",
+            "default": 4
+          },
+          "eos": {
+            "type": "string",
+            "title": "Eos",
+            "default": "[uv_break]"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "chat-tts"
+          },
+          "spliter_thr": {
+            "type": "integer",
+            "title": "Spliter Thr",
+            "default": 100
+          },
+          "enhancer": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EnhancerConfig"
+              }
+            ],
+            "default": {
+              "enabled": false,
+              "model": "resemble-enhance",
+              "nfe": 32,
+              "solver": "midpoint",
+              "lambd": 0.5,
+              "tau": 0.5
+            }
+          },
+          "adjuster": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdjustConfig"
+              }
+            ],
+            "default": {
+              "pitch": 0.0,
+              "speed_rate": 1.0,
+              "volume_gain_db": 0.0,
+              "normalize": true,
+              "headroom": 1.0,
+              "remove_silence": false,
+              "remove_silence_threshold": -42.0
+            }
+          },
+          "stream": {
+            "type": "boolean",
+            "title": "Stream",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "ssml"
+        ],
+        "title": "SSMLParams"
+      },
+      "STTOutputFormat": {
+        "type": "string",
+        "enum": [
+          "txt",
+          "vtt",
+          "srt",
+          "tsv",
+          "json"
+        ],
+        "title": "STTOutputFormat"
+      },
+      "SpeakerConfig": {
+        "properties": {
+          "from_spk_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Spk Id"
+          },
+          "from_spk_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Spk Name"
+          },
+          "from_ref": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpeakerReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "SpeakerConfig",
+        "description": "任选其中一种形式指定 spk"
+      },
+      "SpeakerDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "with_emb": {
+            "type": "boolean",
+            "title": "With Emb",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "SpeakerDetail"
+      },
+      "SpeakerReference": {
+        "properties": {
+          "wav_b64": {
+            "type": "string",
+            "title": "Wav B64"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "wav_b64",
+          "text"
+        ],
+        "title": "SpeakerReference"
+      },
+      "SpeakersUpdate": {
+        "properties": {
+          "speakers": {
+            "items": {},
+            "type": "array",
+            "title": "Speakers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "speakers"
+        ],
+        "title": "SpeakersUpdate"
+      },
+      "SynthesisInput": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "ssml": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ssml"
+          }
+        },
+        "type": "object",
+        "title": "SynthesisInput"
+      },
+      "SynthesisParams": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "speaker_wav": {
+            "type": "string",
+            "title": "Speaker Wav"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "default": "cn"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "speaker_wav"
+        ],
+        "title": "SynthesisParams"
+      },
+      "TNConfig": {
+        "properties": {
+          "enabled": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "disabled": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disabled"
+          }
+        },
+        "type": "object",
+        "title": "TNConfig"
+      },
+      "TTSConfig": {
+        "properties": {
+          "mid": {
+            "type": "string",
+            "title": "Mid",
+            "default": "chat-tts"
+          },
+          "style": {
+            "type": "string",
+            "title": "Style",
+            "default": ""
+          },
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "default": 0.3
+          },
+          "top_p": {
+            "type": "number",
+            "title": "Top P",
+            "default": 0.7
+          },
+          "top_k": {
+            "type": "integer",
+            "title": "Top K",
+            "default": 20
+          },
+          "prompt": {
+            "type": "string",
+            "title": "Prompt",
+            "default": ""
+          },
+          "prompt1": {
+            "type": "string",
+            "title": "Prompt1",
+            "default": ""
+          },
+          "prompt2": {
+            "type": "string",
+            "title": "Prompt2",
+            "default": ""
+          },
+          "prefix": {
+            "type": "string",
+            "title": "Prefix",
+            "default": ""
+          },
+          "emotion": {
+            "type": "string",
+            "title": "Emotion",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "TTSConfig"
+      },
+      "TTSSettingsRequest": {
+        "properties": {
+          "stream_chunk_size": {
+            "type": "integer",
+            "title": "Stream Chunk Size"
+          },
+          "temperature": {
+            "type": "number",
+            "title": "Temperature"
+          },
+          "speed": {
+            "type": "number",
+            "title": "Speed"
+          },
+          "length_penalty": {
+            "type": "number",
+            "title": "Length Penalty"
+          },
+          "repetition_penalty": {
+            "type": "number",
+            "title": "Repetition Penalty"
+          },
+          "top_p": {
+            "type": "number",
+            "title": "Top P"
+          },
+          "top_k": {
+            "type": "integer",
+            "title": "Top K"
+          },
+          "enable_text_splitting": {
+            "type": "boolean",
+            "title": "Enable Text Splitting"
+          },
+          "batch_size": {
+            "type": "integer",
+            "title": "Batch Size"
+          },
+          "eos": {
+            "type": "string",
+            "title": "Eos"
+          },
+          "infer_seed": {
+            "type": "integer",
+            "title": "Infer Seed"
+          },
+          "use_decoder": {
+            "type": "boolean",
+            "title": "Use Decoder"
+          },
+          "prompt1": {
+            "type": "string",
+            "title": "Prompt1"
+          },
+          "prompt2": {
+            "type": "string",
+            "title": "Prompt2"
+          },
+          "prefix": {
+            "type": "string",
+            "title": "Prefix"
+          },
+          "spliter_threshold": {
+            "type": "integer",
+            "title": "Spliter Threshold"
+          },
+          "style": {
+            "type": "string",
+            "title": "Style"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stream_chunk_size",
+          "temperature",
+          "speed",
+          "length_penalty",
+          "repetition_penalty",
+          "top_p",
+          "top_k",
+          "enable_text_splitting"
+        ],
+        "title": "TTSSettingsRequest"
+      },
+      "TextNormalizeRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "pipe_id": {
+            "type": "string",
+            "enum": [
+              "chat-tts",
+              "cosy-voice",
+              "fish-speech"
+            ],
+            "title": "Pipe Id",
+            "default": "chat-tts"
+          },
+          "config": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TNConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "TextNormalizeRequest"
+      },
+      "TranscriptionsResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "data": {
+            "$ref": "#/components/schemas/TranscriptionsResponseData"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message",
+          "data"
+        ],
+        "title": "TranscriptionsResponse"
+      },
+      "TranscriptionsResponseData": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "segments": {
+            "items": {},
+            "type": "array",
+            "title": "Segments"
+          },
+          "info": {
+            "type": "object",
+            "title": "Info"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "segments",
+          "info"
+        ],
+        "title": "TranscriptionsResponseData"
+      },
+      "UpdateSpeaker": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "gender": {
+            "type": "string",
+            "title": "Gender"
+          },
+          "describe": {
+            "type": "string",
+            "title": "Describe"
+          },
+          "tensor": {
+            "items": {},
+            "type": "array",
+            "title": "Tensor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "gender",
+          "describe",
+          "tensor"
+        ],
+        "title": "UpdateSpeaker"
+      },
+      "V2TtsParams": {
+        "properties": {
+          "adjust": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdjustConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "encoder": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EncoderConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "enhance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EnhancerConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "infer": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InferConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "vc": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VCConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tn": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TNConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tts": {
+            "$ref": "#/components/schemas/TTSConfig"
+          },
+          "spk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpeakerConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "texts": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Texts"
+          },
+          "ssml": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ssml"
+          }
+        },
+        "type": "object",
+        "title": "V2TtsParams"
+      },
+      "VCConfig": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": false
+          },
+          "mid": {
+            "type": "string",
+            "title": "Mid",
+            "default": "open-voice"
+          },
+          "emotion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emotion"
+          },
+          "tau": {
+            "type": "number",
+            "title": "Tau",
+            "default": 0.3
+          }
+        },
+        "type": "object",
+        "title": "VCConfig"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VoiceSelectionParams": {
+        "properties": {
+          "languageCode": {
+            "type": "string",
+            "title": "Languagecode",
+            "default": "ZH-CN"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "default": "female2"
+          },
+          "style": {
+            "type": "string",
+            "title": "Style",
+            "default": ""
+          },
+          "temperature": {
+            "type": "number",
+            "title": "Temperature",
+            "default": 0.3
+          },
+          "topP": {
+            "type": "number",
+            "title": "Topp",
+            "default": 0.7
+          },
+          "topK": {
+            "type": "integer",
+            "title": "Topk",
+            "default": 20
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed",
+            "default": 42
+          },
+          "eos": {
+            "type": "string",
+            "title": "Eos",
+            "default": "[uv_break]"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "default": "chat-tts"
+          }
+        },
+        "type": "object",
+        "title": "VoiceSelectionParams"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:7870"
+    },
+    {
+      "url": "http://0.0.0.0:7870"
+    },
+    {
+      "url": "http://localhost:7870"
+    }
+  ]
+}
