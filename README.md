@@ -132,7 +132,7 @@ WIP 开发中
 |                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | 句子级   | en, zh              | ✅          |
 |                 | ~~GPTSoVits~~                                                      | 句子级   |                     | 🚧          |
 | **ASR**         | [Whisper](https://github.com/openai/whisper)                       | 🚧       | ✅                  | ✅          |
-|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)            | 🚧       | ✅                  | 🚧          |
+|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)            | 🚧       | ✅                  | ✅          |
 | **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)               |          |                     | ✅          |
 | **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance) |          |                     | ✅          |
 
