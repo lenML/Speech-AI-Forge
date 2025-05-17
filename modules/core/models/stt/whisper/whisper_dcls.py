@@ -4,7 +4,7 @@ from typing import Iterable
 from faster_whisper.transcribe import Segment, TranscriptionInfo
 
 
-@dataclass(repr=False, eq=False, frozen=True)
+@dataclass(repr=False, eq=False)
 class WhisperSegment:
     seek: int
     start: float
@@ -17,7 +17,7 @@ class WhisperSegment:
     noise_level: float
 
 
-@dataclass(repr=False, eq=False, frozen=True)
+@dataclass(repr=False, eq=False)
 class WhisperTranscribeResult:
     segments: Iterable[Segment]
     language: str

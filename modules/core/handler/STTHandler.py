@@ -1,6 +1,7 @@
 from typing import AsyncGenerator, Generator
 
 from modules.core.handler.datacls.stt_model import STTConfig
+from modules.core.models.stt.STTChunker import STTChunker
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.pipeline.processor import NP_AUDIO
@@ -18,6 +19,8 @@ class STTHandler:
         if self.model is None:
             raise Exception(f"Model {self.stt_config.mid} is not supported")
 
+        self.chunker = STTChunker(model=self.model)
+
     def get_model(self):
         model_id = self.stt_config.mid.lower()
         if model_id.startswith("whisper"):
@@ -25,11 +28,12 @@ class STTHandler:
 
         raise Exception(f"Model {model_id} is not supported")
 
-    async def enqueue(self) -> TranscribeResult:
-        result = self.model.transcribe(audio=self.input_audio, config=self.stt_config)
+    async def enqueue(self) -> str:
+        result = self.chunker.transcribe(audio=self.input_audio, config=self.stt_config)
+        # result = self.model.transcribe(audio=self.input_audio, config=self.stt_config)
         return result
 
-    async def enqueue_stream(self) -> AsyncGenerator[TranscribeResult, None]:
+    async def enqueue_stream(self) -> AsyncGenerator[str, None]:
         raise NotImplementedError(
             "Method 'enqueue_stream' must be implemented by subclass"
         )

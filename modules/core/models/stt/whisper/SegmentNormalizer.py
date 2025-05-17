@@ -54,7 +54,8 @@ class SegmentNormalizer:
                 text=subtitle_text,
                 start_s=subtitle[0].start,
                 end_s=subtitle[-1].end,
-                words=[w._asdict() for w in subtitle],
+                # words=[w._asdict() for w in subtitle],
+                words=subtitle,
             )
 
     def _iterate_subtitles(

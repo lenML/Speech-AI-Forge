@@ -189,7 +189,7 @@ class WhisperModel(STTModel):
         audio = self.ensure_stereo_to_mono(audio=audio)
         return audio
 
-    def transcribe_to_result(
+    def generate_transcribe(
         self, audio: NP_AUDIO, config: STTConfig
     ) -> WhisperTranscribeResult:
         prompt = config.prompt
@@ -230,6 +230,7 @@ class WhisperModel(STTModel):
                 word_timestamps=True,
                 suppress_tokens=[-1] + number_tokens,
                 # fp16=self.dtype == torch.float16,
+                # vad_filter=True,
             )
         if isinstance(result, tuple):
             # 兼容原始 faster_whisper
@@ -266,14 +267,15 @@ class WhisperModel(STTModel):
             language=result.language,
         )
 
-    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> str:
+    def transcribe_to_result(
+        self, audio: NP_AUDIO, config: STTConfig
+    ) -> WhisperTranscribeResult:
         has_ref = config.refrence_transcript.strip() != ""
         if has_ref:
             result = self.force_align(audio=audio, config=config)
         else:
-            result = self.transcribe_to_result(audio=audio, config=config)
-        result_formated = self.convert_result_with_format(config=config, result=result)
-        return result_formated
+            result = self.generate_transcribe(audio=audio, config=config)
+        return result
 
     def force_align_after_refine(
         self, result: stable_whisper.WhisperResult, refrence_transcript: str

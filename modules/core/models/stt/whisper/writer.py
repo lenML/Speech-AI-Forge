@@ -42,7 +42,7 @@ class ResultWriter:
         def _iter():
             try:
                 for segment in normalizer.normalize(options=options, **kwargs):
-                    self.subtitles.append(segment._asdict())
+                    self.subtitles.append(segment)
                     end = segment.end_s
                     next_n = int(end)
                     tqdm_bar.update(next_n - tqdm_bar.n)
@@ -183,7 +183,19 @@ class WriteJSON(ResultWriter):
         segments_list = []
         for segment in segments:
             segments_list.append(segment._asdict())
-        json.dump(segments_list, file, ensure_ascii=False)
+
+        def json_dump_default(o):
+            if isinstance(o, SubtitleSegment):
+                return o._asdict()
+            if isinstance(o, dict):
+                return o
+            if isinstance(o, list):
+                return o
+            if "__dict__" in o:
+                return o.__dict__
+            return str(o)
+
+        json.dump(segments_list, file, ensure_ascii=False, default=json_dump_default)
 
 
 def get_writer(output_format: str) -> ResultWriter:
