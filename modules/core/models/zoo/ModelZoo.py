@@ -11,6 +11,8 @@ from typing import Dict, Union
 from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.TTSModel import TTSModel
 from modules.core.models.enhancer.ResembleEnhanceModel import ResembleEnhanceModel
+from modules.core.models.stt.STTModel import STTModel
+from modules.core.models.stt.SenseVoice import SenseVoiceModel
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
@@ -48,6 +50,7 @@ class ModelZoo:
         # "whisper.medium": WhisperModel("whisper.medium"),
         # "whisper.small": WhisperModel("whisper.small"),
         # "whisper.tiny": WhisperModel("whisper.tiny"),
+        "sensevoice": SenseVoiceModel(),
         # === voice clone ===
         "open-voice": OpenVoiceModel(),
     }
@@ -72,6 +75,20 @@ class ModelZoo:
         models = []
         for id, model in self.models.items():
             if isinstance(model, TTSModel) and model.is_downloaded():
+                models.append(model)
+        return models
+
+    def get_stt_model_ids(self) -> list[str]:
+        ids = []
+        for id, model in self.models.items():
+            if isinstance(model, STTModel):
+                ids.append(id)
+        return ids
+
+    def get_available_stt_model(self) -> list[STTModel]:
+        models = []
+        for id, model in self.models.items():
+            if isinstance(model, STTModel) and model.is_downloaded():
                 models.append(model)
         return models
 
@@ -141,6 +158,9 @@ class ModelZoo:
 
     def get_whisper_turbo(self) -> WhisperModel:
         return self.get_model("whisper.turbo")
+
+    def get_sensevoice(self) -> SenseVoiceModel:
+        return self.get_model("sensevoice")
 
     def get_open_voice(self) -> OpenVoiceModel:
         return self.get_model("open-voice")

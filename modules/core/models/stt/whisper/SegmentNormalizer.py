@@ -1,8 +1,9 @@
 import copy
 from typing import Generator, Iterable, List, NamedTuple, Optional
 
-from faster_whisper.transcribe import Segment, Word
 from whisper.utils import format_timestamp
+
+from modules.core.models.stt.whisper.whisper_dcls import SttSegment, SttWord
 
 
 class SubtitleSegment(NamedTuple):
@@ -15,9 +16,10 @@ class SubtitleSegment(NamedTuple):
 
 
 class SegmentNormalizer:
+
     def __init__(
         self,
-        segments: Iterable[Segment],
+        segments: Iterable[SttSegment],
         always_include_hours: bool,
         decimal_marker: str,
     ):
@@ -67,18 +69,21 @@ class SegmentNormalizer:
     ):
         line_len = 0
         line_count = 1
-        subtitle: List[Word] = []
+        subtitle: List[SttWord] = []
         last: float = 0.0
 
         for segment in self.segments:
             chunk_index = 0
             words = segment.words
+            if words is None or len(words) == 0:
+                yield [SttWord(start=segment.start, end=segment.end, word=segment.text)]
+                continue
             while chunk_index < len(words):
                 words_count = min(max_words_per_line, len(words) - chunk_index)
                 for i, original_timing in enumerate(
                     words[chunk_index : chunk_index + words_count]
                 ):
-                    timing = copy.deepcopy(original_timing)
+                    timing: SttWord = copy.deepcopy(original_timing)
                     long_pause = not preserve_segments and timing.start - last > 3.0
                     has_room = line_len + len(timing.word) <= max_line_width
                     seg_break = i == 0 and len(subtitle) > 0 and preserve_segments
@@ -86,7 +91,8 @@ class SegmentNormalizer:
                     if line_len > 0 and has_room and not long_pause and not seg_break:
                         line_len += len(timing.word)
                     else:
-                        timing = timing._replace(word=timing.word.strip())
+                        # timing = timing._replace(word=timing.word.strip())
+                        timing.word = timing.word.strip()
                         if (
                             len(subtitle) > 0
                             and max_line_count is not None
@@ -98,7 +104,8 @@ class SegmentNormalizer:
                             line_count = 1
                         elif line_len > 0:
                             line_count += 1
-                            timing = timing._replace(word="\n" + timing.word)
+                            # timing = timing._replace(word="\n" + timing.word)
+                            timing.word = "\n" + timing.word
                         line_len = len(timing.word.strip())
                     subtitle.append(timing)
                     last = timing.start

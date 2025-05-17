@@ -16,7 +16,11 @@ import stable_whisper
 from modules import config as global_config
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
-from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
+from modules.core.models.stt.whisper.whisper_dcls import (
+    SttSegment,
+    SttWord,
+    SttResult,
+)
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
@@ -34,35 +38,39 @@ number_tokens = [
 ]
 
 
-def st_word2fw_word(word: stable_whisper.WordTiming) -> Word:
-    return Word(
-        start=word.start, end=word.end, word=word.word, probability=word.probability
-    )
+def st_word2stt_word(word: stable_whisper.WordTiming | Word) -> SttWord:
+    return SttWord(start=word.start, end=word.end, word=word.word)
 
 
-def st_result2result(
-    result: stable_whisper.WhisperResult, duration: int
-) -> WhisperTranscribeResult:
+def st_result2result(result: stable_whisper.WhisperResult, duration: int) -> SttResult:
     segments = [
-        Segment(
-            id=seg.id,
-            seek=seg.seek,
+        SttSegment(
+            text=seg.text,
             start=seg.start,
             end=seg.end,
-            text=seg.text,
-            tokens=seg.tokens,
-            temperature=seg.temperature,
-            avg_logprob=seg.avg_logprob,
-            compression_ratio=seg.compression_ratio,
-            no_speech_prob=seg.no_speech_prob,
-            words=[st_word2fw_word(w) for w in seg.words],
+            words=[st_word2stt_word(w) for w in seg.words],
         )
         for seg in result.segments
     ]
     language = result.language
 
-    return WhisperTranscribeResult(
-        segments=segments, language=language, duration=duration
+    return SttResult(segments=segments, language=language, duration=duration)
+
+
+def fw_result2result(result: tuple, duration: int):
+    segments, info = result
+    language = info.language
+    segments = [
+        SttSegment(
+            text=seg.text,
+            start=seg.start,
+            end=seg.end,
+            words=[st_word2stt_word(w) for w in seg.words],
+        )
+        for seg in segments
+    ]
+    return SttResult(
+        segments=segments, language=language, duration=get_audio_duration(audio)
     )
 
 
@@ -97,6 +105,7 @@ class WhisperModel(STTModel):
     model: Optional[FasterWhisperModel] = None
 
     def __init__(self, model_id: str):
+        super().__init__(model_id)
         # example: `whisper.large` or `whisper` or `whisper.small`
         model_ver = model_id.lower().split(".")
 
@@ -189,9 +198,7 @@ class WhisperModel(STTModel):
         audio = self.ensure_stereo_to_mono(audio=audio)
         return audio
 
-    def generate_transcribe(
-        self, audio: NP_AUDIO, config: STTConfig
-    ) -> WhisperTranscribeResult:
+    def generate_transcribe(self, audio: NP_AUDIO, config: STTConfig) -> SttResult:
         prompt = config.prompt
         prefix = config.prefix
 
@@ -232,44 +239,17 @@ class WhisperModel(STTModel):
                 # fp16=self.dtype == torch.float16,
                 # vad_filter=True,
             )
+        duration = get_audio_duration(audio)
         if isinstance(result, tuple):
             # 兼容原始 faster_whisper
-            segments, info = result
-            language = info.language
-            return WhisperTranscribeResult(
-                segments=segments, language=language, duration=get_audio_duration(audio)
-            )
+            return fw_result2result(result, duration)
         elif isinstance(result, stable_whisper.WhisperResult):
-            result = st_result2result(result, get_audio_duration(audio))
+            result = st_result2result(result, duration)
             return result
         else:
             raise ValueError(f"Unknown result type: {type(result)}")
 
-    def convert_result_with_format(
-        self, config: STTConfig, result: WhisperTranscribeResult
-    ) -> str:
-        writer_options = {
-            "highlight_words": config.highlight_words,
-            "max_line_count": config.max_line_count,
-            "max_line_width": config.max_line_width,
-            "max_words_per_line": config.max_words_per_line,
-        }
-
-        format = config.format
-
-        writer = get_writer(format.value)
-        with disable_tqdm(enabled=global_config.runtime_env_vars.off_tqdm):
-            output = writer.write(result=result, options=writer_options)
-
-        return TranscribeResult(
-            text=output,
-            segments=writer.subtitles,
-            language=result.language,
-        )
-
-    def transcribe_to_result(
-        self, audio: NP_AUDIO, config: STTConfig
-    ) -> WhisperTranscribeResult:
+    def transcribe_to_result(self, audio: NP_AUDIO, config: STTConfig) -> SttResult:
         has_ref = config.refrence_transcript.strip() != ""
         if has_ref:
             result = self.force_align(audio=audio, config=config)
@@ -335,9 +315,7 @@ class WhisperModel(STTModel):
         result.segments = refined_segments
         return result
 
-    def force_align(
-        self, audio: NP_AUDIO, config: STTConfig
-    ) -> WhisperTranscribeResult:
+    def force_align(self, audio: NP_AUDIO, config: STTConfig) -> SttResult:
         """
         文稿匹配
         """

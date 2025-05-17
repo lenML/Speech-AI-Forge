@@ -1,8 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable
-
-from faster_whisper.transcribe import Segment, TranscriptionInfo
-
+from typing import Iterable, List, Optional
 
 @dataclass(repr=False, eq=False)
 class WhisperSegment:
@@ -18,8 +15,23 @@ class WhisperSegment:
 
 
 @dataclass(repr=False, eq=False)
-class WhisperTranscribeResult:
-    segments: Iterable[Segment]
+class SttWord:
+    start: float
+    end: float
+    word: str
+
+
+@dataclass(repr=False, eq=False)
+class SttSegment:
+    text: str
+    start: int
+    end: int
+    words: Optional[List[SttWord]] = None
+
+
+@dataclass(repr=False, eq=False)
+class SttResult:
+    segments: Iterable[SttSegment]
     language: str
     # 这个duration的主要作用是用来做 pregress
     duration: float

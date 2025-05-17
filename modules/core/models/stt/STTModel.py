@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from modules.core.handler.datacls.stt_model import STTConfig, STTOutputFormat
 from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.stt.whisper.SegmentNormalizer import SubtitleSegment
-from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
+from modules.core.models.stt.whisper.whisper_dcls import SttResult
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.utils.monkey_tqdm import disable_tqdm
@@ -23,9 +23,7 @@ class STTModel(BaseZooModel):
     def __init__(self, model_id: str) -> None:
         super().__init__(model_id=model_id)
 
-    def convert_result_with_format(
-        self, config: STTConfig, result: WhisperTranscribeResult
-    ) -> str:
+    def convert_result_with_format(self, config: STTConfig, result: SttResult) -> str:
         writer_options = {
             "highlight_words": config.highlight_words,
             "max_line_count": config.max_line_count,
@@ -50,7 +48,5 @@ class STTModel(BaseZooModel):
         result_formated = self.convert_result_with_format(config=config, result=result)
         return result_formated
 
-    def transcribe_to_result(
-        self, audio: NP_AUDIO, config: STTConfig
-    ) -> WhisperTranscribeResult:
+    def transcribe_to_result(self, audio: NP_AUDIO, config: STTConfig) -> SttResult:
         raise NotImplementedError()

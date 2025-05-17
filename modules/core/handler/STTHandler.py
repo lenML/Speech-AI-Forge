@@ -22,9 +22,12 @@ class STTHandler:
         self.chunker = STTChunker(model=self.model)
 
     def get_model(self):
+        stt_models = model_zoo.get_available_stt_model()
         model_id = self.stt_config.mid.lower()
-        if model_id.startswith("whisper"):
-            return model_zoo.get_model(model_id=model_id)
+
+        for model in stt_models:
+            if model.model_id == self.stt_config.mid.lower():
+                return model
 
         raise Exception(f"Model {model_id} is not supported")
 

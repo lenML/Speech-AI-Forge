@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
-from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
+from modules.core.models.stt.whisper.whisper_dcls import SttResult, SttSegment, SttWord
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.utils.monkey_tqdm import disable_tqdm
@@ -141,48 +141,42 @@ class STTChunker:
         return chunks
 
     def merge_results(
-        self, chunks: list[STTChunkData], results: list[WhisperTranscribeResult]
-    ) -> WhisperTranscribeResult:
+        self, chunks: list[STTChunkData], results: list[SttResult]
+    ) -> SttResult:
         merged_segments = []
         for chunk, result in zip(chunks, results):
             for segment in result.segments:
                 # segment.start += chunk.start_s
                 # segment.end += chunk.start_s
                 merged_segments.append(
-                    Segment(
-                        id=segment.id,
-                        seek=segment.seek,
+                    SttSegment(
                         start=segment.start + chunk.start_s,
                         end=segment.end + chunk.start_s,
                         text=segment.text,
-                        tokens=segment.tokens,
-                        temperature=segment.temperature,
-                        avg_logprob=segment.avg_logprob,
-                        compression_ratio=segment.compression_ratio,
-                        no_speech_prob=segment.no_speech_prob,
-                        words=[
-                            Word(
-                                word=w.word,
-                                start=w.start + chunk.start_s,
-                                end=w.end + chunk.start_s,
-                                probability=w.probability,
-                            )
-                            for w in segment.words
-                        ],
+                        words=(
+                            [
+                                SttWord(
+                                    word=w.word,
+                                    start=w.start + chunk.start_s,
+                                    end=w.end + chunk.start_s,
+                                )
+                                for w in segment.words
+                            ]
+                            if segment.words
+                            else None
+                        ),
                     )
                 )
-        return WhisperTranscribeResult(
+        return SttResult(
             duration=-1,
             segments=merged_segments,
             language=results[0].language,
         )
 
-    def transcribe_to_result(
-        self, audio: NP_AUDIO, config: STTConfig
-    ) -> WhisperTranscribeResult:
+    def transcribe_to_result(self, audio: NP_AUDIO, config: STTConfig) -> SttResult:
         ref_script = RefrenceTranscript(config.refrence_transcript)
         chunks = self.get_chunks(audio)
-        results: list[WhisperTranscribeResult] = []
+        results: list[SttResult] = []
         for chunk in tqdm(
             chunks,
             desc="Transcribing audio chunks",
@@ -194,17 +188,17 @@ class STTChunker:
 
             result_content = ""
             for seg in result.segments:
-                for w in seg.words:
-                    result_content += w.word + " "
-                # result_content += "\n"
+                if seg.words:
+                    for w in seg.words:
+                        result_content += w.word + " "
+                else:
+                    result_content += seg.text
             ref_script.dequeue_content(result_content)
 
         result = self.merge_results(chunks, results)
         return result
 
-    def convert_result_with_format(
-        self, config: STTConfig, result: WhisperTranscribeResult
-    ) -> str:
+    def convert_result_with_format(self, config: STTConfig, result: SttResult) -> str:
         writer_options = {
             "highlight_words": config.highlight_words,
             "max_line_count": config.max_line_count,

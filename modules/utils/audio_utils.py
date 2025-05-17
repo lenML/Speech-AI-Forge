@@ -196,6 +196,20 @@ def remove_silence_edges(
     return audio[start:end]
 
 
+def np_audio_to_bytes(
+    audio: np.ndarray,
+    sample_rate: int = 24000,
+) -> bytes:
+    bytes_ret = io.BytesIO()
+    sf.write(bytes_ret, audio, sample_rate, format="wav", subtype="PCM_16")
+    bytes_ret.seek(0)
+    return bytes_ret.read()
+
+
+def load_audio(audio_filepath: str) -> tuple[int, np.ndarray]:
+    return pydub_to_np(AudioSegment.from_file(audio_filepath))
+
+
 if __name__ == "__main__":
     input_file = sys.argv[1]
 

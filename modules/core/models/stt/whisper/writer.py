@@ -1,6 +1,7 @@
+import dataclasses
 import io
 import json
-from typing import Iterable, Optional, TextIO
+from typing import Iterable, NamedTuple, Optional, TextIO
 
 import tqdm
 
@@ -8,7 +9,7 @@ from modules.core.models.stt.whisper.SegmentNormalizer import (
     SegmentNormalizer,
     SubtitleSegment,
 )
-from modules.core.models.stt.whisper.whisper_dcls import WhisperTranscribeResult
+from modules.core.models.stt.whisper.whisper_dcls import SttResult
 
 
 class ResultWriter:
@@ -18,15 +19,14 @@ class ResultWriter:
     def __init__(self, output: TextIO = None):
         self.output: TextIO = output or io.StringIO()
         self.subtitles: list[SubtitleSegment] = []
+        self.result: SttResult = None
 
-    def __call__(
-        self, result: WhisperTranscribeResult, options: Optional[dict] = None, **kwargs
-    ):
+    def __call__(self, result: SttResult, options: Optional[dict] = None, **kwargs):
         return self.write(result=result, options=options, **kwargs)
 
-    def write(
-        self, result: WhisperTranscribeResult, options: Optional[dict] = None, **kwargs
-    ):
+    def write(self, result: SttResult, options: Optional[dict] = None, **kwargs):
+        self.result = result
+
         self.output.seek(0)
         self.output.truncate(0)
 
@@ -180,22 +180,30 @@ class WriteJSON(ResultWriter):
         options: Optional[dict] = None,
         **kwargs,
     ):
-        segments_list = []
-        for segment in segments:
-            segments_list.append(segment._asdict())
-
         def json_dump_default(o):
-            if isinstance(o, SubtitleSegment):
+            if hasattr(o, "_asdict"):
                 return o._asdict()
+            # 判断是 dataclass
+            if dataclasses.is_dataclass(o):
+                return dataclasses.asdict(o)
             if isinstance(o, dict):
                 return o
             if isinstance(o, list):
                 return o
-            if "__dict__" in o:
+            if hasattr(o, "__dict__"):
                 return o.__dict__
             return str(o)
 
-        json.dump(segments_list, file, ensure_ascii=False, default=json_dump_default)
+        json.dump(
+            {
+                "segments": list(segments),
+                "language": self.result.language,
+                "duration": self.result.duration,
+            },
+            file,
+            ensure_ascii=False,
+            default=json_dump_default,
+        )
 
 
 def get_writer(output_format: str) -> ResultWriter:

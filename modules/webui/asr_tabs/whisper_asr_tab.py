@@ -136,8 +136,9 @@ def create_whisper_asr_tab():
             input_audio=audio_input,
             stt_config=STTConfig(
                 # TODO 支持切换模型
-                mid="whisper",
+                # mid="whisper",
                 # mid="whisper.turbo",
+                mid="sensevoice",
                 format=format_select,
                 prompt=prompt_input or None,
                 prefix=prefix_input or None,
