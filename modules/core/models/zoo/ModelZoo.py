@@ -44,7 +44,7 @@ class ModelZoo:
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
-        "whisper": WhisperModel("whisper.large"),
+        "whisper.large": WhisperModel("whisper.large"),
         "whisper.turbo": WhisperModel("whisper.turbo"),
         # "whisper.large": WhisperModel("whisper.large"),
         # "whisper.medium": WhisperModel("whisper.medium"),

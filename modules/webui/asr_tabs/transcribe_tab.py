@@ -7,6 +7,7 @@ from whisper.tokenizer import LANGUAGES
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.handler.STTHandler import STTHandler
 from modules.webui import webui_config
+from modules.core.models.zoo.ModelZoo import model_zoo
 
 
 def stereo_to_mono(audio_input: tuple[int, np.ndarray]) -> tuple[int, np.ndarray]:
@@ -29,11 +30,6 @@ def create_whisper_asr_tab():
 
     with gr.Row():
         with gr.Column():
-            with gr.Group():
-                gr.Markdown("Input")
-                audio_input = gr.Audio(label="Audio")
-                submit_button = gr.Button("transcribe", variant="primary")
-
             with gr.Group():
                 gr.Markdown("Params")
                 with gr.Row():
@@ -98,6 +94,18 @@ def create_whisper_asr_tab():
                         value=-1,
                     )
 
+            with gr.Group():
+                model_ids = model_zoo.get_stt_model_ids()
+                gr.Markdown("Input")
+                audio_input = gr.Audio(label="Audio")
+                model_selected = gr.Dropdown(
+                    # choices=["whisper.large", "whisper.turbo", "sensevoice"],
+                    choices=model_ids,
+                    label="Model",
+                    value=model_ids[0] if len(model_ids) > 0 else "whisper.large",
+                )
+                submit_button = gr.Button("transcribe", variant="primary")
+
         with gr.Column():
             # 参考文本，可以留空
             input_transcript_content = gr.Textbox(
@@ -122,6 +130,7 @@ def create_whisper_asr_tab():
         max_line_width_input: int,
         max_line_count_input: int,
         refrence_transcript: str,
+        model_id: str,
         progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
     ):
         if max_words_per_line_input == -1:
@@ -135,10 +144,9 @@ def create_whisper_asr_tab():
         handler = STTHandler(
             input_audio=audio_input,
             stt_config=STTConfig(
-                # TODO 支持切换模型
-                # mid="whisper",
+                mid=model_id,
                 # mid="whisper.turbo",
-                mid="sensevoice",
+                # mid="sensevoice",
                 format=format_select,
                 prompt=prompt_input or None,
                 prefix=prefix_input or None,
@@ -173,6 +181,7 @@ def create_whisper_asr_tab():
             max_line_width_input,
             max_line_count_input,
             input_transcript_content,
+            model_selected,
         ],
         outputs=[output, output_file],
     )

@@ -188,6 +188,7 @@ cython_debug/
 /models/vocos-mel-24khz/**/*
 /models/Index-TTS/**/*
 /models/Spark-TTS-0.5B/**/*
+/models/SenseVoiceSmall/**/*
 
 /*.pt
 
