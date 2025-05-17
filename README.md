@@ -28,7 +28,6 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 - 240801: Add ASR API [#92](https://github.com/lenML/Speech-AI-Forge/issues/92)
 - 240723: Support CosyVoice [#90](https://github.com/lenML/Speech-AI-Forge/issues/90)
 
-
 ## Installation and Running
 
 首先，确保 [相关依赖](./docs/dependencies.md) 已经正确安装，并查看 [模型下载](#模型下载) 下载所需模型
@@ -44,6 +43,7 @@ python webui.py
 [点我看详细图文介绍](./docs/webui_features.md)
 
 - **TTS (文本转语音)**: 提供多种强大的 TTS 功能
+
   - **音色切换 (Speaker Switch)**: 可选择不同音色
     - **内置音色**: 提供多个内置音色，包括 `27 ChatTTS` / `7 CosyVoice` 音色 + `1 参考音色`
     - **自定义音色上传**: 支持上传自定义音色文件并进行实时推理
@@ -59,12 +59,14 @@ python webui.py
   - **多模型支持 (Multi-model Support)**: 支持多种 TTS 模型推理，包括 `ChatTTS` / `CosyVoice` / `FishSpeech` / `GPT-SoVITS` / `F5-TTS` 等
 
 - **SSML (语音合成标记语言)**: 提供高级 TTS 合成控制工具
+
   - **分割器 (Splitter)**: 精细控制长文本的分割结果
   - **Podcast**: 帮助创建 `长文本`、`多角色` 的音频，适合博客或剧本式的语音合成
   - **From Subtitle**: 从字幕文件生成 SSML 脚本，方便一键生成语音
   - **脚本编辑器 (Script Editor)**: 新增 SSML 脚本编辑器，支持从分割器（Podcast、来自字幕）导出并编辑 SSML 脚本，进一步优化语音生成效果
 
 - **音色管理 (Voice Management)**:
+
   - **音色构建器 (Builder)**: 创建自定义音色，可从 ChatTTS seed 创建音色，或使用参考音频生成音色
   - **试音功能 (Test Voice)**: 上传音色文件，进行简单的试音和效果评估
   - **ChatTTS 调试工具**: 专门针对 `ChatTTS` 音色的调试工具
@@ -73,12 +75,12 @@ python webui.py
   - **音色 Hub**: 从音色库中选择并下载音色到本地，访问音色仓库 [Speech-AI-Forge-spks](https://github.com/lenML/Speech-AI-Forge-spks) 获取更多音色资源
 
 - **ASR (自动语音识别)**:
+
   - **Whisper**: 使用 Whisper 模型进行高质量的语音转文本（ASR）
   - **SenseVoice**: 正在开发中的 ASR 模型，敬请期待
 
 - **工具 (Tools)**:
   - **后处理工具 (Post Process)**: 提供音频剪辑、调整和增强等功能，优化生成的语音质量
-
 
 ### `launch.py`: API Server
 
@@ -117,24 +119,22 @@ WIP 开发中
 - webui: [.env.webui](./.env.webui)
 - api: [.env.api](./.env.api)
 
-
 ## 模型支持
 
-| 模型类别        | 模型名称                                                                                       | 流式级别 | 支持多语言              | 实现情况           |
-| --------------- | ---------------------------------------------------------------------------------------------- | -------- | ----------------------- | ------------------ |
-| **TTS**         | [ChatTTS](https://github.com/2noise/ChatTTS)                                                  | token 级 | en, zh                  | ✅                 |
-|                 | [FishSpeech](https://github.com/fishaudio/fish-speech)                                         | 句子级   | en, zh, jp, ko      | ✅ (1.4) |
-|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                          | 句子级   | en, zh, jp, yue, ko     | ✅(v2)                 |
-|                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | 句子级   | en, zh                  | ✅                 |
-|                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | 句子级   | en, zh                  | ✅(v0.6/v1)                 |
-|                 | [Index-TTS](https://github.com/index-tts/index-tts)                                           | 句子级   | en, zh                  | ✅                 |
-|                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)                                           | 句子级   | en, zh                  | ✅                 |
-|                 | ~~GPTSoVits~~                                                                                      | 句子级   |                         | 🚧                 |
-| **ASR**         | [Whisper](https://github.com/openai/whisper)                                                  | 🚧       | ✅                      | ✅                 |
-|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                        | 🚧       | ✅                      | 🚧                 |
-| **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                          |          |                         | ✅                 |
-| **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                            |          |                         | ✅                 |
-
+| 模型类别        | 模型名称                                                           | 流式级别 | 支持多语言          | 实现情况    |
+| --------------- | ------------------------------------------------------------------ | -------- | ------------------- | ----------- |
+| **TTS**         | [ChatTTS](https://github.com/2noise/ChatTTS)                       | token 级 | en, zh              | ✅          |
+|                 | [FishSpeech](https://github.com/fishaudio/fish-speech)             | 句子级   | en, zh, jp, ko      | ✅ (1.4)    |
+|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | 句子级   | en, zh, jp, yue, ko | ✅(v2)      |
+|                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)            | 句子级   | en, zh              | ✅          |
+|                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                         | 句子级   | en, zh              | ✅(v0.6/v1) |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | 句子级   | en, zh              | ✅          |
+|                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | 句子级   | en, zh              | ✅          |
+|                 | ~~GPTSoVits~~                                                      | 句子级   |                     | 🚧          |
+| **ASR**         | [Whisper](https://github.com/openai/whisper)                       | 🚧       | ✅                  | ✅          |
+|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)            | 🚧       | ✅                  | 🚧          |
+| **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)               |          |                     | ✅          |
+| **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance) |          |                     | ✅          |
 
 ## 模型下载
 
@@ -142,20 +142,22 @@ WIP 开发中
 
 ### 下载脚本
 
-| 功能         | 模型       | 下载命令                                                                  |
-| ------------ | ---------- | ------------------------------------------------------------------------- |
-| **TTS**      | ChatTTS    | `python -m scripts.dl_chattts --source huggingface`                       |
-|              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
-|              | CosyVoice(v2)  | `python -m scripts.downloader.cosyvoice2 --source huggingface`            |
-|              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
-|              | Index-TTS | `python -m scripts.downloader.index_tts --source huggingface`          |
-|              | Spark-TTS | `python -m scripts.downloader.spark_tts --source huggingface`          |
-|              | F5-TTS(v0.6) | `python -m scripts.downloader.f5_tts --source huggingface`          |
-|              | F5-TTS(v1) | `python -m scripts.downloader.f5_tts_v1 --source huggingface`          |
-|              | F5-TTS(vocos) | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`          |
-| **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
-| **CV**       | OpenVoice  | `python -m scripts.downloader.open_voice --source huggingface`            |
-| **Enhancer** | 增强模型   | `python -m scripts.dl_enhance --source huggingface`                       |
+| 功能         | 模型             | 下载命令                                                                    |
+| ------------ | ---------------- | --------------------------------------------------------------------------- |
+| **TTS**      | ChatTTS          | `python -m scripts.dl_chattts --source huggingface`                         |
+|              | FishSpeech(1.4)  | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`         |
+|              | CosyVoice(v2)    | `python -m scripts.downloader.cosyvoice2 --source huggingface`              |
+|              | FireRedTTS       | `python -m scripts.downloader.fire_red_tts --source huggingface`            |
+|              | Index-TTS        | `python -m scripts.downloader.index_tts --source huggingface`               |
+|              | Spark-TTS        | `python -m scripts.downloader.spark_tts --source huggingface`               |
+|              | F5-TTS(v0.6)     | `python -m scripts.downloader.f5_tts --source huggingface`                  |
+|              | F5-TTS(v1)       | `python -m scripts.downloader.f5_tts_v1 --source huggingface`               |
+|              | F5-TTS(vocos)    | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`         |
+| **ASR**      | Whisper V3       | `python -m scripts.downloader.faster_whisper --source huggingface`          |
+|              | Whisper V3 turbo | `python -m scripts.downloader.faster_whisper_v3_turbo --source huggingface` |
+|              | SenseVoice       | `python -m scripts.downloader.sensevoice_small --source huggingface`        |
+| **CV**       | OpenVoice        | `python -m scripts.downloader.open_voice --source huggingface`              |
+| **Enhancer** | 增强模型         | `python -m scripts.dl_enhance --source huggingface`                         |
 
 > **注意**：如果需要使用 ModelScope 下载模型，请使用 `--source modelscope`。部分模型可能无法使用 ModelScope 下载。
 
@@ -172,6 +174,7 @@ https://pan.baidu.com/s/1Q1vQV5Gs0VhU5J76dZBK4Q?pwd=d7xu
 https://github.com/lenML/Speech-AI-Forge/discussions/65
 
 # Documents
+
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lenML/Speech-AI-Forge)
 
 [Learn About Documents](https://github.com/lenML/Speech-AI-Forge/issues/240)
