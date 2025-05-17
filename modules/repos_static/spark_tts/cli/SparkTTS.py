@@ -14,14 +14,14 @@
 # limitations under the License.
 
 import re
-import torch
-from typing import Tuple
 from pathlib import Path
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from typing import Tuple
 
-from sparktts.utils.file import load_config
+import torch
 from sparktts.models.audio_tokenizer import BiCodecTokenizer
-from sparktts.utils.token_parser import LEVELS_MAP, GENDER_MAP, TASK_TOKEN_MAP
+from sparktts.utils.file import load_config
+from sparktts.utils.token_parser import GENDER_MAP, LEVELS_MAP, TASK_TOKEN_MAP
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class SparkTTS:

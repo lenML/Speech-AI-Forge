@@ -13,19 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pathlib import Path
+from typing import Any, Dict
+
 import torch
 import torch.nn as nn
-from pathlib import Path
-from typing import Dict, Any
 from omegaconf import DictConfig
 from safetensors.torch import load_file
-
-from sparktts.utils.file import load_config
-from sparktts.modules.speaker.speaker_encoder import SpeakerEncoder
-from sparktts.modules.encoder_decoder.feat_encoder import Encoder
 from sparktts.modules.encoder_decoder.feat_decoder import Decoder
+from sparktts.modules.encoder_decoder.feat_encoder import Encoder
 from sparktts.modules.encoder_decoder.wave_generator import WaveGenerator
+from sparktts.modules.speaker.speaker_encoder import SpeakerEncoder
 from sparktts.modules.vq.factorized_vector_quantize import FactorizedVectorQuantize
+from sparktts.utils.file import load_config
 
 
 class BiCodec(nn.Module):

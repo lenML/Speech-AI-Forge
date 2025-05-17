@@ -4,7 +4,6 @@ from pathlib import Path
 
 import httpx
 import ormsgpack
-
 from tools.schema import ServeReferenceAudio, ServeTTSRequest
 
 api_key = os.environ.get("FISH_API_KEY", "YOUR_API_KEY")

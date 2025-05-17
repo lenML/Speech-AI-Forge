@@ -1,7 +1,9 @@
 import re
-import regex
-from builtins import str as unicode
 import unicodedata
+from builtins import str as unicode
+
+import inflect
+import regex
 
 from modules.core.tn.TNPipeline import GuessLang, TNPipeline
 from modules.repos_static.FireRedTTS.fireredtts.modules.text_normalizer.utils import (
@@ -14,8 +16,6 @@ from modules.repos_static.FireRedTTS.fireredtts.modules.text_normalizer.utils im
 
 from .base_tn import BaseTN
 from .whisper import specials_token as whisper_specials_token
-
-import inflect
 
 FireRedTtsTN = BaseTN.clone()
 # FireRedTtsTN = TNPipeline()

@@ -1,6 +1,5 @@
 from modules.core.models.tts.F5.F5Annotation import F5Annotation
 
-
 annotation = F5Annotation()
 
 

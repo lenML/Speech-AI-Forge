@@ -1,14 +1,14 @@
+import xml.dom.minidom
+
 import gradio as gr
 
 from modules.core.models.zoo import ModelZoo
 from modules.webui import webui_config
 from modules.webui.webui_utils import (
+    get_speaker_names,
     get_spk_emotions_from_name,
     synthesize_ssml,
-    get_speaker_names,
 )
-
-import xml.dom.minidom
 
 
 def apply_spk_and_emotion(xml_content: str, spk: str, emotion: str):

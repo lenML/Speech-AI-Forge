@@ -11,9 +11,6 @@ from __future__ import annotations
 
 import torch
 import torch.nn.functional as F
-from torch import nn
-from x_transformers.x_transformers import RotaryEmbedding
-
 from f5_tts.model.modules import (
     AdaLayerNorm_Final,
     ConvNeXtV2Block,
@@ -23,7 +20,8 @@ from f5_tts.model.modules import (
     get_pos_embed_indices,
     precompute_freqs_cis,
 )
-
+from torch import nn
+from x_transformers.x_transformers import RotaryEmbedding
 
 # Text embedding
 

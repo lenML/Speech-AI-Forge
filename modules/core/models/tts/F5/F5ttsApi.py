@@ -1,30 +1,30 @@
 import io
-from pathlib import Path
+import os
 import random
 import sys
 from importlib.resources import files
+from pathlib import Path
 from typing import Generator, Literal, Tuple
 
 import numpy as np
 import numpy.typing as npt
 import soundfile as sf
+import torch
 import torchaudio
 import tqdm
 from hydra.utils import get_class
 from omegaconf import OmegaConf
 
+from modules.repos_static.F5TTS.f5_tts.model.utils import seed_everything
+
 from .f5_infer import (
-    infer_process,
     infer_batch_process,
+    infer_process,
     load_model,
     load_vocoder,
     remove_silence_for_generated_wav,
     save_spectrogram,
 )
-from modules.repos_static.F5TTS.f5_tts.model.utils import seed_everything
-
-import os
-import torch
 
 
 # NOTE: 目前不支持 bigvgan 因为需要引入外部库，并且似乎没什么特别区别

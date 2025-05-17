@@ -1,6 +1,6 @@
 from modules.core.tn.TNPipeline import GuessLang
-from .base_tn import BaseTN
 
+from .base_tn import BaseTN
 from .pinyin_ton3_list import pinyin_ton3
 
 f5_pinyin_annos = [f"({p})" for p in pinyin_ton3]

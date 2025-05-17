@@ -2,7 +2,6 @@ from abc import ABC
 
 import torch
 import torch.nn.functional as F
-
 from matcha.models.components.decoder import Decoder
 from matcha.utils.pylogger import get_pylogger
 

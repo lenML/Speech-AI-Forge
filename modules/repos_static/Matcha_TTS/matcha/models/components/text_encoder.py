@@ -2,11 +2,10 @@
 
 import math
 
+import matcha.utils as utils  # pylint: disable=consider-using-from-import
 import torch
 import torch.nn as nn  # pylint: disable=consider-using-from-import
 from einops import rearrange
-
-import matcha.utils as utils  # pylint: disable=consider-using-from-import
 from matcha.utils.model import sequence_mask
 
 log = utils.get_pylogger(__name__)

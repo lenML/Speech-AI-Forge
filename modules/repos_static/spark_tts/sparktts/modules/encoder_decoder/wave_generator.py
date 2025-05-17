@@ -16,11 +16,10 @@
 
 
 import torch.nn as nn
-
 from sparktts.modules.blocks.layers import (
+    ResidualUnit,
     Snake1d,
     WNConv1d,
-    ResidualUnit,
     WNConvTranspose1d,
     init_weights,
 )

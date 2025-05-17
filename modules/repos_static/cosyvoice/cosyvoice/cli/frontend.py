@@ -11,18 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from functools import partial
 import json
-import onnxruntime
-import torch
-import numpy as np
-import whisper
-from typing import Callable
-import torchaudio.compliance.kaldi as kaldi
-import torchaudio
 import os
 import re
+from functools import partial
+from typing import Callable
+
 import inflect
+import numpy as np
+import onnxruntime
+import torch
+import torchaudio
+import torchaudio.compliance.kaldi as kaldi
+import whisper
+
 try:
     import ttsfrd
     use_ttsfrd = True
@@ -31,7 +33,14 @@ except ImportError:
     from tn.chinese.normalizer import Normalizer as ZhNormalizer
     from tn.english.normalizer import Normalizer as EnNormalizer
     use_ttsfrd = False
-from cosyvoice.utils.frontend_utils import contains_chinese, replace_blank, replace_corner_mark, remove_bracket, spell_out_number, split_paragraph
+from cosyvoice.utils.frontend_utils import (
+    contains_chinese,
+    remove_bracket,
+    replace_blank,
+    replace_corner_mark,
+    spell_out_number,
+    split_paragraph,
+)
 
 
 class CosyVoiceFrontEnd:

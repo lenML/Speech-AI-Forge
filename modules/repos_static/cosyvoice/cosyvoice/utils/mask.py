@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import torch
+
 '''
 def subsequent_mask(
         size: int,

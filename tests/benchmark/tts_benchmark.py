@@ -1,7 +1,10 @@
+import argparse
+import asyncio
 import csv
 import logging
 import os
 import subprocess as sp
+import threading
 import time
 import tracemalloc
 from typing import Coroutine
@@ -11,20 +14,16 @@ import torch
 
 from modules import config
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
+from modules.core.models.zoo import model_zoo
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.devices import devices
+
 # from modules.generate_audio import generate_audio_batch
 # from modules.models import reload_chat_tts, unload_chat_tts
 from modules.utils import audio_utils
-from modules.core.models.zoo import model_zoo
-
-import asyncio
-import threading
-
-import argparse
 
 
 def wait(coro: Coroutine):

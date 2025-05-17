@@ -10,11 +10,12 @@
 4. 将手动标注覆盖到自动生成的拼音上
 """
 
+import re
 from dataclasses import dataclass
 from typing import List, Optional
+
 import jieba
-import re
-from pypinyin import lazy_pinyin, Style
+from pypinyin import Style, lazy_pinyin
 
 
 @dataclass(frozen=True, repr=False)

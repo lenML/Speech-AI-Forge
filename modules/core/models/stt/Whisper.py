@@ -6,21 +6,17 @@ from typing import Optional
 import jieba
 import librosa
 import numpy as np
+import stable_whisper
 import torch
 from faster_whisper import WhisperModel as FasterWhisperModel
 from faster_whisper.transcribe import Segment, TranscriptionInfo, Word
 from whisper import audio
 from whisper.tokenizer import get_tokenizer
-import stable_whisper
 
 from modules import config as global_config
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
-from modules.core.models.stt.whisper.whisper_dcls import (
-    SttSegment,
-    SttWord,
-    SttResult,
-)
+from modules.core.models.stt.whisper.whisper_dcls import SttResult, SttSegment, SttWord
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices

@@ -5,9 +5,6 @@ from importlib.resources import files
 import soundfile as sf
 import tqdm
 from cached_path import cached_path
-from hydra.utils import get_class
-from omegaconf import OmegaConf
-
 from f5_tts.infer.utils_infer import (
     infer_process,
     load_model,
@@ -18,6 +15,8 @@ from f5_tts.infer.utils_infer import (
     transcribe,
 )
 from f5_tts.model.utils import seed_everything
+from hydra.utils import get_class
+from omegaconf import OmegaConf
 
 
 class F5TTS:

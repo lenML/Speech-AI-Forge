@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import argparse
 import glob
+import os
 
-import yaml
 import torch
+import yaml
 
 
 def get_args():

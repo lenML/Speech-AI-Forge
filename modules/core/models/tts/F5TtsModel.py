@@ -1,16 +1,17 @@
 import io
 import logging
 import threading
+from pathlib import Path
 from typing import Generator, Optional
+
+import soundfile as sf
+
 from modules.core.models.tts.F5.F5Annotation import F5Annotation
 from modules.core.models.tts.F5.F5ttsApi import F5TTS
+from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
-import soundfile as sf
-from pathlib import Path
-
-from modules.core.models.TTSModel import TTSModel
 from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)

@@ -9,21 +9,20 @@ import logging
 from typing import Dict, Union
 
 from modules.core.models.BaseZooModel import BaseZooModel
-from modules.core.models.TTSModel import TTSModel
 from modules.core.models.enhancer.ResembleEnhanceModel import ResembleEnhanceModel
-from modules.core.models.stt.STTModel import STTModel
 from modules.core.models.stt.SenseVoice import SenseVoiceModel
+from modules.core.models.stt.STTModel import STTModel
 from modules.core.models.stt.Whisper import WhisperModel
 from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
+from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.tts.IndexTTS.IndexTTSModel import IndexTTSModel
 from modules.core.models.tts.SparkTTS.SparkTTSModel import SparkTTSModel
-from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
+from modules.core.models.TTSModel import TTSModel
 from modules.core.models.vc.OpenVoice import OpenVoiceModel
 from modules.devices import devices
-
 
 logger = logging.getLogger(__name__)
 

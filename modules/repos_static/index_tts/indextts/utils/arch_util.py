@@ -2,7 +2,6 @@ import math
 
 import torch
 import torch.nn as nn
-
 from indextts.utils.xtransformers import RelativePositionBias
 
 

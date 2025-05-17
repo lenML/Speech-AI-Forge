@@ -5,7 +5,6 @@ from pathlib import Path
 import gradio as gr
 import soundfile as sf
 import torch
-
 from matcha.cli import (
     MATCHA_URLS,
     VOCODER_URLS,

@@ -1,4 +1,5 @@
 from typing import Callable
+
 import numpy as np
 import pytest
 
@@ -9,7 +10,6 @@ from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.pipeline import AudioPipeline
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from tests.pipeline.misc import load_audio, load_audio_wav, save_audio
-
 
 # Pipeline function type, which returns a pipeline with a generate() method
 PipelineFunc = Callable[

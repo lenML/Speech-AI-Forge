@@ -1,9 +1,10 @@
 from typing import Dict, Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from matcha.hifigan.models import feature_loss, generator_loss, discriminator_loss
-from cosyvoice.utils.losses import tpr_loss, mel_loss
+from cosyvoice.utils.losses import mel_loss, tpr_loss
+from matcha.hifigan.models import discriminator_loss, feature_loss, generator_loss
 
 
 class HiFiGan(nn.Module):

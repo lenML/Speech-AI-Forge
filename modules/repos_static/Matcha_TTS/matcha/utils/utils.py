@@ -11,9 +11,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import wget
-from omegaconf import DictConfig
-
 from matcha.utils import pylogger, rich_utils
+from omegaconf import DictConfig
 
 log = pylogger.get_pylogger(__name__)
 

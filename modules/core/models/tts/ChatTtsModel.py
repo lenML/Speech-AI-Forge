@@ -5,13 +5,13 @@ from typing import Any, Generator, Union
 import numpy as np
 
 from modules.core.models.AudioReshaper import AudioReshaper
-from modules.core.models.TTSModel import TTSModel
 from modules.core.models.tts.ChatTTS.ChatTTS import (
     ChatTTS,
     load_chat_tts,
     unload_chat_tts,
 )
 from modules.core.models.tts.ChatTTS.ChatTTSInfer import ChatTTSInfer
+from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.pipeline import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
@@ -208,6 +208,7 @@ class ChatTTSModel(TTSModel):
 if __name__ == "__main__":
     import numpy as np
     import soundfile as sf
+
     from modules.core.spk.SpkMgr import spk_mgr
 
     logger.setLevel(logging.DEBUG)

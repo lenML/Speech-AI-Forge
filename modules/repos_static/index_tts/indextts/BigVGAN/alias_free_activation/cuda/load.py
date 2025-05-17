@@ -18,6 +18,7 @@ import re
 import shutil
 import tempfile
 
+
 # 补丁修复：sources 路径含中文字符时，生成 build.ninja 乱码导致编译失败
 # 使用临时目录来规避 ninja 编译失败（比如中文路径）
 def chinese_path_compile_support(sources, buildpath):

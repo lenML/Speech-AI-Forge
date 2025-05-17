@@ -10,7 +10,6 @@ from hydra import compose, initialize
 from hydra.utils import instantiate
 from loguru import logger
 from omegaconf import OmegaConf
-
 from tools.file import AUDIO_EXTENSIONS
 
 # register eval resolver

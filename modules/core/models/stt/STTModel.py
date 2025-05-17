@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
+from modules import config as global_config
 from modules.core.handler.datacls.stt_model import STTConfig, STTOutputFormat
 from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.stt.whisper.SegmentNormalizer import SubtitleSegment
@@ -8,7 +9,6 @@ from modules.core.models.stt.whisper.whisper_dcls import SttResult
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.utils.monkey_tqdm import disable_tqdm
-from modules import config as global_config
 
 
 @dataclass(frozen=True, repr=False, eq=False)

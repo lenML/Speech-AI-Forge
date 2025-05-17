@@ -16,15 +16,17 @@ from __future__ import print_function
 
 import argparse
 import logging
+
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 import os
+
 import torch
-from torch.utils.data import DataLoader
 import torchaudio
-from hyperpyyaml import load_hyperpyyaml
-from tqdm import tqdm
 from cosyvoice.cli.model import CosyVoiceModel
 from cosyvoice.dataset.dataset import Dataset
+from hyperpyyaml import load_hyperpyyaml
+from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 
 def get_args():

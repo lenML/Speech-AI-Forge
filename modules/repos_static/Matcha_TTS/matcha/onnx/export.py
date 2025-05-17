@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import torch
 from lightning import LightningModule
-
 from matcha.cli import VOCODER_URLS, load_matcha, load_vocoder
 
 DEFAULT_OPSET = 15

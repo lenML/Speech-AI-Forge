@@ -18,11 +18,10 @@
     https://github.com/lawlict/ECAPA-TDNN.
 """
 
+import sparktts.modules.speaker.pooling_layers as pooling_layers
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-import sparktts.modules.speaker.pooling_layers as pooling_layers
 
 
 class Res2Conv1dReluBn(nn.Module):

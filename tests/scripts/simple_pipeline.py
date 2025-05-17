@@ -6,7 +6,6 @@ from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.pipeline.processor import TTSPipelineContext
-
 from modules.core.spk.SpkMgr import spk_mgr
 
 context = TTSPipelineContext(

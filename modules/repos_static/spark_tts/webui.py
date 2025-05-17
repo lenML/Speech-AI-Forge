@@ -13,15 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import torch
-import soundfile as sf
-import logging
 import argparse
-import gradio as gr
+import logging
+import os
 import platform
-
 from datetime import datetime
+
+import gradio as gr
+import soundfile as sf
+import torch
 from cli.SparkTTS import SparkTTS
 from sparktts.utils.token_parser import LEVELS_MAP_UI
 

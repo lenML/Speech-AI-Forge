@@ -13,10 +13,6 @@ from typing import Literal
 
 import torch
 import torch.nn.functional as F
-from torch import nn
-from x_transformers import RMSNorm
-from x_transformers.x_transformers import RotaryEmbedding
-
 from f5_tts.model.modules import (
     Attention,
     AttnProcessor,
@@ -27,7 +23,9 @@ from f5_tts.model.modules import (
     get_pos_embed_indices,
     precompute_freqs_cis,
 )
-
+from torch import nn
+from x_transformers import RMSNorm
+from x_transformers.x_transformers import RotaryEmbedding
 
 # Text embedding
 

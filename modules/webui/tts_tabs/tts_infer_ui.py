@@ -7,10 +7,10 @@ from modules.webui import webui_config
 from modules.webui.webui_utils import (
     SPK_FILE_EXTS,
     get_speakers,
-    get_styles,
-    load_spk_info,
     get_spk_emotions,
     get_spk_emotions_from_name,
+    get_styles,
+    load_spk_info,
     refine_text,
     tts_generate,
 )

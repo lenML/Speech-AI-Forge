@@ -183,6 +183,11 @@ https://github.com/lenML/Speech-AI-Forge/discussions/65
 
 To contribute, clone the repository, make your changes, commit and push to your clone, and submit a pull request.
 
+## format code
+```
+isort --profile black
+```
+
 # References
 
 - ChatTTS: https://github.com/2noise/ChatTTS

@@ -2,9 +2,7 @@ import gradio as gr
 
 from modules.webui import webui_config
 from modules.webui.tts_tabs.tts_infer_ui import TTSInterface
-from modules.webui.webui_utils import (
-    get_styles,
-)
+from modules.webui.webui_utils import get_styles
 
 
 # 没有 seed/style/examples 配置的ui

@@ -4,10 +4,9 @@ from dataclasses import dataclass
 from typing import Annotated, Literal, Optional
 
 import torch
+from fish_speech.conversation import Message, TextPart, VQPart
 from pydantic import AfterValidator, BaseModel, Field, confloat, conint, conlist
 from pydantic.functional_validators import SkipValidation
-
-from fish_speech.conversation import Message, TextPart, VQPart
 
 GLOBAL_NUM_SAMPLES = int(os.getenv("GLOBAL_NUM_SAMPLES", 1))
 

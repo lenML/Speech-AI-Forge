@@ -14,10 +14,6 @@ from typing import Callable
 
 import torch
 import torch.nn.functional as F
-from torch import nn
-from torch.nn.utils.rnn import pad_sequence
-from torchdiffeq import odeint
-
 from f5_tts.model.modules import MelSpec
 from f5_tts.model.utils import (
     default,
@@ -27,6 +23,9 @@ from f5_tts.model.utils import (
     list_str_to_tensor,
     mask_from_frac_lengths,
 )
+from torch import nn
+from torch.nn.utils.rnn import pad_sequence
+from torchdiffeq import odeint
 
 
 class CFM(nn.Module):

@@ -7,7 +7,6 @@ import pyaudio
 import requests
 from pydub import AudioSegment
 from pydub.playback import play
-
 from tools.file import audio_to_bytes, read_ref_text
 from tools.schema import ServeReferenceAudio, ServeTTSRequest
 

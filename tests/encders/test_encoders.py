@@ -1,8 +1,8 @@
 import pytest
 
-from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.handler.datacls.audio_model import EncoderConfig
 from modules.core.handler.datacls.tts_model import TTSConfig
+from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 
 # 这里测试 encoder 是否可以正常工作

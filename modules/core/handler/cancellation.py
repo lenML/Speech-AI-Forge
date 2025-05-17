@@ -1,9 +1,8 @@
+import logging
 from contextlib import asynccontextmanager
 
 from anyio import create_task_group
 from fastapi import Request
-
-import logging
 
 logger = logging.getLogger(__name__)
 

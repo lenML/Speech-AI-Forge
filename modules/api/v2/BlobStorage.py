@@ -1,6 +1,6 @@
 import io
-import time
 import threading
+import time
 from typing import Dict
 
 

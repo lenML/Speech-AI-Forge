@@ -1,16 +1,13 @@
-import pytest
-from lxml import etree
-
-from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
-
 import numpy as np
 import pytest
+from lxml import etree
 
 from modules.core.handler.datacls.audio_model import AdjustConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
 from modules.core.pipeline.dcls import TTSPipelineContext
 from modules.core.pipeline.factory import PipelineFactory
 from modules.core.spk.TTSSpeaker import TTSSpeaker
+from modules.core.ssml.SSMLParser import SSMLBreak, SSMLSegment, create_ssml_v01_parser
 from tests.pipeline.misc import load_audio, load_audio_wav, save_audio
 from tests.pipeline.voice_clone_pipe import run_voice_clone_pipeline_test
 

@@ -3,7 +3,6 @@ from modules.repos_static.index_tts.indextts.utils.front import TextNormalizer
 from modules.utils.HomophonesReplacer import HomophonesReplacer
 from modules.utils.html import remove_html_tags as _remove_html_tags
 from modules.utils.markdown import markdown_to_text
-from modules.core.tn.TNPipeline import GuessLang
 
 from .base_tn import BaseTN
 

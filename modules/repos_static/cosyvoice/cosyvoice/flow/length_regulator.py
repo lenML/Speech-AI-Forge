@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from typing import Tuple
-import torch.nn as nn
+
 import torch
-from torch.nn import functional as F
+import torch.nn as nn
 from cosyvoice.utils.mask import make_pad_mask
+from torch.nn import functional as F
 
 
 class InterpolateRegulator(nn.Module):

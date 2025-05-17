@@ -15,9 +15,9 @@ except Exception:
 
 from modules import config
 from modules.api.api_setup import create_api
+from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.devices import devices
 from modules.models_setup import process_model_args, setup_model_args
-from modules.core.models.zoo.ModelZoo import model_zoo
 
 parser = argparse.ArgumentParser(description="Test")
 setup_model_args(parser)

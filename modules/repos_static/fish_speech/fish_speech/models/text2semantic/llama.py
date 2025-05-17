@@ -9,15 +9,14 @@ from typing import Optional
 import torch
 import torch.nn as nn
 from einops import rearrange
+from fish_speech.conversation import SEMANTIC_TOKEN
+from fish_speech.utils import RankedLogger
 from loguru import logger
 from torch import Tensor
 from torch.nn import functional as F
 from torch.nn.attention import SDPBackend, sdpa_kernel
 from torch.utils.checkpoint import checkpoint
 from transformers import AutoTokenizer
-
-from fish_speech.conversation import SEMANTIC_TOKEN
-from fish_speech.utils import RankedLogger
 
 from .lora import LoraConfig, setup_lora
 

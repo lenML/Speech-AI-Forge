@@ -1,17 +1,16 @@
 import logging
-from pathlib import Path
 import time
+from pathlib import Path
 from typing import Optional, Union
+
+import hydra
 import numpy as np
 import torch
+from hydra import compose, initialize
+from hydra.utils import instantiate
 
 from modules import config
 from modules.devices import devices
-from hydra import compose, initialize
-from hydra.utils import instantiate
-import torch
-import hydra
-
 from modules.repos_static.fish_speech.fish_speech.models.text2semantic.llama import (
     BaseTransformer,
     DualARTransformer,

@@ -1,5 +1,6 @@
-from modules.api.worker import app
 import json
+
+from modules.api.worker import app
 
 if __name__ == "__main__":
     """

@@ -6,12 +6,11 @@ import numpy as np
 import torch
 import torchaudio as ta
 from lightning import LightningDataModule
-from torch.utils.data.dataloader import DataLoader
-
 from matcha.text import text_to_sequence
 from matcha.utils.audio import mel_spectrogram
 from matcha.utils.model import fix_len_compatibility, normalize
 from matcha.utils.utils import intersperse
+from torch.utils.data.dataloader import DataLoader
 
 
 def parse_filelist(filelist_path, split_char="|"):

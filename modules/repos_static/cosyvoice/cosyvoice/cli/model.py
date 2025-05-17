@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import torch
-import numpy as np
 import threading
 import time
-from torch.nn import functional as F
-from contextlib import nullcontext
 import uuid
+from contextlib import nullcontext
+
+import numpy as np
+import torch
 from cosyvoice.utils.common import fade_in_out
+from torch.nn import functional as F
 
 
 class CosyVoiceModel:

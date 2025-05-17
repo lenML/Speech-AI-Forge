@@ -8,13 +8,12 @@
 *注意，修改结构可能导致某些数据丢失，最好备份再使用这个脚本
 """
 
+import argparse
+import json
 import os
 import sys
-import json
-import argparse
 
 from modules.core.spk import TTSSpeaker, spk_mgr
-
 
 for spk in spk_mgr.list_speakers():
     filename = spk_mgr.get_item_path(lambda spk0: spk0 == spk)

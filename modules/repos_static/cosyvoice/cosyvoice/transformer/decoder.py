@@ -14,20 +14,19 @@
 # limitations under the License.
 # Modified from ESPnet(https://github.com/espnet/espnet)
 """Decoder definition."""
-from typing import Tuple, List, Optional
+import logging
+from typing import List, Optional, Tuple
 
 import torch
 import torch.utils.checkpoint as ckpt
-import logging
-
 from cosyvoice.transformer.decoder_layer import DecoderLayer
 from cosyvoice.transformer.positionwise_feed_forward import PositionwiseFeedForward
 from cosyvoice.utils.class_utils import (
-    COSYVOICE_EMB_CLASSES,
-    COSYVOICE_ATTENTION_CLASSES,
     COSYVOICE_ACTIVATION_CLASSES,
+    COSYVOICE_ATTENTION_CLASSES,
+    COSYVOICE_EMB_CLASSES,
 )
-from cosyvoice.utils.mask import (subsequent_mask, make_pad_mask)
+from cosyvoice.utils.mask import make_pad_mask, subsequent_mask
 
 
 class TransformerDecoder(torch.nn.Module):

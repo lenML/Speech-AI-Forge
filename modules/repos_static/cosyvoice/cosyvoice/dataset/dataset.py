@@ -13,15 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import random
 import json
 import math
+import random
 from functools import partial
 
 import torch
 import torch.distributed as dist
+from cosyvoice.utils.file_utils import read_json_lists, read_lists
 from torch.utils.data import IterableDataset
-from cosyvoice.utils.file_utils import read_lists, read_json_lists
 
 
 class Processor(IterableDataset):

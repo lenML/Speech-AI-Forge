@@ -13,13 +13,12 @@ import numpy as np
 import torch
 import torch._dynamo.config
 import torch._inductor.config
-from loguru import logger
-from tqdm import tqdm
-from transformers import AutoTokenizer
-
 from fish_speech.conversation import CODEBOOK_PAD_TOKEN_ID
 from fish_speech.models.text2semantic.llama import BaseModelArgs
 from fish_speech.text import clean_text, split_text
+from loguru import logger
+from tqdm import tqdm
+from transformers import AutoTokenizer
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 torch._inductor.config.coordinate_descent_tuning = True
@@ -30,13 +29,12 @@ if hasattr(torch._inductor.config, "fx_graph_cache"):
     torch._inductor.config.fx_graph_cache = True
 
 
-from torch.nn.attention import SDPBackend, sdpa_kernel
-
 from fish_speech.models.text2semantic.llama import (
     BaseTransformer,
     DualARTransformer,
     NaiveTransformer,
 )
+from torch.nn.attention import SDPBackend, sdpa_kernel
 
 
 def multinomial_sample_one_no_sync(

@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 import torch
-
 from matcha.hifigan.config import v1
 from matcha.hifigan.denoiser import Denoiser
 from matcha.hifigan.env import AttrDict

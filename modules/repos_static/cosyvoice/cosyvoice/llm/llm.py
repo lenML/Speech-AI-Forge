@@ -11,15 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from typing import Dict, Optional, Callable, List, Generator
+from typing import Callable, Dict, Generator, List, Optional
+
 import torch
-from torch import nn
 import torch.nn.functional as F
-from transformers import Qwen2ForCausalLM
-from torch.nn.utils.rnn import pad_sequence, unpad_sequence
-from cosyvoice.utils.common import IGNORE_ID
 from cosyvoice.transformer.label_smoothing_loss import LabelSmoothingLoss
-from cosyvoice.utils.common import th_accuracy
+from cosyvoice.utils.common import IGNORE_ID, th_accuracy
+from torch import nn
+from torch.nn.utils.rnn import pad_sequence, unpad_sequence
+from transformers import Qwen2ForCausalLM
 
 
 class TransformerLM(torch.nn.Module):

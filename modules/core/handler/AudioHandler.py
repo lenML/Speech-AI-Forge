@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import io
+import logging
 from typing import AsyncGenerator
 
 import numpy as np
@@ -21,7 +22,6 @@ from modules.core.handler.encoder.encoders import (
 from modules.core.handler.encoder.StreamEncoder import StreamEncoder
 from modules.core.handler.encoder.WavFile import WAVFileBytes
 from modules.core.pipeline.processor import NP_AUDIO
-import logging
 
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)

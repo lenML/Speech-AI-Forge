@@ -2,9 +2,8 @@ import datetime as dt
 import math
 import random
 
-import torch
-
 import matcha.utils.monotonic_align as monotonic_align  # pylint: disable=consider-using-from-import
+import torch
 from matcha import utils
 from matcha.models.baselightningmodule import BaseLightningClass
 from matcha.models.components.flow_matching import CFM

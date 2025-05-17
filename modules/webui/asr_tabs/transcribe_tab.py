@@ -6,8 +6,8 @@ from whisper.tokenizer import LANGUAGES
 
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.handler.STTHandler import STTHandler
-from modules.webui import webui_config
 from modules.core.models.zoo.ModelZoo import model_zoo
+from modules.webui import webui_config
 
 
 def stereo_to_mono(audio_input: tuple[int, np.ndarray]) -> tuple[int, np.ndarray]:

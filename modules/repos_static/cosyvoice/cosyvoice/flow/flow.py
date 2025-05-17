@@ -14,11 +14,12 @@
 import logging
 import random
 from typing import Dict, Optional
+
 import torch
 import torch.nn as nn
-from torch.nn import functional as F
-from omegaconf import DictConfig
 from cosyvoice.utils.mask import make_pad_mask
+from omegaconf import DictConfig
+from torch.nn import functional as F
 
 
 class MaskedDiffWithXvec(torch.nn.Module):

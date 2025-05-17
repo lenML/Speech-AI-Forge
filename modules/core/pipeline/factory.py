@@ -10,8 +10,8 @@ from modules.core.pipeline.processor import (
     TTSPipelineContext,
 )
 from modules.core.pipeline.processors.Adjuster import (
-    AdjustSegmentProcessor,
     AdjusterProcessor,
+    AdjustSegmentProcessor,
 )
 from modules.core.pipeline.processors.Enhancer import EnhancerProcessor
 from modules.core.pipeline.processors.Normalizer import AudioNormalizer
@@ -20,9 +20,9 @@ from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.core.tn.CosyVoiceTN import CosyVoiceTN
+from modules.core.tn.F5TtsTN import F5TtsTN
 from modules.core.tn.FireRedTtsTN import FireRedTtsTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
-from modules.core.tn.F5TtsTN import F5TtsTN
 from modules.core.tn.IndexTTSTN import IndexTTSTN
 from modules.core.tn.SparkTTSTN import SparkTTSTN
 from modules.core.tn.TNPipeline import TNPipeline

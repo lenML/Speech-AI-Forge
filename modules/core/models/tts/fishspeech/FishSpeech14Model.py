@@ -8,14 +8,18 @@ import threading
 from pathlib import Path
 from typing import Generator, Optional, Union
 
+import hydra
+import torch
 import torchaudio
+from hydra import compose, initialize
+from hydra.utils import instantiate
 
 from modules import config
-from modules.core.models.tts.FishSpeechInfer import FishSpeechInfer
-from modules.core.models.TTSModel import TTSModel
 from modules.core.models.tts.fishspeech.FF14_infer import FF14_infer
 from modules.core.models.tts.fishspeech.FF14_llama import FF14_llama
 from modules.core.models.tts.fishspeech.FF14_vqgan import FF14_vqgan
+from modules.core.models.tts.FishSpeechInfer import FishSpeechInfer
+from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
@@ -33,10 +37,6 @@ from modules.repos_static.fish_speech.tools.vqgan.inference import (
     load_model as load_vqgan_model,
 )
 from modules.utils.SeedContext import SeedContext
-from hydra import compose, initialize
-from hydra.utils import instantiate
-import torch
-import hydra
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +127,7 @@ class FishSpeech14Model(TTSModel):
 if __name__ == "__main__":
     import numpy as np
     import soundfile as sf
+
     from modules.core.spk.SpkMgr import spk_mgr
 
     logger.setLevel(logging.DEBUG)

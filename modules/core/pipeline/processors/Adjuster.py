@@ -3,6 +3,7 @@ from modules.core.pipeline.generate.dcls import SynthAudio
 from modules.core.pipeline.processor import NP_AUDIO, AudioProcessor, SegmentProcessor
 from modules.utils import audio_utils
 
+
 class AdjusterProcessor(AudioProcessor):
     """
     对整个合成结果进行 adjust

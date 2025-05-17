@@ -1,11 +1,12 @@
 import io
+import logging
+import struct
 import typing
 import wave
-import struct
+
 import numpy as np
 import pydub
 from pydub import AudioSegment
-import logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,8 @@
 from typing import Any, Dict
 
 from lightning.pytorch.utilities import rank_zero_only
-from omegaconf import OmegaConf
-
 from matcha.utils import pylogger
+from omegaconf import OmegaConf
 
 log = pylogger.get_pylogger(__name__)
 

@@ -17,7 +17,7 @@
 """Swish() activation function for Conformer."""
 
 import torch
-from torch import nn, sin, pow
+from torch import nn, pow, sin
 from torch.nn import Parameter
 
 

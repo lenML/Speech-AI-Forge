@@ -14,10 +14,7 @@ from pydantic import BaseModel, Field
 
 from modules.api.Api import APIManager
 from modules.api.v2.dcls import SpeakerConfig
-from modules.core.handler.datacls.audio_model import (
-    AdjustConfig,
-    EncoderConfig,
-)
+from modules.core.handler.datacls.audio_model import AdjustConfig, EncoderConfig
 from modules.core.handler.datacls.enhancer_model import EnhancerConfig
 from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.handler.datacls.tts_model import InferConfig, TTSConfig
@@ -25,9 +22,7 @@ from modules.core.handler.datacls.vc_model import VCConfig
 from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
-
 from modules.utils.bytes_to_wav import convert_bytes_to_wav_bytes
-
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,11 @@
+import os
+import time
+
 import gradio as gr
 
-from modules.webui import webui_config
 from modules.core.models.zoo import model_zoo
 from modules.devices import devices
-import time
-import os
+from modules.webui import webui_config
 
 is_huggingface_space = os.environ.get("IS_HF_SPACE", None) is not None
 

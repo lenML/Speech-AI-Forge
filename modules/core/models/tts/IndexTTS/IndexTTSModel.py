@@ -1,17 +1,18 @@
 import io
 import os
 from typing import Generator
+
 import numpy as np
-from omegaconf import OmegaConf
+import soundfile as sf
 import torch
+from omegaconf import OmegaConf
+
 from modules.core.models.TTSModel import TTSModel
 from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.devices import devices
 from modules.repos_static.index_tts.indextts.infer import IndexTTS
 from modules.repos_static.index_tts.indextts.utils.front import TextTokenizer
-import soundfile as sf
-
 from modules.utils.SeedContext import SeedContext
 
 

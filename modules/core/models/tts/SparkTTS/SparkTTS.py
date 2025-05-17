@@ -14,19 +14,20 @@
 # limitations under the License.
 
 import re
-import torch
-import numpy.typing as npt
-from typing import Tuple
 from pathlib import Path
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from typing import Tuple
 
-from modules.repos_static.spark_tts.sparktts.utils.file import load_config
+import numpy.typing as npt
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 from modules.repos_static.spark_tts.sparktts.models.audio_tokenizer import (
     BiCodecTokenizer,
 )
+from modules.repos_static.spark_tts.sparktts.utils.file import load_config
 from modules.repos_static.spark_tts.sparktts.utils.token_parser import (
-    LEVELS_MAP,
     GENDER_MAP,
+    LEVELS_MAP,
     TASK_TOKEN_MAP,
 )
 

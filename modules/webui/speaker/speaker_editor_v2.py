@@ -16,6 +16,7 @@ from modules.webui import webui_config
 from modules.webui.speaker.wav_misc import encode_to_wav
 from modules.webui.webui_utils import SPK_FILE_EXTS, tts_generate
 
+
 @spaces.GPU(duration=120)
 async def test_spk_voice(
     spk_file,

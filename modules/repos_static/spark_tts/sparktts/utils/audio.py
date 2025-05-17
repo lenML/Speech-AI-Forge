@@ -19,14 +19,14 @@ Description:
 """
 
 import random
-import soxr
-import soundfile
-import torch
-import torchaudio
-import numpy as np
-
 from pathlib import Path
 from typing import Tuple
+
+import numpy as np
+import soundfile
+import soxr
+import torch
+import torchaudio
 from numpy.lib.stride_tricks import sliding_window_view
 
 

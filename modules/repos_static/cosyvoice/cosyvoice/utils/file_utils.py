@@ -14,8 +14,10 @@
 # limitations under the License.
 
 import json
-import torchaudio
 import logging
+
+import torchaudio
+
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s')

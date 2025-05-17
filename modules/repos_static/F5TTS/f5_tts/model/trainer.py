@@ -10,15 +10,13 @@ import wandb
 from accelerate import Accelerator
 from accelerate.utils import DistributedDataParallelKwargs
 from ema_pytorch import EMA
+from f5_tts.model import CFM
+from f5_tts.model.dataset import DynamicBatchSampler, collate_fn
+from f5_tts.model.utils import default, exists
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import LinearLR, SequentialLR
 from torch.utils.data import DataLoader, Dataset, SequentialSampler
 from tqdm import tqdm
-
-from f5_tts.model import CFM
-from f5_tts.model.dataset import DynamicBatchSampler, collate_fn
-from f5_tts.model.utils import default, exists
-
 
 # trainer
 
@@ -261,7 +259,12 @@ class Trainer:
 
     def train(self, train_dataset: Dataset, num_workers=16, resumable_with_seed: int = None):
         if self.log_samples:
-            from f5_tts.infer.utils_infer import cfg_strength, load_vocoder, nfe_step, sway_sampling_coef
+            from f5_tts.infer.utils_infer import (
+                cfg_strength,
+                load_vocoder,
+                nfe_step,
+                sway_sampling_coef,
+            )
 
             vocoder = load_vocoder(
                 vocoder_name=self.vocoder_name, is_local=self.is_local_vocoder, local_path=self.local_vocoder_path

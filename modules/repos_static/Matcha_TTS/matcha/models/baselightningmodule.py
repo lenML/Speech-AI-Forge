@@ -9,7 +9,6 @@ from typing import Any, Dict
 import torch
 from lightning import LightningModule
 from lightning.pytorch.utilities import grad_norm
-
 from matcha import utils
 from matcha.utils.utils import plot_tensor
 

@@ -20,15 +20,14 @@ Description:
 """
 
 
-import os
-import json
-import json
 import csv
-
-from tqdm import tqdm
-from typing import List, Dict, Any, Set, Union
+import json
+import os
 from pathlib import Path
-from omegaconf import OmegaConf, DictConfig
+from typing import Any, Dict, List, Set, Union
+
+from omegaconf import DictConfig, OmegaConf
+from tqdm import tqdm
 
 
 def resolve_symbolic_link(symbolic_link_path: Path) -> Path:

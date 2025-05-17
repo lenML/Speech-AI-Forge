@@ -1,14 +1,13 @@
 import logging
 from pathlib import Path
+
+import hydra
 import numpy as np
 import torch
-
-from modules.devices import devices
 from hydra import compose, initialize
 from hydra.utils import instantiate
-import torch
-import hydra
 
+from modules.devices import devices
 from modules.repos_static.fish_speech.fish_speech.models.vqgan.modules.firefly import (
     FireflyArchitecture,
 )

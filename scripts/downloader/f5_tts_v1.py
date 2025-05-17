@@ -1,8 +1,10 @@
 import logging
 import os
-from pathlib import Path
-from tqdm import tqdm
 import urllib.request
+from pathlib import Path
+
+from tqdm import tqdm
+
 from scripts.dl_base import BaseModelDownloader
 
 logger = logging.getLogger(__name__)

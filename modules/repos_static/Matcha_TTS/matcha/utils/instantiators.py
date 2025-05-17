@@ -3,9 +3,8 @@ from typing import List
 import hydra
 from lightning import Callback
 from lightning.pytorch.loggers import Logger
-from omegaconf import DictConfig
-
 from matcha.utils import pylogger
+from omegaconf import DictConfig
 
 log = pylogger.get_pylogger(__name__)
 

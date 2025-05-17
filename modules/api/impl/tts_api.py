@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from modules.api import utils as api_utils
 from modules.api.Api import APIManager
+from modules.api.constants import support_bitrates
 from modules.core.handler.datacls.audio_model import (
     AdjustConfig,
     AudioFormat,
@@ -20,8 +21,6 @@ from modules.core.handler.TTSHandler import TTSHandler
 from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
-
-from modules.api.constants import support_bitrates
 
 logger = logging.getLogger(__name__)
 

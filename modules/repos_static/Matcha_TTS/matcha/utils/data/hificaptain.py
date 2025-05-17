@@ -6,10 +6,9 @@ import tempfile
 from pathlib import Path
 
 import torchaudio
+from matcha.utils.data.utils import _extract_zip
 from torch.hub import download_url_to_file
 from tqdm import tqdm
-
-from matcha.utils.data.utils import _extract_zip
 
 URLS = {
     "en-US": {

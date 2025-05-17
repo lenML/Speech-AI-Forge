@@ -13,27 +13,30 @@
 # limitations under the License.
 
 from __future__ import print_function
+
 import argparse
 import datetime
 import logging
+
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
-from copy import deepcopy
 import os
+from copy import deepcopy
+
+import deepspeed
 import torch
 import torch.distributed as dist
-import deepspeed
-
-from hyperpyyaml import load_hyperpyyaml
-
-from torch.distributed.elastic.multiprocessing.errors import record
-
 from cosyvoice.utils.executor import Executor
 from cosyvoice.utils.train_utils import (
-    init_distributed,
+    check_modify_and_save_config,
     init_dataset_and_dataloader,
+    init_distributed,
     init_optimizer_and_scheduler,
-    init_summarywriter, save_model,
-    wrap_cuda_model, check_modify_and_save_config)
+    init_summarywriter,
+    save_model,
+    wrap_cuda_model,
+)
+from hyperpyyaml import load_hyperpyyaml
+from torch.distributed.elastic.multiprocessing.errors import record
 
 
 def get_args():

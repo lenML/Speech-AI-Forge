@@ -1,5 +1,7 @@
 import argparse
+
 import torch
+
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 

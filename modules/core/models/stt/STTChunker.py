@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 
 import numpy as np
+from faster_whisper.transcribe import Segment, TranscriptionInfo, Word
+from faster_whisper.vad import get_speech_timestamps
 from tqdm import tqdm
+
+from modules import config as global_config
 from modules.core.handler.datacls.stt_model import STTConfig
 from modules.core.models.stt.STTModel import STTModel, TranscribeResult
 from modules.core.models.stt.whisper.whisper_dcls import SttResult, SttSegment, SttWord
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
-from modules.utils.monkey_tqdm import disable_tqdm
 from modules.utils.detect_lang import guess_lang
 from modules.utils.monkey_tqdm import disable_tqdm
-from modules import config as global_config
-from faster_whisper.vad import get_speech_timestamps
-from faster_whisper.transcribe import Segment, TranscriptionInfo, Word
 
 
 @dataclass(frozen=True, eq=False)

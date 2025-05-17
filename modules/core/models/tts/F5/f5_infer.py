@@ -6,7 +6,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 from modules.core.models.tts.F5.convert_char_to_pinyin import convert_char_to_pinyin
 
-
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"  # for MPS device compatibility
 sys.path.append(
     f"{os.path.dirname(os.path.abspath(__file__))}/../../third_party/BigVGAN/"
@@ -18,7 +17,6 @@ import tempfile
 from importlib.resources import files
 
 import matplotlib
-
 
 matplotlib.use("Agg")
 
@@ -33,10 +31,7 @@ from transformers import pipeline
 from vocos import Vocos
 
 from modules.repos_static.F5TTS.f5_tts.model import CFM
-from modules.repos_static.F5TTS.f5_tts.model.utils import (
-    get_tokenizer,
-)
-
+from modules.repos_static.F5TTS.f5_tts.model.utils import get_tokenizer
 
 _ref_audio_cache = {}
 

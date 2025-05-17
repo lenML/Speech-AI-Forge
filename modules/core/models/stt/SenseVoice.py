@@ -1,22 +1,21 @@
 import logging
-from pathlib import Path
 import time
-import numpy as np
-import numpy.typing as npt
+from pathlib import Path
 from typing import List
 
-from tqdm import tqdm
-from modules.core.models.stt.STTModel import STTModel
+import numpy as np
+import numpy.typing as npt
 
 # from funasr.models.sense_voice.model import SenseVoiceSmall
 from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
+from resampy.core import resample
+from tqdm import tqdm
 
-from modules.core.models.stt.whisper.whisper_dcls import SttSegment, SttResult
+from modules.core.models.stt.STTModel import STTModel
+from modules.core.models.stt.whisper.whisper_dcls import SttResult, SttSegment
 from modules.devices import devices
 from modules.utils import audio_utils
-from resampy.core import resample
-
 
 logger = logging.getLogger(__name__)
 

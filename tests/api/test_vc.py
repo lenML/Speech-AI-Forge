@@ -1,12 +1,13 @@
 import os
 from typing import Union
 
+import pytest
 from fastapi import Response
 from fastapi.responses import StreamingResponse
-import pytest
 from fastapi.testclient import TestClient
 
 import tests.conftest
+
 
 @pytest.mark.vc_api
 def test_vc_ref_audio_file(client: TestClient):

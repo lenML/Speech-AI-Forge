@@ -4,14 +4,14 @@ from importlib.resources import files
 import torch
 import torch.nn.functional as F
 import torchaudio
-from datasets import Dataset as Dataset_
-from datasets import load_from_disk
+from f5_tts.model.modules import MelSpec
+from f5_tts.model.utils import default
 from torch import nn
 from torch.utils.data import Dataset, Sampler
 from tqdm import tqdm
 
-from f5_tts.model.modules import MelSpec
-from f5_tts.model.utils import default
+from datasets import Dataset as Dataset_
+from datasets import load_from_disk
 
 
 class HFDataset(Dataset):

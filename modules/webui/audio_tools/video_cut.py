@@ -1,5 +1,6 @@
-import gradio as gr
 import tempfile
+
+import gradio as gr
 from moviepy.editor import VideoFileClip
 
 

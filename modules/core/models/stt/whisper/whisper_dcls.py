@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, List, Optional
 
+
 @dataclass(repr=False, eq=False)
 class WhisperSegment:
     seek: int

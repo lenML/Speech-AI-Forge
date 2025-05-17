@@ -6,6 +6,7 @@ segment指的是语音片段，并且应该支持多说话人同时推理
 """
 
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from modules.api.v2.dcls import SpeakerConfig

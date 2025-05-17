@@ -13,11 +13,10 @@ from pathlib import Path
 import rootutils
 import torch
 from hydra import compose, initialize
-from omegaconf import open_dict
-from tqdm.auto import tqdm
-
 from matcha.data.text_mel_datamodule import TextMelDataModule
 from matcha.utils.logging_utils import pylogger
+from omegaconf import open_dict
+from tqdm.auto import tqdm
 
 log = pylogger.get_pylogger(__name__)
 

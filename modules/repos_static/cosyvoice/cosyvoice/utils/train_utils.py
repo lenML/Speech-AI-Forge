@@ -14,26 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+import json
 import logging
 import os
-import torch
-import json
 import re
-import datetime
-import yaml
 
 import deepspeed
-import torch.optim as optim
+import torch
 import torch.distributed as dist
-
-from torch.utils.tensorboard import SummaryWriter
-from torch.utils.data import DataLoader
-from torch.nn.utils import clip_grad_norm_
-
-from deepspeed.runtime.zero.stage_1_and_2 import estimate_zero2_model_states_mem_needs_all_live
-
+import torch.optim as optim
+import yaml
 from cosyvoice.dataset.dataset import Dataset
-from cosyvoice.utils.scheduler import WarmupLR, NoamHoldAnnealing, ConstantLR
+from cosyvoice.utils.scheduler import ConstantLR, NoamHoldAnnealing, WarmupLR
+from deepspeed.runtime.zero.stage_1_and_2 import (
+    estimate_zero2_model_states_mem_needs_all_live,
+)
+from torch.nn.utils import clip_grad_norm_
+from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 
 
 def init_distributed(args):

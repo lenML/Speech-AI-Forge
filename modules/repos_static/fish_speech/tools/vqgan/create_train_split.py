@@ -5,9 +5,8 @@ from random import Random
 import click
 from loguru import logger
 from pydub import AudioSegment
-from tqdm import tqdm
-
 from tools.file import AUDIO_EXTENSIONS, list_files, load_filelist
+from tqdm import tqdm
 
 
 @click.command()

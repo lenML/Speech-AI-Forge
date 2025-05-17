@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import re
+
 chinese_char_pattern = re.compile(r'[\u4e00-\u9fff]+')
 
 

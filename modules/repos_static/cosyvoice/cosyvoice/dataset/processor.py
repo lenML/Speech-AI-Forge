@@ -13,13 +13,13 @@
 # limitations under the License.
 import logging
 import random
+from io import BytesIO
 
 import pyarrow.parquet as pq
-from io import BytesIO
 import torch
+import torch.nn.functional as F
 import torchaudio
 from torch.nn.utils.rnn import pad_sequence
-import torch.nn.functional as F
 
 torchaudio.set_audio_backend('soundfile')
 

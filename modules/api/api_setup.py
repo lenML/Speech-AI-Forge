@@ -20,10 +20,7 @@ from modules.api.impl import (
     vc_api,
     xtts_v2_api,
 )
-from modules.api.v2 import (
-    tts_api as tts_api_v2,
-    #
-)
+from modules.api.v2 import tts_api as tts_api_v2
 from modules.utils import env
 
 logger = logging.getLogger(__name__)

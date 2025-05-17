@@ -14,14 +14,14 @@
 # limitations under the License.
 
 
-import os
 import argparse
-import torch
-import soundfile as sf
 import logging
-from datetime import datetime
+import os
 import platform
+from datetime import datetime
 
+import soundfile as sf
+import torch
 from cli.SparkTTS import SparkTTS
 
 

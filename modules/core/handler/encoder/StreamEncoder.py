@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import queue
 import subprocess
@@ -8,8 +9,6 @@ from time import sleep
 
 import pydub
 import pydub.utils
-
-import logging
 
 logger = logging.getLogger(__name__)
 

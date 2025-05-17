@@ -40,9 +40,6 @@ from threading import Lock
 
 import httpx
 from cachetools import LRUCache, cached
-from funasr import AutoModel
-from silero_vad import get_speech_timestamps, load_silero_vad
-
 from fish_speech.conversation import IM_END_TOKEN, SEMANTIC_TOKEN
 from fish_speech.models.text2semantic.llama import BaseModelArgs
 
@@ -50,6 +47,8 @@ from fish_speech.models.text2semantic.llama import BaseModelArgs
 from fish_speech.models.vqgan.modules.firefly import FireflyArchitecture
 from fish_speech.text.chn_text_norm.text import Text as ChnNormedText
 from fish_speech.utils import autocast_exclude_mps, set_seed
+from funasr import AutoModel
+from silero_vad import get_speech_timestamps, load_silero_vad
 from tools.file import AUDIO_EXTENSIONS, audio_to_bytes, list_files, read_ref_text
 from tools.llama.generate import (
     GenerateRequest,

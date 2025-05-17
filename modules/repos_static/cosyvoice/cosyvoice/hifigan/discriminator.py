@@ -1,8 +1,9 @@
+from typing import List, Optional, Tuple
+
 import torch
 import torch.nn as nn
-from torch.nn.utils import weight_norm
-from typing import List, Optional, Tuple
 from einops import rearrange
+from torch.nn.utils import weight_norm
 from torchaudio.transforms import Spectrogram
 
 

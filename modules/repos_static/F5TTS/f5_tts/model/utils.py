@@ -10,7 +10,6 @@ import torch
 from pypinyin import Style, lazy_pinyin
 from torch.nn.utils.rnn import pad_sequence
 
-
 # seed everything
 
 

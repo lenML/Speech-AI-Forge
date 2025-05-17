@@ -4,9 +4,8 @@ import random
 import tempfile
 from pathlib import Path
 
-from torch.hub import download_url_to_file
-
 from matcha.utils.data.utils import _extract_tar
+from torch.hub import download_url_to_file
 
 URL = "https://data.keithito.com/data/speech/LJSpeech-1.1.tar.bz2"
 

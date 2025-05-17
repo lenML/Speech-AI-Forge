@@ -1,10 +1,10 @@
 import gradio as gr
 
+from modules.core.models.zoo.ModelZoo import model_zoo
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.utils.hf import spaces
 from modules.webui import webui_config
 from modules.webui.webui_utils import SPK_FILE_EXTS, get_spk_emotions, tts_generate
-from modules.core.models.zoo.ModelZoo import model_zoo
 
 
 @spaces.GPU(duration=120)

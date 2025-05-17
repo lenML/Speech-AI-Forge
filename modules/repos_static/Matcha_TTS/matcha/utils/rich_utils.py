@@ -6,10 +6,9 @@ import rich.syntax
 import rich.tree
 from hydra.core.hydra_config import HydraConfig
 from lightning.pytorch.utilities import rank_zero_only
+from matcha.utils import pylogger
 from omegaconf import DictConfig, OmegaConf, open_dict
 from rich.prompt import Prompt
-
-from matcha.utils import pylogger
 
 log = pylogger.get_pylogger(__name__)
 

@@ -14,13 +14,20 @@
 # limitations under the License.
 
 import logging
-from contextlib import nullcontext
 import os
+from contextlib import nullcontext
 
 import torch
 import torch.distributed as dist
-
-from cosyvoice.utils.train_utils import update_parameter_and_lr, log_per_step, log_per_save, batch_forward, batch_backward, save_model, cosyvoice_join
+from cosyvoice.utils.train_utils import (
+    batch_backward,
+    batch_forward,
+    cosyvoice_join,
+    log_per_save,
+    log_per_step,
+    save_model,
+    update_parameter_and_lr,
+)
 
 
 class Executor:

@@ -15,15 +15,14 @@ import numpy as np
 import rootutils
 import torch
 from hydra import compose, initialize
-from omegaconf import open_dict
-from torch import nn
-from tqdm.auto import tqdm
-
 from matcha.cli import get_device
 from matcha.data.text_mel_datamodule import TextMelDataModule
 from matcha.models.matcha_tts import MatchaTTS
 from matcha.utils.logging_utils import pylogger
 from matcha.utils.utils import get_phoneme_durations
+from omegaconf import open_dict
+from torch import nn
+from tqdm.auto import tqdm
 
 log = pylogger.get_pylogger(__name__)
 

@@ -3,15 +3,13 @@ import functools
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import GPT2Config, GPT2PreTrainedModel, LogitsProcessorList
-from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
-from transformers.utils.model_parallel_utils import (assert_device_map,
-                                                     get_device_map)
-
 from indextts.gpt.conformer_encoder import ConformerEncoder
 from indextts.gpt.perceiver import PerceiverResampler
 from indextts.utils.arch_util import AttentionBlock
 from indextts.utils.typical_sampling import TypicalLogitsWarper
+from transformers import GPT2Config, GPT2PreTrainedModel, LogitsProcessorList
+from transformers.modeling_outputs import CausalLMOutputWithCrossAttentions
+from transformers.utils.model_parallel_utils import assert_device_map, get_device_map
 
 
 def null_position_embeddings(range, dim):
