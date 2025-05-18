@@ -17,6 +17,7 @@ You can experience and deploy Speech-AI-Forge through the following methods:
 
 ## Breaking change logs
 
+- 250518: Support SenseVoice ASR [#122](https://github.com/lenML/Speech-AI-Forge/issues/122)
 - 250508: Support Spark-TTS [#223](https://github.com/lenML/Speech-AI-Forge/issues/223)
 - 250507: Support F5TTS-TTS-v1 model [#231](https://github.com/lenML/Speech-AI-Forge/issues/231)
 - 250505: Support Index-TTS [#229](https://github.com/lenML/Speech-AI-Forge/issues/229)
