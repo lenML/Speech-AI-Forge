@@ -14,7 +14,6 @@ import onnxruntime
 import requests
 
 onnxruntime.set_default_logger_severity(3)
-from opencc import OpenCC
 from pypinyin import Style, pinyin
 from transformers import AutoTokenizer
 
@@ -168,6 +167,8 @@ class G2PWOnnxConverter:
             self.char_bopomofo_dict = json.load(fr)
 
         if self.enable_opencc:
+            from opencc import OpenCC
+
             self.cc = OpenCC("s2tw")
 
     def _convert_bopomofo_to_pinyin(self, bopomofo: str) -> str:

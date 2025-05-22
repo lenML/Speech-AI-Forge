@@ -17,18 +17,18 @@ pinyin_to_symbol_map = {
     for line in open(os.path.join(current_file_path, "opencpop-strict.txt")).readlines()
 }
 
-import jieba_fast
-import logging
+import jieba.posseg as psg
 
-jieba_fast.setLogLevel(logging.CRITICAL)
-import jieba_fast.posseg as psg
+# import logging
+# jieba_fast.setLogLevel(logging.CRITICAL)
+# import jieba_fast.posseg as psg
 
 # is_g2pw_str = os.environ.get("is_g2pw", "True")##默认开启
 # is_g2pw = False#True if is_g2pw_str.lower() == 'true' else False
-is_g2pw = True  # True if is_g2pw_str.lower() == 'true' else False
+is_g2pw = False  # True if is_g2pw_str.lower() == 'true' else False
 if is_g2pw:
     # print("当前使用g2pw进行拼音推理")
-    from text.g2pw import G2PWPinyin, correct_pronunciation
+    from ..text.g2pw import G2PWPinyin, correct_pronunciation
 
     parent_directory = os.path.dirname(current_file_path)
     g2pw = G2PWPinyin(

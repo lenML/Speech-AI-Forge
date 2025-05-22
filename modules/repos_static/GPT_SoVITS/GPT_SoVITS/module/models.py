@@ -10,7 +10,7 @@ from torch.nn import functional as F
 from ..module import commons
 from ..module import modules
 from ..module import attentions
-from f5_tts.model import DiT
+from ..f5_tts.model import DiT
 from torch.nn import Conv1d, ConvTranspose1d, Conv2d
 from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
 from ..module.commons import init_weights, get_padding
@@ -1009,7 +1009,15 @@ class CFM(torch.nn.Module):
             d_tensor = torch.ones(x.shape[0], device=x.device, dtype=mu.dtype) * d
             # v_pred = model(x, t_tensor, d_tensor, **extra_args)
             v_pred = self.estimator(
-                x, prompt_x, x_lens, t_tensor, d_tensor, mu, use_grad_ckpt=False, drop_audio_cond=False, drop_text=False
+                x,
+                prompt_x,
+                x_lens,
+                t_tensor,
+                d_tensor,
+                mu,
+                use_grad_ckpt=False,
+                drop_audio_cond=False,
+                drop_text=False,
             ).transpose(2, 1)
             if inference_cfg_rate > 1e-5:
                 neg = self.estimator(

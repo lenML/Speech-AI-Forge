@@ -14,7 +14,7 @@ from torch import nn
 
 from x_transformers.x_transformers import RotaryEmbedding
 
-from f5_tts.model.modules import (
+from ..modules import (
     TimestepEmbedding,
     ConvPositionEmbedding,
     MMDiTBlock,

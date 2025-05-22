@@ -432,7 +432,6 @@ class TTS:
             "aux_ref_audio_paths": [],
         }
 
-
         self.stop_flag: bool = False
         self.precision: torch.dtype = torch.float16 if self.configs.is_half else torch.float32
 
@@ -572,7 +571,7 @@ class TTS:
                 self.vocoder.cpu()
                 del self.vocoder
                 self.empty_cache()
-                
+
             self.vocoder = BigVGAN.from_pretrained(
                 "%s/GPT_SoVITS/pretrained_models/models--nvidia--bigvgan_v2_24khz_100band_256x" % (now_dir,),
                 use_cuda_kernel=False,
@@ -613,9 +612,6 @@ class TTS:
             self.vocoder_configs["T_chunk"] = 1000
             self.vocoder_configs["upsample_rate"] = 480
             self.vocoder_configs["overlapped_len"] = 12
-
-
-
 
         self.vocoder = self.vocoder.eval()
         if self.configs.is_half == True:
@@ -747,8 +743,8 @@ class TTS:
         )
         with torch.no_grad():
             wav16k, sr = librosa.load(ref_wav_path, sr=16000)
-            if wav16k.shape[0] > 160000 or wav16k.shape[0] < 48000:
-                raise OSError(i18n("参考音频在3~10秒范围外，请更换！"))
+            # if wav16k.shape[0] > 160000 or wav16k.shape[0] < 48000:
+            #     raise OSError(i18n("参考音频在3~10秒范围外，请更换！"))
             wav16k = torch.from_numpy(wav16k)
             zero_wav_torch = torch.from_numpy(zero_wav)
             wav16k = wav16k.to(self.configs.device)
@@ -1439,7 +1435,7 @@ class TTS:
         ref_audio = ref_audio.to(self.configs.device).float()
         if ref_audio.shape[0] == 2:
             ref_audio = ref_audio.mean(0).unsqueeze(0)
-            
+
         # tgt_sr = self.vocoder_configs["sr"]
         tgt_sr = 24000 if self.configs.version == "v3" else 32000
         if ref_sr != tgt_sr:

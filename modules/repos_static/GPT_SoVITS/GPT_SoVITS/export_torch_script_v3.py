@@ -5,12 +5,12 @@ from export_torch_script import (
     resamplex,
     spectrogram_torch,
 )
-from f5_tts.model.backbones.dit import DiT
+from .f5_tts.model.backbones.dit import DiT
 from inference_webui import get_phones_and_bert
 import librosa
-from module import commons
-from module.mel_processing import mel_spectrogram_torch
-from module.models_onnx import CFM, SynthesizerTrnV3
+from .module import commons
+from .module.mel_processing import mel_spectrogram_torch
+from .module.models_onnx import CFM, SynthesizerTrnV3
 import numpy as np
 import torch._dynamo.config
 import torchaudio

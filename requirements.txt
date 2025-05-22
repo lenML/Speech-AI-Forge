@@ -3,7 +3,7 @@ scipy==1.11.4
 lxml==5.2.2
 pydub==0.25.1
 fastapi==0.111.0
-soundfile==0.12.1
+soundfile==0.13.1
 omegaconf==2.3.0
 pypinyin==0.51.0
 vocos==0.1.0
@@ -87,6 +87,11 @@ funasr==1.1.12
 jiwer==3.0.4
 zhconv==1.4.3
 tomli==2.2.1
+
+### Gpt So Vits
+fast-langdetect==0.3.2
+split-lang==2.1.0
+ffmpeg-python==0.2.0
 
 ### webui tools
 moviepy==1.0.3

@@ -189,6 +189,8 @@ cython_debug/
 /models/Index-TTS/**/*
 /models/Spark-TTS-0.5B/**/*
 /models/SenseVoiceSmall/**/*
+/models/gpt_sovits_v4/**/*
+/models/gpt_sovits_v3/**/*
 
 /*.pt
 
