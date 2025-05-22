@@ -17,6 +17,7 @@ You can experience and deploy Speech-AI-Forge through the following methods:
 
 ## Breaking change logs
 
+- 250522: Support GptSoVits [#198](https://github.com/lenML/Speech-AI-Forge/issues/198)
 - 250518: Support SenseVoice ASR [#122](https://github.com/lenML/Speech-AI-Forge/issues/122)
 - 250508: Support Spark-TTS [#223](https://github.com/lenML/Speech-AI-Forge/issues/223)
 - 250507: Support F5TTS-TTS-v1 model [#231](https://github.com/lenML/Speech-AI-Forge/issues/231)
@@ -28,7 +29,6 @@ You can experience and deploy Speech-AI-Forge through the following methods:
 - 240813: Support OpenVoice [#100](https://github.com/lenML/Speech-AI-Forge/issues/100)
 - 240801: Add ASR API [#92](https://github.com/lenML/Speech-AI-Forge/issues/92)
 - 240723: Support CosyVoice [#90](https://github.com/lenML/Speech-AI-Forge/issues/90)
-
 
 ## Installation and Running
 
@@ -45,6 +45,7 @@ python webui.py
 [Click here for detailed documentation with images](./docs/webui_features.md)
 
 - **TTS (Text-to-Speech)**: Powerful TTS capabilities
+
   - **Speaker Switch**: Switch between different voices
     - **Built-in Voices**: Multiple built-in voices available, including `27 ChatTTS` / `7 CosyVoice` voices + `1 Reference Voice`
     - **Custom Voice Upload**: Support for uploading custom voice files and performing real-time inference
@@ -60,12 +61,14 @@ python webui.py
   - **Multi-model Support**: Support for multiple TTS models, including `ChatTTS`, `CosyVoice`, `FishSpeech`, `GPT-SoVITS`, and `F5-TTS`
 
 - **SSML (Speech Synthesis Markup Language)**: Advanced TTS synthesis control
+
   - **Splitter**: Fine control over text segmentation for long-form content
   - **PodCast**: A tool for creating `long-form` and `multi-character` audio, ideal for blogs or scripted voice synthesis
   - **From Subtitle**: Create SSML scripts directly from subtitle files for easy TTS generation
   - **Script Editor**: New SSML script editor that allows users to export and edit SSML scripts from the Splitter (PodCast, From Subtitle) for further refinement
 
 - **Voice Management**:
+
   - **Builder**: Create custom voices from ChatTTS seeds or by using reference audio
   - **Test Voice**: Upload and test custom voice files quickly
   - **ChatTTS Debugging Tools**: Specific tools for debugging `ChatTTS` voices
@@ -74,6 +77,7 @@ python webui.py
   - **Voice Hub**: Select and download voices from our voice library to your local machine. Access the voice repository at [Speech-AI-Forge-spks](https://github.com/lenML/Speech-AI-Forge-spks)
 
 - **ASR (Automatic Speech Recognition)**:
+
   - **Whisper**: Use the Whisper model for high-quality speech-to-text (ASR)
   - **SenseVoice**: ASR model in development, coming soon
 
@@ -117,23 +121,22 @@ Environment variable configuration:
 - webui: [.env.webui](./.env.webui)
 - API: [.env.api](./.env.api)
 
-
 ## Model Support
 
-| Model Category   | Model Name                                                                                  | Streaming Level | Multi-Language Support       | Status                  |
-| ---------------- | ------------------------------------------------------------------------------------------- | --------------- | ---------------------------- | ----------------------- |
-| **TTS**          | [ChatTTS](https://github.com/2noise/ChatTTS)                                                | token-level     | en, zh                       | ✅                       |
-|                  | [FishSpeech](https://github.com/fishaudio/fish-speech)                                       | sentence-level  | en, zh, jp, ko           | ✅ (1.4) |
-|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)                                          | sentence-level   | en, zh, jp, yue, ko     | ✅(v2)                 |
-|                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)                                        | sentence-level   | en, zh                  | ✅                 |
-|                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                                                    | sentence-level   | en, zh                  | ✅(v0.6/v1)                 |
-|                 | [Index-TTS](https://github.com/index-tts/index-tts)                                           | sentence-level   | en, zh                  | ✅                 |
-|                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)                                           | sentence-level   | en, zh                  | ✅                 |
-|                 | ~~GPTSoVits~~                                                                                      | sentence-level   |                         | 🚧                 |
-| **ASR**         | [Whisper](https://github.com/openai/whisper)                                                  | 🚧       | ✅                      | ✅                 |
-|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)                                        | 🚧       | ✅                      | 🚧                 |
-| **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)                                          |          |                         | ✅                 |
-| **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance)                            |          |                         | ✅                 |
+| Model Category  | Model Name                                                         | Streaming Level | Multi-Language Support | Status      |
+| --------------- | ------------------------------------------------------------------ | --------------- | ---------------------- | ----------- |
+| **TTS**         | [ChatTTS](https://github.com/2noise/ChatTTS)                       | token-level     | en, zh                 | ✅          |
+|                 | [FishSpeech](https://github.com/fishaudio/fish-speech)             | sentence-level  | en, zh, jp, ko         | ✅ (1.4)    |
+|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | sentence-level  | en, zh, jp, yue, ko    | ✅(v2)      |
+|                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)            | sentence-level  | en, zh                 | ✅          |
+|                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                         | sentence-level  | en, zh                 | ✅(v0.6/v1) |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | sentence-level  | en, zh                 | ✅          |
+|                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | sentence-level  | en, zh                 | ✅          |
+|                 | [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS/tree/main)     | 句子级          | en, zh, ja, ko, yue    | ✅          |
+| **ASR**         | [Whisper](https://github.com/openai/whisper)                       | 🚧              | ✅                     | ✅          |
+|                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)            | 🚧              | ✅                     | 🚧          |
+| **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)               |                 |                        | ✅          |
+| **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance) |                 |                        | ✅          |
 
 ## Model Download
 
@@ -141,20 +144,21 @@ Since Forge primarily focuses on API functionality development, automatic downlo
 
 ### Download Script
 
-| Function     | Model          | Download Command                                                          |
-| ------------ | ---------- | ------------------------------------------------------------------------- |
-| **TTS**      | ChatTTS    | `python -m scripts.dl_chattts --source huggingface`                       |
-|              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface`    |
-|              | CosyVoice(v2)  | `python -m scripts.downloader.cosyvoice2 --source huggingface`            |
-|              | FireRedTTS | `python -m scripts.downloader.fire_red_tts --source huggingface`          |
-|              | Index-TTS | `python -m scripts.downloader.index_tts --source huggingface`          |
-|              | Spark-TTS | `python -m scripts.downloader.spark_tts --source huggingface`          |
-|              | F5-TTS(v0.6) | `python -m scripts.downloader.f5_tts --source huggingface`          |
-|              | F5-TTS(v1) | `python -m scripts.downloader.f5_tts_v1 --source huggingface`          |
-|              | F5-TTS(vocos) | `python -m scripts.downloader.vocos_mel_24khz --source huggingface`          |
-| **ASR**      | Whisper    | `python -m scripts.downloader.faster_whisper --source huggingface`        |
-| **CV**       | OpenVoice  | `python -m scripts.downloader.open_voice --source huggingface`            |
-| **Enhancer** | Enhancer   | `python -m scripts.dl_enhance --source huggingface`                       |
+| Function     | Model           | Download Command                                                    |
+| ------------ | --------------- | ------------------------------------------------------------------- |
+| **TTS**      | ChatTTS         | `python -m scripts.dl_chattts --source huggingface`                 |
+|              | GPT-SoVITS(v4)  | `python -m scripts.downloader.gpt_sovits_v4 --source huggingface`   |
+|              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface` |
+|              | CosyVoice(v2)   | `python -m scripts.downloader.cosyvoice2 --source huggingface`      |
+|              | FireRedTTS      | `python -m scripts.downloader.fire_red_tts --source huggingface`    |
+|              | Index-TTS       | `python -m scripts.downloader.index_tts --source huggingface`       |
+|              | Spark-TTS       | `python -m scripts.downloader.spark_tts --source huggingface`       |
+|              | F5-TTS(v0.6)    | `python -m scripts.downloader.f5_tts --source huggingface`          |
+|              | F5-TTS(v1)      | `python -m scripts.downloader.f5_tts_v1 --source huggingface`       |
+|              | F5-TTS(vocos)   | `python -m scripts.downloader.vocos_mel_24khz --source huggingface` |
+| **ASR**      | Whisper         | `python -m scripts.downloader.faster_whisper --source huggingface`  |
+| **CV**       | OpenVoice       | `python -m scripts.downloader.open_voice --source huggingface`      |
+| **Enhancer** | Enhancer        | `python -m scripts.dl_enhance --source huggingface`                 |
 
 > **Note**: If you need to use ModelScope to download models, use `--source modelscope`. Some models may not be available for download using ModelScope.
 
@@ -185,6 +189,7 @@ To contribute, clone the repository, make your changes, commit and push to your 
 - F5-TTS: https://github.com/SWivid/F5-TTS
 - Index-TTS: https://github.com/index-tts/index-tts
 - Spark-TTS: https://github.com/SparkAudio/Spark-TTS
+- GPT-SoVITS: https://github.com/RVC-Boss/GPT-SoVITS
 
 - Whisper: https://github.com/openai/whisper
 
