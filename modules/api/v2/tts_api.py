@@ -119,6 +119,31 @@ async def forge_text_synthesize(params: V2TtsParams, request: Request):
 
 
 def setup(api_manager: APIManager):
-    api_manager.post("/v2/tts", response_class=FileResponse, tags=["Forge V2"])(
-        forge_text_synthesize
-    )
+    api_manager.post(
+        "/v2/tts",
+        description="""
+通用 TTS（Text-to-Speech）推理接口，支持多种输入形式（纯文本、SSML、文本批量），并可配置完整的语音合成处理流程。
+
+支持功能：
+- 纯文本（text）、SSML（ssml）、多段文本（texts）输入（只能三选一）
+- 可指定说话人（spk）信息，包括：从已有说话人ID、说话人名获取，或上传参考音频生成
+- 支持完整的音频处理链条配置（可选项）：语音增强、声码器配置、TTS 推理参数、VC（语音转换）、TN（文本归一化）、调整器、编码器
+- 返回音频文件，格式取决于后端设置（一般为 WAV）
+
+参数说明：
+- `text`: 单段文本输入
+- `texts`: 多段文本列表，用于批量合成
+- `ssml`: 使用 SSML 格式进行输入（包含富文本语音控制）
+- `spk`: 指定说话人信息（支持引用已有说话人或上传参考音频）
+- `tts`, `infer`, `vc`, `tn`, `enhance`, `encoder`, `adjust`: 各类语音生成和处理配置（均为可选）
+
+注意：
+- `text`、`texts` 和 `ssml` 三者只能选择一个输入
+- 若模型要求必须提供说话人信息，未设置 `spk` 时将抛出错误
+
+返回值：
+- 成功时返回合成语音的音频文件
+""",
+        response_class=FileResponse,
+        tags=["Forge V2"],
+    )(forge_text_synthesize)
