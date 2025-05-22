@@ -6,14 +6,20 @@ from typing import Optional
 from scripts.ModelDownloader import ModelDownloader
 
 
+def ensure_file_dir_exists(file_path: str):
+    file_dir = os.path.dirname(file_path)
+    if not os.path.exists(file_dir):
+        os.makedirs(file_dir, exist_ok=True)
+
+
 class BaseModelDownloader(ModelDownloader):
 
     def __init__(
         self,
-        model_name,
-        modelscope_repo=None,
-        huggingface_repo=None,
-        required_files=[],
+        model_name: str,
+        modelscope_repo: Optional[str] = None,
+        huggingface_repo: Optional[str] = None,
+        required_files: list[str] = [],
         modelscope_revision="master",
         huggingface_revision="main",
         just_download_required_files=False,
@@ -42,6 +48,11 @@ class BaseModelDownloader(ModelDownloader):
         from modelscope import model_file_download
 
         for file in self.required_files:
+            target_path = self.model_dir / file
+            ensure_file_dir_exists(target_path)
+            if target_path.exists():
+                self.logger.info(f"File {file} already exists, skipping download.")
+                continue
             try:
                 downloaded_file = model_file_download(
                     model_id=self.modelscope_repo,
@@ -49,7 +60,6 @@ class BaseModelDownloader(ModelDownloader):
                     revision=self.modelscope_revision,
                     cache_dir=str(self.cache_dir),
                 )
-                target_path = self.model_dir / file
                 shutil.copy2(downloaded_file, target_path)
                 os.remove(downloaded_file)
                 self.logger.info(f"Downloaded {file} from ModelScope.")
@@ -103,6 +113,11 @@ class BaseModelDownloader(ModelDownloader):
         from huggingface_hub import hf_hub_download
 
         for file in self.required_files:
+            target_path = self.model_dir / file
+            ensure_file_dir_exists(target_path)
+            if target_path.exists():
+                self.logger.info(f"File {file} already exists, skipping download.")
+                continue
             try:
                 downloaded_file = hf_hub_download(
                     repo_id=self.huggingface_repo,
@@ -112,7 +127,6 @@ class BaseModelDownloader(ModelDownloader):
                     force_download=True,
                     local_dir_use_symlinks=False,
                 )
-                target_path = self.model_dir / file
                 shutil.copy2(downloaded_file, target_path)
                 os.remove(downloaded_file)
                 self.logger.info(f"Downloaded {file} from HuggingFace.")

@@ -4,6 +4,7 @@ from pathlib import Path
 
 MODEL_DIR = Path("models")
 
+logger = logging.getLogger(__name__)
 
 class ModelDownloader:
     def __init__(self):
@@ -30,7 +31,7 @@ class ModelDownloader:
     @staticmethod
     def execate(*, downloader: "ModelDownloader", source: str):
         if downloader.check_exist():
-            print(f"Model {downloader.model_name} already exists.")
+            logger.info(f"🟢 Model [{downloader.model_name}] already exists.")
             return
 
         if source == "modelscope" or source == "ms":
@@ -50,3 +51,5 @@ class ModelDownloader:
                 raise TimeoutError("Download timeout")
 
         downloader.gc()
+
+        logger.info(f"✅ Model [{downloader.model_name}] downloaded.")
