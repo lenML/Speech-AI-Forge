@@ -78,8 +78,8 @@ python webui.py
 
 - **ASR (Automatic Speech Recognition)**:
 
-  - **Whisper**: Use the Whisper model for high-quality speech-to-text (ASR)
-  - **SenseVoice**: ASR model in development, coming soon
+  - **ASR**: Use the Whisper/SenseVoice model for high-quality speech-to-text (ASR)
+  - **Force Aligment**: The Whisper model can be used for document matching to improve recognition accuracy
 
 - **Tools**:
   - **Post Process**: Post-processing tools for audio clipping, adjustment, and enhancement to optimize speech output

@@ -78,8 +78,8 @@ python webui.py
 
 - **ASR (自动语音识别)**:
 
-  - **Whisper**: 使用 Whisper 模型进行高质量的语音转文本（ASR）
-  - **SenseVoice**: 正在开发中的 ASR 模型，敬请期待
+  - **ASR**: 使用 Whisper/SenseVoice 等模型进行高质量的语音转文本（ASR）
+  - **Force Aligment**: 使用 Whisper 模型可以进行【文稿匹配】提高识别准确性
 
 - **工具 (Tools)**:
   - **后处理工具 (Post Process)**: 提供音频剪辑、调整和增强等功能，优化生成的语音质量
