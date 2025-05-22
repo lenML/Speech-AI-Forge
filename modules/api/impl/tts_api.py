@@ -220,6 +220,61 @@ async def synthesize_tts(request: Request, params: TTSParams = Depends()):
 
 
 def setup(api_manager: APIManager):
-    api_manager.get("/v1/tts", response_class=FileResponse, tags=["TTS"])(
-        synthesize_tts
-    )
+    api_manager.get(
+        "/v1/tts",
+        description="""
+**Text-to-Speech Synthesis API (v1 - GET)**
+
+This endpoint converts text into speech using GET request parameters.
+It offers various options for customizing the voice, style, audio output, and processing.
+
+**Mandatory Parameter**:
+*   `text`: The text string to be synthesized.
+
+**Speaker and Style Customization**:
+*   `spk`: Specify the speaker by name or seed (e.g., "female2").
+*   `style`: Define the speaking style (e.g., "chat").
+
+**Generation Control**:
+*   `temperature`: Sampling temperature (0.0-1.0, e.g., 0.3). Controls randomness.
+*   `top_p`: Nucleus sampling probability (0.0-1.0, e.g., 0.5).
+*   `top_k`: Limits sampling to the K most likely next tokens (e.g., 20).
+*   `seed`: Seed for reproducible generation (e.g., 42).
+*   `prompt`, `prompt1`, `prompt2`: Optional text prompts to guide inference.
+*   `prefix`: Optional text prefix for inference.
+*   `bs` (batch_size): Batch size for processing (e.g., "8").
+*   `thr` (threshold): Sentence splitter threshold (e.g., "100").
+*   `eos`: End-of-sentence marker (e.g., "[uv_break]").
+
+**Output Audio Configuration**:
+*   `format`: Desired audio output format. Supported: "mp3", "wav", "raw" (default).
+*   `bitrate`: Audio bitrate for compressed formats (e.g., "64k").
+
+**Audio Adjustments**:
+*   `speed`: Playback speed multiplier (e.g., 1.0 for normal).
+*   `pitch`: Pitch adjustment (e.g., 0 for no change).
+*   `volume_gain`: Volume gain in dB (e.g., 0 for no change).
+
+**Enhancements**:
+*   `enhance`: Boolean to enable audio enhancement (default: false).
+*   `denoise`: Boolean to enable audio denoising (default: false).
+
+**Streaming Output**:
+*   `stream`: Boolean to enable streaming audio generation (default: false).
+*   `chunk_size`: Size of chunks for streaming (e.g., 64, if stream is true).
+
+**Caching**:
+*   `no_cache`: Boolean or "on"/"off" to disable caching (default: false).
+
+**Model Selection**:
+*   `model`: Specify the TTS model ID to use (e.g., "chat-tts", "cosy-voice").
+
+**Response**:
+*   **Success**: An audio file stream (`FileResponse`).
+*   **Failure**: A JSON object detailing the error (e.g., validation errors, internal server error).
+
+**Note**: This v1 endpoint does *not* support voice cloning via reference audio. For voice cloning, please refer to the v2 API. Parameters like temperature, top_p, top_k, seed, prompts, and prefix might be overridden by specific speaker (`spk`) or style (`style`) configurations.
+""",
+        response_class=FileResponse,
+        tags=["TTS"],
+    )(synthesize_tts)

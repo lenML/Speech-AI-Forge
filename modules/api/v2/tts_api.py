@@ -122,27 +122,65 @@ def setup(api_manager: APIManager):
     api_manager.post(
         "/v2/tts",
         description="""
-通用 TTS（Text-to-Speech）推理接口，支持多种输入形式（纯文本、SSML、文本批量），并可配置完整的语音合成处理流程。
+**Text-to-Speech Synthesis API (v2)**
 
-支持功能：
-- 纯文本（text）、SSML（ssml）、多段文本（texts）输入（只能三选一）
-- 可指定说话人（spk）信息，包括：从已有说话人ID、说话人名获取，或上传参考音频生成
-- 支持完整的音频处理链条配置（可选项）：语音增强、声码器配置、TTS 推理参数、VC（语音转换）、TN（文本归一化）、调整器、编码器
-- 返回音频文件，格式取决于后端设置（一般为 WAV）
+This endpoint converts text into speech, offering a wide range of customization options.
+It accepts JSON formatted data in the request body.
 
-参数说明：
-- `text`: 单段文本输入
-- `texts`: 多段文本列表，用于批量合成
-- `ssml`: 使用 SSML 格式进行输入（包含富文本语音控制）
-- `spk`: 指定说话人信息（支持引用已有说话人或上传参考音频）
-- `tts`, `infer`, `vc`, `tn`, `enhance`, `encoder`, `adjust`: 各类语音生成和处理配置（均为可选）
+**Core Functionality**:
+*   Synthesizes speech from various text inputs.
+*   Supports voice cloning by directly uploading a reference audio.
 
-注意：
-- `text`、`texts` 和 `ssml` 三者只能选择一个输入
-- 若模型要求必须提供说话人信息，未设置 `spk` 时将抛出错误
+**Input Flexibility**:
+*   Provide text via one of these mutually exclusive fields:
+    *   `text`: A single string of text.
+    *   `texts`: A list of strings for batch processing.
+    *   `ssml`: Text formatted using Speech Synthesis Markup Language (SSML).
 
-返回值：
-- 成功时返回合成语音的音频文件
+**Speaker Customization (`spk`)**:
+*   Use pre-defined speakers via `spk.from_spk_id` or `spk.from_spk_name`.
+*   **Voice Cloning**: Provide reference audio for voice cloning:
+    *   `spk.from_ref.wav_b64`: Base64 encoded WAV audio data.
+    *   `spk.from_ref.text`: The transcript corresponding to the reference audio.
+
+**Audio Processing & Control**:
+*   **Adjustments (`adjust`)**:
+    *   `pitch`: Modify audio pitch.
+    *   `speed_rate`: Adjust speaking rate.
+    *   `volume_gain_db`: Change audio volume.
+    *   `normalize`: Apply volume normalization.
+    *   `remove_silence`: Trim silence from audio ends.
+*   **Encoding (`encoder`)**:
+    *   `format`: Output audio format (e.g., "mp3", "wav").
+    *   `bitrate`: Audio bitrate (e.g., "64k").
+    *   `acodec`: Audio codec (e.g., "libmp3lame").
+*   **Enhancement (`enhance`)**:
+    *   `enabled`: Toggle audio enhancement.
+    *   `model`: Select enhancement model.
+    *   Additional parameters like `nfe`, `solver`, `lambd`, `tau` for fine-tuning.
+*   **Inference (`infer`)**:
+    *   `batch_size`, `spliter_threshold`, `eos` for text processing.
+    *   `seed`: For reproducible outputs.
+    *   `stream`, `stream_chunk_size`: Enable and configure streaming output.
+    *   `no_cache`, `sync_gen`: Control caching and generation mode.
+*   **Text Normalization (`tn`)**:
+    *   `enabled`/`disabled`: Specify text normalization rules.
+*   **TTS Model Parameters (`tts`)**:
+    *   `mid`: TTS model ID (e.g., "cosy-voice").
+    *   `style`, `emotion`: Control speaking style and emotion.
+    *   `temperature`, `top_p`, `top_k`: Adjust sampling parameters for generation.
+    *   Deprecated: `prompt`, `prompt1`, `prompt2`, `prefix`.
+*   **Voice Cloning (`vc`)** (Note: Potentially deprecated, mainly for OpenVoice):
+    *   `enabled`, `mid`, `emotion`, `tau`.
+
+**Response**:
+*   **Success**: An audio file stream (`FileResponse`).
+*   **Failure**: A JSON object detailing the error.
+
+**Key Considerations**:
+1.  Ensure only one of `text`, `texts`, or `ssml` is provided.
+2.  For voice cloning, use high-quality reference audio (3-5 seconds recommended).
+3.  Enabling audio enhancement may increase generation latency.
 """,
         response_class=FileResponse,
         tags=["Forge V2"],
