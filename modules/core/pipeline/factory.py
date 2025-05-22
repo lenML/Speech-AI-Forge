@@ -18,6 +18,7 @@ from modules.core.pipeline.processors.Normalizer import AudioNormalizer
 from modules.core.pipeline.processors.VoiceClone import VoiceCloneProcessor
 from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
+from modules.core.tn.base_tn import BaseTN
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.core.tn.CosyVoiceTN import CosyVoiceTN
 from modules.core.tn.F5TtsTN import F5TtsTN
@@ -111,22 +112,24 @@ class FromAudioPipeline(AudioPipeline):
 class PipelineFactory:
     @classmethod
     def create(cls, ctx: TTSPipelineContext) -> TTSPipeline:
-        model_id = ctx.tts_config.mid.lower()
+        model_id = ctx.tts_config.mid.lower().replace(" ", "-").replace("-", "")
 
-        if model_id == "chattts" or model_id == "chat-tts":
+        if model_id == "chattts":
             return cls.create_chattts_pipeline(ctx)
-        elif model_id == "fishspeech" or model_id == "fish-speech":
+        elif model_id == "fishspeech":
             return cls.create_fishspeech_pipeline(ctx)
-        elif model_id == "cosyvoice" or model_id == "cosy-voice":
+        elif model_id == "cosyvoice":
             return cls.create_cosyvoice_pipeline(ctx)
-        elif model_id == "firered" or model_id == "fire-red-tts":
+        elif model_id == "firered":
             return cls.create_fire_red_tts_pipeline(ctx)
-        elif model_id == "f5" or model_id == "f5-tts":
+        elif model_id == "f5" or model_id == "f5tts":
             return cls.create_f5_tts_pipeline(ctx)
-        elif model_id == "indextts" or model_id == "index-tts":
+        elif model_id == "indextts":
             return cls.create_index_tts_pipeline(ctx)
-        elif model_id == "sparktts" or model_id == "spark-tts":
+        elif model_id == "sparktts":
             return cls.create_spark_tts_pipeline(ctx)
+        elif model_id == "gptsovitsv4":
+            return cls.create_gpt_sovits_v4(ctx)
         else:
             raise Exception(f"Unknown model id: {model_id}")
 
@@ -220,6 +223,15 @@ class PipelineFactory:
 
         pipeline.audio_sr = model.get_sample_rate()
         return pipeline
+
+    @classmethod
+    def create_gpt_sovits_v4(cls, ctx: TTSPipelineContext):
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        # TODO: 可能需要实现自己的TN，不确定需不需要
+        pipeline.add_module(TNProcess(tn_pipeline=BaseTN))
+        model = model_zoo.get_gpt_sovits_v4()
+        pipeline.set_model(model)
 
     @classmethod
     def create_postprocess_pipeline(cls, audio: NP_AUDIO, ctx: TTSPipelineContext):

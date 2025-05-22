@@ -17,6 +17,7 @@ from modules.core.models.tts.ChatTtsModel import ChatTTSModel
 from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
+from modules.core.models.tts.GptSoVits.GptSoVitsModel import GptSoVitsModel
 from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.tts.IndexTTS.IndexTTSModel import IndexTTSModel
 from modules.core.models.tts.SparkTTS.SparkTTSModel import SparkTTSModel
@@ -40,6 +41,10 @@ class ModelZoo:
         "f5-tts": F5TtsModel(),
         "index-tts": IndexTTSModel(),
         "spark-tts": SparkTTSModel(),
+        "gpt-sovits-v1": GptSoVitsModel("v1"),
+        "gpt-sovits-v2": GptSoVitsModel("v2"),
+        "gpt-sovits-v3": GptSoVitsModel("v3"),
+        "gpt-sovits-v4": GptSoVitsModel("v4"),
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
@@ -175,6 +180,18 @@ class ModelZoo:
 
     def get_spark_tts(self) -> SparkTTSModel:
         return self.get_model("spark-tts")
+
+    def get_gpt_sovits_v1(self) -> GptSoVitsModel:
+        return self.get_model("gpt-sovits-v1")
+
+    def get_gpt_sovits_v2(self) -> GptSoVitsModel:
+        return self.get_model("gpt-sovits-v2")
+
+    def get_gpt_sovits_v3(self) -> GptSoVitsModel:
+        return self.get_model("gpt-sovits-v3")
+
+    def get_gpt_sovits_v4(self) -> GptSoVitsModel:
+        return self.get_model("gpt-sovits-v4")
 
 
 model_zoo = ModelZoo()
