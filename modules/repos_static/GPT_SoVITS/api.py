@@ -166,7 +166,7 @@ from io import BytesIO
 from module.models import SynthesizerTrn, SynthesizerTrnV3
 from peft import LoraConfig, get_peft_model
 from AR.models.t2s_lightning_module import Text2SemanticLightningModule
-from text import cleaned_text_to_sequence
+from ..text import cleaned_text_to_sequence
 from text.cleaner import clean_text
 from module.mel_processing import spectrogram_torch
 import config as global_config
@@ -438,7 +438,7 @@ def get_bert_inf(phones, word2ph, norm_text, language):
     return bert
 
 
-from text import chinese
+from ..text import chinese
 
 
 def get_phones_and_bert(text, language, version, final=False):

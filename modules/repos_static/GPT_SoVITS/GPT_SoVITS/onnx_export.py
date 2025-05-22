@@ -12,7 +12,7 @@ import json
 import os
 
 import soundfile
-from text import cleaned_text_to_sequence
+from ..text import cleaned_text_to_sequence
 
 
 def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False):

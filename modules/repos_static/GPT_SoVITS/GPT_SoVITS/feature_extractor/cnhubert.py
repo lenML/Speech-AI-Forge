@@ -13,7 +13,7 @@ from transformers import (
     HubertModel,
 )
 
-import utils
+from .. import utils
 import torch.nn as nn
 
 cnhubert_base_path = None

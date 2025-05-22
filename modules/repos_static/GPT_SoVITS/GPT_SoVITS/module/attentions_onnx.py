@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from module import commons
+from ..module import commons
 
 from typing import Optional
 
