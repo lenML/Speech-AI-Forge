@@ -210,6 +210,12 @@ def load_audio(audio_filepath: str) -> tuple[int, np.ndarray]:
     return pydub_to_np(AudioSegment.from_file(audio_filepath))
 
 
+def get_wav_sr(audio: bytes) -> int:
+    byte_io = io.BytesIO(audio)
+    audio_data, read_sr = sf.read(byte_io, dtype="float32")
+    return read_sr
+
+
 if __name__ == "__main__":
     input_file = sys.argv[1]
 

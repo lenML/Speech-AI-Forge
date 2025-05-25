@@ -1,3 +1,4 @@
+from typing import Optional
 import torch
 from fastapi import Depends, HTTPException, Query, Request
 from pydantic import BaseModel
@@ -9,20 +10,27 @@ from modules.core.spk.SpkMgr import spk_mgr
 from modules.core.spk.TTSSpeaker import TTSSpeaker
 
 
+class AudioReference(BaseModel):
+    wav_b64: str
+    text: str
+    emotion: Optional[str] = "default"
+
+
 class CreateSpeaker(BaseModel):
     name: str
-    gender: str
-    describe: str
-    tensor: list = None
-    seed: int = None
+    gender: str = ""
+    author: str = ""
+    desc: str = ""
+    version: str = ""
+
+    wavs: Optional[list[AudioReference]] = None
+
+    # 是否保存到本地，默认不保存
+    save_file: bool = False
 
 
 class UpdateSpeaker(BaseModel):
-    id: str
-    name: str
-    gender: str
-    describe: str
-    tensor: list
+    json: Optional[dict] = None
 
 
 class SpeakerDetail(BaseModel):
@@ -31,12 +39,18 @@ class SpeakerDetail(BaseModel):
 
 
 class SpeakersUpdate(BaseModel):
-    speakers: list
+    speakers: list[dict]
+
+
+class SpkListParams(BaseModel):
+    detailed: bool = Query(False, description="Return all detailed big data")
+
+    # page params
+    offset: int = Query(0, description="Offset for pagination")
+    limit: int = Query(5, description="Limit for pagination")
 
 
 def setup(app: APIManager):
-    class SpkListParams(BaseModel):
-        full_data: bool = Query(False, description="Return all data")
 
     @app.get(
         "/v1/speakers/list", response_model=api_utils.BaseResponse, tags=["Speaker"]
@@ -45,12 +59,24 @@ def setup(app: APIManager):
         request: Request,
         parmas: SpkListParams = Depends(),
     ):
+        detailed = parmas.detailed
+        offset = parmas.offset
+        limit = parmas.limit
+
+        # NOTE: 因为没有数据库，所以直接拿全部数据然后 slice 即可
+        spks = spk_mgr.list_speakers()
         data = [
-            spk.to_json(just_info=not parmas.full_data)
-            for spk in spk_mgr.list_speakers()
+            spk.to_json(just_info=not detailed) for spk in spks[offset : offset + limit]
         ]
 
-        return api_utils.success_response(data)
+        return api_utils.success_response(
+            {
+                "items": data,
+                "offset": offset,
+                "limit": limit,
+                "total": len(spks),
+            }
+        )
 
     @app.post(
         "/v1/speakers/refresh", response_model=api_utils.BaseResponse, tags=["Speaker"]
@@ -63,84 +89,85 @@ def setup(app: APIManager):
         "/v1/speakers/update", response_model=api_utils.BaseResponse, tags=["Speaker"]
     )
     async def update_speakers(request: SpeakersUpdate):
-        for config in request.speakers:
-            config: dict = config
-            cfg_spk = TTSSpeaker.from_json(config)
-            spk = spk_mgr.get_speaker_by_id(cfg_spk.id)
-            if spk is None:
-                raise HTTPException(
-                    status_code=404, detail=f"Speaker not found: {config['id']}"
-                )
-            spk.set_name(cfg_spk.name)
-            spk.set_gender(cfg_spk.gender)
-            spk.set_desc(cfg_spk.desc)
-            spk.set_version(cfg_spk.version)
-            spk.set_author(cfg_spk.author)
+        try:
+            update_spks = [TTSSpeaker.from_json(cfg) for cfg in request.speakers]
 
-            # TODO: 支持更新其他属性
-            # if (
-            #     config.get("tensor")
-            #     and isinstance(config["tensor"], list)
-            #     and len(config["tensor"]) > 0
-            # ):
-            #     # number array => Tensor
-            #     token = torch.tensor(config["tensor"])
-            #     spk.set_token(tokens=[token], model_id="chat-tts")
-        spk_mgr.save_all()
+            # check exist
+            for spk in update_spks:
+                if spk_mgr.get_speaker_by_id(spk.id) is None:
+                    raise HTTPException(
+                        status_code=404, detail=f"Speaker not found: {spk.id}"
+                    )
 
-        return api_utils.success_response(None)
+            for cfg_spk in update_spks:
+                spk = spk_mgr.get_speaker_by_id(cfg_spk.id)
+                spk.update(cfg_spk)
+            spk_mgr.save_all()
 
-    # TODO 需要适配新版本 speaker
+            return api_utils.success_response(None)
+        except Exception as e:
+            import logging
+
+            logging.exception(e)
+            if isinstance(e, HTTPException):
+                raise e
+            else:
+                raise HTTPException(status_code=500, detail=str(e))
+
     @app.post(
         "/v1/speaker/create", response_model=api_utils.BaseResponse, tags=["Speaker"]
     )
     async def create_speaker(request: CreateSpeaker):
-        if (
-            request.tensor
-            and isinstance(request.tensor, list)
-            and len(request.tensor) > 0
-        ):
-            # from tensor
-            token = torch.tensor(request.tensor)
+        try:
             spk = TTSSpeaker.empty()
-            spk.set_token(tokens=[token], model_id="chat-tts")
-        elif request.seed:
-            # from seed
-            spk = ChatTtsModel.ChatTTSModel.create_speaker_from_seed(request.seed)
             spk.set_name(request.name)
             spk.set_gender(request.gender)
-            spk.set_desc(request.describe)
-        else:
-            raise HTTPException(
-                status_code=400, detail="Missing tensor or seed in request"
-            )
-        filepath = spk_mgr.filepath(request.name + ".spkv1.json")
-        spk_mgr.save_item(spk, file_path=filepath)
-        spk_mgr.refresh()
-        return api_utils.success_response(spk.to_json())
+            spk.set_author(request.author)
+            spk.set_desc(request.desc)
+            spk.set_version(request.version)
+
+            for wav in request.wavs or []:
+                spk_ref = TTSSpeaker.create_spk_ref_from_wav_b64(wav.wav_b64, wav.text)
+                spk_ref.emotion = wav.emotion or "default"
+                spk.add_ref(spk_ref)
+
+            filepath = spk_mgr.filepath(request.name + ".spkv1.json")
+
+            if request.save_file:
+                spk_mgr.save_item(spk, file_path=filepath)
+                spk_mgr.refresh()
+            return api_utils.success_response(spk.to_json())
+        except Exception as e:
+            import logging
+
+            logging.exception(e)
+            if isinstance(e, HTTPException):
+                raise e
+            else:
+                raise HTTPException(status_code=500, detail=str(e))
 
     @app.post(
         "/v1/speaker/update", response_model=api_utils.BaseResponse, tags=["Speaker"]
     )
     async def update_speaker(request: UpdateSpeaker):
-        speaker = spk_mgr.get_speaker_by_id(request.id)
-        if speaker is None:
-            raise HTTPException(
-                status_code=404, detail=f"Speaker not found: {request.id}"
-            )
-        speaker.set_name(request.name)
-        speaker.set_gender(request.gender)
-        speaker.set_desc(request.describe)
-        if (
-            request.tensor
-            and isinstance(request.tensor, list)
-            and len(request.tensor) > 0
-        ):
-            # number array => Tensor
-            token = torch.tensor(request.tensor)
-            speaker.set_token(tokens=[token], model_id="chat-tts")
-        spk_mgr.update_item(speaker, lambda x: x.id == speaker.id)
-        return api_utils.success_response(None)
+        try:
+            cfg_spk = TTSSpeaker.from_json(request.json)
+            speaker = spk_mgr.get_speaker_by_id(cfg_spk.id)
+            if speaker is None:
+                raise HTTPException(
+                    status_code=404, detail=f"Speaker not found: {request.id}"
+                )
+            speaker.update(cfg_spk)
+            spk_mgr.update_item(speaker, lambda x: x.id == speaker.id)
+            return api_utils.success_response(None)
+        except Exception as e:
+            import logging
+
+            logging.exception(e)
+            if isinstance(e, HTTPException):
+                raise e
+            else:
+                raise HTTPException(status_code=500, detail=str(e))
 
     @app.post(
         "/v1/speaker/detail", response_model=api_utils.BaseResponse, tags=["Speaker"]
@@ -148,7 +175,9 @@ def setup(app: APIManager):
     async def speaker_detail(request: SpeakerDetail):
         speaker = spk_mgr.get_speaker_by_id(request.id)
         if speaker is None:
-            raise HTTPException(status_code=404, detail="Speaker not found")
+            raise HTTPException(
+                status_code=404, detail=f"Speaker not found: {request.id}"
+            )
         return api_utils.success_response(
             speaker.to_json(just_info=not request.with_emb)
         )

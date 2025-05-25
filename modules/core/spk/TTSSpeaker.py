@@ -151,6 +151,28 @@ class TTSSpeaker:
         spk.add_ref(ref=DcSpkReference(text=text, wav=data, wav_sr=sr))
         return spk
 
+    @staticmethod
+    def create_spk_ref_from_wav(
+        ref_wav: tuple[int, np.ndarray], text=""
+    ) -> DcSpkReference:
+        sr, data = ref_wav
+        assert data.dtype == np.int16, f"ref wav must be int16, but got {data.dtype}"
+        return DcSpkReference(text=text, wav=data.tobytes(), wav_sr=sr)
+
+    @staticmethod
+    def create_spk_ref_from_wav_bytes(
+        ref_wav: tuple[int, bytes], text=""
+    ) -> DcSpkReference:
+        sr, data = ref_wav
+        return DcSpkReference(text=text, wav=data, wav_sr=sr)
+
+    @staticmethod
+    def create_spk_ref_from_wav_b64(ref_wav_b64: str, text="") -> "DcSpkReference":
+        # 解码并计算 wav 的 sr
+        wav_bytes = base64.b64decode(ref_wav_b64)
+        wav_sr = audio_utils.get_wav_sr(wav_bytes)
+        return TTSSpeaker.create_spk_ref_from_wav((wav_sr, wav_bytes), text)
+
     def __init__(self, data: DcSpk) -> None:
         assert isinstance(data, DcSpk), "data must be a DcSpk instance"
 
@@ -249,6 +271,9 @@ class TTSSpeaker:
     def set_version(self, version: str) -> None:
         self._data.meta.version = version
 
+    def set_avatar(self, avatar: str) -> None:
+        self._data.meta.avatar = avatar
+
     def set_token(self, tokens: list, model_id: str, model_hash: str = "") -> None:
         token = DcSpkVoiceToken(
             model_id=model_id,
@@ -274,6 +299,34 @@ class TTSSpeaker:
             self._data.samples = []
         self._data.samples.append(sample)
 
+    def update(self, spk: "TTSSpeaker") -> None:
+        """
+        使用传入的 spk 更新自己
+
+        TODO: 更多属性更新
+        """
+        if spk.name:
+            self.set_name(spk.name)
+        if spk.gender != "":
+            self.set_gender(spk.gender)
+        if spk.desc:
+            self.set_desc(spk.desc)
+        if spk.version:
+            self.set_version(spk.version)
+        if spk.author:
+            self.set_author(spk.author)
+        if spk.avatar:
+            self.set_avatar(spk.avatar)
+        # TODO: 支持更新其他属性
+        # if (
+        #     config.get("tensor")
+        #     and isinstance(config["tensor"], list)
+        #     and len(config["tensor"]) > 0
+        # ):
+        #     # number array => Tensor
+        #     token = torch.tensor(config["tensor"])
+        #     spk.set_token(tokens=[token], model_id="chat-tts")
+
     @property
     def id(self) -> str:
         return self._data.id
@@ -297,6 +350,10 @@ class TTSSpeaker:
     @property
     def version(self) -> str:
         return self._data.meta.version
+
+    @property
+    def avatar(self) -> str:
+        return self._data.meta.avatar
 
     def __hash__(self):
         return hash(self.id)

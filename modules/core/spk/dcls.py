@@ -9,7 +9,7 @@ import torch
 class DcSpkMeta:
     name: str = ""
     desc: str = ""
-    gender: str = "*"
+    gender: str = ""
 
     author: str = ""
     version: str = ""
