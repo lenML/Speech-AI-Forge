@@ -4,12 +4,12 @@ import re
 import wordsegment
 from g2p_en import G2p
 
-from text.symbols import punctuation
+from ..text.symbols import punctuation
 
-from text.symbols2 import symbols
+from ..text.symbols2 import symbols
 
 from builtins import str as unicode
-from text.en_normalization.expend import normalize
+from ..text.en_normalization.expend import normalize
 from nltk.tokenize import TweetTokenizer
 
 word_tokenize = TweetTokenizer().tokenize

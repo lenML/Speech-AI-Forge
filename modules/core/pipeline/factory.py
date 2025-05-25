@@ -233,6 +233,9 @@ class PipelineFactory:
         model = model_zoo.get_gpt_sovits_v4()
         pipeline.set_model(model)
 
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
     @classmethod
     def create_postprocess_pipeline(cls, audio: NP_AUDIO, ctx: TTSPipelineContext):
         pipeline = FromAudioPipeline(audio=audio, ctx=ctx)

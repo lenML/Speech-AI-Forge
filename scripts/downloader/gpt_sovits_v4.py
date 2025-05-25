@@ -28,6 +28,13 @@ class GptSoVitsV4Downloader(BaseModelDownloader):
 
         self.logger = logger
 
+    def extra_data_prepare(self):
+        import nltk
+
+        nltk.download(
+            ["averaged_perceptron_tagger", "averaged_perceptron_tagger_eng", "cmudict"]
+        )
+
 
 if __name__ == "__main__":
     from scripts.dl_args import parser_args

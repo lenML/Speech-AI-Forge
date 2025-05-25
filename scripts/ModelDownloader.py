@@ -1,4 +1,15 @@
-import logging
+try:
+    import logging
+    import os
+
+    # 设置全局格式
+    logging.basicConfig(
+        level=os.getenv("LOG_LEVEL", "INFO"),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+except Exception as e:
+    pass
+
 import time
 from pathlib import Path
 
@@ -25,8 +36,15 @@ class ModelDownloader:
     def gc(self):
         raise NotImplementedError()
 
+    def extra_data_prepare(self):
+        """
+        某些第三方依赖定义在这里，比如 gpt-sovits 依赖 nltk data
+        """
+        pass
+
     def __call__(self, source: str):
         self.execate(downloader=self, source=source)
+        self.extra_data_prepare()
 
     @staticmethod
     def execate(*, downloader: "ModelDownloader", source: str):

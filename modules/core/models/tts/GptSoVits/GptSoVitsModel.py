@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Literal
 
 import numpy as np
+import torch
+from modules.core.models.AudioReshaper import AudioReshaper
 from modules.core.models.TTSModel import TTSModel
 from modules.core.models.tts.GptSoVits.GptSoVitsTTS import GptSoVitsTTS
 from modules.core.models.tts.GptSoVits.GptSoVitsTTSConfig import GptSoVitsTTSConfig
@@ -24,16 +26,31 @@ class GptSoVitsModel(TTSModel):
         model_id = f"gpt-so-vits-{version}"
         super().__init__(model_id)
 
+        self.device = devices.get_device_for("gpt-so-vits")
+        self.dtype = devices.dtype
+        self.version = version
+
         self.model: GptSoVitsTTS = None
-        # FIXME: 在这里初始化有可能导致提前加载 pytorch
-        self.config: GptSoVitsTTSConfig = GptSoVitsTTSConfig({"version": version})
 
     def get_sample_rate(self):
-        return self.config.sampling_rate
+        # return self.config.sampling_rate
+        # 来自 modules/repos_static/GPT_SoVITS/GPT_SoVITS/TTS_infer_pack/TTS.py
+        return 32000
 
     def load(self):
         if self.model is None:
-            self.model = GptSoVitsTTS(self.config)
+            configs = GptSoVitsTTSConfig(
+                {
+                    "custom": {
+                        "device": self.device,
+                        "is_half": self.dtype == torch.float16,
+                    },
+                    "version": self.version,
+                }
+            )
+            # print("gpt-sovits configs:")
+            # print(configs)
+            self.model = GptSoVitsTTS(configs=configs)
         return self.model
 
     @devices.after_gc()
@@ -97,8 +114,9 @@ class GptSoVitsModel(TTSModel):
                         }
                     )
                 )
-                sr, data = result
-                # maybe process something here?
+                # 这里输出的 data 是 int16 ，我们转为 float32 以适配整个系统
+                sr, data = AudioReshaper.ensure_float32(result)
+
                 return sr, data
 
     def generate_batch(self, segments, context):

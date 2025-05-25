@@ -132,6 +132,24 @@ class SparkTTSInterface(NotSeedTTSInterface):
         self.show_style_dropdown = False
 
 
+class GptSoVitsInterface(NotSeedTTSInterface):
+
+    def __init__(self):
+        super().__init__("gpt-sovits-v4")
+        self.refine_visible = False
+        self.contorl_tokens = []
+        self.spliter_eos = " 。 "
+
+        self.styles = ["*auto"]
+
+        self.default_temprature = 0.8
+        self.default_top_p = 0.95
+        self.default_top_k = 50
+
+        # NOTE: 这个模型不支持 instruction
+        self.show_style_dropdown = False
+
+
 class ChatTTSInterface(TTSInterface):
     def __init__(self, model_id="chat-tts"):
         super().__init__(model_id)
@@ -161,5 +179,8 @@ def create_tts_interface():
             spark_tts_interface = SparkTTSInterface()
             spark_tts_interface.create_tts_interface()
         with gr.TabItem("FishSpeech"):
-            cosy_voice_interface = FishSpeechInterface()
-            cosy_voice_interface.create_tts_interface()
+            fishspeech_interface = FishSpeechInterface()
+            fishspeech_interface.create_tts_interface()
+        with gr.TabItem("GPT-SoVITS"):
+            gpt_sovits_interface = GptSoVitsInterface()
+            gpt_sovits_interface.create_tts_interface()

@@ -152,8 +152,9 @@ def create_interface():
                 with gr.Tabs():
                     with gr.TabItem("readme"):
                         create_readme_tab()
-                    with gr.TabItem("changelog"):
-                        create_changelog_tab()
+                    # TODO: changlog 现在删了，还没搞新的
+                    # with gr.TabItem("changelog"):
+                    #     create_changelog_tab()
 
         create_app_footer()
 
