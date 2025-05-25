@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Speech-AI Forge API",
-    "description": "\n🍦 Speech-AI-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。<br/>\n🍦 Speech-AI-Forge is a project developed around the TTS generation model ChatTTS, implementing an API Server and a Gradio-based WebUI.\n\n项目地址: [https://github.com/lenML/Speech-AI-Forge](https://github.com/lenML/Speech-AI-Forge)\n\n> 所有生成音频的 POST api都无法在此页面调试，调试建议使用 playground <br/>\n> All audio generation POST APIs cannot be debugged on this page, it is recommended to use playground for debugging\n\n> 如果你不熟悉本系统，建议从这个一键脚本开始，在colab中尝试一下：<br/>\n> [https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb)\n            ",
+    "description": "\n🍦 Speech-AI-Forge 是一个围绕 TTS 生成模型 ChatTTS 开发的项目，实现了 API Server 和 基于 Gradio 的 WebUI。<br/>\n🍦 Speech-AI-Forge is a project developed around the TTS generation model ChatTTS, implementing an API Server and a Gradio-based WebUI.\n\n项目地址: [https://github.com/lenML/Speech-AI-Forge](https://github.com/lenML/Speech-AI-Forge)\n\n> 所有生成音频的 POST api都无法在此页面调试，调试建议使用 playground <br/>\n> All audio generation POST APIs cannot be debugged on this page, it is recommended to use playground for debugging\n\n> 如果你不熟悉本系统，建议从这个一键脚本开始，在colab中尝试一下：<br/>\n> [https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb)\n\n[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)\n            ",
     "version": "0.1.0"
   },
   "paths": {
@@ -12,6 +12,7 @@
           "System"
         ],
         "summary": "Ping",
+        "description": "Health check",
         "operationId": "ping_v1_ping_get",
         "responses": {
           "200": {
@@ -33,6 +34,7 @@
           "System"
         ],
         "summary": "Get Versions",
+        "description": "Get versions",
         "operationId": "get_versions_v1_versions_get",
         "responses": {
           "200": {
@@ -54,6 +56,7 @@
           "System"
         ],
         "summary": "Get Audio Formats",
+        "description": "Get audio encoder formats",
         "operationId": "get_audio_formats_v1_audio_formats_get",
         "responses": {
           "200": {
@@ -138,6 +141,7 @@
           "Style"
         ],
         "summary": "List Styles",
+        "description": "**DEPRECATED**\nThis API is deprecated and will be removed in the future. We will replace it with the speaker system and prompt system.",
         "operationId": "list_styles_v1_styles_list_get",
         "responses": {
           "200": {
@@ -159,16 +163,37 @@
           "Speaker"
         ],
         "summary": "List Speakers",
+        "description": "List all available speakers with optional pagination and detail control.\n\n- `detailed`: If true, returns complete metadata including references and embeddings.\n- `offset` / `limit`: Support for paginated speaker listing.",
         "operationId": "list_speakers_v1_speakers_list_get",
         "parameters": [
           {
-            "name": "full_data",
+            "name": "detailed",
             "in": "query",
             "required": false,
             "schema": {
               "type": "boolean",
               "default": false,
-              "title": "Full Data"
+              "title": "Detailed"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 5,
+              "title": "Limit"
             }
           }
         ],
@@ -202,6 +227,7 @@
           "Speaker"
         ],
         "summary": "Refresh Speakers",
+        "description": "Force reload of all speaker metadata from disk.  \nUse this when files are modified externally or newly added.",
         "operationId": "refresh_speakers_v1_speakers_refresh_post",
         "responses": {
           "200": {
@@ -223,6 +249,7 @@
           "Speaker"
         ],
         "summary": "Update Speakers",
+        "description": "Batch update multiple speakers by providing a list of speaker JSON configs.\n\nEach speaker must already exist (matched by ID).  \nWill overwrite corresponding fields and persist changes to disk.",
         "operationId": "update_speakers_v1_speakers_update_post",
         "requestBody": {
           "content": {
@@ -264,6 +291,7 @@
           "Speaker"
         ],
         "summary": "Create Speaker",
+        "description": "Create a new speaker profile with optional reference audios.\n\n- `name` is required and used as unique identifier.\n- `wavs` is a list of audio samples (base64-encoded) and reference texts for embedding.\n- `save_file`: If true, the speaker will be saved to disk and available after refresh.",
         "operationId": "create_speaker_v1_speaker_create_post",
         "requestBody": {
           "content": {
@@ -305,6 +333,7 @@
           "Speaker"
         ],
         "summary": "Update Speaker",
+        "description": "Update a single speaker's configuration by full JSON override.\n\nThe speaker must already exist (matched by ID).  \nFields like name, gender, refs, etc., will be updated accordingly.",
         "operationId": "update_speaker_v1_speaker_update_post",
         "requestBody": {
           "content": {
@@ -346,6 +375,7 @@
           "Speaker"
         ],
         "summary": "Speaker Detail",
+        "description": "Fetch metadata of a specific speaker by ID.\n\n- `with_emb`: If true, includes embedding vectors and all reference data.",
         "operationId": "speaker_detail_v1_speaker_detail_post",
         "requestBody": {
           "content": {
@@ -674,6 +704,7 @@
           "SSML"
         ],
         "summary": "Synthesize Ssml Api",
+        "description": "Synthesize speech from SSML-formatted input using a specified TTS model.\n\nThis endpoint supports multi-speaker, multi-style speech synthesis based on structured SSML input.\nIt can return audio in various formats (e.g., `raw`, `wav`, `mp3`), with optional enhancements and prosody adjustments.\n\n### Supported Features\n- Multiple speakers via `<voice spk=\"...\">`\n- Arbitrary text segmentation with sentence break markers (e.g., `eos=\"[uv_break]\"`)\n- Streaming or full-response audio\n- Audio enhancement & pitch/speed adjustment via `EnhancerConfig` / `AdjustConfig`\n- Custom batch size & segment length control via `batch_size` / `spliter_thr`\n\n### Parameters\n- `ssml` (str): SSML XML string containing structured speech content (required)\n- `format` (str): Output audio format. One of: `raw`, `wav`, `mp3` (default: `raw`)\n- `batch_size` (int): Batch size for internal TTS inference, must be > 0\n- `eos` (str): End-of-sentence token for segmentation (default: `[uv_break]`)\n- `model` (str): TTS model identifier to be used (default: `chat-tts`)\n- `spliter_thr` (int): Threshold to split long texts (default: 100, minimum: 50)\n- `enhancer` (EnhancerConfig): Optional audio enhancer settings\n- `adjuster` (AdjustConfig): Optional pitch/speed/volume control\n- `stream` (bool): If true, returns a streaming response; otherwise, file response\n\n### Example SSML Input\n\n```xml\n<speak version=\"0.1\">\n    <voice spk=\"mona\">ChatTTS 用于合成多角色多情感的有声书示例</voice>\n    <voice spk=\"mona\">黛玉冷笑道：</voice>\n    <voice spk=\"doubao\" emotion=\"happy\">我说呢，亏了绊住，不然，早就飞起来了。</voice>\n    <voice spk=\"mona\">宝玉道：</voice>\n    <voice spk=\"mona\">“只许和你玩，替你解闷。不过偶然到他那里，就说这些闲话。”</voice>\n    <voice spk=\"doubao\" emotion=\"angry\">“好没意思的话！ 去不去，关我什么事儿？ 又没叫你替我解闷儿 ，还许你不理我呢”</voice>\n    <voice spk=\"mona\">说着，便赌气回房去了。</voice>\n</speak>\n````\n\nThe endpoint returns a synthesized audio file or stream based on the provided SSML and configuration.",
         "operationId": "synthesize_ssml_api_v1_ssml_post",
         "requestBody": {
           "content": {
@@ -879,10 +910,10 @@
     "/v1/prompt/refine": {
       "post": {
         "tags": [
-          "Text Refiner"
+          "Text"
         ],
         "summary": "Refiner Prompt Post",
-        "description": "This endpoint receives a prompt and returns the refined result",
+        "description": "**DeprecationWarning**\n\nThis endpoint is deprecated and will be removed in the future.\n\nRequirements:\n- `chattts` model",
         "operationId": "refiner_prompt_post_v1_prompt_refine_post",
         "requestBody": {
           "content": {
@@ -921,10 +952,10 @@
     "/v1/text/normalize": {
       "post": {
         "tags": [
-          "Text Refiner"
+          "Text"
         ],
         "summary": "Text Normalize Post",
-        "description": "This endpoint receives a text and returns the normalized text",
+        "description": "Normalize raw input text using a selected Text Normalization (TN) pipeline.\n\nThis endpoint supports different TN implementations to perform text normalization \n(e.g., expanding numbers, abbreviations, adding pauses or prosodic markers for TTS, etc.).\n\n### Parameters\n\n- `text` (str): The raw text to normalize.\n- `pipe_id` (str): The TN pipeline to use. Available options:\n  - `base`\n  - `chat-tts`\n  - `cosy-voice`\n  - `fish-speech`\n  - `f5-tts`\n  - `index-tts`\n  - `spark-tts`\n- `config` (TNConfig, optional): Optional configuration to customize TN behavior for specific pipelines.\n\n### Returns\n\nA normalized version of the input text, suitable for use in speech synthesis or downstream NLP tasks.",
         "operationId": "text_normalize_post_v1_text_normalize_post",
         "requestBody": {
           "content": {
@@ -966,6 +997,7 @@
           "XTTS"
         ],
         "summary": "Speakers",
+        "description": "[[Click To XTTS_V2 API Document]](https://github.com/lenML/Speech-AI-Forge/blob/main/docs/api_xtts.md)\n\n[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)",
         "operationId": "speakers_v1_xtts_v2_speakers_get",
         "responses": {
           "200": {
@@ -985,6 +1017,7 @@
           "XTTS"
         ],
         "summary": "Tts To Audio",
+        "description": "[[Click To XTTS_V2 API Document]](https://github.com/lenML/Speech-AI-Forge/blob/main/docs/api_xtts.md)\n\n[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)",
         "operationId": "tts_to_audio_v1_xtts_v2_tts_to_audio_post",
         "requestBody": {
           "content": {
@@ -1019,6 +1052,7 @@
           "XTTS"
         ],
         "summary": "Tts Stream",
+        "description": "[[Click To XTTS_V2 API Document]](https://github.com/lenML/Speech-AI-Forge/blob/main/docs/api_xtts.md)\n\n[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)",
         "operationId": "tts_stream_v1_xtts_v2_tts_stream_get",
         "parameters": [
           {
@@ -1088,6 +1122,7 @@
           "XTTS"
         ],
         "summary": "Set Tts Settings",
+        "description": "[[Click To XTTS_V2 API Document]](https://github.com/lenML/Speech-AI-Forge/blob/main/docs/api_xtts.md)\n\n[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)",
         "operationId": "set_tts_settings_v1_xtts_v2_set_tts_settings_post",
         "requestBody": {
           "content": {
@@ -1169,7 +1204,7 @@
           "STT"
         ],
         "summary": "Transcribe Stream",
-        "description": "Transcribes audio into the input language in real-time.",
+        "description": "Transcribes audio into the input language in real-time.\n\n* Not implemented yet (WIP)",
         "operationId": "transcribe_stream_v1_stt_stream_post",
         "requestBody": {
           "content": {
@@ -1209,7 +1244,7 @@
           "Voice Clone"
         ],
         "summary": "Voice Clone",
-        "description": "Voice cloning API",
+        "description": "Voice cloning API\n\n**Deprecated**\nThis API is deprecated and will be removed in the future.\nPlease use the `TTS API` instead.",
         "operationId": "voice_clone_v1_vc_post",
         "parameters": [
           {
@@ -1441,6 +1476,36 @@
           "raw"
         ],
         "title": "AudioFormat"
+      },
+      "AudioReference": {
+        "properties": {
+          "wav_b64": {
+            "type": "string",
+            "title": "Wav B64"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "emotion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emotion",
+            "default": "default"
+          }
+        },
+        "type": "object",
+        "required": [
+          "wav_b64",
+          "text"
+        ],
+        "title": "AudioReference"
       },
       "AudioSpeechParams": {
         "properties": {
@@ -2007,27 +2072,47 @@
           },
           "gender": {
             "type": "string",
-            "title": "Gender"
+            "title": "Gender",
+            "default": ""
           },
-          "describe": {
+          "author": {
             "type": "string",
-            "title": "Describe"
+            "title": "Author",
+            "default": ""
           },
-          "tensor": {
-            "items": {},
-            "type": "array",
-            "title": "Tensor"
+          "desc": {
+            "type": "string",
+            "title": "Desc",
+            "default": ""
           },
-          "seed": {
-            "type": "integer",
-            "title": "Seed"
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "default": ""
+          },
+          "wavs": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AudioReference"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wavs"
+          },
+          "save_file": {
+            "type": "boolean",
+            "title": "Save File",
+            "default": false
           }
         },
         "type": "object",
         "required": [
-          "name",
-          "gender",
-          "describe"
+          "name"
         ],
         "title": "CreateSpeaker"
       },
@@ -2431,7 +2516,9 @@
       "SpeakersUpdate": {
         "properties": {
           "speakers": {
-            "items": {},
+            "items": {
+              "type": "object"
+            },
             "type": "array",
             "title": "Speakers"
           }
@@ -2676,12 +2763,16 @@
           "pipe_id": {
             "type": "string",
             "enum": [
+              "base",
               "chat-tts",
               "cosy-voice",
-              "fish-speech"
+              "fish-speech",
+              "f5-tts",
+              "index-tts",
+              "spark-tts"
             ],
             "title": "Pipe Id",
-            "default": "chat-tts"
+            "default": "base"
           },
           "config": {
             "anyOf": [
@@ -2743,36 +2834,19 @@
       },
       "UpdateSpeaker": {
         "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "gender": {
-            "type": "string",
-            "title": "Gender"
-          },
-          "describe": {
-            "type": "string",
-            "title": "Describe"
-          },
-          "tensor": {
-            "items": {},
-            "type": "array",
-            "title": "Tensor"
+          "json": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Json"
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "gender",
-          "describe",
-          "tensor"
-        ],
         "title": "UpdateSpeaker"
       },
       "V2TtsParams": {

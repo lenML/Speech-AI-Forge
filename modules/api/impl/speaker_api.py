@@ -53,7 +53,15 @@ class SpkListParams(BaseModel):
 def setup(app: APIManager):
 
     @app.get(
-        "/v1/speakers/list", response_model=api_utils.BaseResponse, tags=["Speaker"]
+        "/v1/speakers/list",
+        response_model=api_utils.BaseResponse,
+        tags=["Speaker"],
+        description="""
+List all available speakers with optional pagination and detail control.
+
+- `detailed`: If true, returns complete metadata including references and embeddings.
+- `offset` / `limit`: Support for paginated speaker listing.
+""",
     )
     async def list_speakers(
         request: Request,
@@ -79,14 +87,28 @@ def setup(app: APIManager):
         )
 
     @app.post(
-        "/v1/speakers/refresh", response_model=api_utils.BaseResponse, tags=["Speaker"]
+        "/v1/speakers/refresh",
+        response_model=api_utils.BaseResponse,
+        tags=["Speaker"],
+        description="""
+Force reload of all speaker metadata from disk.  
+Use this when files are modified externally or newly added.
+""",
     )
     async def refresh_speakers():
         spk_mgr.refresh()
         return api_utils.success_response(None)
 
     @app.post(
-        "/v1/speakers/update", response_model=api_utils.BaseResponse, tags=["Speaker"]
+        "/v1/speakers/update",
+        response_model=api_utils.BaseResponse,
+        tags=["Speaker"],
+        description="""
+Batch update multiple speakers by providing a list of speaker JSON configs.
+
+Each speaker must already exist (matched by ID).  
+Will overwrite corresponding fields and persist changes to disk.
+""",
     )
     async def update_speakers(request: SpeakersUpdate):
         try:
@@ -115,7 +137,16 @@ def setup(app: APIManager):
                 raise HTTPException(status_code=500, detail=str(e))
 
     @app.post(
-        "/v1/speaker/create", response_model=api_utils.BaseResponse, tags=["Speaker"]
+        "/v1/speaker/create",
+        response_model=api_utils.BaseResponse,
+        tags=["Speaker"],
+        description="""
+Create a new speaker profile with optional reference audios.
+
+- `name` is required and used as unique identifier.
+- `wavs` is a list of audio samples (base64-encoded) and reference texts for embedding.
+- `save_file`: If true, the speaker will be saved to disk and available after refresh.
+""",
     )
     async def create_speaker(request: CreateSpeaker):
         try:
@@ -147,7 +178,15 @@ def setup(app: APIManager):
                 raise HTTPException(status_code=500, detail=str(e))
 
     @app.post(
-        "/v1/speaker/update", response_model=api_utils.BaseResponse, tags=["Speaker"]
+        "/v1/speaker/update",
+        response_model=api_utils.BaseResponse,
+        tags=["Speaker"],
+        description="""
+Update a single speaker's configuration by full JSON override.
+
+The speaker must already exist (matched by ID).  
+Fields like name, gender, refs, etc., will be updated accordingly.
+""",
     )
     async def update_speaker(request: UpdateSpeaker):
         try:
@@ -170,7 +209,14 @@ def setup(app: APIManager):
                 raise HTTPException(status_code=500, detail=str(e))
 
     @app.post(
-        "/v1/speaker/detail", response_model=api_utils.BaseResponse, tags=["Speaker"]
+        "/v1/speaker/detail",
+        response_model=api_utils.BaseResponse,
+        tags=["Speaker"],
+        description="""
+Fetch metadata of a specific speaker by ID.
+
+- `with_emb`: If true, includes embedding vectors and all reference data.
+""",
     )
     async def speaker_detail(request: SpeakerDetail):
         speaker = spk_mgr.get_speaker_by_id(request.id)

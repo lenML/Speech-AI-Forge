@@ -77,7 +77,14 @@ def setup(app: APIManager):
 
     @app.post(
         "/v1/vc",
-        description="Voice cloning API",
+        # 此接口依赖模型 openvoice ，并且，不再维护，且准备废弃
+        description="""
+Voice cloning API
+
+**Deprecated**
+This API is deprecated and will be removed in the future.
+Please use the `TTS API` instead.
+""",
         response_class=StreamingResponse,
         tags=["Voice Clone"],
     )

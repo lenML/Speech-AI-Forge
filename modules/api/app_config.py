@@ -9,6 +9,8 @@ app_description = """
 
 > 如果你不熟悉本系统，建议从这个一键脚本开始，在colab中尝试一下：<br/>
 > [https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb)
+
+[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)
             """
 app_title = "Speech-AI Forge API"
 app_version = "0.1.0"

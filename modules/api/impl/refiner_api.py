@@ -10,6 +10,10 @@ from modules.core.handler.datacls.tn_model import TNConfig
 from modules.core.tn.ChatTtsTN import ChatTtsTN
 from modules.core.tn.CosyVoiceTN import CosyVoiceTN
 from modules.core.tn.FishSpeechTN import FishSpeechTN
+from modules.core.tn.base_tn import BaseTN
+from modules.core.tn.F5TtsTN import F5TtsTN
+from modules.core.tn.IndexTTSTN import IndexTTSTN
+from modules.core.tn.SparkTTSTN import SparkTTSTN
 
 
 class RefineTextRequest(BaseModel):
@@ -59,19 +63,31 @@ async def refiner_prompt_post(request: RefineTextRequest):
             raise HTTPException(status_code=500, detail=str(e))
 
 
-class TextNormalizeRequest(BaseModel):
-    text: str
-
-    pipe_id: Literal["chat-tts", "cosy-voice", "fish-speech"] = "chat-tts"
-
-    config: Optional[TNConfig] = None
-
-
 pipelines = {
+    "base": BaseTN,
     "chat-tts": ChatTtsTN,
     "cosy-voice": CosyVoiceTN,
     "fish-speech": FishSpeechTN,
+    "f5-tts": F5TtsTN,
+    "index-tts": IndexTTSTN,
+    "spark-tts": SparkTTSTN,
 }
+
+
+class TextNormalizeRequest(BaseModel):
+    text: str
+
+    pipe_id: Literal[
+        "base",
+        "chat-tts",
+        "cosy-voice",
+        "fish-speech",
+        "f5-tts",
+        "index-tts",
+        "spark-tts",
+    ] = "base"
+
+    config: Optional[TNConfig] = None
 
 
 async def text_normalize_post(request: TextNormalizeRequest):
@@ -108,11 +124,43 @@ def setup(app: APIManager):
     app.post(
         "/v1/prompt/refine",
         response_model=api_utils.BaseResponse,
-        tags=["Text Refiner"],
+        tags=["Text"],
+        # 此接口暂时不会积极维护，并且依赖 chattts 模型，如果模型未下载将报错
+        description="""
+**DeprecationWarning**
+
+This endpoint is deprecated and will be removed in the future.
+
+Requirements:
+- `chattts` model
+""",
     )(refiner_prompt_post)
 
     app.post(
         "/v1/text/normalize",
         response_model=api_utils.BaseResponse,
-        tags=["Text Refiner"],
+        tags=["Text"],
+        description="""
+Normalize raw input text using a selected Text Normalization (TN) pipeline.
+
+This endpoint supports different TN implementations to perform text normalization 
+(e.g., expanding numbers, abbreviations, adding pauses or prosodic markers for TTS, etc.).
+
+### Parameters
+
+- `text` (str): The raw text to normalize.
+- `pipe_id` (str): The TN pipeline to use. Available options:
+  - `base`
+  - `chat-tts`
+  - `cosy-voice`
+  - `fish-speech`
+  - `f5-tts`
+  - `index-tts`
+  - `spark-tts`
+- `config` (TNConfig, optional): Optional configuration to customize TN behavior for specific pipelines.
+
+### Returns
+
+A normalized version of the input text, suitable for use in speech synthesis or downstream NLP tasks.
+""",
     )(text_normalize_post)

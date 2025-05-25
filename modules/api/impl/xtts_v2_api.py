@@ -109,11 +109,20 @@ class SynthesisParams(BaseModel):
     # xtts 接口这个是必填的，但是我们这里不需要所以可以为空
     language: str = "cn"
 
+api_desc = """
+[[Click To XTTS_V2 API Document]](https://github.com/lenML/Speech-AI-Forge/blob/main/docs/api_xtts.md)
+
+[[Learn More About Documents]](https://github.com/lenML/Speech-AI-Forge/issues/240)
+"""
 
 def setup(app: APIManager):
     XTTSV2 = XTTS_V2_Settings()
 
-    @app.get("/v1/xtts_v2/speakers", tags=["XTTS"])
+    @app.get(
+        "/v1/xtts_v2/speakers",
+        tags=["XTTS"],
+        description=api_desc,
+    )
     async def speakers():
         spks = spk_mgr.list_speakers()
         return [
@@ -127,7 +136,10 @@ def setup(app: APIManager):
         ]
 
     @app.post(
-        "/v1/xtts_v2/tts_to_audio", response_class=StreamingResponse, tags=["XTTS"]
+        "/v1/xtts_v2/tts_to_audio",
+        response_class=StreamingResponse,
+        tags=["XTTS"],
+        description=api_desc,
     )
     async def tts_to_audio(request: Request, params: SynthesisParams):
         text = params.text
@@ -179,7 +191,11 @@ def setup(app: APIManager):
         handler.set_current_request(request=request)
         return await handler.enqueue_to_response()
 
-    @app.get("/v1/xtts_v2/tts_stream", tags=["XTTS"])
+    @app.get(
+        "/v1/xtts_v2/tts_stream",
+        tags=["XTTS"],
+        description=api_desc,
+    )
     async def tts_stream(
         request: Request,
         text: str = Query(),
@@ -236,7 +252,11 @@ def setup(app: APIManager):
         handler.set_current_request(request=request)
         return await handler.enqueue_to_response()
 
-    @app.post("/v1/xtts_v2/set_tts_settings", tags=["XTTS"])
+    @app.post(
+        "/v1/xtts_v2/set_tts_settings",
+        tags=["XTTS"],
+        description=api_desc,
+    )
     async def set_tts_settings(request: TTSSettingsRequest):
         try:
             if request.stream_chunk_size < 50:

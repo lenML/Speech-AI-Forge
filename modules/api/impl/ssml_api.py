@@ -103,6 +103,48 @@ async def synthesize_ssml_api(
 
 
 def setup(api_manager: APIManager):
-    api_manager.post("/v1/ssml", response_class=FileResponse, tags=["SSML"])(
-        synthesize_ssml_api
-    )
+    api_manager.post(
+        "/v1/ssml",
+        response_class=FileResponse,
+        tags=["SSML"],
+        description="""
+Synthesize speech from SSML-formatted input using a specified TTS model.
+
+This endpoint supports multi-speaker, multi-style speech synthesis based on structured SSML input.
+It can return audio in various formats (e.g., `raw`, `wav`, `mp3`), with optional enhancements and prosody adjustments.
+
+### Supported Features
+- Multiple speakers via `<voice spk="...">`
+- Arbitrary text segmentation with sentence break markers (e.g., `eos="[uv_break]"`)
+- Streaming or full-response audio
+- Audio enhancement & pitch/speed adjustment via `EnhancerConfig` / `AdjustConfig`
+- Custom batch size & segment length control via `batch_size` / `spliter_thr`
+
+### Parameters
+- `ssml` (str): SSML XML string containing structured speech content (required)
+- `format` (str): Output audio format. One of: `raw`, `wav`, `mp3` (default: `raw`)
+- `batch_size` (int): Batch size for internal TTS inference, must be > 0
+- `eos` (str): End-of-sentence token for segmentation (default: `[uv_break]`)
+- `model` (str): TTS model identifier to be used (default: `chat-tts`)
+- `spliter_thr` (int): Threshold to split long texts (default: 100, minimum: 50)
+- `enhancer` (EnhancerConfig): Optional audio enhancer settings
+- `adjuster` (AdjustConfig): Optional pitch/speed/volume control
+- `stream` (bool): If true, returns a streaming response; otherwise, file response
+
+### Example SSML Input
+
+```xml
+<speak version="0.1">
+    <voice spk="mona">ChatTTS 用于合成多角色多情感的有声书示例</voice>
+    <voice spk="mona">黛玉冷笑道：</voice>
+    <voice spk="doubao" emotion="happy">我说呢，亏了绊住，不然，早就飞起来了。</voice>
+    <voice spk="mona">宝玉道：</voice>
+    <voice spk="mona">“只许和你玩，替你解闷。不过偶然到他那里，就说这些闲话。”</voice>
+    <voice spk="doubao" emotion="angry">“好没意思的话！ 去不去，关我什么事儿？ 又没叫你替我解闷儿 ，还许你不理我呢”</voice>
+    <voice spk="mona">说着，便赌气回房去了。</voice>
+</speak>
+````
+
+The endpoint returns a synthesized audio file or stream based on the provided SSML and configuration.
+""",
+    )(synthesize_ssml_api)

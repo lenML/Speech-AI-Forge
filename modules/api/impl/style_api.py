@@ -13,6 +13,13 @@ async def create_style():
 
 
 def setup(app: APIManager):
-    app.get("/v1/styles/list", response_model=api_utils.BaseResponse, tags=["Style"])(
-        list_styles
-    )
+    app.get(
+        "/v1/styles/list",
+        response_model=api_utils.BaseResponse,
+        tags=["Style"],
+        # 此 api 将废弃，取而代之的是 speaker 系统 和 prompt
+        description="""
+**DEPRECATED**
+This API is deprecated and will be removed in the future. We will replace it with the speaker system and prompt system.
+""",
+    )(list_styles)

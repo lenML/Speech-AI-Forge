@@ -100,9 +100,11 @@ def setup(app: APIManager):
 
     @app.post(
         "/v1/stt/transcribe",
-        description="Transcribes audio into the input language.",
         response_model=TranscriptionsResponse,
         tags=["STT"],
+        description="""
+Transcribes audio into the input language.
+""",
     )
     async def transcribe(
         form_data: TranscriptionsForm = Depends(TranscriptionsForm.as_form),
@@ -170,8 +172,12 @@ def setup(app: APIManager):
 
     @app.post(
         "/v1/stt/stream",
-        description="Transcribes audio into the input language in real-time.",
         tags=["STT"],
+        description="""
+Transcribes audio into the input language in real-time.
+
+* Not implemented yet (WIP)
+""",
     )
     async def transcribe_stream(
         form_data: TranscriptionsForm = Depends(TranscriptionsForm.as_form),
