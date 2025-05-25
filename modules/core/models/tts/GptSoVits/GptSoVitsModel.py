@@ -63,7 +63,10 @@ class GptSoVitsModel(TTSModel):
         self.model = None
 
     def generate(self, segment, context):
-        # TODO 增加 cache
+        cached = self.get_cache(segments=[segment], context=context)
+        if cached is not None:
+            return cached
+
         model = self.load()
 
         seg0 = segment
@@ -116,6 +119,11 @@ class GptSoVitsModel(TTSModel):
                 )
                 # 这里输出的 data 是 int16 ，我们转为 float32 以适配整个系统
                 sr, data = AudioReshaper.ensure_float32(result)
+
+                if not context.stop:
+                    self.set_cache(
+                        segments=[segment], context=context, value=(sr, data)
+                    )
 
                 return sr, data
 
