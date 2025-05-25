@@ -88,3 +88,63 @@ export interface ITTSParamsV2 {
     };
   };
 }
+
+export namespace Speaker {
+  export interface AudioReference {
+    wav_b64: string;
+    text: string;
+    emotion?: string;
+  }
+
+  export interface CreateSpeaker {
+    name: string;
+    gender?: string;
+    author?: string;
+    desc?: string;
+    version?: string;
+    wavs?: AudioReference[];
+    save_file?: boolean;
+  }
+
+  export interface UpdateSpeaker {
+    json?: Record<string, any>;
+  }
+
+  export interface SpeakerDetail {
+    id: string;
+    with_emb?: boolean;
+  }
+
+  export interface SpeakersUpdate {
+    speakers: Record<string, any>[];
+  }
+
+  export interface SpkListParams {
+    detailed?: boolean;
+    offset?: number;
+    limit?: number;
+  }
+
+  export interface Speaker {
+    id: string;
+    name: string;
+    gender?: string;
+    author?: string;
+    desc?: string;
+    version?: string;
+    [key: string]: any;
+  }
+
+  export interface PaginatedResponse<T> {
+    items: T[];
+    offset: number;
+    limit: number;
+    total: number;
+  }
+
+  export interface BaseResponse<T = any> {
+    // code: number;
+    message: string;
+    data: T;
+  }
+}

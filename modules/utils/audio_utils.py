@@ -9,6 +9,7 @@ import pyrubberband as pyrb
 import scipy.io.wavfile as wavfile
 import soundfile as sf
 from pydub import AudioSegment, effects
+import base64
 
 INT16_MAX = np.iinfo(np.int16).max
 
@@ -214,6 +215,17 @@ def get_wav_sr(audio: bytes) -> int:
     byte_io = io.BytesIO(audio)
     audio_data, read_sr = sf.read(byte_io, dtype="float32")
     return read_sr
+
+
+def read_base64_audio(base64_audio: str) -> tuple[int, np.ndarray]:
+    # 去除 data URI
+    if ";base64," in base64_audio:
+        base64_audio = base64_audio.split(";base64,")[-1]
+
+    audio_bytes = base64.b64decode(base64_audio)
+    audio_buffer = io.BytesIO(audio_bytes)
+    audio_np, sr = sf.read(audio_buffer)
+    return sr, audio_np
 
 
 if __name__ == "__main__":

@@ -129,7 +129,7 @@ def setup(app: APIManager):
             for wav in request.wavs or []:
                 spk_ref = TTSSpeaker.create_spk_ref_from_wav_b64(wav.wav_b64, wav.text)
                 spk_ref.emotion = wav.emotion or "default"
-                spk.add_ref(spk_ref)
+                spk.add_ref(ref=spk_ref)
 
             filepath = spk_mgr.filepath(request.name + ".spkv1.json")
 

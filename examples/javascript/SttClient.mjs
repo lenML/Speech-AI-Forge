@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Blob } from "buffer";
+import { BaseClient } from "./client.mjs";
 
 /**
  *
@@ -44,27 +45,7 @@ function readFile(filepath) {
  * @property {TranscriptionsResponseData} data
  */
 
-export class SttClient {
-  BASE_URL = "http://localhost:7870/";
-
-  /**
-   * @param {string} base_url
-   */
-  constructor(base_url) {
-    if (base_url) {
-      this.BASE_URL = base_url;
-    }
-  }
-
-  /**
-   * 构建 URL
-   * @param {string} path
-   * @returns {string}
-   */
-  #join(path) {
-    return new URL(path, this.BASE_URL).toString();
-  }
-
+export class SttClient extends BaseClient {
   /**
    * 调用 STT 接口进行转录
    * @param {string} filePath 本地音频文件路径
@@ -81,7 +62,7 @@ export class SttClient {
       }
     }
 
-    const resp = await fetch(this.#join("/v1/stt/transcribe"), {
+    const resp = await fetch(this._join("/v1/stt/transcribe"), {
       method: "POST",
       body: form,
     });

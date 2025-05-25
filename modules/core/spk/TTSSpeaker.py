@@ -168,10 +168,10 @@ class TTSSpeaker:
 
     @staticmethod
     def create_spk_ref_from_wav_b64(ref_wav_b64: str, text="") -> "DcSpkReference":
-        # 解码并计算 wav 的 sr
-        wav_bytes = base64.b64decode(ref_wav_b64)
-        wav_sr = audio_utils.get_wav_sr(wav_bytes)
-        return TTSSpeaker.create_spk_ref_from_wav((wav_sr, wav_bytes), text)
+        sr, data = audio_utils.read_base64_audio(ref_wav_b64)
+        data = audio_utils.audio_to_int16(data)
+        wav = sr, data
+        return TTSSpeaker.create_spk_ref_from_wav(wav, text)
 
     def __init__(self, data: DcSpk) -> None:
         assert isinstance(data, DcSpk), "data must be a DcSpk instance"
