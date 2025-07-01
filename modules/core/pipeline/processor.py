@@ -8,6 +8,8 @@ from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.generate.dcls import SynthAudio
 from modules.utils import audio_utils as audio_utils
 
+# NOTE: 这里有个隐藏设定，默认是 f32 的 dtype，但是其实应该还是有一些地方传递的不是 f32
+# FIXME: 最好增强这个 NP_AUDIO 数据类型，支持自动转换 dtype 好一点
 NP_AUDIO = Tuple[int, npt.NDArray]
 AUDIO = Union[NP_AUDIO, AudioSegment]
 

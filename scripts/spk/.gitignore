@@ -1,0 +1,3 @@
+/spk_factory/*
+!/spk_factory/readme.md
+!/spk_factory/*.py

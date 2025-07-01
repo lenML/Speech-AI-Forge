@@ -9,7 +9,7 @@
 ```xml
 <speak version="0.1">
     <voice spk="Bob" seed="42" style="narration-relaxed">
-        下面是一个 ChatTTS 用于合成多角色多情感的有声书示例[lbreak]
+        下面是一个Speech AI Forge用于合成多角色多情感的有声书示例[lbreak]
     </voice>
     <voice spk="Bob" seed="42" style="narration-relaxed">
         黛玉冷笑道：[lbreak]

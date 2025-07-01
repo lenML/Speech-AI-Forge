@@ -1,9 +1,9 @@
-# ChatTTS-SSML
+# SAF-SSML
 
-ChatTTS-SSML 是类似 微软 tts 的那种格式，结合本系统中的 speaker 和 style 会很好用。
+SAF-SSML 是类似 微软 tts 的那种格式，结合本系统中的 speaker 和 style 会很好用。
 
 > 目前这个 SSML 系统是非常实验性质的实现，只具备基本功能
-> ChatTTS-SSML 规范暂时未定，未来可能随时修改
+> SAF-SSML 规范暂时未定，未来可能随时修改
 
 ## What is SSML ?
 
@@ -14,7 +14,7 @@ SSML（Speech Synthesis Markup Language）是一种基于 XML 的标记语言，
 - 微软 TTS 文档：https://learn.microsoft.com/zh-cn/azure/ai-services/speech-service/speech-synthesis-markup-structure
 - 谷歌 TTS 文档：https://cloud.google.com/text-to-speech/docs/ssml?hl=zh-cn
 
-## ChatTTS-SSML v0.1
+## SAF-SSML v0.1
 
 我们的 SSML 实现，目前只拥有以下三种元素
 
@@ -27,7 +27,7 @@ SSML（Speech Synthesis Markup Language）是一种基于 XML 的标记语言，
 ```xml
 <speak version="0.1">
     <voice spk="Bob" style="narration-relaxed">
-        ChatTTS 用于合成多角色多情感的有声书示例
+        SAF 用于合成多角色多情感的有声书示例
     </voice>
     <voice spk="Bob" style="narration-relaxed">
         黛玉冷笑道：
@@ -50,7 +50,7 @@ SSML（Speech Synthesis Markup Language）是一种基于 XML 的标记语言，
 </speak>
 ```
 
-[ssml_demo.webm](https://github.com/lenML/ChatTTS-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
+[ssml_demo.webm](https://github.com/lenML/SAF-Forge/assets/37396659/b2434702-1e3c-4e2a-ae94-2012897e16d7)
 
 ## voice
 

@@ -167,6 +167,12 @@ class TTSSpeaker:
         return DcSpkReference(text=text, wav=data, wav_sr=sr)
 
     @staticmethod
+    def create_spk_ref_from_filepath(ref_filepath: str, text="") -> DcSpkReference:
+        sr, data = audio_utils.load_audio(ref_filepath)
+        data = audio_utils.audio_to_int16(data)
+        return TTSSpeaker.create_spk_ref_from_wav((sr, data), text)
+
+    @staticmethod
     def create_spk_ref_from_wav_b64(ref_wav_b64: str, text="") -> "DcSpkReference":
         sr, data = audio_utils.read_base64_audio(ref_wav_b64)
         data = audio_utils.audio_to_int16(data)
@@ -257,22 +263,32 @@ class TTSSpeaker:
         return emotions
 
     def set_name(self, name: str) -> None:
+        assert isinstance(name, str), "name must be a string"
         self._data.meta.name = name
 
     def set_gender(self, gender: str) -> None:
+        assert isinstance(gender, str), "gender must be a string"
         self._data.meta.gender = gender
 
     def set_author(self, author: str) -> None:
+        assert isinstance(author, str), "author must be a string"
         self._data.meta.author = author
 
     def set_desc(self, desc: str) -> None:
+        assert isinstance(desc, str), "desc must be a string"
         self._data.meta.desc = desc
 
     def set_version(self, version: str) -> None:
+        assert isinstance(version, str), "version must be a string"
         self._data.meta.version = version
 
     def set_avatar(self, avatar: str) -> None:
+        assert isinstance(avatar, str), "avatar must be a string"
         self._data.meta.avatar = avatar
+
+    def set_tags(self, tags: list[str]) -> None:
+        assert isinstance(tags, list), "tags must be a list"
+        self._data.meta.tags = tags
 
     def set_token(self, tokens: list, model_id: str, model_hash: str = "") -> None:
         token = DcSpkVoiceToken(
@@ -283,6 +299,9 @@ class TTSSpeaker:
         self.set_token_obj(token=token)
 
     def set_token_obj(self, *, token: DcSpkVoiceToken):
+        assert isinstance(
+            token, DcSpkVoiceToken
+        ), "token must be a DcSpkVoiceToken instance"
         for i, t in enumerate(self._data.token):
             if t.model_id == token.model_id:
                 self._data.token[i] = token
@@ -290,11 +309,13 @@ class TTSSpeaker:
         self._data.token.append(token)
 
     def add_ref(self, *, ref: DcSpkReference) -> None:
+        assert isinstance(ref, DcSpkReference), "ref must be a DcSpkReference instance"
         if self._data.refs is None:
             self._data.refs = []
         self._data.refs.append(ref)
 
     def add_sample(self, *, sample: DcSpkSample) -> None:
+        assert isinstance(sample, DcSpkSample), "sample must be a DcSpkSample instance"
         if self._data.samples is None:
             self._data.samples = []
         self._data.samples.append(sample)
@@ -305,6 +326,7 @@ class TTSSpeaker:
 
         TODO: 更多属性更新
         """
+        assert isinstance(spk, TTSSpeaker), "spk must be a TTSSpeaker instance"
         if spk.name:
             self.set_name(spk.name)
         if spk.gender != "":
