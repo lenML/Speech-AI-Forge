@@ -66,9 +66,6 @@ class CosyVoiceTTSModel(TTSModel):
 
         self.model_dir = paths[0]
 
-        self.device = devices.get_device_for(self.model_id)
-        self.dtype = devices.dtype
-
         self.model = CosyVoiceTTSModel.model
         self.frontend = CosyVoiceTTSModel.frontend
 
@@ -95,8 +92,8 @@ class CosyVoiceTTSModel(TTSModel):
                 return CosyVoiceTTSModel.model, CosyVoiceTTSModel.frontend
             self.logger.info("Loading CosyVoice model...")
 
-            device = self.device
-            dtype = self.dtype
+            device = self.get_device()
+            dtype = self.get_dtype()
             model_dir = self.model_dir
 
             # V2 完全支持 instruct 不需要区分模型

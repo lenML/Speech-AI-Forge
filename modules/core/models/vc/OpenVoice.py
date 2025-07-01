@@ -30,17 +30,14 @@ class OpenVoiceModel(VCModel):
 
         self.model_dir = Path("./models/OpenVoiceV2/converter")
 
-        self.device = devices.get_device_for(self.model_id)
-        # NOTE: dtype 好像没用到
-        self.dtype = devices.dtype
-
     @devices.after_gc()
     def load(self) -> None:
         with self.lock:
             if OpenVoiceModel.model is None:
+                # FIXME: 用上 dtype 配置
                 model = ToneColorConverter(
                     config_path=self.model_dir / "config.json",
-                    device=str(self.device),
+                    device=str(self.get_device()),
                     enable_watermark=False,
                 )
                 model.load_ckpt(ckpt_path=self.model_dir / "checkpoint.pth")

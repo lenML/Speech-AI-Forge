@@ -45,9 +45,6 @@ class SenseVoiceModel(STTModel):
         self.asr_model: AutoModel = None
         self.vad_model: AutoModel = None
 
-        self.device = devices.get_device_for("sensevoice")
-        self.dtype = devices.dtype
-
         self.max_single_segment_time_seconds = 30
         self.with_punct = True
         self.offset_in_seconds = -0.25
@@ -60,9 +57,9 @@ class SenseVoiceModel(STTModel):
             vad_model=None,  # We'll handle VAD separately
             punc_model=None,
             ban_emo_unks=True,
-            device=str(self.device),
+            device=str(self.get_device()),
             # 不确定这个dtype能不能用
-            dtype=str(self.dtype),
+            dtype=str(self.get_dtype()),
             disable_update=True,
         )
         # TODO: 有关问题，这里还是需要联网下载 vad 模型，我们要是预先下载，并指定目录更好一点

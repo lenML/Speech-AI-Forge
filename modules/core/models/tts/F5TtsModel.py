@@ -37,8 +37,6 @@ class F5TtsModel(TTSModel):
             self.model_version = "F5TTS_Base"
 
         self.model: Optional[F5TTS] = None
-        self.device = devices.get_device_for("f5-tts")
-        self.dtype = devices.dtype
 
         self.annotation = F5Annotation()
 
@@ -65,8 +63,8 @@ class F5TtsModel(TTSModel):
                 self.model = F5TTS(
                     model=self.model_version,
                     vocoder_local_path=str(self.vocos_path),
-                    device=self.device,
-                    dtype=self.dtype,
+                    device=self.get_device(),
+                    dtype=self.get_dtype(),
                     # TODO: 下面这两个也许可以配置一下？
                     ode_method="euler",
                     use_ema=True,

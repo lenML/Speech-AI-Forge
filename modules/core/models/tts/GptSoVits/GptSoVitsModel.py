@@ -26,11 +26,12 @@ class GptSoVitsModel(TTSModel):
         model_id = f"gpt-so-vits-{version}"
         super().__init__(model_id)
 
-        self.device = devices.get_device_for("gpt-so-vits")
-        self.dtype = devices.dtype
         self.version = version
 
         self.model: GptSoVitsTTS = None
+
+    def get_device(self):
+        return devices.get_device_for("gpt-so-vits")
 
     def get_sample_rate(self):
         # return self.config.sampling_rate
@@ -42,8 +43,8 @@ class GptSoVitsModel(TTSModel):
             configs = GptSoVitsTTSConfig(
                 {
                     "custom": {
-                        "device": self.device,
-                        "is_half": self.dtype == torch.float16,
+                        "device": self.get_device(),
+                        "is_half": self.get_dtype() == torch.float16,
                     },
                     "version": self.version,
                 }

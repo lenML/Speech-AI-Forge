@@ -22,8 +22,6 @@ class IndexTTSModel(TTSModel):
     def __init__(self):
         super().__init__("index-tts")
         self.tts: IndexTTS = None
-        self.device = devices.get_device_for("index-tts")
-        self.dtype = devices.dtype
         self.cfg_path = "./modules/repos_static/index_tts/checkpoints/config.yaml"
         self.model_dir = "./models/Index-TTS"
         self.tokenizer: TextTokenizer = None
@@ -62,11 +60,11 @@ class IndexTTSModel(TTSModel):
         self.tts = IndexTTS(
             cfg_path=self.cfg_path,
             model_dir=self.model_dir,
-            is_fp16=self.dtype == torch.float16,
+            is_fp16=self.get_dtype() == torch.float16,
             # 这个好像可以加速，但是需要冷启动
             # TODO: 暂时不实现，有需要的自行打开即可
             use_cuda_kernel=False,
-            device=self.device,
+            device=self.get_device(),
         )
 
     @devices.after_gc()

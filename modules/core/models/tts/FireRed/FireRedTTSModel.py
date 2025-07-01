@@ -25,7 +25,6 @@ class FireRedTTSModel(TTSModel):
         super().__init__(FireRedTTSModel.model_id)
 
         self.fire_red: FireRedTTSInfer = None
-        self.device = devices.get_device_for("fire-red-tts")
 
     def is_downloaded(self) -> bool:
         return Path("models/FireRedTTS").exists()
@@ -37,7 +36,7 @@ class FireRedTTSModel(TTSModel):
         self.fire_red = FireRedTTSInfer(
             config_path="./modules/repos_static/FireRedTTS/config_24k.json",
             pretrained_path="./models/FireRedTTS",
-            device=self.device,
+            device=self.get_device(),
         )
         logger.info("FireRedTTS model loaded.")
         return self.fire_red

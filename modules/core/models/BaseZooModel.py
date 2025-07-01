@@ -1,8 +1,17 @@
+from modules.devices import devices
+
+
 class BaseZooModel:
 
     def __init__(self, model_id: str) -> None:
         self.model_id = model_id
         self.hash = ""
+
+    def get_device(self):
+        return devices.get_device_for(self.model_id)
+
+    def get_dtype(self):
+        return devices.dtype
 
     def reset(self) -> None:
         """

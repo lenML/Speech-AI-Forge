@@ -8,6 +8,7 @@ from modules.core.models.stt.whisper.SegmentNormalizer import SubtitleSegment
 from modules.core.models.stt.whisper.whisper_dcls import SttResult
 from modules.core.models.stt.whisper.writer import get_writer
 from modules.core.pipeline.processor import NP_AUDIO
+from modules.devices import devices
 from modules.utils.monkey_tqdm import disable_tqdm
 
 

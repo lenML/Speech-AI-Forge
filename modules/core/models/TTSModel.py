@@ -5,6 +5,7 @@ from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.tts.InferCache import InferCache
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
+from modules.devices import devices
 from modules.utils import audio_utils
 
 

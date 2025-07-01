@@ -24,8 +24,6 @@ class SparkTTSModel(TTSModel):
         self.model: SparkTTS = None
 
         self.model_path = Path("./models/Spark-TTS-0.5B")
-        self.device = devices.get_device_for(model_id)
-        self.dtype = devices.dtype
 
     def is_downloaded(self) -> bool:
         return self.model_path.exists()
@@ -43,7 +41,9 @@ class SparkTTSModel(TTSModel):
     def load(self):
         if self.model is None:
             # TODO: 配置 dtype
-            self.model = SparkTTS(model_dir=str(self.model_path), device=self.device)
+            self.model = SparkTTS(
+                model_dir=str(self.model_path), device=self.get_device()
+            )
         return self.model
 
     @devices.after_gc()

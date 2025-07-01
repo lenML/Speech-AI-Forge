@@ -115,33 +115,32 @@ class WhisperModel(STTModel):
             else model_dir_mapping["large"]
         )
 
-        self.device = devices.get_device_for("whisper")
-        self.dtype = devices.dtype
+    def get_device(self):
+        return devices.get_device_for("whisper")
 
     def is_loaded(self) -> bool:
         return WhisperModel.model is not None
 
     def load(self):
+        device = self.get_device()
+        dtype = self.get_dtype()
         if WhisperModel.model is None:
             with self.lock:
-                self.logger.info(f"Loading Whisper model [{self.model_size}]...")
-
+                self.logger.info(
+                    f"Loading Whisper model [{device.type}:{dtype}] [{self.model_size}]..."
+                )
                 WhisperModel.model = FasterWhisperModel(
                     model_size_or_path=str(self.model_dir),
                     download_root=str(self.model_dir),
-                    device=self.device.type,
-                    compute_type=(
-                        "float16" if self.dtype == torch.float16 else "float32"
-                    ),
+                    device=device.type,
+                    compute_type=("float16" if dtype == torch.float16 else "float32"),
                     local_files_only=True,
                 )
                 WhisperModel.model = stable_whisper.load_faster_whisper(
                     model_size_or_path=str(self.model_dir),
                     local_files_only=True,
-                    device=self.device.type,
-                    compute_type=(
-                        "float16" if self.dtype == torch.float16 else "float32"
-                    ),
+                    device=device.type,
+                    compute_type=("float16" if dtype == torch.float16 else "float32"),
                 )
                 self.logger.info("Whisper model loaded.")
         return WhisperModel.model
@@ -152,7 +151,6 @@ class WhisperModel(STTModel):
             return
         with self.lock:
             self.model = None
-            WhisperModel.unload()
             del WhisperModel.model
             WhisperModel.model = None
             del self.model
