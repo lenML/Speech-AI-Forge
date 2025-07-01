@@ -228,7 +228,7 @@ class TTSInterface:
                 1, 50, value=self.default_top_k, step=1, label="Top K"
             )
             batch_size_input = gr.Slider(
-                1, webui_config.max_batch_size, value=4, step=1, label="Batch Size"
+                1, webui_config.max_batch_size, value=2, step=1, label="Batch Size"
             )
         return temperature_input, top_p_input, top_k_input, batch_size_input
 
@@ -237,7 +237,7 @@ class TTSInterface:
             gr.Markdown("🎛️Spliter")
             eos_input = gr.Textbox(label="eos", value=self.spliter_eos)
             spliter_thr_input = gr.Slider(
-                label="Spliter Threshold", value=100, minimum=50, maximum=1000, step=1
+                label="Spliter Threshold", value=30, minimum=10, maximum=1000, step=1
             )
         return eos_input, spliter_thr_input
 
