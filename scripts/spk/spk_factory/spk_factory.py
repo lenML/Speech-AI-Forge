@@ -43,11 +43,16 @@ def read_spks_configs(spk_dir: Path = Path("./scripts/spk/spk_factory")) -> list
     spk_configs = []
 
     folders = [f for f in spk_dir.iterdir() if f.is_dir()]
+    # 跳过以 .或者_ 开头的文件夹
+    folders = [f for f in folders if not f.name.startswith(".")]
+    folders = [f for f in folders if not f.name.startswith("_")]
+
     for folder in tqdm(folders, desc="Processing speakers"):
         config = {
             "name": folder.name,
             "author": None,
             "avatar": None,
+            "gender": None,
             "desc": None,
             "version": None,
             "tags": [],
@@ -111,6 +116,8 @@ def create_spk_from_config(config: dict):
         spk.set_version(config["version"])
     if config["tags"]:
         spk.set_tags(config["tags"])
+    if config["gender"]:
+        spk.set_gender(config["gender"])
     for audio_file in config["audio"]:
         filepath = audio_file["filepath"]
         caption = audio_file["caption"]
@@ -176,8 +183,13 @@ def postprocess_audio(filepath: str) -> str:
 def main():
     configs = read_spks_configs()
     for cfg in tqdm(configs, desc="Creating speakers"):
-        spk = create_spk_from_config(cfg)
-        save_spk_to_data(spk)
+        try:
+            spk = create_spk_from_config(cfg)
+            save_spk_to_data(spk)
+        except Exception as e:
+            name = cfg["name"]
+            print(f"音色保存失败 {name}")
+            print(e)
 
 
 if __name__ == "__main__":
@@ -213,7 +225,14 @@ if __name__ == "__main__":
       ├── readme.md
       └── spk_facotry.py
 
+    # 音质不够好
     `python -m scripts.spk.spk_factory.spk_factory --overwrite --enhance --normalize --remove_silence`
+
+    # 音质可以但是需要处理裁剪
+    `python -m scripts.spk.spk_factory.spk_factory --overwrite --normalize --remove_silence`
+
+    # 音质很好也不需要裁剪
+    `python -m scripts.spk.spk_factory.spk_factory --overwrite`
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--overwrite", action="store_true", help="覆盖已有音色文件")
