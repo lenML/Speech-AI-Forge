@@ -1,5 +1,6 @@
 import io
 import os
+from pathlib import Path
 from typing import Generator
 
 import numpy as np
@@ -15,6 +16,9 @@ from modules.repos_static.index_tts.indextts.infer import IndexTTS
 from modules.repos_static.index_tts.indextts.utils.front import TextTokenizer
 from modules.utils.SeedContext import SeedContext
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class IndexTTSModel(TTSModel):
     model_id = "index-tts"
@@ -22,21 +26,28 @@ class IndexTTSModel(TTSModel):
     def __init__(self):
         super().__init__("index-tts")
         self.tts: IndexTTS = None
-        self.cfg_path = "./modules/repos_static/index_tts/checkpoints/config.yaml"
-        self.model_dir = "./models/Index-TTS"
+        model_v1_dir = Path("./models/Index-TTS")
+        model_v1_5_dir = Path("./models/Index-TTS-1.5")
+        self.model_dir = model_v1_5_dir if model_v1_5_dir.exists() else model_v1_dir
         self.tokenizer: TextTokenizer = None
 
+        if model_v1_dir.exists() and not model_v1_5_dir.exists():
+            logger.warning(
+                "Index-TTS 模型已经更新，建议使用 Index-TTS-1.5 模型，使用 1.5 下载脚本下载最新模型即可使用。"
+            )
+
     def is_downloaded(self):
-        return os.path.exists(self.model_dir)
+        return self.model_dir.exists()
 
     def is_loaded(self):
         return self.tts is not None
 
     def load_tokenizer(self):
         if self.tokenizer is None:
-            cfg = OmegaConf.load(self.cfg_path)
-            bpe_path = os.path.join(self.model_dir, cfg.dataset["bpe_model"])
-            self.tokenizer = TextTokenizer(bpe_path)
+            cfg_path = self.model_dir / "config.yaml"
+            cfg = OmegaConf.load(cfg_path)
+            bpe_path = self.model_dir / cfg.dataset["bpe_model"]
+            self.tokenizer = TextTokenizer(str(bpe_path))
         return self.tokenizer
 
     def encode(self, text):
@@ -49,6 +60,7 @@ class IndexTTSModel(TTSModel):
 
     def get_sample_rate(self):
         # 来自 modules/repos_static/index_tts/checkpoints/config.yaml
+        # NOTE: 其实应该从 config.yaml 里取，但是 v1 v1.5 都一样，所以直接写死得了，因为加载配置需要外部依赖库
         return 24000
 
     def is_loaded(self):
@@ -57,9 +69,10 @@ class IndexTTSModel(TTSModel):
     def load(self):
         if self.tts:
             return
+        cfg_path = self.model_dir / "config.yaml"
         self.tts = IndexTTS(
-            cfg_path=self.cfg_path,
-            model_dir=self.model_dir,
+            cfg_path=str(cfg_path),
+            model_dir=str(self.model_dir),
             is_fp16=self.get_dtype() == torch.float16,
             # 这个好像可以加速，但是需要冷启动
             # TODO: 暂时不实现，有需要的自行打开即可

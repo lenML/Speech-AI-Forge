@@ -151,6 +151,7 @@ WIP 开发中
 |              | GPT-SoVITS(v4)   | `python -m scripts.downloader.gpt_sovits_v4 --source huggingface`           |
 |              | CosyVoice(v2)    | `python -m scripts.downloader.cosyvoice2 --source huggingface`              |
 |              | FireRedTTS       | `python -m scripts.downloader.fire_red_tts --source huggingface`            |
+|              | Index-TTS-1.5    | `python -m scripts.downloader.index_tts_1_5 --source huggingface`           |
 |              | Index-TTS        | `python -m scripts.downloader.index_tts --source huggingface`               |
 |              | Spark-TTS        | `python -m scripts.downloader.spark_tts --source huggingface`               |
 |              | F5-TTS(v0.6)     | `python -m scripts.downloader.f5_tts --source huggingface`                  |
