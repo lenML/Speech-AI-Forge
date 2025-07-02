@@ -285,7 +285,8 @@ class IndexTTS:
                 - 越大，bucket数量越少，batch越多，推理速度越*快*，占用内存更多，可能影响质量
                 - 越小，bucket数量越多，batch越少，推理速度越*慢*，占用内存和质量更接近于非快速推理
         """
-        print(">> start fast inference...")
+        if verbose:
+            print(">> start fast inference...")
         
         self._set_gr_progress(0, "start fast inference...")
         if verbose:
@@ -472,15 +473,16 @@ class IndexTTS:
         self._set_gr_progress(0.9, "save audio...")
         wav = torch.cat(wavs, dim=1)
         wav_length = wav.shape[-1] / sampling_rate
-        print(f">> Reference audio length: {cond_mel_frame * 256 / sampling_rate:.2f} seconds")
-        print(f">> gpt_gen_time: {gpt_gen_time:.2f} seconds")
-        print(f">> gpt_forward_time: {gpt_forward_time:.2f} seconds")
-        print(f">> bigvgan_time: {bigvgan_time:.2f} seconds")
-        print(f">> Total fast inference time: {end_time - start_time:.2f} seconds")
-        print(f">> Generated audio length: {wav_length:.2f} seconds")
-        print(f">> [fast] bigvgan chunk_length: {chunk_length}")
-        print(f">> [fast] batch_num: {all_batch_num} bucket_max_size: {bucket_max_size}", f"bucket_count: {bucket_count}" if bucket_max_size > 1 else "")
-        print(f">> [fast] RTF: {(end_time - start_time) / wav_length:.4f}")
+        if verbose:
+            print(f">> Reference audio length: {cond_mel_frame * 256 / sampling_rate:.2f} seconds")
+            print(f">> gpt_gen_time: {gpt_gen_time:.2f} seconds")
+            print(f">> gpt_forward_time: {gpt_forward_time:.2f} seconds")
+            print(f">> bigvgan_time: {bigvgan_time:.2f} seconds")
+            print(f">> Total fast inference time: {end_time - start_time:.2f} seconds")
+            print(f">> Generated audio length: {wav_length:.2f} seconds")
+            print(f">> [fast] bigvgan chunk_length: {chunk_length}")
+            print(f">> [fast] batch_num: {all_batch_num} bucket_max_size: {bucket_max_size}", f"bucket_count: {bucket_count}" if bucket_max_size > 1 else "")
+            print(f">> [fast] RTF: {(end_time - start_time) / wav_length:.4f}")
 
         # save audio
         wav = wav.cpu()  # to cpu
