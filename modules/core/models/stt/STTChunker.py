@@ -18,8 +18,8 @@ from modules.utils.monkey_tqdm import disable_tqdm
 @dataclass(frozen=True, eq=False)
 class STTChunkData:
     audio: NP_AUDIO
-    start_s: int
-    end_s: int
+    start_s: float
+    end_s: float
 
 
 class RefrenceTranscript:
@@ -70,7 +70,7 @@ class STTChunker:
     def __init__(self, model: STTModel):
         self.model = model
 
-    def get_chunk(self, audio: NP_AUDIO, start_s: int, end_s: int):
+    def get_chunk(self, audio: NP_AUDIO, start_s: float, end_s: float):
         sr, data = audio
         start = int(start_s * sr)
         end = int(end_s * sr)
@@ -82,37 +82,45 @@ class STTChunker:
 
     def get_chunks(self, audio: NP_AUDIO):
         """
-        根据vad结果，尽量将audio分为小于30s的短音频
+        根据 VAD 结果，将 audio 分割为短音频，尽量不超过 22s。
+        - 小于 22s：尽量与后续合并。
+        - 大于 22s：强制切分为多个子片段，优先与前面残留合并。
 
-        如果小于30s就尝试和后续的合并
-        如果大于30s直接作为chunk
+        这里只是使用非常小的vad模型粗略的分割音频，所以不太准确
+        但是对于带有参考文案的识别很合适
         """
-        sr, data = audio
-        index_to_s = lambda index: int(index / sr)
-        get_duration_s = lambda start, end: index_to_s(end - start)
-        duration_s = get_duration_s(0, len(data))
-        MAX_DURATION = 30.0  # seconds
+        MAX_DURATION = 22.0  # seconds
 
-        if duration_s < MAX_DURATION:
-            return [
-                STTChunkData(
-                    audio=audio,
-                    start_s=0,
-                    end_s=duration_s,
-                )
-            ]
+        sr, data = audio
+        index_to_s = lambda index: index / sr
+        s_to_index = lambda s: int(s * sr)
+
         speech_timestamps = get_speech_timestamps(data.astype(np.float32))
         chunks: list[STTChunkData] = []
 
         buffer_start = None
         buffer_end = None
 
-        for speech in speech_timestamps:
-            start, end = speech["start"], speech["end"]
-            speech_duration = get_duration_s(start, end)
-
-            if speech_duration >= MAX_DURATION:
-                if buffer_start is not None:
+        def flush_buffer():
+            nonlocal buffer_start, buffer_end
+            if buffer_start is not None and buffer_end is not None:
+                start_s = index_to_s(buffer_start)
+                end_s = index_to_s(buffer_end)
+                duration = end_s - start_s
+                if duration > MAX_DURATION:
+                    # 强制切割成多个小片段
+                    cur_start = buffer_start
+                    while cur_start < buffer_end:
+                        cur_end = min(cur_start + s_to_index(MAX_DURATION), buffer_end)
+                        chunks.append(
+                            STTChunkData(
+                                audio=(sr, data[cur_start:cur_end]),
+                                start_s=index_to_s(cur_start),
+                                end_s=index_to_s(cur_end),
+                            )
+                        )
+                        cur_start = cur_end
+                else:
                     chunks.append(
                         STTChunkData(
                             audio=(sr, data[buffer_start:buffer_end]),
@@ -120,49 +128,23 @@ class STTChunker:
                             end_s=index_to_s(buffer_end),
                         )
                     )
-                    buffer_start = None
-                    buffer_end = None
-                # 大段，直接作为 chunk
-                chunks.append(
-                    STTChunkData(
-                        audio=(sr, data[start:end]),
-                        start_s=index_to_s(start),
-                        end_s=index_to_s(end),
-                    )
-                )
+            buffer_start = buffer_end = None
+
+        for ts in speech_timestamps:
+            start, end = ts["start"], ts["end"]
+            if buffer_start is None:
+                buffer_start, buffer_end = start, end
                 continue
 
-            if buffer_start is None:
-                buffer_start = start
+            # 尝试与前一个合并
+            new_duration = index_to_s(end - buffer_start)
+            if new_duration <= MAX_DURATION:
                 buffer_end = end
             else:
-                # 尝试合并
-                new_duration = get_duration_s(buffer_start, end)
-                if new_duration <= MAX_DURATION:
-                    buffer_end = end  # 合并
-                else:
-                    # 提交当前 buffer
-                    chunks.append(
-                        STTChunkData(
-                            audio=(sr, data[buffer_start:buffer_end]),
-                            start_s=index_to_s(buffer_start),
-                            end_s=index_to_s(buffer_end),
-                        )
-                    )
-                    buffer_start = start
-                    buffer_end = end
+                flush_buffer()
+                buffer_start, buffer_end = start, end
 
-        # 收尾处理剩余的 buffer
-        if buffer_start is not None:
-            chunks.append(
-                STTChunkData(
-                    audio=(sr, data[buffer_start:buffer_end]),
-                    start_s=index_to_s(buffer_start),
-                    end_s=index_to_s(buffer_end),
-                )
-            )
-
-        # 根据 start_s 排序
+        flush_buffer()
         return chunks
 
     def merge_results(
@@ -212,6 +194,7 @@ class STTChunker:
 
             # check last segement if broken
             # 检查最后一个识别是否是损坏的，如果只识别了一部分，而不是完整的一句，那么我们需要放弃这个识别，并调整下一个 chunk 的数据，包含错误识别的部分
+            # NOTE: 这里只有使用了参考文案才会执行
             while (
                 len(result.segments) != 0
                 and len(ref_script.raw_lines) != 0
@@ -232,7 +215,7 @@ class STTChunker:
                 continue
 
             # 不管有没有 broken 都调整下一个 chunk 的范围
-            next_start_s: int = result.segments[-1].end + chunk.start_s
+            next_start_s: float = result.segments[-1].end + chunk.start_s
             if chunk_idx + 1 < len(chunks):
                 orig_next_chunk = chunks[chunk_idx + 1]
                 next_chunk = self.get_chunk(

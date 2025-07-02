@@ -25,8 +25,9 @@ class SttWord:
 @dataclass(repr=False, eq=False)
 class SttSegment:
     text: str
-    start: int
-    end: int
+    # 单位秒
+    start: float
+    end: float
     words: Optional[List[SttWord]] = None
 
 
