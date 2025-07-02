@@ -184,6 +184,25 @@ class STTChunker:
         ref_script = RefrenceTranscript(config.refrence_transcript.strip())
         chunks = self.get_chunks(audio)
         results: list[SttResult] = []
+
+        def is_broken_seg(seg: SttSegment, segs: list[SttSegment]):
+            """
+            判断是否为错误的识别
+
+            这些情况可能生成错误片段：
+            1. 音频被截断
+            2. 因为参考文本太长但是音频太短
+            """
+            if seg.text not in ref_script.raw_lines:
+                return True
+            if seg.end == seg.start or seg.start > seg.end:  # 错误的时间戳
+                return True
+            if (
+                seg.end - seg.start < 0.1 and len(seg.text) > 2
+            ):  # 小于0.1秒的片段并且两个字以上认为是错误的
+                return True
+            return False
+
         for chunk in tqdm(
             chunks,
             desc="Transcribing audio chunks",
@@ -193,14 +212,13 @@ class STTChunker:
             result = self.model.transcribe_to_result(chunk.audio, config)
 
             # check last segement if broken
-            # 检查最后一个识别是否是损坏的，如果只识别了一部分，而不是完整的一句，那么我们需要放弃这个识别，并调整下一个 chunk 的数据，包含错误识别的部分
+            # 检查最后一个识别是否是损坏的，并调整下一个 chunk 的数据，包含错误识别的部分以重新识别
             # NOTE: 这里只有使用了参考文案才会执行
             while (
                 len(result.segments) != 0
                 and len(ref_script.raw_lines) != 0
-                and result.segments[-1].text not in ref_script.raw_lines
+                and is_broken_seg(result.segments[-1], result.segments)
             ):
-                # TODO: 这个识别好像有点问题，应该关注前一个句子来定位会好点
                 result.segments = result.segments[:-1]
 
             chunk_idx = chunks.index(chunk)
