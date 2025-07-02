@@ -3,22 +3,17 @@ from typing import Optional, Tuple
 
 import torch
 import torch.nn as nn
-from indextts.gpt.conformer.attention import (
-    MultiHeadedAttention,
-    RelPositionMultiHeadedAttention,
-)
-from indextts.gpt.conformer.embedding import (
-    NoPositionalEncoding,
-    PositionalEncoding,
-    RelPositionalEncoding,
-)
-from indextts.gpt.conformer.subsampling import (
-    Conv2dSubsampling2,
-    Conv2dSubsampling4,
-    Conv2dSubsampling6,
-    Conv2dSubsampling8,
-    LinearNoSubsampling,
-)
+
+from indextts.gpt.conformer.attention import (MultiHeadedAttention,
+                                              RelPositionMultiHeadedAttention)
+from indextts.gpt.conformer.embedding import (NoPositionalEncoding,
+                                              PositionalEncoding,
+                                              RelPositionalEncoding)
+from indextts.gpt.conformer.subsampling import (Conv2dSubsampling2,
+                                                Conv2dSubsampling4,
+                                                Conv2dSubsampling6,
+                                                Conv2dSubsampling8,
+                                                LinearNoSubsampling)
 from indextts.utils.common import make_pad_mask
 
 
