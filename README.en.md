@@ -17,6 +17,7 @@ You can experience and deploy Speech-AI-Forge through the following methods:
 
 ## Breaking change logs
 
+- 250702: Support Index-TTS-1.5 [#250](https://github.com/lenML/Speech-AI-Forge/issues/250)
 - 250522: Support GptSoVits [#198](https://github.com/lenML/Speech-AI-Forge/issues/198)
 - 250518: Support SenseVoice ASR [#122](https://github.com/lenML/Speech-AI-Forge/issues/122)
 - 250508: Support Spark-TTS [#223](https://github.com/lenML/Speech-AI-Forge/issues/223)
@@ -130,7 +131,7 @@ Environment variable configuration:
 |                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | sentence-level  | en, zh, jp, yue, ko    | ✅(v2)      |
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)            | sentence-level  | en, zh                 | ✅          |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                         | sentence-level  | en, zh                 | ✅(v0.6/v1) |
-|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | sentence-level  | en, zh                 | ✅          |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | sentence-level  | en, zh                 | ✅(v1/v1.5) |
 |                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | sentence-level  | en, zh                 | ✅          |
 |                 | [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS/tree/main)     | 句子级          | en, zh, ja, ko, yue    | ✅          |
 | **ASR**         | [Whisper](https://github.com/openai/whisper)                       | 🚧              | ✅                     | ✅          |
@@ -151,6 +152,7 @@ Since Forge primarily focuses on API functionality development, automatic downlo
 |              | FishSpeech(1.4) | `python -m scripts.downloader.fish_speech_1_4 --source huggingface` |
 |              | CosyVoice(v2)   | `python -m scripts.downloader.cosyvoice2 --source huggingface`      |
 |              | FireRedTTS      | `python -m scripts.downloader.fire_red_tts --source huggingface`    |
+|              | Index-TTS-1.5   | `python -m scripts.downloader.index_tts_1_5 --source huggingface`   |
 |              | Index-TTS       | `python -m scripts.downloader.index_tts --source huggingface`       |
 |              | Spark-TTS       | `python -m scripts.downloader.spark_tts --source huggingface`       |
 |              | F5-TTS(v0.6)    | `python -m scripts.downloader.f5_tts --source huggingface`          |

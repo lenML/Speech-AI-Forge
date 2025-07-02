@@ -17,6 +17,7 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 ## Breaking change logs
 
+- 250702: Support Index-TTS-1.5 [#250](https://github.com/lenML/Speech-AI-Forge/issues/250)
 - 250522: Support GptSoVits [#198](https://github.com/lenML/Speech-AI-Forge/issues/198)
 - 250518: Support SenseVoice ASR [#122](https://github.com/lenML/Speech-AI-Forge/issues/122)
 - 250508: Support Spark-TTS [#223](https://github.com/lenML/Speech-AI-Forge/issues/223)
@@ -130,7 +131,7 @@ WIP 开发中
 |                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | 句子级   | en, zh, jp, yue, ko | ✅(v2)      |
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)            | 句子级   | en, zh              | ✅          |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                         | 句子级   | en, zh              | ✅(v0.6/v1) |
-|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | 句子级   | en, zh              | ✅          |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | 句子级   | en, zh              | ✅(v1/v1.5) |
 |                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | 句子级   | en, zh              | ✅          |
 |                 | [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS/tree/main)     | 句子级   | en, zh, ja, ko, yue | ✅          |
 | **ASR**         | [Whisper](https://github.com/openai/whisper)                       | 🚧       | ✅                  | ✅          |
