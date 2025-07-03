@@ -30,6 +30,9 @@ class GptSoVitsModel(TTSModel):
 
         self.model: GptSoVitsTTS = None
 
+    def is_downloaded(self):
+        return Path(f"models/gpt_sovits_{self.version}").exists()
+
     def get_device(self):
         return devices.get_device_for("gpt-so-vits")
 
