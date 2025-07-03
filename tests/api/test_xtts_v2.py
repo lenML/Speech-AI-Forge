@@ -7,7 +7,8 @@ import tests
 
 default_tts_params = {
     "text": "Hello, world! [lbreak]",
-    "speaker_wav": "female2",
+    # NOTE: 因为默认模型是 cosyvoice 所以只能用 spkv1.json 带有参考音频的模型
+    "speaker_wav": "mona",
     "language": "en",
 }
 

@@ -44,10 +44,10 @@ def after_each_test():
     # NOTE: 测试机器 vram 不足的情况，可以开启这个 fixture
     # NOTE: 全部模型加载大概要 16gb 显存左右，开启卸载之后基本在 8gb 左右
     # 清空模型
-    # try:
-    #     model_zoo.unload_all_models()
-    # except Exception as e:
-    #     pass
+    try:
+        model_zoo.unload_all_models()
+    except Exception as e:
+        pass
 
 
 test_inputs_dir = os.path.dirname(__file__) + "/test_inputs"

@@ -26,6 +26,7 @@ def test_create_speaker(client):
         "gender": "male",
         "describe": "这是一个测试发言人",
         "tensor": [0.1, 0.2, 0.3],
+        "save_file": True,
     }
     response = client.post("/v1/speaker/create", json=data)
     assert response.status_code == 200

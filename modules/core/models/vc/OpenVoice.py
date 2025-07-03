@@ -65,7 +65,7 @@ class OpenVoiceModel(VCModel):
 
     def audio_to_se(self, audio: NP_AUDIO) -> torch.Tensor:
         hps = self.model.hps
-        device = self.device
+        device = self.get_device()
         model = self.model.model
         target_sr = hps.data.sampling_rate
 
@@ -92,7 +92,7 @@ class OpenVoiceModel(VCModel):
         self, audio: npt.NDArray, src_se: torch.Tensor, tgt_se: torch.Tensor, tau: float
     ) -> npt.NDArray:
         hps = self.model.hps
-        device = self.device
+        device = self.get_device()
         model = self.model.model
 
         with torch.no_grad():

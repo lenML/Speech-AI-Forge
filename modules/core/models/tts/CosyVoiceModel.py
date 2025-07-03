@@ -297,6 +297,12 @@ class CosyVoiceTTSModel(TTSModel):
             self.spk_to_ref_wav(spk, emotion=emotion) if spk else (None, None)
         )
 
+        if ref_wav is None:
+            # Cosyvoice 必须使用参考音频生成，这里报错请更改 说话人/音色
+            raise ValueError(
+                "Cosyvoice must be generated using reference audio. If an error occurs, please change the speaker/timbre."
+            )
+
         infer_func: callable = None
         if instruct_text is not None:
             infer_func = partial(

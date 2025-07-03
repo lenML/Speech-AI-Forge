@@ -24,6 +24,10 @@ class STTChunkData:
 
 class RefrenceTranscript:
     def __init__(self, content: str):
+        if not isinstance(content, str):
+            # 比如 content == None 的情况
+            content = ""
+        content = content.strip()
         self.raw = content
         self.buffer = content
         self.raw_lines = content.split("\n")
@@ -181,7 +185,7 @@ class STTChunker:
         )
 
     def transcribe_to_result(self, audio: NP_AUDIO, config: STTConfig) -> SttResult:
-        ref_script = RefrenceTranscript(config.refrence_transcript.strip())
+        ref_script = RefrenceTranscript(config.refrence_transcript)
         chunks = self.get_chunks(audio)
         results: list[SttResult] = []
 
