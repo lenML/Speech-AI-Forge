@@ -13,15 +13,15 @@
 # limitations under the License.
 import logging
 import random
-from io import BytesIO
 
 import pyarrow.parquet as pq
+from io import BytesIO
 import torch
-import torch.nn.functional as F
 import torchaudio
 from torch.nn.utils.rnn import pad_sequence
+import torch.nn.functional as F
+import pyworld as pw
 
-torchaudio.set_audio_backend('soundfile')
 
 AUDIO_FORMAT_SETS = {'flac', 'mp3', 'm4a', 'ogg', 'opus', 'wav', 'wma'}
 
@@ -43,8 +43,6 @@ def parquet_opener(data, mode='train', tts_data={}):
             for df in pq.ParquetFile(url).iter_batches(batch_size=64):
                 df = df.to_pandas()
                 for i in range(len(df)):
-                    if mode == 'inference' and df.loc[i, 'utt'] not in tts_data:
-                        continue
                     sample.update(dict(df.loc[i]))
                     if mode == 'train':
                         # NOTE do not return sample directly, must initialize a new dict
@@ -99,6 +97,8 @@ def filter(data,
         if len(sample['text_token']) > token_max_length:
             continue
         if len(sample['speech_token']) == 0:
+            continue
+        if 'reject_speech_token' in sample and len(sample['reject_speech_token']) == 0:
             continue
         if num_frames != 0:
             if len(sample['text_token']) / num_frames < min_output_input_ratio:
@@ -159,6 +159,7 @@ def truncate(data, truncate_length=24576, mode='train'):
 
 def compute_fbank(data,
                   feat_extractor,
+                  token_mel_ratio=0,
                   mode='train'):
     """ Extract fbank
 
@@ -174,12 +175,17 @@ def compute_fbank(data,
         assert 'utt' in sample
         assert 'text_token' in sample
         waveform = sample['speech']
-        mat = feat_extractor(waveform).squeeze(dim=0).transpose(0, 1)
-        sample['speech_feat'] = mat
+        feat = feat_extractor(waveform).squeeze(dim=0).transpose(0, 1)
+        if token_mel_ratio != 0:
+            # trim to align speech_token and speech_feat
+            token_len = int(min(feat.shape[0] / token_mel_ratio, sample["speech_token"].shape[0]))
+            feat = feat[:token_mel_ratio * token_len]
+            sample["speech_token"] = sample["speech_token"][:token_len]
+        sample['speech_feat'] = feat
         yield sample
 
 
-def compute_f0(data, pitch_extractor, mode='train'):
+def compute_f0(data, sample_rate, hop_size, mode='train'):
     """ Extract f0
 
         Args:
@@ -188,15 +194,19 @@ def compute_f0(data, pitch_extractor, mode='train'):
         Returns:
             Iterable[{key, feat, label}]
     """
+    frame_period = hop_size * 1000 / sample_rate
     for sample in data:
         assert 'sample_rate' in sample
         assert 'speech' in sample
         assert 'utt' in sample
         assert 'text_token' in sample
         waveform = sample['speech']
-        mat = pitch_extractor(waveform).transpose(1, 2)
-        mat = F.interpolate(mat, size=sample['speech_feat'].shape[0], mode='linear')
-        sample['pitch_feat'] = mat[0, 0]
+        _f0, t = pw.harvest(waveform.squeeze(dim=0).numpy().astype('double'), sample_rate, frame_period=frame_period)
+        if sum(_f0 != 0) < 5:  # this happens when the algorithm fails
+            _f0, t = pw.dio(waveform.squeeze(dim=0).numpy().astype('double'), sample_rate, frame_period=frame_period)  # if harvest fails, try dio
+        f0 = pw.stonemask(waveform.squeeze(dim=0).numpy().astype('double'), _f0, t, sample_rate)
+        f0 = F.interpolate(torch.from_numpy(f0).view(1, 1, -1), size=sample['speech_feat'].shape[0], mode='linear').view(-1)
+        sample['pitch_feat'] = f0
         yield sample
 
 
@@ -232,8 +242,6 @@ def tokenize(data, get_tokenizer, allowed_special, mode='train'):
     for sample in data:
         assert 'text' in sample
         sample['text_token'] = tokenizer.encode(sample['text'], allowed_special=allowed_special)
-        if mode == 'inference':
-            sample['tts_text_token'] = tokenizer.encode(sample['tts_text'], allowed_special=allowed_special)
         yield sample
 
 
@@ -341,18 +349,15 @@ def dynamic_batch(data, max_frames_in_batch=12000, mode='train'):
 def batch(data, batch_type='static', batch_size=16, max_frames_in_batch=12000, mode='train'):
     """ Wrapper for static/dynamic batch
     """
-    if mode == 'inference':
-        return static_batch(data, 1)
+    if batch_type == 'static':
+        return static_batch(data, batch_size)
+    elif batch_type == 'dynamic':
+        return dynamic_batch(data, max_frames_in_batch)
     else:
-        if batch_type == 'static':
-            return static_batch(data, batch_size)
-        elif batch_type == 'dynamic':
-            return dynamic_batch(data, max_frames_in_batch)
-        else:
-            logging.fatal('Unsupported batch type {}'.format(batch_type))
+        logging.fatal('Unsupported batch type {}'.format(batch_type))
 
 
-def padding(data, use_spk_embedding, mode='train', gan=False):
+def padding(data, use_spk_embedding, mode='train', gan=False, dpo=False):
     """ Padding the data into training data
 
         Args:
@@ -414,16 +419,14 @@ def padding(data, use_spk_embedding, mode='train', gan=False):
             # only gan train needs speech, delete it to save memory
             del batch["speech"]
             del batch["speech_len"]
-        if mode == 'inference':
-            tts_text = [sample[i]['tts_text'] for i in order]
-            tts_index = [sample[i]['tts_index'] for i in order]
-            tts_text_token = [torch.tensor(sample[i]['tts_text_token']) for i in order]
-            tts_text_token_len = torch.tensor([i.size(0) for i in tts_text_token], dtype=torch.int32)
-            tts_text_token = pad_sequence(tts_text_token, batch_first=True, padding_value=-1)
-            batch.update({'tts_text': tts_text,
-                          'tts_index': tts_index,
-                          'tts_text_token': tts_text_token,
-                          'tts_text_token_len': tts_text_token_len})
+        if dpo is True:
+            reject_speech_token = [torch.tensor(sample[i]['reject_speech_token']) for i in order]
+            reject_speech_token_len = torch.tensor([i.size(0) for i in reject_speech_token], dtype=torch.int32)
+            reject_speech_token = pad_sequence(reject_speech_token,
+                                               batch_first=True,
+                                               padding_value=0)
+            batch['reject_speech_token'] = reject_speech_token
+            batch['reject_speech_token_len'] = reject_speech_token_len
         if use_spk_embedding is True:
             batch["embedding"] = batch["spk_embedding"]
         else:

@@ -13,30 +13,28 @@
 # limitations under the License.
 
 from __future__ import print_function
-
 import argparse
 import datetime
 import logging
-
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
-import os
 from copy import deepcopy
-
-import deepspeed
+import os
 import torch
 import torch.distributed as dist
+import deepspeed
+
+from hyperpyyaml import load_hyperpyyaml
+
+from torch.distributed.elastic.multiprocessing.errors import record
+
+from cosyvoice.utils.losses import DPOLoss
 from cosyvoice.utils.executor import Executor
 from cosyvoice.utils.train_utils import (
-    check_modify_and_save_config,
-    init_dataset_and_dataloader,
     init_distributed,
+    init_dataset_and_dataloader,
     init_optimizer_and_scheduler,
-    init_summarywriter,
-    save_model,
-    wrap_cuda_model,
-)
-from hyperpyyaml import load_hyperpyyaml
-from torch.distributed.elastic.multiprocessing.errors import record
+    init_summarywriter, save_model,
+    wrap_cuda_model, check_modify_and_save_config)
 
 
 def get_args():
@@ -46,9 +44,11 @@ def get_args():
                         choices=['torch_ddp', 'deepspeed'],
                         help='Engine for paralleled training')
     parser.add_argument('--model', required=True, help='model which will be trained')
+    parser.add_argument('--ref_model', required=False, help='ref model used in dpo')
     parser.add_argument('--config', required=True, help='config file')
     parser.add_argument('--train_data', required=True, help='train data file')
     parser.add_argument('--cv_data', required=True, help='cv data file')
+    parser.add_argument('--qwen_pretrain_path', required=False, help='qwen pretrain path')
     parser.add_argument('--checkpoint', help='checkpoint model')
     parser.add_argument('--model_dir', required=True, help='save model dir')
     parser.add_argument('--tensorboard_dir',
@@ -75,6 +75,10 @@ def get_args():
                         action='store_true',
                         default=False,
                         help='Use automatic mixed precision training')
+    parser.add_argument('--dpo',
+                        action='store_true',
+                        default=False,
+                        help='Use Direct Preference Optimization')
     parser.add_argument('--deepspeed.save_states',
                         dest='save_states',
                         default='model_only',
@@ -100,8 +104,12 @@ def main():
     override_dict = {k: None for k in ['llm', 'flow', 'hift', 'hifigan'] if k != args.model}
     if gan is True:
         override_dict.pop('hift')
-    with open(args.config, 'r') as f:
-        configs = load_hyperpyyaml(f, overrides=override_dict)
+    try:
+        with open(args.config, 'r') as f:
+            configs = load_hyperpyyaml(f, overrides={**override_dict, 'qwen_pretrain_path': args.qwen_pretrain_path})
+    except Exception:
+        with open(args.config, 'r') as f:
+            configs = load_hyperpyyaml(f, overrides=override_dict)
     if gan is True:
         configs['train_conf'] = configs['train_conf_gan']
     configs['train_conf'].update(vars(args))
@@ -111,7 +119,7 @@ def main():
 
     # Get dataset & dataloader
     train_dataset, cv_dataset, train_data_loader, cv_data_loader = \
-        init_dataset_and_dataloader(args, configs, gan)
+        init_dataset_and_dataloader(args, configs, gan, args.dpo)
 
     # Do some sanity checks and save config to arsg.model_dir
     configs = check_modify_and_save_config(args, configs)
@@ -120,6 +128,8 @@ def main():
     writer = init_summarywriter(args)
 
     # load checkpoint
+    if args.dpo is True:
+        configs[args.model].forward = configs[args.model].forward_dpo
     model = configs[args.model]
     start_step, start_epoch = 0, -1
     if args.checkpoint is not None:
@@ -148,13 +158,25 @@ def main():
     info_dict['epoch'] = start_epoch
     save_model(model, 'init', info_dict)
 
+    # DPO related
+    if args.dpo is True:
+        ref_model = deepcopy(configs[args.model])
+        state_dict = torch.load(args.ref_model, map_location='cpu')
+        ref_model.load_state_dict(state_dict, strict=False)
+        dpo_loss = DPOLoss(beta=0.01, label_smoothing=0.0, ipo=False)
+        # NOTE maybe it is not needed to wrap ref_model as ddp because its parameter is not updated
+        ref_model = wrap_cuda_model(args, ref_model)
+    else:
+        ref_model, dpo_loss = None, None
+
     # Get executor
-    executor = Executor(gan=gan)
+    executor = Executor(gan=gan, ref_model=ref_model, dpo_loss=dpo_loss)
     executor.step = start_step
 
     # Init scaler, used for pytorch amp mixed precision training
     scaler = torch.cuda.amp.GradScaler() if args.use_amp else None
     print('start step {} start epoch {}'.format(start_step, start_epoch))
+
     # Start training loop
     for epoch in range(start_epoch + 1, info_dict['max_epoch']):
         executor.epoch = epoch
@@ -165,7 +187,7 @@ def main():
             executor.train_one_epoc_gan(model, optimizer, scheduler, optimizer_d, scheduler_d, train_data_loader, cv_data_loader,
                                         writer, info_dict, scaler, group_join)
         else:
-            executor.train_one_epoc(model, optimizer, scheduler, train_data_loader, cv_data_loader, writer, info_dict, scaler, group_join)
+            executor.train_one_epoc(model, optimizer, scheduler, train_data_loader, cv_data_loader, writer, info_dict, scaler, group_join, ref_model=ref_model)
         dist.destroy_process_group(group_join)
 
 

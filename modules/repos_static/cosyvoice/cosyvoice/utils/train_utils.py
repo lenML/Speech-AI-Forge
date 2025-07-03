@@ -14,25 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import json
 import logging
 import os
+import torch
+import json
 import re
+import datetime
+import yaml
 
 import deepspeed
-import torch
-import torch.distributed as dist
 import torch.optim as optim
-import yaml
-from cosyvoice.dataset.dataset import Dataset
-from cosyvoice.utils.scheduler import ConstantLR, NoamHoldAnnealing, WarmupLR
-from deepspeed.runtime.zero.stage_1_and_2 import (
-    estimate_zero2_model_states_mem_needs_all_live,
-)
-from torch.nn.utils import clip_grad_norm_
-from torch.utils.data import DataLoader
+import torch.distributed as dist
+
 from torch.utils.tensorboard import SummaryWriter
+from torch.utils.data import DataLoader
+from torch.nn.utils import clip_grad_norm_
+
+from deepspeed.runtime.zero.stage_1_and_2 import estimate_zero2_model_states_mem_needs_all_live
+
+from cosyvoice.dataset.dataset import Dataset
+from cosyvoice.utils.scheduler import WarmupLR, NoamHoldAnnealing, ConstantLR
 
 
 def init_distributed(args):
@@ -49,10 +50,10 @@ def init_distributed(args):
     return world_size, local_rank, rank
 
 
-def init_dataset_and_dataloader(args, configs, gan):
+def init_dataset_and_dataloader(args, configs, gan, dpo):
     data_pipeline = configs['data_pipeline_gan'] if gan is True else configs['data_pipeline']
-    train_dataset = Dataset(args.train_data, data_pipeline=data_pipeline, mode='train', gan=gan, shuffle=True, partition=True)
-    cv_dataset = Dataset(args.cv_data, data_pipeline=data_pipeline, mode='train', gan=gan, shuffle=False, partition=False)
+    train_dataset = Dataset(args.train_data, data_pipeline=data_pipeline, mode='train', gan=gan, dpo=dpo, shuffle=True, partition=True)
+    cv_dataset = Dataset(args.cv_data, data_pipeline=data_pipeline, mode='train', gan=gan, dpo=dpo, shuffle=False, partition=False)
 
     # do not use persistent_workers=True, as whisper tokenizer opens tiktoken file each time when the for loop starts
     train_data_loader = DataLoader(train_dataset,
@@ -234,7 +235,7 @@ def cosyvoice_join(group_join, info_dict):
         return False
 
 
-def batch_forward(model, batch, scaler, info_dict):
+def batch_forward(model, batch, scaler, info_dict, ref_model=None, dpo_loss=None):
     device = int(os.environ.get('LOCAL_RANK', 0))
 
     dtype = info_dict["dtype"]
@@ -252,6 +253,24 @@ def batch_forward(model, batch, scaler, info_dict):
 
     with autocast:
         info_dict['loss_dict'] = model(batch, device)
+        if ref_model is not None and dpo_loss is not None:
+            chosen_logps = info_dict['loss_dict']["chosen_logps"]
+            rejected_logps = info_dict['loss_dict']["rejected_logps"]
+            sft_loss = info_dict['loss_dict']['loss']
+            with torch.no_grad():
+                ref_loss_dict = ref_model(batch, device)
+            reference_chosen_logps = ref_loss_dict["chosen_logps"]
+            reference_rejected_logps = ref_loss_dict["rejected_logps"]
+            preference_loss, chosen_reward, reject_reward = dpo_loss(
+                chosen_logps, rejected_logps, reference_chosen_logps, reference_rejected_logps
+            )
+            dpo_acc = (chosen_reward > reject_reward).float().mean()
+            info_dict['loss_dict']["loss"] = preference_loss + sft_loss
+            info_dict['loss_dict']["sft_loss"] = sft_loss
+            info_dict['loss_dict']["dpo_loss"] = preference_loss
+            info_dict['loss_dict']["dpo_acc"] = dpo_acc
+            info_dict['loss_dict']["chosen_reward"] = chosen_reward.mean()
+            info_dict['loss_dict']["reject_reward"] = reject_reward.mean()
     return info_dict
 
 
@@ -285,11 +304,15 @@ def update_parameter_and_lr(model, optimizer, scheduler, scaler, info_dict):
             # optimizer.step().
             if torch.isfinite(grad_norm):
                 scaler.step(optimizer)
+            else:
+                logging.warning('get infinite grad_norm, check your code/data if it appears frequently')
             scaler.update()
         else:
             grad_norm = clip_grad_norm_(model.parameters(), info_dict['grad_clip'])
             if torch.isfinite(grad_norm):
                 optimizer.step()
+            else:
+                logging.warning('get infinite grad_norm, check your code/data if it appears frequently')
         optimizer.zero_grad()
         scheduler.step()
     info_dict["lr"] = optimizer.param_groups[0]['lr']
@@ -335,7 +358,7 @@ def log_per_save(writer, info_dict):
     rank = int(os.environ.get('RANK', 0))
     logging.info(
         'Epoch {} Step {} CV info lr {} {} rank {}'.format(
-            epoch, step + 1, lr, rank, ' '.join(['{}_{}'.format(k, v) for k, v in loss_dict.items()])))
+            epoch, step + 1, lr, rank, ' '.join(['{} {}'.format(k, v) for k, v in loss_dict.items()])))
 
     if writer is not None:
         for k in ['epoch', 'lr']:

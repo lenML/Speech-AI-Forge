@@ -13,28 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import torch
+
 from cosyvoice.transformer.activation import Swish
-from cosyvoice.transformer.attention import (
-    MultiHeadedAttention,
-    RelPositionMultiHeadedAttention,
-)
-from cosyvoice.transformer.embedding import (
-    EspnetRelPositionalEncoding,
-    LearnablePositionalEncoding,
-    NoPositionalEncoding,
-    PositionalEncoding,
-    RelPositionalEncoding,
-    WhisperPositionalEncoding,
-)
 from cosyvoice.transformer.subsampling import (
+    LinearNoSubsampling,
+    EmbedinigNoSubsampling,
     Conv1dSubsampling2,
     Conv2dSubsampling4,
     Conv2dSubsampling6,
     Conv2dSubsampling8,
-    EmbedinigNoSubsampling,
-    LegacyLinearNoSubsampling,
-    LinearNoSubsampling,
 )
+from cosyvoice.transformer.embedding import (PositionalEncoding,
+                                             RelPositionalEncoding,
+                                             WhisperPositionalEncoding,
+                                             LearnablePositionalEncoding,
+                                             NoPositionalEncoding)
+from cosyvoice.transformer.attention import (MultiHeadedAttention,
+                                             RelPositionMultiHeadedAttention)
+from cosyvoice.transformer.embedding import EspnetRelPositionalEncoding
+from cosyvoice.transformer.subsampling import LegacyLinearNoSubsampling
+from cosyvoice.llm.llm import TransformerLM, Qwen2LM
+from cosyvoice.flow.flow import MaskedDiffWithXvec, CausalMaskedDiffWithXvec
+from cosyvoice.hifigan.generator import HiFTGenerator
+from cosyvoice.cli.model import CosyVoiceModel, CosyVoice2Model
+
 
 COSYVOICE_ACTIVATION_CLASSES = {
     "hardtanh": torch.nn.Hardtanh,
@@ -70,3 +72,12 @@ COSYVOICE_ATTENTION_CLASSES = {
     "selfattn": MultiHeadedAttention,
     "rel_selfattn": RelPositionMultiHeadedAttention,
 }
+
+
+def get_model_type(configs):
+    # NOTE CosyVoice2Model inherits CosyVoiceModel
+    if isinstance(configs['llm'], TransformerLM) and isinstance(configs['flow'], MaskedDiffWithXvec) and isinstance(configs['hift'], HiFTGenerator):
+        return CosyVoiceModel
+    if isinstance(configs['llm'], Qwen2LM) and isinstance(configs['flow'], CausalMaskedDiffWithXvec) and isinstance(configs['hift'], HiFTGenerator):
+        return CosyVoice2Model
+    raise TypeError('No valid model type found!')

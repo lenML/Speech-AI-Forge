@@ -16,10 +16,10 @@
 # Modified from ESPnet(https://github.com/espnet/espnet)
 #               NeMo(https://github.com/NVIDIA/NeMo)
 
-import math
-import warnings
 from typing import Union
 
+import math
+import warnings
 import torch
 from torch.optim.lr_scheduler import _LRScheduler
 

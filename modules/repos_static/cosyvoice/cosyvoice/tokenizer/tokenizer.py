@@ -2,11 +2,11 @@ import base64
 import os
 from functools import lru_cache
 from typing import Optional
-
-import tiktoken
 import torch
 from transformers import AutoTokenizer
 from whisper.tokenizer import Tokenizer
+
+import tiktoken
 
 LANGUAGES = {
     "en": "english",
