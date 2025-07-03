@@ -34,8 +34,16 @@ def_ps = FireRedTTSParams()
 
 
 class FireRedTTSInfer:
-    def __init__(self, config_path: str, pretrained_path: str, device: str = "cuda"):
+
+    def __init__(
+        self,
+        config_path: str,
+        pretrained_path: str,
+        device: str = "cuda",
+        dtype: torch.dtype = torch.float32,
+    ):
         self.device = device
+        self.dtype = dtype
         self.config: dict = json.load(open(config_path))
         self.gpt_path: str = os.path.join(pretrained_path, "fireredtts_gpt.pt")
         self.token2wav_path: str = os.path.join(
@@ -76,7 +84,7 @@ class FireRedTTSInfer:
 
         sd = torch.load(self.gpt_path, map_location="cpu")["model"]
         self.gpt.load_state_dict(sd, strict=True)
-        self.gpt = self.gpt.to(device=device)
+        self.gpt = self.gpt.to(device=device, dtype=dtype)
         self.gpt.eval()
         self.gpt.init_gpt_for_inference(kv_cache=True)
 
@@ -89,7 +97,7 @@ class FireRedTTSInfer:
         self.token2wav.load_state_dict(sd, strict=True)
         self.token2wav.generator.remove_weight_norm()
         self.token2wav.eval()
-        self.token2wav = self.token2wav.to(device)
+        self.token2wav = self.token2wav.to(device=device, dtype=dtype)
 
     def unload_models(self):
         """卸载所有模型并释放资源。"""
@@ -113,7 +121,12 @@ class FireRedTTSInfer:
             torch.Tensor: Speaker embeddings tensor.
         """
         # Convert numpy array to torch tensor and resample if needed
-        audio_tensor = torch.from_numpy(audio).unsqueeze(0).float().to(self.device)
+        audio_tensor = (
+            torch.from_numpy(audio)
+            .unsqueeze(0)
+            .float()
+            .to(device=self.device, dtype=self.dtype)
+        )
         audio_resampled = torchaudio.functional.resample(
             audio_tensor, orig_freq=audio_sr, new_freq=16000
         )
@@ -122,9 +135,11 @@ class FireRedTTSInfer:
         )
 
         # Extract speaker embeddings
-        spk_embeddings: torch.Tensor = self.speaker_extractor(
-            audio_resampled
-        ).unsqueeze(0)
+        spk_embeddings: torch.Tensor = (
+            self.speaker_extractor(audio_resampled)
+            .unsqueeze(0)
+            .to(device=self.device, dtype=self.dtype)
+        )
         return spk_embeddings
 
     def do_gpt_inference(

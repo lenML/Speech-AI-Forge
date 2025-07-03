@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Tuple
 
 import numpy as np
+import torch
 
 from modules.core.models.tts.FireRed.FireRedInfer import (
     FireRedTTSInfer,
@@ -37,6 +38,7 @@ class FireRedTTSModel(TTSModel):
             config_path="./modules/repos_static/FireRedTTS/config_24k.json",
             pretrained_path="./models/FireRedTTS",
             device=self.get_device(),
+            dtype=self.get_dtype(),
         )
         logger.info("FireRedTTS model loaded.")
         return self.fire_red
@@ -78,7 +80,9 @@ class FireRedTTSModel(TTSModel):
         # seed = seg0.infer_seed
         # chunk_size = context.infer_config.stream_chunk_size
 
-        with SeedContext(seed=seg0.infer_seed):
+        with SeedContext(seed=seg0.infer_seed), torch.cuda.amp.autocast(
+            dtype=self.get_dtype()
+        ):
             syn_audio = model.synthesize(
                 audio=spk_wav,
                 audio_sr=self.get_sample_rate(),
