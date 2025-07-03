@@ -111,6 +111,8 @@ class CosyVoiceTTSModel(TTSModel):
                 spk2info=model_dir / "spk2info.pt",
                 instruct=instruct,
                 allowed_special=configs["allowed_special"],
+                device=device,
+                dtype=dtype,
             )
             frontend.device = device
             self.frontend = frontend
@@ -122,6 +124,7 @@ class CosyVoiceTTSModel(TTSModel):
                 llm=configs["llm"],
                 flow=configs["flow"],
                 hift=configs["hift"],
+                fp16=dtype == torch.float16,
             )
             model.device = device
             model.load(
@@ -129,9 +132,6 @@ class CosyVoiceTTSModel(TTSModel):
                 flow_model=model_dir / "flow.pt",
                 hift_model=model_dir / "hift.pt",
             )
-            model.llm.to(device=device, dtype=dtype)
-            model.flow.to(device=device, dtype=dtype)
-            model.hift.to(device=device, dtype=dtype)
 
             self.model = model
 

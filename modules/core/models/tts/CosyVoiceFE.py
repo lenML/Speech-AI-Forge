@@ -23,10 +23,13 @@ class CosyVoiceFrontEnd:
         spk2info: str = "",
         instruct: bool = False,
         allowed_special: str = "all",
+        device: torch.device = torch.cuda,
+        dtype: torch.dtype = torch.float32,
     ):
         self.tokenizer = get_tokenizer()
         self.feat_extractor = feat_extractor
-        self.device = devices.get_device_for("cosy-voice")
+        self.device = device
+        self.dtype = dtype
         option = onnxruntime.SessionOptions()
         option.graph_optimization_level = (
             onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
@@ -54,7 +57,9 @@ class CosyVoiceFrontEnd:
 
     def _extract_text_token(self, text):
         text_token = self.tokenizer.encode(text, allowed_special=self.allowed_special)
-        text_token = torch.tensor([text_token], dtype=torch.int32).to(self.device)
+        text_token = torch.tensor([text_token], dtype=torch.int32).to(
+            device=self.device
+        )
         text_token_len = torch.tensor([text_token.shape[1]], dtype=torch.int32).to(
             self.device
         )
@@ -78,7 +83,9 @@ class CosyVoiceFrontEnd:
             .flatten()
             .tolist()
         )
-        speech_token = torch.tensor([speech_token], dtype=torch.int32).to(self.device)
+        speech_token = torch.tensor([speech_token], dtype=torch.int32).to(
+            device=self.device
+        )
         speech_token_len = torch.tensor([speech_token.shape[1]], dtype=torch.int32).to(
             self.device
         )
@@ -100,12 +107,15 @@ class CosyVoiceFrontEnd:
             .flatten()
             .tolist()
         )
-        embedding = torch.tensor([embedding]).to(self.device)
+        embedding = torch.tensor([embedding]).to(device=self.device, dtype=self.dtype)
         return embedding
 
     def _extract_speech_feat(self, speech):
         speech_feat = (
-            self.feat_extractor(speech).squeeze(dim=0).transpose(0, 1).to(self.device)
+            self.feat_extractor(speech)
+            .squeeze(dim=0)
+            .transpose(0, 1)
+            .to(device=self.device, dtype=self.dtype)
         )
         speech_feat = speech_feat.unsqueeze(dim=0)
         speech_feat_len = torch.tensor([speech_feat.shape[1]], dtype=torch.int32).to(
