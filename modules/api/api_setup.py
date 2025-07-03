@@ -21,6 +21,7 @@ from modules.api.impl import (
     xtts_v2_api,
 )
 from modules.api.v2 import tts_api as tts_api_v2
+from modules.api.v2 import transcribe_api as transcribe_api_v2
 from modules.utils import env
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,7 @@ def create_api(app: FastAPI, exclude=[]):
 
     # v2 apis
     tts_api_v2.setup(app_mgr)
+    transcribe_api_v2.setup(app_mgr)
 
     return app_mgr
 

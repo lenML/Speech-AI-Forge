@@ -259,7 +259,9 @@ class STTChunker:
         result = self.merge_results(chunks, results)
         return result
 
-    def convert_result_with_format(self, config: STTConfig, result: SttResult) -> str:
+    def convert_result_with_format(
+        self, config: STTConfig, result: SttResult
+    ) -> TranscribeResult:
         writer_options = {
             "highlight_words": config.highlight_words,
             "max_line_count": config.max_line_count,
@@ -279,7 +281,7 @@ class STTChunker:
             language=result.language,
         )
 
-    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> str:
+    def transcribe(self, audio: NP_AUDIO, config: STTConfig) -> TranscribeResult:
         result = self.transcribe_to_result(audio, config)
         sr, data = audio
         result.duration = len(data) / sr

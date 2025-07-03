@@ -10,6 +10,7 @@ from modules.api import utils as api_utils
 from modules.api.Api import APIManager
 from modules.core.handler.datacls.stt_model import STTConfig, STTOutputFormat
 from modules.core.handler.STTHandler import STTHandler
+from modules.core.models.stt.STTModel import TranscribeResult
 
 
 class TranscriptionsForm(BaseModel):
@@ -75,15 +76,9 @@ class TranscriptionsForm(BaseModel):
         )
 
 
-class TranscriptionsResponseData(BaseModel):
-    text: str
-    segments: list
-    info: dict
-
-
 class TranscriptionsResponse(BaseModel):
     message: str
-    data: TranscriptionsResponseData
+    data: TranscribeResult
 
 
 def setup(app: APIManager):
