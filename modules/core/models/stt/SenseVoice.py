@@ -62,9 +62,10 @@ class SenseVoiceModel(STTModel):
             dtype=str(self.get_dtype()),
             disable_update=True,
         )
-        # TODO: 有关问题，这里还是需要联网下载 vad 模型，我们要是预先下载，并指定目录更好一点
+        vad_model_dir = Path("./models/fsmn-vad")
         self.vad_model = AutoModel(
-            model="fsmn-vad",
+            # 如果有预先下载就使用 Models 下面的，如果没有就用它内部的自动下载逻辑，会下载到 ~/.cache 目录下面
+            model=str(vad_model_dir) if vad_model_dir.exists() else "fsmn-vad",
             max_single_segment_time=self.max_single_segment_time_seconds * 1000,
             disable_update=True,
         )
@@ -83,7 +84,7 @@ class SenseVoiceModel(STTModel):
         sr: int,
         speech: npt.NDArray,
         language: str = "auto",
-    ) -> List[SttSegment]:
+    ) -> tuple[List[SttSegment], str]:
         """
         Transcribe audio file to text with timestamps.
 
@@ -112,7 +113,7 @@ class SenseVoiceModel(STTModel):
         logger.info("VAD took %.2f seconds", time.time() - start_time)
 
         if not vad_results or not vad_results[0]["value"]:
-            return []
+            return [], language
 
         vad_segments = vad_results[0]["value"]
 
