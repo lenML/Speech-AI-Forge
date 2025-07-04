@@ -161,6 +161,7 @@ WIP 开发中
 | **ASR**      | Whisper V3       | `python -m scripts.downloader.faster_whisper --source huggingface`          |
 |              | Whisper V3 turbo | `python -m scripts.downloader.faster_whisper_v3_turbo --source huggingface` |
 |              | SenseVoice       | `python -m scripts.downloader.sensevoice_small --source huggingface`        |
+|              | fsmn-vad       | `python -m scripts.downloader.fsmn_vad --source huggingface`        |
 | **CV**       | OpenVoice        | `python -m scripts.downloader.open_voice --source huggingface`              |
 | **Enhancer** | 增强模型         | `python -m scripts.dl_enhance --source huggingface`                         |
 
