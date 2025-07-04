@@ -19,7 +19,7 @@ from typing import Tuple
 
 import numpy.typing as npt
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, Qwen2ForCausalLM
 
 from modules.repos_static.spark_tts.sparktts.models.audio_tokenizer import (
     BiCodecTokenizer,
@@ -37,7 +37,12 @@ class SparkTTS:
     Spark-TTS for text-to-speech generation.
     """
 
-    def __init__(self, model_dir: Path, device: torch.device = torch.device("cuda:0")):
+    def __init__(
+        self,
+        model_dir: Path,
+        device: torch.device = torch.device("cuda:0"),
+        dtype: torch.dtype = torch.float32,
+    ):
         """
         Initializes the SparkTTS model with the provided configurations and device.
 
@@ -46,6 +51,7 @@ class SparkTTS:
             device (torch.device): The device (CPU/GPU) to run the model on.
         """
         self.device = device
+        self.dtype = dtype
         self.model_dir = model_dir
         self.configs = load_config(f"{model_dir}/config.yaml")
         self.sample_rate = self.configs["sample_rate"]
@@ -54,9 +60,12 @@ class SparkTTS:
     def _initialize_inference(self):
         """Initializes the tokenizer, model, and audio tokenizer for inference."""
         self.tokenizer = AutoTokenizer.from_pretrained(f"{self.model_dir}/LLM")
-        self.model = AutoModelForCausalLM.from_pretrained(f"{self.model_dir}/LLM")
+        self.model: Qwen2ForCausalLM = AutoModelForCausalLM.from_pretrained(
+            f"{self.model_dir}/LLM"
+        )
         self.audio_tokenizer = BiCodecTokenizer(self.model_dir, device=self.device)
-        self.model.to(self.device)
+        self.model.to(device=self.device, dtype=self.dtype)
+        self.model.eval()
 
     def process_prompt(
         self,

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Literal, Optional, Union
 
 import soundfile as sf
+import torch
 
 from modules.core.models.tts.SparkTTS.SparkTTS import SparkTTS
 from modules.core.models.TTSModel import TTSModel
@@ -38,11 +39,25 @@ class SparkTTSModel(TTSModel):
     def is_downloaded(self) -> bool:
         return self.model_path.exists()
 
+    def get_dtype(self):
+        dtype = super().get_dtype()
+        if dtype == torch.float16:
+            # NOTE: SparkTTS 模型对于 float16 精度很糟糕，几乎破坏了模型，无法运行
+            # NOTE: 你可以使用 `--bf16` 启动项开启 bfloat16 模式，虽然可以运行，但是还是容易生成大量空白
+            # NOTE: 所以，如果没有使用 bf16 又开启了 half ，那么将切换为 f32
+            logger.warning(
+                "检测到 dtype 为 float16，但 SparkTTS 对 float16 支持很差，已强制切换为 float32。"
+                "建议使用 --bf16 开启 bfloat16 模式以获得更好兼容性。"
+            )
+            return torch.float32
+        return dtype
+
     def load(self):
         if self.model is None:
-            # TODO: 配置 dtype
             self.model = SparkTTS(
-                model_dir=str(self.model_path), device=self.get_device()
+                model_dir=str(self.model_path),
+                device=self.get_device(),
+                dtype=self.get_dtype(),
             )
         return self.model
 

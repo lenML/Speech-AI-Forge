@@ -56,10 +56,17 @@ def setup_model_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Preload all models at startup",
     )
+    # NOTE: 开启 ftc 等于给 torch 预热，但是服务冷启动变慢
     parser.add_argument(
         "--ftc",
         action="store_true",
         help="Enable first time calculation",
+    )
+    # NOTE: 不同模型可能有不同的适配度，比如 sparktts 只能使用 bfloat16 而不能使用 float16 ，所以某些模型半精度的情况需要开启这个
+    parser.add_argument(
+        "--bf16",
+        action="store_true",
+        help="Use bfloat16 as the data type when loading with half precision.",
     )
 
 
@@ -75,6 +82,7 @@ def process_model_args(args: argparse.Namespace):
     debug_generate = env.get_and_update_env(args, "debug_generate", False, bool)
     preload_models = env.get_and_update_env(args, "preload_models", False, bool)
     enable_ftc = env.get_and_update_env(args, "ftc", False, bool)
+    bf16 = env.get_and_update_env(args, "bf16", False, bool)
 
     # TODO: 需要等 zoo 模块实现
     # generate_audio.setup_lru_cache()

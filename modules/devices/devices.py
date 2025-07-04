@@ -145,8 +145,12 @@ def reset_device():
         config.runtime_env_vars.no_half = True
 
     if not config.runtime_env_vars.no_half:
-        dtype = torch.float16
-        logger.info("Using half precision: torch.float16")
+        if config.runtime_env_vars.bf16:
+            dtype = torch.bfloat16
+            logger.info("Using half precision: torch.bfloat16")
+        else:
+            dtype = torch.float16
+            logger.info("Using half precision: torch.float16")
     else:
         dtype = torch.float32
         logger.info("Using full precision: torch.float32")
