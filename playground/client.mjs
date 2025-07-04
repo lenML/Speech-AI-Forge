@@ -209,7 +209,11 @@ class APIClient {
   async listSpeakers() {
     try {
       const response = await this.client.get("/v1/speakers/list");
-      return response.data;
+      /**
+       * @type {{message:string,data:{items:any[],limit:number,offset:number,total:number}}}
+       */
+      const ret = response.data;
+      return ret;
     } catch (error) {
       console.error("Error listing speakers:", error);
       throw error;

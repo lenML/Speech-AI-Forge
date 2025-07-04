@@ -19,7 +19,7 @@ window.addEventListener("load", async () => {
   console.log("formats:", formats);
   useGlobalStore.set({
     styles: styles.data,
-    speakers: speakers.data,
+    speakers: speakers.data.items,
     formats: formats.data,
   });
 });

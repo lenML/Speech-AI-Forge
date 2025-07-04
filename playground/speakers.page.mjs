@@ -43,7 +43,7 @@ const useStore = create((set, get) => ({
 
 window.addEventListener("load", async () => {
   const speakers = await client.listSpeakers();
-  useStore.get().setSpeakers(speakers.data);
+  useStore.get().setSpeakers(speakers.data.items);
 });
 
 const CreateForm = () => {
