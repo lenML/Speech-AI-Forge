@@ -193,7 +193,7 @@ class IndexTTS:
         outputs: List[Dict] = []
         for idx, sent in enumerate(sentences):
             outputs.append({"idx": idx, "sent": sent, "len": len(sent)})
-       
+
         if len(outputs) > bucket_max_size:
             # split sentences into buckets by sentence length
             buckets: List[List[Dict]] = []
@@ -247,7 +247,9 @@ class IndexTTS:
             # 1.5版本以上，直接使用stop_text_token 右侧填充，填充到最大长度
             # [1, N] -> [N,]
             tokens = [t.squeeze(0) for t in tokens]
-            return pad_sequence(tokens, batch_first=True, padding_value=self.cfg.gpt.stop_text_token, padding_side="right")
+            return pad_sequence(
+                tokens, batch_first=True, padding_value=self.cfg.gpt.stop_text_token
+            )
         max_len = max(t.size(1) for t in tokens)
         outputs = []
         for tensor in tokens:
@@ -287,7 +289,7 @@ class IndexTTS:
         """
         if verbose:
             print(">> start fast inference...")
-        
+
         self._set_gr_progress(0, "start fast inference...")
         if verbose:
             print(f"origin text:{text}")
@@ -365,8 +367,7 @@ class IndexTTS:
                     text_token_syms = self.tokenizer.convert_ids_to_tokens(text_tokens[0].tolist())
                     print("text_token_syms is same as sentence tokens", text_token_syms == sent) 
                 temp_tokens.append(text_tokens)
-        
-            
+
         # Sequential processing of bucketing data
         all_batch_num = sum(len(s) for s in all_sentences)
         all_batch_codes = []
