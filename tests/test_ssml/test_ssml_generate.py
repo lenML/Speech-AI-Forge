@@ -40,7 +40,8 @@ async def run_ssml_pipeline(ssml: str, filename="ssml_test.wav"):
 
 
 @pytest.mark.ssml_gen
-def test_ssml_gen1():
+@pytest.mark.asyncio
+async def test_ssml_gen1():
     ssml = """
     <speak version="0.1">
         <voice spk="xiaoyan" style="news">
@@ -51,4 +52,4 @@ def test_ssml_gen1():
     </speak>
     """
 
-    run_ssml_pipeline(ssml, filename="ssml_gen1.wav")
+    await run_ssml_pipeline(ssml, filename="ssml_gen1.wav")
