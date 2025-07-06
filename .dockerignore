@@ -22,7 +22,7 @@ venv
 /pip-wheel
 /pip-wheelhouse
 /pip-cache
-requirements.txt
+
 requirements.lock
 *.log
 
