@@ -5,9 +5,11 @@ from modules.core.models.BaseZooModel import BaseZooModel
 from modules.core.models.tts.InferCache import InferCache
 from modules.core.pipeline.dcls import TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO, TTSPipelineContext
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.devices import devices
 from modules.utils import audio_utils
 
+import numpy.typing as npt
 
 class TTSModel(BaseZooModel):
 
@@ -25,6 +27,16 @@ class TTSModel(BaseZooModel):
 
     def generate(self, segment: TTSSegment, context: TTSPipelineContext) -> NP_AUDIO:
         return self.generate_batch([segment], context=context)[0]
+
+    def compute_spk_features(self, spk: TTSSpeaker) -> npt.NDArray:
+        """
+        计算说话人特征，只有部分模型支持
+
+        用于音色合并或者其他用途
+        """
+        raise NotImplementedError(
+            f"Model {self.model_id} is not support extracting speaker features"
+        )
 
     # NOTE: 这里会有假设，所有的 segments 除了文本以外所有配置相同，具体调用逻辑在 core.pipeline.generate 中
     def generate_batch(

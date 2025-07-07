@@ -19,8 +19,11 @@ class TTSConfig(BaseModel):
 
 
 class InferConfig(BaseModel):
-    batch_size: int = 4
-    spliter_threshold: int = 100
+    # NOTE: batch_size * spliter_threshold = 预计最大vram面积 * 不同模型的系数
+    # 大概 batch_sise=2 spliter_threshold=30 可以保证在8gb显存正常推理
+    batch_size: int = 2
+    spliter_threshold: int = 30
+
     # end_of_sentence
     eos: str = "。"
     seed: int = 42

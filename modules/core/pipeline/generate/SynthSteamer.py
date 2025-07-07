@@ -16,14 +16,19 @@ class SynthStreamer:
         self.output_wav = np.empty(0)
 
     def flush(self):
+        """
+        刷新合并音频
+        """
         output_wav = np.empty(0)
 
         for seg in self.segments:
             data = seg.data
             if data.size == 0 and not seg.done:
+                # 空检查
                 break
             output_wav = np.concatenate((output_wav, data), axis=0)
             if not seg.done:
+                # 未完成的块，退出，因为只需要合并已经完成的块
                 break
 
         self.output_wav = output_wav

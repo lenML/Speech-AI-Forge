@@ -123,6 +123,7 @@ class AudioHandler:
                     yield chunk_data
                     chunk_data = encoder.read()
 
+            # wait to finish
             encoder.close()
 
             chunk_data = encoder.read()
