@@ -1371,6 +1371,48 @@
           }
         }
       }
+    },
+    "/v2/stt": {
+      "post": {
+        "tags": [
+          "Forge V2"
+        ],
+        "summary": "Transcribe V2",
+        "description": "Transcribes audio using base64 or URL input. Stateless interface.",
+        "operationId": "transcribe_v2_v2_stt_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TranscriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2187,6 +2229,38 @@
         "type": "object",
         "title": "EnhancerConfig"
       },
+      "FromUrl": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Url",
+            "description": "音频文件 URL，必须是合法的 http(s) 地址"
+          },
+          "headers": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headers",
+            "description": "请求 URL 时附带的自定义 header"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "FromUrl"
+      },
       "GoogleTextSynthesizeParams": {
         "properties": {
           "input": {
@@ -2290,6 +2364,35 @@
         },
         "type": "object",
         "title": "InferConfig"
+      },
+      "InputAudio": {
+        "properties": {
+          "from_url": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FromUrl"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "从 URL 加载音频"
+          },
+          "from_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Base64",
+            "description": "base64 编码的音频数据"
+          }
+        },
+        "type": "object",
+        "title": "InputAudio"
       },
       "RefineTextRequest": {
         "properties": {
@@ -2528,6 +2631,38 @@
           "speakers"
         ],
         "title": "SpeakersUpdate"
+      },
+      "SubtitleSegment": {
+        "prefixItems": [
+          {
+            "type": "string",
+            "title": "Start"
+          },
+          {
+            "type": "string",
+            "title": "End"
+          },
+          {
+            "type": "string",
+            "title": "Text"
+          },
+          {
+            "items": {},
+            "type": "array",
+            "title": "Words"
+          },
+          {
+            "type": "number",
+            "title": "Start S"
+          },
+          {
+            "type": "number",
+            "title": "End S"
+          }
+        ],
+        "type": "array",
+        "maxItems": 6,
+        "minItems": 6
       },
       "SynthesisInput": {
         "properties": {
@@ -2791,6 +2926,237 @@
         ],
         "title": "TextNormalizeRequest"
       },
+      "TranscribeResult": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/SubtitleSegment"
+            },
+            "type": "array",
+            "title": "Segments"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "segments",
+          "language"
+        ],
+        "title": "TranscribeResult"
+      },
+      "TranscriptionRequest": {
+        "properties": {
+          "input_audio": {
+            "$ref": "#/components/schemas/InputAudio"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "ASR 模型名称，如 whisper.base、whisper.large",
+            "default": "whisper.large"
+          },
+          "refrence_transcript": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refrence Transcript",
+            "description": "参考文案"
+          },
+          "prompt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt",
+            "description": "提示词，用于引导模型"
+          },
+          "prefix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prefix",
+            "description": "对话历史或固定开头"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language",
+            "description": "语言代码，如 'en', 'zh' 等"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature",
+            "description": "采样温度，控制多样性，范围 0~1"
+          },
+          "sample_len": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Len",
+            "description": "采样长度，必须 >= 1"
+          },
+          "best_of": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Of",
+            "description": "在 temperature > 0 时采样 n 次取最佳结果"
+          },
+          "beam_size": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beam Size",
+            "description": "beam search 的宽度，推荐 5~10"
+          },
+          "patience": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Patience",
+            "description": "beam search 的 patience 参数，越大越宽松"
+          },
+          "length_penalty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Length Penalty",
+            "description": "对生成文本长度的惩罚，负值鼓励短输出"
+          },
+          "format": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/STTOutputFormat"
+              }
+            ],
+            "description": "输出格式，如 txt, json, srt, vtt",
+            "default": "txt"
+          },
+          "highlight_words": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Highlight Words",
+            "description": "是否高亮每个识别的单词（如 JSON 格式）",
+            "default": false
+          },
+          "max_line_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Line Count",
+            "description": "最大行数限制（用于格式化输出）"
+          },
+          "max_line_width": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Line Width",
+            "description": "最大每行字符数（用于 txt 格式）"
+          },
+          "max_words_per_line": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Words Per Line",
+            "description": "每行最多几个词（用于格式化输出）"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_audio"
+        ],
+        "title": "TranscriptionRequest"
+      },
       "TranscriptionsResponse": {
         "properties": {
           "message": {
@@ -2798,7 +3164,7 @@
             "title": "Message"
           },
           "data": {
-            "$ref": "#/components/schemas/TranscriptionsResponseData"
+            "$ref": "#/components/schemas/TranscribeResult"
           }
         },
         "type": "object",
@@ -2807,30 +3173,6 @@
           "data"
         ],
         "title": "TranscriptionsResponse"
-      },
-      "TranscriptionsResponseData": {
-        "properties": {
-          "text": {
-            "type": "string",
-            "title": "Text"
-          },
-          "segments": {
-            "items": {},
-            "type": "array",
-            "title": "Segments"
-          },
-          "info": {
-            "type": "object",
-            "title": "Info"
-          }
-        },
-        "type": "object",
-        "required": [
-          "text",
-          "segments",
-          "info"
-        ],
-        "title": "TranscriptionsResponseData"
       },
       "UpdateSpeaker": {
         "properties": {
