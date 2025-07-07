@@ -89,6 +89,19 @@ const StreamPageContainer = styled.div`
   }
 `;
 
+const support_models = [
+  "chat-tts",
+  "fish-speech",
+  "cosy-voice",
+  "fire-red-tts",
+  "f5-tts",
+  "index-tts",
+  "spark-tts",
+  "gpt-sovits-v1",
+  "gpt-sovits-v2",
+  "gpt-sovits-v3",
+  "gpt-sovits-v4",
+];
 const useStore = create((set, get) => ({
   params: {
     text: "你好，这是一个测试。你好，这是一个测试。你好，这是一个测试。你好，这是一个测试。你好，这是一个测试。你好，这是一个测试。",
@@ -100,6 +113,7 @@ const useStore = create((set, get) => ({
     seed: 42,
     format: "mp3",
     no_cache: false,
+    model: "chat-tts",
   },
   setParams: (params) =>
     set({
@@ -136,6 +150,7 @@ const StreamForm = () => {
       seed,
       format,
       no_cache,
+      model,
     } = params;
     const audio_url = client.synthesizeTTSUrl({
       text,
@@ -148,6 +163,7 @@ const StreamForm = () => {
       format,
       no_cache,
       stream: true,
+      model,
     });
     setAudioUrl(audio_url);
   };
@@ -159,6 +175,14 @@ const StreamForm = () => {
         <label>
           Text
           <textarea name="text" value=${params.text} onChange=${handleChange} />
+        </label>
+        <label>
+          Model
+          <select name="model" value=${params.model} onChange=${handleChange}>
+            ${support_models.map(
+              (name) => html`<option key=${name} value=${name}>${name}</option>`
+            )}
+          </select>
         </label>
         <label>
           Speaker

@@ -45,6 +45,7 @@ class APIClient {
     thr = 100,
     no_cache = false,
     stream = false,
+    model = "chat-tts",
   }) {
     const params = new URLSearchParams({
       text,
@@ -62,6 +63,7 @@ class APIClient {
       thr,
       no_cache,
       stream,
+      model,
     });
     // return `${this.client.defaults.baseURL}v1/tts?${params.toString()}`;
 
