@@ -29,8 +29,10 @@ from .f5_infer import (
 
 # NOTE: 目前不支持 bigvgan 因为需要引入外部库，并且似乎没什么特别区别
 class F5TTS:
+
     def __init__(
         self,
+        ckpt_file: Path,
         model: Literal["F5TTS_v1_Base", "F5TTS_Base"] = "F5TTS_v1_Base",
         ode_method="euler",
         use_ema=True,
@@ -47,13 +49,6 @@ class F5TTS:
             / "configs"
             / f"{model}.yaml"
         )
-        ckpt_file = (
-            Path(os.getcwd())
-            / "models"
-            / "F5-TTS"
-            / model
-            / "model_1200000.safetensors"
-        )
         vocab_file = (
             Path(os.getcwd())
             / "modules"
@@ -64,16 +59,6 @@ class F5TTS:
             / "Emilia_ZH_EN_pinyin"
             / f"vocab.txt"
         )
-        if not ckpt_file.exists():
-            # NOTE: 不存在，提示使用脚本下载 `python -m scripts.downloader.f5_tts_v1 --source huggingface`
-            if model == "F5TTS_Base":
-                raise ValueError(
-                    f"F5TTS model {model} not found, please download it manually using `python -m scripts.downloader.f5_tts --source huggingface`"
-                )
-            else:
-                raise ValueError(
-                    f"F5TTS model {model} not found, please download it manually using `python -m scripts.downloader.f5_tts_v1 --source huggingface`"
-                )
 
         # Path to str path, 因为f5的函数不支持Path
         ckpt_file = str(ckpt_file)

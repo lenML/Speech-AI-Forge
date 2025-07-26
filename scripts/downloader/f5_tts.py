@@ -31,6 +31,7 @@ class F5TTSDownloader(BaseModelDownloader):
             modelscope_repo="AI-ModelScope/F5-TTS",
             huggingface_repo="SWivid/F5-TTS",
             required_files=required_files,
+            just_download_required_files=True,
         )
 
         self.logger = logger

@@ -31,6 +31,7 @@ class F5TTSV1Downloader(BaseModelDownloader):
             modelscope_repo="AI-ModelScope/F5-TTS",
             huggingface_repo="SWivid/F5-TTS",
             required_files=required_files,
+            just_download_required_files=True,
         )
 
         self.logger = logger
@@ -60,7 +61,7 @@ class F5TTSV1Downloader(BaseModelDownloader):
 
         # v1 版本是 2025/3 发布的新模型
         url = "https://modelscope.cn/models/AI-ModelScope/F5-TTS/resolve/master/F5TTS_v1_Base/model_1250000.safetensors"
-        dest_path = self.model_dir / "F5TTS_v1_Base" / "model_1200000.safetensors"
+        dest_path = self.model_dir / "F5TTS_v1_Base" / "model_1250000.safetensors"
 
         self._download_with_progress(url, dest_path)
 
