@@ -24,7 +24,7 @@ class F5TTSV1Downloader(BaseModelDownloader):
     def __init__(self):
         # NOTE: 只需要下载一个文件
         required_files = [
-            "F5TTS_v1_Base/model_1200000.safetensors",
+            "F5TTS_v1_Base/model_1250000.safetensors",
         ]
         super().__init__(
             model_name="F5-TTS",
