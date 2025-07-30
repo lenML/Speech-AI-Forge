@@ -16,7 +16,7 @@ from ..utils import del_all
 class Tokenizer:
     def __init__(
         self,
-        tokenizer_path: torch.serialization.FILE_LIKE,
+        tokenizer_path: torch.serialization.FileLike,
     ):
         """
         tokenizer: BertTokenizerFast = torch.load(

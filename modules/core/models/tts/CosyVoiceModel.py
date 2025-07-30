@@ -100,7 +100,7 @@ class CosyVoiceTTSModel(TTSModel):
             # instruct = True if "-Instruct" in str(model_dir) else False
             instruct = True
 
-            with open(model_dir / "cosyvoice.yaml", "r") as f:
+            with open(model_dir / "cosyvoice2.yaml", "r") as f:
                 configs = load_hyperpyyaml(f, overrides=self.hp_overrides)
 
             frontend = CosyVoiceFrontEnd(

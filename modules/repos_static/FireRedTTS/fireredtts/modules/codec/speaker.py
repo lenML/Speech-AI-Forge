@@ -1037,7 +1037,7 @@ class SpeakerEmbedddingExtractor(object):
             global_context=True,
             batch_norm=True,
         )
-        model.load_state_dict(torch.load(ckpt_path), strict=True)
+        model.load_state_dict(torch.load(ckpt_path, map_location=torch.device(device)), strict=True)
         model.eval()
         self.model = model
         self.model.to(device)
