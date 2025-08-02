@@ -73,6 +73,22 @@ def setup_api_args(parser: argparse.ArgumentParser):
         help="Exclude the specified API from the server",
     )
 
+import starlette
+def configure_cors_middleware(app: FastAPI, allow_origins: list = ["*"],
+        allow_credentials: bool = True,
+        allow_methods: list = ["*"],
+        allow_headers: list = ["*"],):
+    from starlette.middleware.cors import CORSMiddleware
+
+    cors_options = {
+        "allow_methods": allow_methods,
+        "allow_headers": allow_headers,
+        "allow_credentials": allow_credentials,
+        "allow_origins": allow_origins,
+    }
+
+    app.user_middleware.insert(0, starlette.middleware.Middleware(CORSMiddleware, **cors_options))
+    app.build_middleware_stack()  # rebuild middleware stack on-the-fly
 
 def process_api_args(args: argparse.Namespace, app: FastAPI):
     cors_origin = env.get_and_update_env(args, "cors_origin", "*", str)
@@ -84,7 +100,7 @@ def process_api_args(args: argparse.Namespace, app: FastAPI):
     config.api = api
 
     if cors_origin:
-        api.set_cors(allow_origins=[cors_origin])
+        configure_cors_middleware(app, allow_origins=[cors_origin])
         logger.info(f"allow CORS origin: {cors_origin}")
 
     if not no_playground:
