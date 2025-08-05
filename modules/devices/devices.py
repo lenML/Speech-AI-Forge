@@ -201,9 +201,14 @@ def get_cpu_memory():
 
 
 def get_gpu_memory():
-    total_memory = torch.cuda.get_device_properties(0).total_memory
-    reserved_memory = torch.cuda.memory_reserved(0)
-    allocated_memory = torch.cuda.memory_allocated(0)
+    if torch.cuda.is_available():
+        total_memory = torch.cuda.get_device_properties(0).total_memory
+        reserved_memory = torch.cuda.memory_reserved(0)
+        allocated_memory = torch.cuda.memory_allocated(0)
+    else:
+        total_memory = 0
+        reserved_memory = 0
+        allocated_memory = 0
     free_memory = total_memory - reserved_memory
     return MemUsage(
         device=cuda,

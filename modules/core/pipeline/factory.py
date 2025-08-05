@@ -120,7 +120,7 @@ class PipelineFactory:
             return cls.create_fishspeech_pipeline(ctx)
         elif model_id == "cosyvoice":
             return cls.create_cosyvoice_pipeline(ctx)
-        elif model_id == "firered":
+        elif model_id == "fireredtts":
             return cls.create_fire_red_tts_pipeline(ctx)
         elif model_id == "f5" or model_id == "f5tts":
             return cls.create_f5_tts_pipeline(ctx)

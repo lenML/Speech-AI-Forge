@@ -98,7 +98,7 @@ class APIManager:
             if allow_credentials:
                 response.headers["Access-Control-Allow-Credentials"] = "true"
 
-        @self.app.middleware("http")
+#         @self.app.middleware("http")
         async def cors_handler(request: Request, call_next):
             response: Response = await call_next(request)
 
