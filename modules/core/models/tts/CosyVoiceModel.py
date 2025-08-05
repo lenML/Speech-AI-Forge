@@ -100,7 +100,14 @@ class CosyVoiceTTSModel(TTSModel):
             # instruct = True if "-Instruct" in str(model_dir) else False
             instruct = True
 
-            with open(model_dir / "cosyvoice.yaml", "r") as f:
+            # 具体看 #268 ，因为 cosyvoice 改动配置文件名，所以兼容两种情况
+            configure_path_1 = model_dir / "cosyvoice.yaml"
+            configure_path_2 = model_dir / "cosyvoice2.yaml"
+            configure_path = (
+                configure_path_1 if configure_path_1.exists() else configure_path_2
+            )
+
+            with open(configure_path, "r") as f:
                 configs = load_hyperpyyaml(f, overrides=self.hp_overrides)
 
             frontend = CosyVoiceFrontEnd(
