@@ -179,6 +179,8 @@ hyperpyyaml==1.2.2
 openai-whisper==20231117
 onnxruntime==1.18.1
 inflect==7.3.1
+gdown==5.2.0
+
 ### matcha tts
 conformer==0.3.2
 wget==3.2

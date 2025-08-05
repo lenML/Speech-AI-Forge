@@ -405,3 +405,4 @@ stable-ts==2.19.0
 
 ### cosyvoice
 pyworld==0.3.5
+gdown==5.2.0
