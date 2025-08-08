@@ -1,5 +1,6 @@
 import io
 import logging
+import os
 import tempfile
 from pathlib import Path
 from typing import Literal, Optional, Union
@@ -47,7 +48,7 @@ class SparkTTSModel(TTSModel):
             # NOTE: 所以，如果没有使用 bf16 又开启了 half ，那么将切换为 f32
             logger.warning(
                 "检测到 dtype 为 float16，但 SparkTTS 对 float16 支持很差，已强制切换为 float32。"
-                "建议使用 --bf16 开启 bfloat16 模式以获得更好兼容性。"
+                "如需 f16 减少显存占用，请使用 --bf16 开启 bfloat16 模式以获得更好兼容性。"
             )
             return torch.float32
         return dtype
@@ -126,9 +127,15 @@ class SparkTTSModel(TTSModel):
 
         # 将 ref_wav 保存为临时文件
         # NOTE: 感觉不太好，可能有兼容问题，最好是可以直接传 bytesio 进去，但是得改 spark tts 库...暂时这样
-        with tempfile.NamedTemporaryFile(suffix=".wav") as tmpfile:
-            sf.write(tmpfile.name, ref_wav, sr, format="WAV")
-            ref_wav_path = Path(tmpfile.name)
+
+        # NOTE: 关于为什么使用 mkstemp 而不是 NamedTemporaryFile，请看 issues #270
+        # https://github.com/lenML/Speech-AI-Forge/issues/270
+        fd, tmp_path = tempfile.mkstemp(suffix=".wav")
+        os.close(fd)
+
+        try:
+            sf.write(tmp_path, ref_wav, sr, format="WAV")
+            ref_wav_path = Path(tmp_path)
 
             with SeedContext(seed):
                 wav = self.model.inference(
@@ -150,6 +157,12 @@ class SparkTTSModel(TTSModel):
                         segments=[segment], context=context, value=[(sr, wav)]
                     )
                 return (sr, wav)
+
+        finally:
+            try:
+                os.remove(tmp_path)
+            except Exception as e:
+                logger.warning(f"Failed to remove temp file {tmp_path}: {e}")
 
     def generate_batch(self, segments, context):
         return [self.generate(segment, context) for segment in segments]
