@@ -41,6 +41,12 @@ class TTSInterface:
         self.show_style_dropdown = True
         self.show_sampling = True
 
+        self.default_enable_enhance = True
+
+        # 输入 感情 提示词
+        # 目前只有 index-tts v2 支持
+        self.show_emotion_input_box = False
+
         self.reload_speakers()
         self.default_selected_speaker = (
             self.speaker_names[1] if len(self.speaker_names) > 1 else "*random"
@@ -214,6 +220,18 @@ class TTSInterface:
                 choices=self.styles, interactive=True, show_label=False, value="*auto"
             )
         return style_input_dropdown
+
+    def create_emotion_prompt(self):
+        with gr.Group(visible=self.show_emotion_input_box):
+            gr.Markdown("😊Emotion")
+            emotion_prompt_text = gr.Textbox(
+                label="Emotion Prompt",
+                placeholder="Emotion Prompt",
+                value="",
+                lines=1,
+                show_label=False,
+            )
+        return emotion_prompt_text
 
     def create_sampling_interface(self):
         with gr.Group(visible=self.show_sampling):
@@ -391,7 +409,9 @@ class TTSInterface:
         with gr.Group():
             gr.Markdown("🔊Generate")
             with gr.Group():
-                enable_enhance = gr.Checkbox(value=True, label="Enable Enhance")
+                enable_enhance = gr.Checkbox(
+                    value=self.default_enable_enhance, label="Enable Enhance"
+                )
                 enable_de_noise = gr.Checkbox(value=False, label="Enable De-noise")
             tts_button = gr.Button(
                 "🔊Generate Audio", variant="primary", elem_classes="big-button"
@@ -420,6 +440,7 @@ class TTSInterface:
                     spk_emotion2,
                 ) = self.create_speaker_interface()
                 style_input_dropdown = self.create_style_interface()
+                emotion_prompt_text = self.create_emotion_prompt()
                 temperature_input, top_p_input, top_k_input, batch_size_input = (
                     self.create_sampling_interface()
                 )
@@ -500,6 +521,7 @@ class TTSInterface:
                 ref_text_input,
                 spk_emotion1,
                 spk_emotion2,
+                emotion_prompt_text,
             ],
             outputs=[tts_output1, tts_output2, tts_output3, audio_history],
         )

@@ -194,6 +194,7 @@ cython_debug/
 /models/Index-TTS-1.5/**/*
 /models/fsmn-vad/**/*
 /models/Index-TTS-2/**/*
+/models/facebook/**/*
 
 /*.pt
 

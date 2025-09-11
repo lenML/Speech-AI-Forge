@@ -81,6 +81,7 @@ class TTSModel(BaseZooModel):
         prompt2 = seg0.prompt2
         prefix = seg0.prefix
         emotion = seg0.emotion
+        emotion_prompt = seg0.emotion_prompt
         # use_decoder = seg0.use_decoder
         seed = seg0.infer_seed
         chunk_size = context.infer_config.stream_chunk_size
@@ -99,6 +100,7 @@ class TTSModel(BaseZooModel):
             stream_chunk_size=chunk_size,
             seed=seed,
             emotion=emotion,
+            emotion_prompt=emotion_prompt,
         )
         return kwargs
 

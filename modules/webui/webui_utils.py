@@ -268,6 +268,8 @@ async def tts_generate(
     spk_emotion1="default",
     # 这个是上传音色的 emotion
     spk_emotion2="default",
+    # emotion 提示词
+    emotion_prompt_text="",
     model_id: str = "chat-tts",
     progress=gr.Progress(track_tqdm=not webui_config.off_track_tqdm),
 ):
@@ -349,6 +351,7 @@ async def tts_generate(
         prompt1=prompt1,
         prompt2=prompt2,
         emotion=spk_emotion,
+        emotion_prompt=emotion_prompt_text,
     )
     infer_config = InferConfig(
         batch_size=batch_size,

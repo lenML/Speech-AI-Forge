@@ -113,6 +113,33 @@ class IndexTTSInterface(NotSeedTTSInterface):
         # NOTE: 这个模型不支持 instruction
         self.show_style_dropdown = False
 
+        # 这个模型几乎不需要 enhance, 或者说，自带 enhance
+        self.default_enable_enhance = False
+
+
+class IndexTTSV2Interface(NotSeedTTSInterface):
+
+    def __init__(self):
+        super().__init__("index-tts-v2")
+        self.refine_visible = False
+        self.contorl_tokens = []
+        self.spliter_eos = " 。 "
+
+        self.styles = ["*auto"]
+
+        self.default_temprature = 0.8
+        self.default_top_p = 0.8
+        self.default_top_k = 30
+
+        # NOTE: 这个模型不支持 instruction
+        self.show_style_dropdown = False
+
+        # 这个模型几乎不需要 enhance, 或者说，自带 enhance
+        self.default_enable_enhance = False
+
+        # NOTE: 这个用于实现特性 emotion prompt，传给 ttsconfig.emotion
+        self.show_emotion_input_box = True
+
 
 class SparkTTSInterface(NotSeedTTSInterface):
 
@@ -172,8 +199,11 @@ def create_tts_interface():
         with gr.TabItem("F5TTS"):
             f5_tts_interface = F5TtsInterface()
             f5_tts_interface.create_tts_interface()
-        with gr.TabItem("IndexTTS"):
+        with gr.TabItem("IndexTTS-v1"):
             index_tts_interface = IndexTTSInterface()
+            index_tts_interface.create_tts_interface()
+        with gr.TabItem("IndexTTS-v2"):
+            index_tts_interface = IndexTTSV2Interface()
             index_tts_interface.create_tts_interface()
         with gr.TabItem("SparkTTS"):
             spark_tts_interface = SparkTTSInterface()
