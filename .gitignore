@@ -193,6 +193,7 @@ cython_debug/
 /models/gpt_sovits_v3/**/*
 /models/Index-TTS-1.5/**/*
 /models/fsmn-vad/**/*
+/models/Index-TTS-2/**/*
 
 /*.pt
 
