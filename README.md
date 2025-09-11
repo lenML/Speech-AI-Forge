@@ -153,7 +153,7 @@ WIP 开发中
 |              | GPT-SoVITS(v4)   | `python -m scripts.downloader.gpt_sovits_v4 --source huggingface`           |
 |              | CosyVoice(v2)    | `python -m scripts.downloader.cosyvoice2 --source huggingface`              |
 |              | FireRedTTS       | `python -m scripts.downloader.fire_red_tts --source huggingface`            |
-|              | Index-TTS-2    | <code>python -m scripts.downloader.index_tts_2 --source huggingface<br/>python -m scripts.downloader.facebook_w2v_bert_2 --source huggingface <br/> python -m scripts.downloader.funasr_campplus --source huggingface <br/> python -m scripts.downloader.MaskGCT_semantic_codec --source huggingface <br/> python -m scripts.downloader.nvidia_bigvgan_v2 --source huggingface</code>        |
+|              | Index-TTS-2    |  见下方`Index-TTS-v2 下载`      |
 |              | Index-TTS-1.5    | `python -m scripts.downloader.index_tts_1_5 --source huggingface`           |
 |              | Index-TTS        | `python -m scripts.downloader.index_tts --source huggingface`               |
 |              | Spark-TTS        | `python -m scripts.downloader.spark_tts --source huggingface`               |
@@ -168,6 +168,16 @@ WIP 开发中
 | **Enhancer** | 增强模型         | `python -m scripts.dl_enhance --source huggingface`                         |
 
 > **注意**：如果需要使用 ModelScope 下载模型，请使用 `--source modelscope`。部分模型可能无法使用 ModelScope 下载。
+
+#### Index-TTS-v2 下载
+使用 indextts-v2 需要安装一下五个模型
+```
+python -m scripts.downloader.index_tts_2 --source huggingface
+python -m scripts.downloader.facebook_w2v_bert_2 --source huggingface 
+python -m scripts.downloader.funasr_campplus --source huggingface 
+python -m scripts.downloader.MaskGCT_semantic_codec --source huggingface 
+python -m scripts.downloader.nvidia_bigvgan_v2 --source huggingface
+```
 
 ## FAQ
 
