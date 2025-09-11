@@ -5,7 +5,7 @@ from scripts.dl_base import BaseModelDownloader
 logger = logging.getLogger(__name__)
 
 
-class IndexTTS25Downloader(BaseModelDownloader):
+class IndexTTSV2Downloader(BaseModelDownloader):
     def __init__(self):
         # 只对几个大文件进行验证，因为所有文件都需要下载
         required_files = [
@@ -27,4 +27,4 @@ if __name__ == "__main__":
     from scripts.dl_args import parser_args
 
     args = parser_args()
-    IndexTTS25Downloader()(source=args.source)
+    IndexTTSV2Downloader()(source=args.source)

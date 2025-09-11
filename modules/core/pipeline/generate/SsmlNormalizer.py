@@ -86,6 +86,7 @@ class SsmlNormalizer:
                 prompt2=params.get("prompt2", ""),
                 prefix=params.get("prefix", ""),
                 emotion=params.get("emotion", ""),
+                emotion_prompt=params.get("emotion_prompt", ""),
                 duration_ms=params.get("duration", None),
             )
 
@@ -95,6 +96,7 @@ class SsmlNormalizer:
         spk = attrs.spk
         style = attrs.style
         emotion = attrs.emotion
+        emotion_prompt = attrs.emotion_prompt
 
         # FIXME: 这个逻辑有点...emmm 最好干掉
         ss_params = calc_spk_style(spk, style)
@@ -126,6 +128,7 @@ class SsmlNormalizer:
             prompt2=prompt2,
             prefix=prefix,
             emotion=emotion or style,
+            emotion_prompt=emotion_prompt,
             duration_ms=duration_ms,
             speed_rate=speed_rate,
         )

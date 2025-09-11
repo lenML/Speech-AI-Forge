@@ -24,7 +24,10 @@ class TTSSegment:
     prompt2: str = ""
     prefix: str = ""
 
+    # 指定使用哪个 reference ，如果没有会使用默认
     emotion: str = ""
+    # 情绪 prompt ，只有部分模型支持
+    emotion_prompt: str = ""
 
     spk: TTSSpeaker = None
 

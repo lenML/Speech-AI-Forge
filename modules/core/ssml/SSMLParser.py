@@ -25,6 +25,7 @@ class SSMLContext(Box):
         self.prompt2 = None
         self.prefix = None
         self.emotion = None
+        self.emotion_prompt = None
         self.duration = None
 
         super().__init__(*args, **kwargs)

@@ -13,7 +13,10 @@ class TTSConfig(BaseModel):
     prompt1: str = ""
     prompt2: str = ""
     prefix: str = ""
+    # 指定使用哪个特定的子 reference
     emotion: str = ""
+    # 设置 emotion prompt ，只有特定模型支持
+    emotion_prompt: str = ""
 
     # TODO 添加 dit 配置
 

@@ -126,6 +126,8 @@ class PipelineFactory:
             return cls.create_f5_tts_pipeline(ctx)
         elif model_id == "indextts":
             return cls.create_index_tts_pipeline(ctx)
+        elif model_id == "indexttsv2":
+            return cls.create_index_tts_v2_pipeline(ctx)
         elif model_id == "sparktts":
             return cls.create_spark_tts_pipeline(ctx)
         elif model_id == "gptsovitsv4":
@@ -208,6 +210,17 @@ class PipelineFactory:
         cls.setup_base_modules(pipeline=pipeline)
         pipeline.add_module(TNProcess(tn_pipeline=IndexTTSTN))
         model = model_zoo.get_index_tts()
+        pipeline.set_model(model)
+
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
+    @classmethod
+    def create_index_tts_v2_pipeline(cls, ctx: TTSPipelineContext):
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        pipeline.add_module(TNProcess(tn_pipeline=IndexTTSTN))
+        model = model_zoo.get_index_tts_v2()
         pipeline.set_model(model)
 
         pipeline.audio_sr = model.get_sample_rate()

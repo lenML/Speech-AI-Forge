@@ -18,6 +18,7 @@ from modules.core.models.tts.CosyVoiceModel import CosyVoiceTTSModel
 from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
 from modules.core.models.tts.GptSoVits.GptSoVitsModel import GptSoVitsModel
+from modules.core.models.tts.IndexTTS.IndexTTSV2Model import IndexTTSV2Model
 from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.tts.IndexTTS.IndexTTSModel import IndexTTSModel
 from modules.core.models.tts.SparkTTS.SparkTTSModel import SparkTTSModel
@@ -40,6 +41,7 @@ class ModelZoo:
         "fire-red-tts": FireRedTTSModel(),
         "f5-tts": F5TtsModel(),
         "index-tts": IndexTTSModel(),
+        "index-tts-v2": IndexTTSV2Model(),
         "spark-tts": SparkTTSModel(),
         "gpt-sovits-v1": GptSoVitsModel("v1"),
         "gpt-sovits-v2": GptSoVitsModel("v2"),
@@ -58,6 +60,10 @@ class ModelZoo:
         # === voice clone ===
         "open-voice": OpenVoiceModel(),
     }
+
+    # 自定义模型
+    # 自定义模型将从 /models/custom 目录下查找 *.model.yaml 配置文件，并根据配置文件初始化模型
+    custom_models: Dict[str, BaseZooModel] = {}
 
     # 当mem不足时，是否自动卸载其他模型
     auto_unload = True
@@ -177,6 +183,9 @@ class ModelZoo:
 
     def get_index_tts(self) -> IndexTTSModel:
         return self.get_model("index-tts")
+
+    def get_index_tts_v2(self) -> IndexTTSV2Model:
+        return self.get_model("index-tts-v2")
 
     def get_spark_tts(self) -> SparkTTSModel:
         return self.get_model("spark-tts")

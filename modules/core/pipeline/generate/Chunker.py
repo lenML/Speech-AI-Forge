@@ -48,6 +48,7 @@ class TTSChunker:
         prompt2 = self.context.tts_config.prompt2
         prefix = self.context.tts_config.prefix
         emotion = self.context.tts_config.emotion
+        emotion_prompt = self.context.tts_config.emotion_prompt
 
         eos = self.context.infer_config.eos
 
@@ -66,6 +67,7 @@ class TTSChunker:
             prompt2=prompt2,
             prefix=prefix,
             emotion=emotion,
+            emotion_prompt=emotion_prompt,
         )
 
     def text_segments(self):

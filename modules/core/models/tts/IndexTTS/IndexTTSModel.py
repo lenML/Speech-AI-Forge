@@ -20,6 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# IndexTTS v1 和 v1.5 的推理
 class IndexTTSModel(TTSModel):
     model_id = "index-tts"
 
@@ -28,12 +29,17 @@ class IndexTTSModel(TTSModel):
         self.tts: IndexTTS = None
         model_v1_dir = Path("./models/Index-TTS")
         model_v1_5_dir = Path("./models/Index-TTS-1.5")
-        self.model_dir = model_v1_5_dir if model_v1_5_dir.exists() else model_v1_dir
+        self.model_dir = model_v1_dir
+
+        if model_v1_5_dir.exists():
+            self.model_dir = model_v1_5_dir
+
         self.tokenizer: TextTokenizer = None
 
-        if model_v1_dir.exists() and not model_v1_5_dir.exists():
+        # 如果没有下载 v1.5 模型就提醒
+        if self.model_dir is not model_v1_5_dir:
             logger.warning(
-                "Index-TTS 模型已经更新，建议使用 Index-TTS-1.5 模型，使用 1.5 下载脚本下载最新模型即可使用。"
+                "Index-TTS 模型已经更新，建议使用 Index-TTS-1.5 模型，使用 v1.5 下载脚本下载最新模型即可使用。"
             )
 
     def is_downloaded(self):
@@ -73,7 +79,7 @@ class IndexTTSModel(TTSModel):
         self.tts = IndexTTS(
             cfg_path=str(cfg_path),
             model_dir=str(self.model_dir),
-            is_fp16=self.get_dtype() == torch.float16,
+            use_fp16=self.get_dtype() == torch.float16,
             # 这个好像可以加速，但是需要冷启动
             # TODO: 暂时不实现，有需要的自行打开即可
             use_cuda_kernel=False,
