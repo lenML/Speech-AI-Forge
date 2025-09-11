@@ -17,6 +17,7 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 ## Breaking change logs
 
+- 250912: Support Index-TTS-2 [#265](https://github.com/lenML/Speech-AI-Forge/issues/265)
 - 250702: Support Index-TTS-1.5 [#250](https://github.com/lenML/Speech-AI-Forge/issues/250)
 - 250522: Support GptSoVits [#198](https://github.com/lenML/Speech-AI-Forge/issues/198)
 - 250518: Support SenseVoice ASR [#122](https://github.com/lenML/Speech-AI-Forge/issues/122)
@@ -152,6 +153,7 @@ WIP 开发中
 |              | GPT-SoVITS(v4)   | `python -m scripts.downloader.gpt_sovits_v4 --source huggingface`           |
 |              | CosyVoice(v2)    | `python -m scripts.downloader.cosyvoice2 --source huggingface`              |
 |              | FireRedTTS       | `python -m scripts.downloader.fire_red_tts --source huggingface`            |
+|              | Index-TTS-2    | <code>python -m scripts.downloader.index_tts_2 --source huggingface<br/>python -m scripts.downloader.facebook_w2v_bert_2 --source huggingface <br/> python -m scripts.downloader.funasr_campplus --source huggingface <br/> python -m scripts.downloader.MaskGCT_semantic_codec --source huggingface <br/> python -m scripts.downloader.nvidia_bigvgan_v2 --source huggingface</code>        |
 |              | Index-TTS-1.5    | `python -m scripts.downloader.index_tts_1_5 --source huggingface`           |
 |              | Index-TTS        | `python -m scripts.downloader.index_tts --source huggingface`               |
 |              | Spark-TTS        | `python -m scripts.downloader.spark_tts --source huggingface`               |
