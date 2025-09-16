@@ -163,6 +163,9 @@ class IndexTTSV2Model(TTSModel):
                         output_path=None,
                         emo_text=emotion_text,
                         use_emo_text=True if emotion_text else False,
+                        # 这个值控制 emotion 的强度，太强了会导致不像原来的音色，所以设置这个值的来自于 官方仓库中的 emo_weight
+                        # ref: https://github.com/index-tts/index-tts/blob/a05850286588600c632675bb128f628dc58b9070/webui.py#L115-L168
+                        emo_alpha=0.8 * 0.8,
                         # 下面是 generation_kwargs
                         top_k=top_k,
                         top_p=top_p,
