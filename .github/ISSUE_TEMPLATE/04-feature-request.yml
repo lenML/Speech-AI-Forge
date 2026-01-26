@@ -1,0 +1,40 @@
+name: "\U0001F64B‍♀️ Feature request"
+description: "建议增加新功能或优化现有功能"
+title: "[Feature] "
+labels: enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请搜索现有的 Issues，避免重复建议。
+  
+  - type: checkboxes
+    id: check
+    attributes:
+      label: 确认
+      options:
+        - label: 我已确认这是一个新功能建议（而非 Bug 反馈），且之前无人提出
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 功能描述 / 痛点
+      description: 你希望解决什么问题？或者希望添加什么新能力？
+      placeholder: |
+        现状/痛点：目前每次只能处理一个文件，效率很低...
+        建议：希望增加批量处理功能，允许拖入文件夹...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 参考资料或实现思路 (可选)
+      description: 是否有其他软件实现了类似功能？或者你有具体的实现建议？
+      placeholder: |
+        参考：XXX 项目的实现方式 (链接/截图) ...
+        思路：可以通过调用 YYY 库来实现...
+        链接: https://huggingface.com/xxx...
+    validations:
+      required: false
