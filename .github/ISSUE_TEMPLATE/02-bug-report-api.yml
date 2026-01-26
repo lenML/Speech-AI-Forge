@@ -1,0 +1,50 @@
+name: "\U0001F41B Bug report: api"
+description: "API 功能运行不正常 / 失效"
+title: "[BUG:API] "
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请确保已查阅文档并搜索过现有 Issues。
+  
+  - type: checkboxes
+    id: issue-check
+    attributes:
+      label: 确认
+      options:
+        - label: 我已确认之前没有 Issue 涉及此 BUG，且当前使用的是最新代码
+          required: true
+
+  - type: textarea
+    id: system-info
+    attributes:
+      label: 运行环境
+      description: 请提供 Forge Commit/Tag、操作系统、Python 和 PyTorch 版本。
+      placeholder: |
+        - Commit/Tag: 
+        - OS: 
+        - Python: 
+        - PyTorch: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: BUG 描述与复现
+      description: 请描述发生了什么，以及如何复现（请提供 API 端点和参数，最好附上 cURL 或代码片段）。
+      placeholder: |
+        端点：/v1/tts
+        参数：{ "text": "..." }
+        
+        描述：发送请求后，返回了 500 错误...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 报错日志
+      description: 请粘贴终端的错误堆栈信息
+      render: shell

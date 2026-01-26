@@ -1,0 +1,22 @@
+name: "\U0001F646‍♂️ Any issues"
+description: Anything you talking.
+title: "[ISSUE] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请确保已查阅文档并搜索过现有 Issues。
+  - type: checkboxes
+    id: issue-check
+    attributes:
+      label: 确认
+      options:
+        - label: 我已确认之前没有 Issue 涉及此 BUG，且当前使用的是最新代码
+          required: true
+  - type: textarea
+    id: text
+    attributes:
+      label: 你的issues
+      description: 请尽量附带上下文信息以及运行环境
+    validations:
+      required: true
