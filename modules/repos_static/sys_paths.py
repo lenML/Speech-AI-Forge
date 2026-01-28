@@ -13,6 +13,7 @@ paths = [
     REPO_DIR("index_tts"),
     REPO_DIR("spark_tts"),
     REPO_DIR("GPT_SoVITS"),
+    REPO_DIR("Qwen3-TTS"),
 ]
 
 
