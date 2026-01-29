@@ -185,32 +185,57 @@ class ChatTTSInterface(TTSInterface):
 
 
 def create_tts_interface():
+    # ---- 1. 模型注册表（顺序 = 默认顺序）----
+    MODELS: list[TTSInterface] = [
+        IndexTTSV2Interface(),
+        CosyVoiceInterface(),
+        IndexTTSInterface(),
+        F5TtsInterface(),
+        GptSoVitsInterface(),
+        FishSpeechInterface(),
+        SparkTTSInterface(),
+        FireRedTTSInterface(),
+        ChatTTSInterface(),
+    ]
 
-    with gr.Tabs():
-        with gr.TabItem("ChatTTS"):
-            tts_interface = TTSInterface()
-            tts_interface.create_tts_interface()
-        with gr.TabItem("CosyVoice"):
-            cosy_voice_interface = CosyVoiceInterface()
-            cosy_voice_interface.create_tts_interface()
-        with gr.TabItem("FireRedTTS"):
-            fire_red_tts_interface = FireRedTTSInterface()
-            fire_red_tts_interface.create_tts_interface()
-        with gr.TabItem("F5TTS"):
-            f5_tts_interface = F5TtsInterface()
-            f5_tts_interface.create_tts_interface()
-        with gr.TabItem("IndexTTS-v1"):
-            index_tts_interface = IndexTTSInterface()
-            index_tts_interface.create_tts_interface()
-        with gr.TabItem("IndexTTS-v2"):
-            index_tts_interface = IndexTTSV2Interface()
-            index_tts_interface.create_tts_interface()
-        with gr.TabItem("SparkTTS"):
-            spark_tts_interface = SparkTTSInterface()
-            spark_tts_interface.create_tts_interface()
-        with gr.TabItem("FishSpeech"):
-            fishspeech_interface = FishSpeechInterface()
-            fishspeech_interface.create_tts_interface()
-        with gr.TabItem("GPT-SoVITS"):
-            gpt_sovits_interface = GptSoVitsInterface()
-            gpt_sovits_interface.create_tts_interface()
+    # ---- 2. 从 class 拿 model_id ----
+    model_choices = [cls.model_id for cls in MODELS]
+    default_model_id = model_choices[0]
+
+    current_model_id = gr.State(default_model_id)
+
+    model_selector = gr.Dropdown(
+        choices=model_choices,
+        value=default_model_id,
+        label="TTS Model",
+    )
+
+    # ---- 3. 创建所有 Interface + Group ----
+    interfaces = []
+    groups = []
+
+    for idx, cls in enumerate(MODELS):
+        with gr.Row(visible=(idx == 0)) as group:
+            iface = cls
+            iface.create_tts_interface()
+
+        interfaces.append(iface)
+        groups.append(group)
+
+    # ---- 4. model_id -> index 映射 ----
+    model_index_map = {model_id: idx for idx, model_id in enumerate(model_choices)}
+
+    # ---- 5. 切换逻辑 ----
+    def switch_model(model_id):
+        active_idx = model_index_map[model_id]
+
+        updates = [gr.update(visible=(i == active_idx)) for i in range(len(groups))]
+
+        return [model_id, *updates]
+
+    # ---- 6. 绑定 Dropdown ----
+    model_selector.change(
+        fn=switch_model,
+        inputs=model_selector,
+        outputs=[current_model_id, *groups],
+    )
