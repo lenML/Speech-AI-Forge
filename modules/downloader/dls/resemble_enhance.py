@@ -3,12 +3,13 @@ import logging
 import requests
 from tqdm import tqdm
 
-from scripts.ModelDownloader import ModelDownloader
+from modules.downloader.dl_base import TModelDownloader
+
 
 logger = logging.getLogger(__name__)
 
 
-class ResembleEnhanceDownloader(ModelDownloader):
+class ResembleEnhanceDownloader(TModelDownloader):
     def __init__(self):
         super().__init__()
         self.model_name = "resemble-enhance"
@@ -56,7 +57,7 @@ class ResembleEnhanceDownloader(ModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     ResembleEnhanceDownloader()(source=args.source)

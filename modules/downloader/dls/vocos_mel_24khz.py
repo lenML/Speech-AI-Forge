@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class VocosMel24khzDownloader(BaseModelDownloader):
+class VocosMel24khzDownloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
             "config.yaml",
@@ -22,7 +22,7 @@ class VocosMel24khzDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     VocosMel24khzDownloader()(source=args.source)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +17,14 @@ class DownloadProgressBar(tqdm):
         self.update(b * bsize - self.n)
 
 
-class F5TTSV1Downloader(BaseModelDownloader):
+class F5TTSDownloader(RemoteModelDownloader):
     # TODO: 验证文件完整性
     MODEL_SHA256 = "4180310f91d592cee4bc14998cd37c781f779cf105e8ca8744d9bd48ca7046ae"
 
     def __init__(self):
         # NOTE: 只需要下载一个文件
         required_files = [
-            "F5TTS_v1_Base/model_1250000.safetensors",
+            "F5TTS_Base/model_1200000.safetensors",
         ]
         super().__init__(
             model_name="F5-TTS",
@@ -39,8 +39,8 @@ class F5TTSV1Downloader(BaseModelDownloader):
     def ensure_dir(self):
         if not os.path.exists(self.model_dir):
             os.makedirs(self.model_dir)
-        if not os.path.exists(self.model_dir / "F5TTS_v1_Base"):
-            os.makedirs(self.model_dir / "F5TTS_v1_Base")
+        if not os.path.exists(self.model_dir / "F5TTS_Base"):
+            os.makedirs(self.model_dir / "F5TTS_Base")
 
     def from_huggingface(self):
         from huggingface_hub import hf_hub_download
@@ -51,7 +51,7 @@ class F5TTSV1Downloader(BaseModelDownloader):
             file_path = hf_hub_download(
                 repo_id=self.huggingface_repo,
                 filename=file,
-                cache_dir=self.model_dir / "F5TTS_v1_Base",
+                cache_dir=self.model_dir / "F5TTS_Base",
             )
             logger.info(f"Downloaded {file} from Huggingface Hub to {file_path}.")
 
@@ -59,9 +59,9 @@ class F5TTSV1Downloader(BaseModelDownloader):
         """从 ModelScope 下载指定文件，并显示进度条"""
         self.ensure_dir()
 
-        # v1 版本是 2025/3 发布的新模型
-        url = "https://modelscope.cn/models/AI-ModelScope/F5-TTS/resolve/master/F5TTS_v1_Base/model_1250000.safetensors"
-        dest_path = self.model_dir / "F5TTS_v1_Base" / "model_1250000.safetensors"
+        # 这个是 2024 年发布的模型 版本号是 0.6
+        url = "https://modelscope.cn/models/AI-ModelScope/F5-TTS/resolve/master/F5TTS_Base/model_1200000.safetensors"
+        dest_path = self.model_dir / "F5TTS_Base" / "model_1200000.safetensors"
 
         self._download_with_progress(url, dest_path)
 
@@ -75,7 +75,7 @@ class F5TTSV1Downloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
-    F5TTSV1Downloader()(source=args.source)
+    F5TTSDownloader()(source=args.source)

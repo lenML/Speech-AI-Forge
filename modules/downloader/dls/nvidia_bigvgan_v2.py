@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class NvidiaBigvganV2Downloader(BaseModelDownloader):
+class NvidiaBigvganV2Downloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
             "configuration.json",
@@ -23,7 +23,7 @@ class NvidiaBigvganV2Downloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     NvidiaBigvganV2Downloader()(source=args.source)

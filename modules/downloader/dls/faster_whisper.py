@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class FasterWhisperDownloader(BaseModelDownloader):
+class FasterWhisperDownloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
             "model.bin",
@@ -15,9 +15,9 @@ class FasterWhisperDownloader(BaseModelDownloader):
             "config.json",
         ]
         super().__init__(
-            model_name="faster-whisper-large-v3-turbo-ct2",
-            modelscope_repo="pengzhendong/faster-whisper-large-v3-turbo",
-            huggingface_repo="deepdml/faster-whisper-large-v3-turbo-ct2",
+            model_name="faster-whisper-large-v3",
+            modelscope_repo="keepitsimple/faster-whisper-large-v3",
+            huggingface_repo="Systran/faster-whisper-large-v3",
             required_files=required_files,
         )
 
@@ -25,7 +25,7 @@ class FasterWhisperDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     FasterWhisperDownloader()(source=args.source)

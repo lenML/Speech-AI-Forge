@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class SenseVoiceSmallDownloader(BaseModelDownloader):
+class SenseVoiceSmallDownloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
             "model.pt",
@@ -24,7 +24,7 @@ class SenseVoiceSmallDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     SenseVoiceSmallDownloader()(source=args.source)

@@ -1,18 +1,50 @@
+import logging
 import os
 import shutil
 import sys
 from typing import Optional
 
-from scripts.ModelDownloader import ModelDownloader
+
+import time
+from pathlib import Path
+
+MODEL_DIR = Path("models")
+
+logger = logging.getLogger(__name__)
+
+
+class TModelDownloader:
+    def __init__(self):
+        self.model_name = "<no-name>"
+        self.dir_path = MODEL_DIR
+
+        self.logger = logging.getLogger(__name__)
+
+    def from_modelscope(self):
+        raise NotImplementedError()
+
+    def from_huggingface(self):
+        raise NotImplementedError()
+
+    def check_exist(self) -> bool:
+        return NotImplementedError()
+
+    def gc(self):
+        raise NotImplementedError()
+
+    def extra_data_prepare(self):
+        """
+        某些第三方依赖定义在这里，比如 gpt-sovits 依赖 nltk data
+        """
+        pass
 
 
 def ensure_file_dir_exists(file_path: str):
     file_dir = os.path.dirname(file_path)
-    if not os.path.exists(file_dir):
-        os.makedirs(file_dir, exist_ok=True)
+    os.makedirs(file_dir, exist_ok=True)
 
 
-class BaseModelDownloader(ModelDownloader):
+class RemoteModelDownloader(TModelDownloader):
 
     def __init__(
         self,

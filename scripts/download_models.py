@@ -1,26 +1,31 @@
+import argparse
 import logging
+
+from modules.downloader.AutoModelDownloader import AutoModelDownloader
 
 try:
     logging.basicConfig(level=logging.INFO)
 except:
     pass
 
-from scripts.dl_args import parser_args
-from scripts.dl_chattts import ChatTTSDownloader
-from scripts.dl_enhance import ResembleEnhanceDownloader
-from scripts.ModelDownloader import ModelDownloader
-
-
-def main():
-    args = parser_args()
-
-    downloaders: list[ModelDownloader] = []
-    downloaders.append(ChatTTSDownloader())
-    downloaders.append(ResembleEnhanceDownloader())
-
-    for downloader in downloaders:
-        downloader(source=args.source)
-
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description="Download model to the specified folder"
+    )
+    parser.add_argument(
+        "--source",
+        choices=["modelscope", "ms", "huggingface", "hf"],
+        required=True,
+        help="Choose the source to download the model from",
+    )
+    # models 可以列出模型名字 逗号分割
+    parser.add_argument(
+        "--models",
+        type=str,
+        required=True,
+        help="The models to download, separated by commas",
+    )
+    args = parser.parse_args()
+    md = AutoModelDownloader(down_source=args.source)
+    md.download_models(model_names=args.models.split(","), request_type="script")

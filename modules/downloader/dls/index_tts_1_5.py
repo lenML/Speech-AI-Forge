@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class IndexTTSDownloader(BaseModelDownloader):
+class IndexTTS15Downloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
             "bigvgan_discriminator.pth",
@@ -17,9 +17,9 @@ class IndexTTSDownloader(BaseModelDownloader):
             "unigram_12000.vocab",
         ]
         super().__init__(
-            model_name="Index-TTS",
-            modelscope_repo="IndexTeam/Index-TTS",
-            huggingface_repo="IndexTeam/Index-TTS",
+            model_name="Index-TTS-1.5",
+            modelscope_repo="IndexTeam/IndexTTS-1.5",
+            huggingface_repo="IndexTeam/IndexTTS-1.5",
             required_files=required_files,
             just_download_required_files=True,
         )
@@ -27,7 +27,7 @@ class IndexTTSDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
-    IndexTTSDownloader()(source=args.source)
+    IndexTTS15Downloader()(source=args.source)

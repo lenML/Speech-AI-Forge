@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class SparkTTSDownloader(BaseModelDownloader):
+class SparkTTSDownloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
             "config.yaml",
@@ -31,7 +31,7 @@ class SparkTTSDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     SparkTTSDownloader()(source=args.source)

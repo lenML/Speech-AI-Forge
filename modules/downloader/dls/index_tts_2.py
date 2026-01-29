@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class IndexTTSV2Downloader(BaseModelDownloader):
+class IndexTTSV2Downloader(RemoteModelDownloader):
     def __init__(self):
         # 只对几个大文件进行验证，因为所有文件都需要下载
         required_files = [
@@ -24,7 +24,7 @@ class IndexTTSV2Downloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     IndexTTSV2Downloader()(source=args.source)

@@ -1,11 +1,11 @@
 import logging
 
-from scripts.dl_base import BaseModelDownloader
+from modules.downloader.dl_base import RemoteModelDownloader
 
 logger = logging.getLogger(__name__)
 
 
-class FsmnVADDownloader(BaseModelDownloader):
+class FsmnVADDownloader(RemoteModelDownloader):
     """
     这个是 sensevoice 使用的 vad
     只有 2mb+ 大小，所以，其实自动下载也可以
@@ -33,7 +33,7 @@ class FsmnVADDownloader(BaseModelDownloader):
 
 
 if __name__ == "__main__":
-    from scripts.dl_args import parser_args
+    from modules.downloader.dl_args import parser_args
 
     args = parser_args()
     FsmnVADDownloader()(source=args.source)
