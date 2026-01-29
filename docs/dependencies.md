@@ -100,6 +100,7 @@ python -m scripts.download_audio_backend
 ```bash
 brew install ffmpeg
 brew install rubberband
+brew install sox
 ```
 
 **Linux（使用 aptitude）**:
@@ -107,6 +108,7 @@ brew install rubberband
 ```bash
 apt-get install ffmpeg libavcodec-extra
 apt-get install rubberband-cli
+apt-get install sox
 ```
 
 **Windows**:
@@ -116,12 +118,17 @@ apt-get install rubberband-cli
 下载 ffmpeg
 
 1. 从[此处](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z)下载并解压 ffmpeg 的 Windows 二进制文件。
-2. 将 ffmpeg 的`/bin`文件夹中的 .exe 文件解压到 `项目目录/ffmpeg` 文件夹内
+2. 将 ffmpeg 的`/bin`文件夹中的 .exe 文件解压到 `项目目录/ffmpeg` 文件夹内  （或者系统Path路径内）
 
 下载 rubberband
 
 1. 从[此处](https://breakfastquay.com/files/releases/rubberband-3.3.0-gpl-executable-windows.zip)下载并解压 rubberband 的 Windows 二进制文件。
-2. 将 压缩包中 `rubberband-3.3.0-gpl-executable-windows` 文件夹下的 .exe/.dll 文件解压到 `项目目录/ffmpeg` 文件夹内
+2. 将 压缩包中 `rubberband-3.3.0-gpl-executable-windows` 文件夹下的 .exe/.dll 文件解压到 `项目目录/ffmpeg` 文件夹内 （或者系统Path路径内）
+
+下载 sox (Qwen3TTS依赖)
+
+1. 从[此处](https://sourceforge.net/projects/sox/files/sox/14.4.1/sox-14.4.1a-win32.zip/download)下载并解压
+2.  将 压缩包中 `sox.exe` 文件解压到 `项目目录/ffmpeg` 文件夹内（或者系统Path路径内）
 
 文件 (window) 目录应该如下
 
