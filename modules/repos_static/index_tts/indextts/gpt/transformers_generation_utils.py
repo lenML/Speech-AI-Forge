@@ -1027,7 +1027,10 @@ class GenerationMixin:
                     device=device,
                 )
             )
-        if generation_config.forced_decoder_ids is not None:
+        if (
+            hasattr(generation_config, "forced_decoder_ids")
+            and generation_config.forced_decoder_ids is not None
+        ):
             # TODO (sanchit): move this exception to GenerationConfig.validate() when TF & FLAX are aligned with PT
             raise ValueError(
                 "You have explicitly specified `forced_decoder_ids`. Please remove the `forced_decoder_ids` argument "
