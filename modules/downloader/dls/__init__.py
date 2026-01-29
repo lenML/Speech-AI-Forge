@@ -27,4 +27,6 @@ from .vocos_mel_24khz import VocosMel24khzDownloader
 
 # qwen3 tts
 from .qwen3_tts_06cv import Qwen3TTS12hz06BCustomVoiceDownloader
+from .qwen3_tts_06base import Qwen3TTS12hz06BBaseDownloader
 from .qwen3_tts_17cv import Qwen3TTS12hz17BCustomVoiceDownloader
+from .qwen3_tts_17base import Qwen3TTS12hz17BBaseDownloader

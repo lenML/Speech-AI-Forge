@@ -177,6 +177,24 @@ class GptSoVitsInterface(NotSeedTTSInterface):
         self.show_style_dropdown = False
 
 
+class Qwen3TTSInterface(NotSeedTTSInterface):
+
+    def __init__(self, model_id="qwen3-tts-06cv"):
+        super().__init__(model_id)
+        self.refine_visible = False
+        self.contorl_tokens = []
+        self.spliter_eos = "\n"
+
+        self.styles = ["*auto"]
+
+        self.default_temprature = 0.8
+        self.default_top_p = 0.95
+        self.default_top_k = 50
+
+        # NOTE: 这个模型不支持 instruction
+        self.show_style_dropdown = False
+
+
 class ChatTTSInterface(TTSInterface):
     def __init__(self, model_id="chat-tts"):
         super().__init__(model_id)
@@ -188,6 +206,10 @@ def create_tts_interface():
     # ---- 1. 模型注册表（顺序 = 默认顺序）----
     MODELS: list[TTSInterface] = [
         IndexTTSV2Interface(),
+        Qwen3TTSInterface("qwen3-tts-06base"),
+        Qwen3TTSInterface("qwen3-tts-17base"),
+        Qwen3TTSInterface("qwen3-tts-06cv"),
+        Qwen3TTSInterface("qwen3-tts-17cv"),
         CosyVoiceInterface(),
         IndexTTSInterface(),
         F5TtsInterface(),

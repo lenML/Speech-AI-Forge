@@ -132,6 +132,8 @@ class PipelineFactory:
             return cls.create_spark_tts_pipeline(ctx)
         elif model_id == "gptsovitsv4":
             return cls.create_gpt_sovits_v4(ctx)
+        elif model_id.startswith("qwen3tts"):
+            return cls.create_qwen3_tts_pipeline(ctx)
         else:
             raise Exception(f"Unknown model id: {model_id}")
 
@@ -244,6 +246,30 @@ class PipelineFactory:
         # TODO: 可能需要实现自己的TN，不确定需不需要
         pipeline.add_module(TNProcess(tn_pipeline=BaseTN))
         model = model_zoo.get_gpt_sovits_v4()
+        pipeline.set_model(model)
+
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
+    @classmethod
+    def create_qwen3_tts_pipeline(cls, ctx: TTSPipelineContext):
+        model_id = ctx.tts_config.mid.lower().replace(" ", "-").replace("-", "")
+
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        # NOTE: 似乎不需要，因为完全由 llm 来做副语言控制，所以这里直接用基础的文本预处理 TN 即可
+        pipeline.add_module(TNProcess(tn_pipeline=BaseTN))
+        if model_id.endswith("06cv"):
+            model = model_zoo.get_qwen3_tts_06cv()
+        elif model_id.endswith("06base"):
+            model = model_zoo.get_qwen3_tts_06base()
+        elif model_id.endswith("17cv"):
+            model = model_zoo.get_qwen3_tts_17cv()
+        elif model_id.endswith("17base"):
+            model = model_zoo.get_qwen3_tts_17base()
+        else:
+            # 不支持
+            raise ValueError(f"Unsupported model_id: {model_id}")
         pipeline.set_model(model)
 
         pipeline.audio_sr = model.get_sample_rate()

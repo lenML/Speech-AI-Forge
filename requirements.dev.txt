@@ -142,7 +142,7 @@ torch-tb-profiler==0.4.3
 torchaudio==2.1.1
 torchvision==0.16.1
 tqdm==4.66.3
-transformers==4.52.1
+transformers==4.57.3
 triton==2.1.0
 typer==0.12.3
 typing_extensions==4.12.0
@@ -229,3 +229,6 @@ modelscope==1.20.0
 ### Index-TTS v2
 munch==4.0.0
 descript-audiotools==0.7.2
+
+### Qwen3-TTS
+sox==1.5.0

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class DownloadRegistry:
     def __init__(self):
         self.registry: "list[RemoteModelDownloader]" = []
-        # 自动下载
+        # 自动下载 TODO: 从配置文件中读取
         self.auto_download = False
 
     def match_model_name(self, model_name: str) -> tuple[bool, str]:
@@ -51,7 +51,7 @@ class DownloadRegistry:
 
     def get_model_dir_path(self, model_name: str) -> Path:
         downloader = self.get_downloader(model_name)
-        return downloader.dir_path
+        return downloader.model_dir
 
     def download_model(
         self,

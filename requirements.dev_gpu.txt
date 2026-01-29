@@ -339,7 +339,7 @@ tornado==6.4.1
 tqdm==4.66.3
 traitlets==5.14.3
 transformer_engine==0.0.0
-transformers==4.52.1
+transformers==4.57.3
 triton==2.3.1
 trove-classifiers==2024.9.12
 typeguard==4.3.0
@@ -410,3 +410,6 @@ gdown==5.2.0
 ### Index-TTS v2
 munch==4.0.0
 descript-audiotools==0.7.2
+
+### Qwen3-TTS
+sox==1.5.0

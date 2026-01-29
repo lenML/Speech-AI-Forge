@@ -19,6 +19,7 @@ from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
 from modules.core.models.tts.GptSoVits.GptSoVitsModel import GptSoVitsModel
 from modules.core.models.tts.IndexTTS.IndexTTSV2Model import IndexTTSV2Model
+from modules.core.models.tts.Qwen.Qwen3TTS import Qwen3TTSModel
 from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.tts.IndexTTS.IndexTTSModel import IndexTTSModel
 from modules.core.models.tts.SparkTTS.SparkTTSModel import SparkTTSModel
@@ -47,6 +48,11 @@ class ModelZoo:
         "gpt-sovits-v2": GptSoVitsModel("v2"),
         "gpt-sovits-v3": GptSoVitsModel("v3"),
         "gpt-sovits-v4": GptSoVitsModel("v4"),
+        # Qwen3-TTS
+        "qwen3-tts-06cv": Qwen3TTSModel("0.6B-CustomVoice"),
+        "qwen3-tts-06base": Qwen3TTSModel("0.6B-Base"),
+        "qwen3-tts-17cv": Qwen3TTSModel("1.7B-CustomVoice"),
+        "qwen3-tts-17base": Qwen3TTSModel("1.7B-Base"),
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
@@ -201,6 +207,18 @@ class ModelZoo:
 
     def get_gpt_sovits_v4(self) -> GptSoVitsModel:
         return self.get_model("gpt-sovits-v4")
+
+    def get_qwen3_tts_06cv(self) -> Qwen3TTSModel:
+        return self.get_model("qwen3-tts-06cv")
+
+    def get_qwen3_tts_06base(self) -> Qwen3TTSModel:
+        return self.get_model("qwen3-tts-06base")
+
+    def get_qwen3_tts_17cv(self) -> Qwen3TTSModel:
+        return self.get_model("qwen3-tts-17cv")
+
+    def get_qwen3_tts_17base(self) -> Qwen3TTSModel:
+        return self.get_model("qwen3-tts-17base")
 
 
 model_zoo = ModelZoo()

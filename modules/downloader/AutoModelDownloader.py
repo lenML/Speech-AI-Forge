@@ -6,9 +6,18 @@ from modules.downloader.dl_registry import DownloadRegistry
 import modules.downloader.dls as dls
 
 
+def get_default_down_source():
+    # TODO: 根据配置文件选择默认下载源
+    return "auto"
+
+
 class AutoModelDownloader:
+
     def __init__(
-        self, down_source: Literal["huggingface", "modelscope", "auto"] = "auto"
+        self,
+        down_source: Literal[
+            "huggingface", "modelscope", "auto"
+        ] = get_default_down_source(),
     ):
         self.registry = DownloadRegistry()
         self.down_source = down_source
