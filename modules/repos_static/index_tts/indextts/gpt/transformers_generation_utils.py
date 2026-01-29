@@ -30,7 +30,6 @@ from transformers.cache_utils import (
     DynamicCache,
     EncoderDecoderCache,
     OffloadedCache,
-    QuantizedCacheConfig,
     StaticCache,
 )
 from transformers.configuration_utils import PretrainedConfig
@@ -55,16 +54,42 @@ from transformers.generation.candidate_generator import (
     AssistedCandidateGeneratorDifferentTokenizers,
     CandidateGenerator,
     PromptLookupCandidateGenerator,
-    _crop_past_key_values,
     _prepare_attention_mask,
     _prepare_token_type_ids,
 )
+
+
+def _crop_past_key_values(model, past_key_values, new_length):
+    """Crop past key values to a specific length."""
+    if past_key_values is None:
+        return None
+
+    if isinstance(past_key_values, tuple):
+        return tuple(
+            tuple(
+                (
+                    tensor[:, :new_length, ...]
+                    if isinstance(tensor, torch.Tensor)
+                    else tensor
+                )
+                for tensor in layer_past
+            )
+            for layer_past in past_key_values
+        )
+    else:
+        return past_key_values
+
+
 from transformers.generation.configuration_utils import (
-    NEED_SETUP_CACHE_CLASSES_MAPPING,
-    QUANT_BACKEND_CLASSES_MAPPING,
     GenerationConfig,
     GenerationMode,
 )
+
+# Define our own cache mapping
+NEED_SETUP_CACHE_CLASSES_MAPPING = {
+    "dynamic": DynamicCache,
+    "static": StaticCache,
+}
 from transformers.generation.logits_process import (
     EncoderNoRepeatNGramLogitsProcessor,
     EncoderRepetitionPenaltyLogitsProcessor,
@@ -1742,12 +1767,9 @@ class GenerationMixin:
                         "cache, please open an issue and tag @zucchini-nlp."
                     )
 
-                cache_config = (
-                    generation_config.cache_config
-                    if generation_config.cache_config is not None
-                    else QuantizedCacheConfig()
-                )
-                cache_class = QUANT_BACKEND_CLASSES_MAPPING[cache_config.backend]
+                cache_config = generation_config.cache_config
+                # Use default DynamicCache if no specific cache config is provided
+                cache_class = DynamicCache
 
                 # if cache_config.backend == "quanto" and not (is_optimum_quanto_available() or is_quanto_available()):
                 if cache_config.backend == "quanto" and not is_optimum_quanto_available():

@@ -32,7 +32,6 @@ import transformers
 
 from indextts.gpt.transformers_generation_utils import GenerationMixin
 from indextts.gpt.transformers_modeling_utils import PreTrainedModel
-from transformers.modeling_utils import SequenceSummary
 
 from transformers.modeling_attn_mask_utils import _prepare_4d_attention_mask_for_sdpa, _prepare_4d_causal_attention_mask_for_sdpa
 from transformers.modeling_outputs import (
@@ -42,19 +41,81 @@ from transformers.modeling_outputs import (
     SequenceClassifierOutputWithPast,
     TokenClassifierOutput,
 )
-# from transformers.modeling_utils import PreTrainedModel, SequenceSummary
 
 from transformers.pytorch_utils import Conv1D, find_pruneable_heads_and_indices, prune_conv1d_layer
 from transformers.utils import (
     ModelOutput,
     add_code_sample_docstrings,
+)
+
+# Local implementation of SequenceSummary since it's not available in transformers 4.56.1
+class SequenceSummary(nn.Module):
+    """Compute a single vector summary of a sequence hidden states."""
+
+    def __init__(self, config):
+        super().__init__()
+        self.summary_type = getattr(config, "summary_type", "last")
+        if self.summary_type == "attn":
+            raise NotImplementedError
+
+        self.has_summary = hasattr(config, "summary_use_proj") and config.summary_use_proj
+        if self.has_summary:
+            if hasattr(config, "summary_proj_to_labels") and config.summary_proj_to_labels and config.num_labels > 0:
+                num_classes = config.num_labels
+            else:
+                num_classes = config.hidden_size
+            self.summary = nn.Linear(config.hidden_size, num_classes)
+
+        activation_string = getattr(config, "summary_activation", None)
+        self.activation = (ACT2FN[activation_string] if activation_string else nn.Identity())
+
+        self.first_dropout = nn.Dropout(getattr(config, "summary_first_dropout", 0.1))
+        self.last_dropout = nn.Dropout(getattr(config, "summary_last_dropout", 0.1))
+
+    def forward(
+        self, hidden_states: torch.FloatTensor, cls_index: Optional[torch.LongTensor] = None
+    ) -> torch.FloatTensor:
+        if self.summary_type == "last":
+            output = hidden_states[:, -1]
+        elif self.summary_type == "first":
+            output = hidden_states[:, 0]
+        elif self.summary_type == "mean":
+            output = hidden_states.mean(dim=1)
+        elif self.summary_type == "cls_index":
+            if cls_index is None:
+                cls_index = torch.full(
+                    fill_value=-1,
+                    size=(hidden_states.size(0),),
+                    dtype=torch.long,
+                    device=hidden_states.device,
+                )
+            batch_size = hidden_states.shape[0]
+            if cls_index.shape[0] != batch_size:
+                raise ValueError(
+                    f"cls_index shape {cls_index.shape} doesn't match batch_size {batch_size}"
+                )
+            output = hidden_states[torch.arange(batch_size, device=hidden_states.device), cls_index]
+        else:
+            raise ValueError(f"Unsupported summary type: {self.summary_type}")
+
+        output = self.first_dropout(output)
+        if self.has_summary:
+            output = self.summary(output)
+        output = self.activation(output)
+        output = self.last_dropout(output)
+
+        return output
+
+
+
+from transformers.utils import (
     add_start_docstrings,
     add_start_docstrings_to_model_forward,
     get_torch_version,
     is_flash_attn_2_available,
     is_flash_attn_greater_or_equal_2_10,
     logging,
-    replace_return_docstrings,
+    replace_return_docstrings
 )
 from transformers.utils.model_parallel_utils import assert_device_map, get_device_map
 from transformers.models.gpt2.configuration_gpt2 import GPT2Config
@@ -1876,3 +1937,4 @@ class GPT2ForQuestionAnswering(GPT2PreTrainedModel):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
+
