@@ -14,6 +14,7 @@ from modules.webui.webui_utils import (
     refine_text,
     tts_generate,
 )
+from fnmatch import fnmatch
 
 
 class TTSInterface:
@@ -28,6 +29,7 @@ class TTSInterface:
         self.contorl_tokens = ["[laugh]", "[uv_break]", "[v_break]", "[lbreak]"]
 
         self.spliter_eos = " 。 "
+        self.def_spliter_thr = 30
 
         self.default_content = webui_config.localization.DEFAULT_TTS_TEXT
 
@@ -42,6 +44,7 @@ class TTSInterface:
         self.show_sampling = True
 
         self.default_enable_enhance = True
+        self.default_loudness_norm = True
 
         # 输入 感情 提示词
         # 目前只有 index-tts v2 支持
@@ -58,12 +61,16 @@ class TTSInterface:
         # 是否支持 seed （其实目前就 chattts 支持 seed speaker...）
         self.support_seed_speaker = False
 
+        self.support_speaker = True
+
     def reload_speakers(self):
         def spk_filter(spk: TTSSpeaker):
             if spk.has_refs:
                 return True
             if spk.get_token(model_id=self.model_id) is not None:
                 return True
+            if spk._data.models:
+                return any(fnmatch(self.model_id, m) for m in spk._data.models)
             return False
 
         self.speakers = get_speakers(spk_filter)
@@ -158,7 +165,7 @@ class TTSInterface:
         return spk_input_text, spk_input_dropdown, spk_emotion
 
     def create_speaker_interface(self):
-        with gr.Group():
+        with gr.Group(visible=self.support_speaker):
             gr.Markdown("🗣️Speaker")
             with gr.Tabs():
                 with gr.Tab(label="Pick"):
@@ -235,19 +242,23 @@ class TTSInterface:
 
     def create_sampling_interface(self):
         with gr.Group(visible=self.show_sampling):
-            gr.Markdown("🎛️Sampling")
-            temperature_input = gr.Slider(
-                0.01, 2.0, value=self.default_temprature, step=0.01, label="Temperature"
-            )
-            top_p_input = gr.Slider(
-                0.1, 1.0, value=self.default_top_p, step=0.1, label="Top P"
-            )
-            top_k_input = gr.Slider(
-                1, 50, value=self.default_top_k, step=1, label="Top K"
-            )
-            batch_size_input = gr.Slider(
-                1, webui_config.max_batch_size, value=2, step=1, label="Batch Size"
-            )
+            with gr.Accordion("🎛️Sampling", open=False):
+                temperature_input = gr.Slider(
+                    0.01,
+                    2.0,
+                    value=self.default_temprature,
+                    step=0.01,
+                    label="Temperature",
+                )
+                top_p_input = gr.Slider(
+                    0.1, 1.0, value=self.default_top_p, step=0.1, label="Top P"
+                )
+                top_k_input = gr.Slider(
+                    1, 100, value=self.default_top_k, step=1, label="Top K"
+                )
+                batch_size_input = gr.Slider(
+                    1, webui_config.max_batch_size, value=2, step=1, label="Batch Size"
+                )
         return temperature_input, top_p_input, top_k_input, batch_size_input
 
     def create_splitter_interface(self):
@@ -255,7 +266,11 @@ class TTSInterface:
             gr.Markdown("🎛️Spliter")
             eos_input = gr.Textbox(label="eos", value=self.spliter_eos)
             spliter_thr_input = gr.Slider(
-                label="Spliter Threshold", value=30, minimum=10, maximum=1000, step=1
+                label="Spliter Threshold",
+                value=self.def_spliter_thr,
+                minimum=10,
+                maximum=1000,
+                step=1,
             )
         return eos_input, spliter_thr_input
 
@@ -348,35 +363,36 @@ class TTSInterface:
 
     def create_adjuster_interface(self):
         with gr.Group():
-            gr.Markdown("🎛️Adjuster")
-            speed_input = gr.Slider(
-                label="Speed", value=1.0, minimum=0.5, maximum=2.0, step=0.1
-            )
-            pitch_input = gr.Slider(
-                label="Pitch", value=0, minimum=-12, maximum=12, step=0.1
-            )
-            volume_up_input = gr.Slider(
-                label="Volume Gain", value=0, minimum=-20, maximum=6, step=0.1
-            )
-            # NOTE: 如果关闭的话容易爆音，打开的话又可能损失质量...
-            enable_loudness_normalization = gr.Checkbox(
-                value=True, label="Enable Loudness EQ"
-            )
-            headroom_input = gr.Slider(
-                label="Headroom", value=0.5, minimum=0, maximum=12, step=0.1
-            )
+            # gr.Markdown("🎛️Adjuster")
+            with gr.Accordion("🎛️Adjuster", open=False):
+                speed_input = gr.Slider(
+                    label="Speed", value=1.0, minimum=0.5, maximum=2.0, step=0.1
+                )
+                pitch_input = gr.Slider(
+                    label="Pitch", value=0, minimum=-12, maximum=12, step=0.1
+                )
+                volume_up_input = gr.Slider(
+                    label="Volume Gain", value=0, minimum=-20, maximum=6, step=0.1
+                )
+                # NOTE: 如果关闭的话容易爆音，打开的话又可能损失质量...
+                enable_loudness_normalization = gr.Checkbox(
+                    value=self.default_loudness_norm, label="Enable Loudness EQ"
+                )
+                headroom_input = gr.Slider(
+                    label="Headroom", value=0.5, minimum=0, maximum=12, step=0.1
+                )
 
-            enable_remove_silence = gr.Checkbox(
-                value=False, label="Enable Remove Silence"
-            )
-            # 默认 -42
-            remove_silence_threshold_input = gr.Slider(
-                label="Remove Silence Threshold",
-                value=-42,
-                minimum=-60,
-                maximum=0,
-                step=1,
-            )
+                enable_remove_silence = gr.Checkbox(
+                    value=False, label="Enable Remove Silence"
+                )
+                # 默认 -42
+                remove_silence_threshold_input = gr.Slider(
+                    label="Remove Silence Threshold",
+                    value=-42,
+                    minimum=-60,
+                    maximum=0,
+                    step=1,
+                )
         return (
             speed_input,
             pitch_input,

@@ -92,6 +92,9 @@ class DcSpk:
     # 这里是 speaker file 版本
     version: str = "0.1"
 
+    # 支持的模型，None 就是所有都支持
+    models: Optional[List[str]] = None
+
     meta: DcSpkMeta = field(default_factory=DcSpkMeta)
     token: List[DcSpkVoiceToken] = field(default_factory=list)
     samples: List[DcSpkSample] = field(default_factory=list)

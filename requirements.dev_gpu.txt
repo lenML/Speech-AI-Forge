@@ -329,11 +329,11 @@ tokenizers==0.19.1
 tomli==2.0.1
 tomlkit==0.12.0
 toolz==0.12.1
-torch @ https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torch-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+torch @ https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torch-2.6.0%2Bcu126-cp310-cp310-linux_x86_64.whl
 torch-tb-profiler==0.4.3
-torchaudio @ https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchaudio-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+torchaudio @ https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torchaudio-2.6.0%2Bcu126-cp310-cp310-linux_x86_64.whl
 torchmetrics==1.4.0.post0
-torchvision @ https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+torchvision @ https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torchvision-0.21.0%2Bcu126-cp310-cp310-linux_x86_64.whl
 torchviz==0.0.2
 tornado==6.4.1
 tqdm==4.66.3
@@ -366,7 +366,6 @@ websocket-client==1.8.0
 websockets==11.0.3
 Werkzeug==3.0.3
 WeTextProcessing==1.0.3
-xformers==0.0.23.post1
 xxhash==3.4.1
 yarl==1.9.4
 zhon==2.0.2

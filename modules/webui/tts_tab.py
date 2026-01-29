@@ -187,12 +187,70 @@ class Qwen3TTSInterface(NotSeedTTSInterface):
 
         self.styles = ["*auto"]
 
-        self.default_temprature = 0.8
-        self.default_top_p = 0.95
+        # 来自 modules/repos_static/Qwen3_TTS/qwen_tts/inference/qwen3_tts_model.py 复制出来方便看默认值
+        # hard_defaults = dict(
+        #     do_sample=True,
+        #     top_k=50,
+        #     top_p=1.0,
+        #     temperature=0.9,
+        #     repetition_penalty=1.05,
+        #     subtalker_dosample=True,
+        #     subtalker_top_k=50,
+        #     subtalker_top_p=1.0,
+        #     subtalker_temperature=0.9,
+        #     max_new_tokens=2048,
+        # )
+
+        self.default_temprature = 0.9
+        self.default_top_p = 1.0
         self.default_top_k = 50
 
         # NOTE: 这个模型不支持 instruction
         self.show_style_dropdown = False
+        # 这个模型很强不太需要这个
+        self.default_enable_enhance = False
+        self.default_loudness_norm = False
+
+
+class Qwen3TTSVoiceDesignInterface(NotSeedTTSInterface):
+
+    def __init__(self, model_id="qwen3-tts-17vd"):
+        super().__init__(model_id)
+        self.refine_visible = False
+        self.contorl_tokens = []
+        self.spliter_eos = "\n"
+
+        self.styles = ["*auto"]
+
+        self.default_temprature = 0.9
+        self.default_top_p = 1.0
+        self.default_top_k = 50
+
+        # NOTE: 这个模型使用的是 prompt 1 作为 voice design ，所以关闭 sytle
+        self.show_style_dropdown = False
+        # 音色设计模型不太需要这个
+        self.support_speaker = False
+
+        # 这个模型很强不太需要这个
+        self.default_enable_enhance = False
+        self.default_loudness_norm = False
+        # 上下文越长，效果越好
+        self.def_spliter_thr = 100
+
+    def create_prompt_engineering_interface(self):
+        with gr.Group(visible=True):
+            gr.Markdown("🔧Prompt engineering")
+            prompt1_input = gr.Textbox(
+                label="Voice Design",
+                lines=10,
+                placeholder="Describe the voice characteristics, emotions, and other details you want to achieve.",
+            )
+
+            # 这几个是为了保证返回值正确
+            prompt2_input = gr.Textbox(label="Prompt 2", visible=False)
+            prefix_input = gr.Textbox(label="Prefix", visible=False)
+            prompt_audio = gr.File(label="prompt_audio", visible=False)
+        return prompt1_input, prompt2_input, prefix_input, prompt_audio
 
 
 class ChatTTSInterface(TTSInterface):
@@ -210,6 +268,7 @@ def create_tts_interface():
         Qwen3TTSInterface("qwen3-tts-17base"),
         Qwen3TTSInterface("qwen3-tts-06cv"),
         Qwen3TTSInterface("qwen3-tts-17cv"),
+        Qwen3TTSVoiceDesignInterface(),
         CosyVoiceInterface(),
         IndexTTSInterface(),
         F5TtsInterface(),

@@ -137,10 +137,10 @@ tokenizers==0.19.1
 tomli==2.0.1
 tomlkit==0.12.0
 toolz==0.12.1
-torch==2.1.1
+torch==2.6.0
 torch-tb-profiler==0.4.3
-torchaudio==2.1.1
-torchvision==0.16.1
+torchaudio==2.6.0
+torchvision==0.21.0
 tqdm==4.66.3
 transformers==4.57.3
 triton==2.1.0

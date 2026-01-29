@@ -53,6 +53,7 @@ class ModelZoo:
         "qwen3-tts-06base": Qwen3TTSModel("0.6B-Base"),
         "qwen3-tts-17cv": Qwen3TTSModel("1.7B-CustomVoice"),
         "qwen3-tts-17base": Qwen3TTSModel("1.7B-Base"),
+        "qwen3-tts-17vd": Qwen3TTSModel("1.7B-VoiceDesign"),
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
@@ -151,8 +152,9 @@ class ModelZoo:
         model = self.get_model(model_id)
         if model is None:
             raise ValueError(f"Model {model_id} not found")
-        model.unload()
-        logger.info(f"Model {model_id} unloaded")
+        if model.is_loaded():
+            model.unload()
+            logger.info(f"Model {model_id} unloaded")
         return model
 
     # --------------- getters --------------
@@ -219,6 +221,9 @@ class ModelZoo:
 
     def get_qwen3_tts_17base(self) -> Qwen3TTSModel:
         return self.get_model("qwen3-tts-17base")
+
+    def get_qwen3_tts_17vd(self) -> Qwen3TTSModel:
+        return self.get_model("qwen3-tts-17vd")
 
 
 model_zoo = ModelZoo()

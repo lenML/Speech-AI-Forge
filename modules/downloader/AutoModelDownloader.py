@@ -49,7 +49,7 @@ class AutoModelDownloader:
         auto_download=model_* 模式匹配，表示所有以 model_ 开头的模型都可以自动下载
         """
         auto_download = config.runtime_env_vars["auto_download"]
-        if auto_download is False or auto_download is None or auto_download is "False":
+        if auto_download is False or auto_download is None or auto_download == "False":
             return False
         if auto_download == "*":
             return True

@@ -14,6 +14,8 @@ class SpeakerManager(FolderDatabase):
     def __init__(self):
         super().__init__("./data/speakers/")
 
+        self.ext_items: list[TTSSpeaker] = []
+
     def is_valid_file(self, file_path: str) -> bool:
         return file_path.endswith(".spkv1.json") or file_path.endswith(".spkv1.png")
 
@@ -32,6 +34,8 @@ class SpeakerManager(FolderDatabase):
             raise ValueError("Invalid file extension for speaker file: " + file_path)
 
     def save_item(self, item: TTSSpeaker, file_path: str):
+        if item._is_virtual_spk:
+            raise ValueError("Cannot save a virtual speaker")
         if file_path.endswith(".spkv1.json"):
             with open(file_path, "w", encoding="utf-8") as f:
                 json_str = item.to_json_str()
@@ -48,7 +52,7 @@ class SpeakerManager(FolderDatabase):
         return self.get_item(lambda x: x.id == id)
 
     def list_speakers(self) -> list[TTSSpeaker]:
-        return list(self.items.values())
+        return list(self.items.values()) + list(self.ext_items)
 
 
 spk_mgr = SpeakerManager()

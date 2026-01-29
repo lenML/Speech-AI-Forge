@@ -267,6 +267,8 @@ class PipelineFactory:
             model = model_zoo.get_qwen3_tts_17cv()
         elif model_id.endswith("17base"):
             model = model_zoo.get_qwen3_tts_17base()
+        elif model_id.endswith("17vd"):
+            model = model_zoo.get_qwen3_tts_17vd()
         else:
             # 不支持
             raise ValueError(f"Unsupported model_id: {model_id}")

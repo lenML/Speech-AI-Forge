@@ -57,6 +57,9 @@ class GptSoVitsModel(TTSModel):
             self.model = GptSoVitsTTS(configs=configs)
         return self.model
 
+    def is_loaded(self):
+        return self.model is not None
+
     @devices.after_gc()
     def unload(self):
         if self.model is None:

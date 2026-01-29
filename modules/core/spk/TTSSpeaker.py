@@ -110,6 +110,17 @@ class TTSSpeaker:
         )
 
     @staticmethod
+    def virtual(name: str, models: list[str] = []) -> "TTSSpeaker":
+        """
+        return a virtual TTSSpeaker
+        """
+        spk = TTSSpeaker.empty()
+        spk.set_name(name=name)
+        spk.set_models(models=models)
+        spk._is_virtual_spk = True
+        return spk
+
+    @staticmethod
     def from_json(data: dict) -> "TTSSpeaker":
         return TTSSpeaker(
             json.loads(
@@ -183,6 +194,11 @@ class TTSSpeaker:
         assert isinstance(data, DcSpk), "data must be a DcSpk instance"
 
         self._data = data
+
+        # 虚拟的speaker，用于模型配置，只会影响推理，不包含任何音频数据
+        # 比如， qwen3tts custom voice 中可以指定 speaker name，有内置的音色
+        # 虚拟 spk 将不能操作 save / update
+        self._is_virtual_spk = False
 
     @property
     def has_refs(self):
@@ -289,6 +305,10 @@ class TTSSpeaker:
     def set_tags(self, tags: list[str]) -> None:
         assert isinstance(tags, list), "tags must be a list"
         self._data.meta.tags = tags
+
+    def set_models(self, models: list[str]) -> None:
+        assert isinstance(models, list), "models must be a list"
+        self._data.models = models
 
     def set_token(self, tokens: list, model_id: str, model_hash: str = "") -> None:
         token = DcSpkVoiceToken(

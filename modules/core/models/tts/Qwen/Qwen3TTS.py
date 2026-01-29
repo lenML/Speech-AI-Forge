@@ -1,6 +1,9 @@
 import logging
+from typing import Literal
 import torch
 from modules.core.models.TTSModel import TTSModel
+from modules.core.spk.SpkMgr import spk_mgr
+from modules.core.spk.TTSSpeaker import TTSSpeaker
 from modules.devices import devices
 from modules.downloader.AutoModelDownloader import AutoModelDownloader
 
@@ -9,6 +12,7 @@ from modules.repos_static.Qwen3_TTS.qwen_tts import (
     Qwen3TTSModel as Qwen3TTS,
     Qwen3TTSTokenizer,
 )
+from modules.utils.SeedContext import SeedContext
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +24,40 @@ model_versions = [
     "0.6B-Base",
 ]
 
+# For `Qwen3-TTS-12Hz-1.7B/0.6B-CustomVoice` models, the supported speaker list and speaker descriptions are provided below. We recommend using each speaker’s native language for the best quality. Of course, each speaker can speak any language supported by the model.
+
+# | Speaker | Voice Description  |  Native language |
+# | --- | --- | --- |
+# | Vivian | Bright, slightly edgy young female voice. | Chinese |
+# | Serena | Warm, gentle young female voice. | Chinese |
+# | Uncle_Fu | Seasoned male voice with a low, mellow timbre. | Chinese |
+# | Dylan | Youthful Beijing male voice with a clear, natural timbre. | Chinese (Beijing Dialect) |
+# | Eric | Lively Chengdu male voice with a slightly husky brightness. | Chinese (Sichuan Dialect) |
+# | Ryan | Dynamic male voice with strong rhythmic drive. | English |
+# | Aiden | Sunny American male voice with a clear midrange. | English |
+# | Ono_Anna | Playful Japanese female voice with a light, nimble timbre. | Japanese |
+# | Sohee | Warm Korean female voice with rich emotion. | Korean |
+custom_voices = [
+    "Vivian",
+    "Serena",
+    "Uncle_Fu",
+    "Dylan",
+    "Eric",
+    "Ryan",
+    "Aiden",
+    "Ono_Anna",
+    "Sohee",
+]
+custom_spks = [
+    TTSSpeaker.virtual(name=name, models=["qwen3-tts-*cv"]) for name in custom_voices
+]
+# 添加到 mgr
+for spk in custom_spks:
+    spk_mgr.ext_items.append(spk)
 
 class Qwen3TTSModel(TTSModel):
-    def __init__(self, model_version="1.7B-CustomVoice", tokenizer_sr="12Hz"):
+
+    def __init__(self, model_version="1.7B-Base", tokenizer_sr="12Hz"):
         super().__init__("qwen3-tts")
         self.model_version = model_version
         self.tokenizer_sr = tokenizer_sr
@@ -45,12 +80,9 @@ class Qwen3TTSModel(TTSModel):
     def get_dtype(self):
         dtype = super().get_dtype()
         if dtype == torch.float16:
-            # NOTE: 实测用不了，会导致数值溢出
-            logger.warning(
-                "检测到 dtype 为 float16，但 Qwen3TTS 对 float16 支持很差，已强制切换为 float32。"
-                "如需 f16 减少显存占用，请使用 --bf16 开启 bfloat16 模式以获得更好兼容性。"
-            )
-            return torch.float32
+            # NOTE: 实测用不了，会导致数值溢出 切换为 bf16
+            logger.warning("qwen3-tts: bf16 is used instead of fp16")
+            dtype = torch.bfloat16
         return dtype
 
     def load(self):
@@ -58,12 +90,8 @@ class Qwen3TTSModel(TTSModel):
             return self.model, self.tokenizer
 
         downloader = AutoModelDownloader()
-        # TODO: 获取当前执行环境 type
-        request_type = "api"
 
-        model_path = downloader.download(
-            model_name=self.model_name, request_type=request_type
-        )
+        model_path = downloader.download(model_name=self.model_name)
 
         device = self.get_device()
         dtype = self.get_dtype()
@@ -71,7 +99,7 @@ class Qwen3TTSModel(TTSModel):
         self.model = Qwen3TTS.from_pretrained(
             str(model_path.absolute()),
             device_map=device,
-            # dtype=dtype,
+            dtype=dtype,
             # TODO: 支持 flash atten
             # attn_implementation="flash_attention_2",
         )
@@ -81,6 +109,9 @@ class Qwen3TTSModel(TTSModel):
         )
 
         return self.model, self.tokenizer
+
+    def is_loaded(self):
+        return self.model is not None and self.tokenizer is not None
 
     @devices.after_gc()
     def unload(self):
@@ -100,23 +131,58 @@ class Qwen3TTSModel(TTSModel):
         temperature = seg0.temperature
         seed = seg0.infer_seed
 
-        ref_wav, ref_txt = self.get_ref_wav(seg0)
-        if ref_wav is None:
-            raise RuntimeError("Reference audio not found.")
-
-        # TODO: 不同type用不同的方法
-        model_type = model.model.tts_model_type
-
-        voice_clone_prompt = model.create_voice_clone_prompt(
-            ref_audio=(ref_wav, sr),
-            ref_text=ref_txt,
+        model_type: Literal["base", "custom_voice", "voice_design"] = (
+            model.model.tts_model_type
         )
-        wavs, sr = model.generate_voice_clone(
-            text=[seg.text for seg in segments],
-            # FIXME: 似乎如果能提供 lang 会有助于推理，但是也支持 auto
-            # language=None,
-            voice_clone_prompt=voice_clone_prompt,
-        )
+
+        texts = [seg.text for seg in segments]
+        instructs = [seg.prompt1 for seg in segments]
+
+        with SeedContext(seed=seed):
+            if model_type == "base":
+                ref_wav, ref_txt = self.get_ref_wav(seg0)
+                if ref_wav is None:
+                    raise RuntimeError(
+                        "Reference audio not found. Base model requires a reference audio."
+                    )
+                voice_clone_prompt = model.create_voice_clone_prompt(
+                    ref_audio=(ref_wav, sr),
+                    ref_text=ref_txt,
+                )
+                wavs, sr = model.generate_voice_clone(
+                    text=texts,
+                    top_k=top_k,
+                    top_p=top_p,
+                    temperature=temperature,
+                    # FIXME: 似乎如果能提供 lang 会有助于推理，但是也支持 auto
+                    # language=None,
+                    voice_clone_prompt=voice_clone_prompt,
+                )
+            elif model_type == "custom_voice":
+                speakers = [seg.spk.name for seg in segments]
+                # 如果不是 custom_voices 里的就报错
+                if not all(speaker in custom_voices for speaker in speakers):
+                    raise ValueError(
+                        f"Speaker(s) {', '.join(set(speakers) - set(custom_voices))} not found in custom_voices."
+                    )
+                wavs, sr = model.generate_custom_voice(
+                    text=texts,
+                    instruct=instructs,
+                    speaker=speakers,
+                    top_k=top_k,
+                    top_p=top_p,
+                    temperature=temperature,
+                )
+            elif model_type == "voice_design":
+                wavs, sr = model.generate_voice_design(
+                    text=texts,
+                    instruct=instructs,
+                    top_k=top_k,
+                    top_p=top_p,
+                    temperature=temperature,
+                )
+            else:
+                raise ValueError(f"Unsupported model type: {model_type}")
 
         return [(sr, wav) for wav in wavs]
 

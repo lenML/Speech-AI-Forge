@@ -57,6 +57,8 @@ def merge_prompt(attrs: dict, elem: Dict[str, Any]):
     attr_num(attrs, "break", 0, 7)
 
 
+# NOTE: 搞这些复杂的就是因为一开始要支持 chattts 那些配置
+# FIXME: 现在其实不太需要了，之后需要简化这里
 def calc_spk_style(
     spk: Union[str, int, None] = None, style: Union[str, int, None] = None
 ):
