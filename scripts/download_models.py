@@ -32,4 +32,4 @@ if __name__ == "__main__":
     if args.source == "hf":
         args.source = "huggingface"
     md = AutoModelDownloader(down_source=args.source)
-    md.download_models(model_names=args.models.split(","), request_type="script")
+    md.download_models(model_names=args.models.split(","), force=True)

@@ -68,6 +68,13 @@ def setup_model_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Use bfloat16 as the data type when loading with half precision.",
     )
+    # 自动下载模型
+    parser.add_argument(
+        "--auto_download",
+        type=str,
+        default=None,
+        help="Auto download model when not found",
+    )
 
 
 def process_model_args(args: argparse.Namespace):
@@ -83,6 +90,7 @@ def process_model_args(args: argparse.Namespace):
     preload_models = env.get_and_update_env(args, "preload_models", False, bool)
     enable_ftc = env.get_and_update_env(args, "ftc", False, bool)
     bf16 = env.get_and_update_env(args, "bf16", False, bool)
+    auto_download = env.get_and_update_env(args, "auto_download", "False", str)
 
     # TODO: 需要等 zoo 模块实现
     # generate_audio.setup_lru_cache()

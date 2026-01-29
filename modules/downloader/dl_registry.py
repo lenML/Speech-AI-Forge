@@ -20,12 +20,21 @@ class DownloadRegistry:
         # 自动下载 TODO: 从配置文件中读取
         self.auto_download = False
 
+    def list_model_names(self) -> list[str]:
+        return [d.model_name for d in self.registry]
+
     def match_model_name(self, model_name: str) -> tuple[bool, str]:
         """
         大小写不敏感，并且移除 -_ 等字符
         返回匹配到的原始 model_name 字符串
         """
-        preprocess = lambda x: x.lower().replace("-", "").replace("_", "")
+        preprocess = (
+            lambda x: x.lower()
+            .replace("-", "")
+            .replace("_", "")
+            .replace("/", "")
+            .replace("\\", "")
+        )
         model_name = preprocess(model_name)
         for downloader in self.registry:
             if preprocess(downloader.model_name) == model_name:
@@ -57,19 +66,11 @@ class DownloadRegistry:
         self,
         model_name: str,
         down_source: Literal["huggingface", "modelscope", "auto"] = "auto",
-        request_type: Literal["script", "webui", "api"] = "script",
     ):
         downloader = self.get_downloader(model_name)
         if downloader.check_exist():
             logger.info(f"🟢 Model [{downloader.model_name}] already exists.")
             return
-        # 来自 webui 和 api 的下载需要开启自动下载
-        do_download = self.auto_download or request_type == "script"
-        if not do_download:
-            raise ValueError(
-                f"Model {model_name} not downloaded, auto_download is False."
-            )
-
         if down_source == "auto":
             can_access_hf = can_net_access(HF_TEST_FILE_URL)
             if can_access_hf:
