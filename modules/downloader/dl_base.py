@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 import sys
-from typing import Optional
+from typing import Literal, Optional
 
 
 import time
@@ -37,6 +37,32 @@ class TModelDownloader:
         某些第三方依赖定义在这里，比如 gpt-sovits 依赖 nltk data
         """
         pass
+
+    def download(self, down_source: Literal["huggingface", "modelscope"]):
+        if down_source == "huggingface":
+            self.from_huggingface()
+        else:
+            self.from_modelscope()
+
+        # after check
+        times = 5
+        for i in range(times):
+            if self.check_exist():
+                break
+            time.sleep(5)
+            if i == times - 1:
+                raise TimeoutError("Download timeout")
+
+        self.extra_data_prepare()
+
+        self.gc()
+
+    def __call__(self, down_source: Literal["huggingface", "modelscope"]):
+        if self.check_exist():
+            logger.info(f"🟢 Model [{self.model_name}] already exists.")
+            return
+        self.download(down_source=down_source)
+        logger.info(f"✅ Model [{self.model_name}] downloaded.")
 
 
 def ensure_file_dir_exists(file_path: str):
@@ -189,6 +215,9 @@ class RemoteModelDownloader(TModelDownloader):
 
     def check_exist(self) -> bool:
         if not self.model_dir.exists():
+            return False
+        # 如果是空文件夹返回 False
+        if not any(self.model_dir.iterdir()):
             return False
         for file in self.required_files:
             if not (self.model_dir / file).exists():

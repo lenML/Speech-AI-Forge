@@ -78,22 +78,6 @@ class DownloadRegistry:
                 print(f"Cannot access Hugging Face, will download from ModelScope.")
                 down_source = "modelscope"
 
-        if down_source == "huggingface":
-            downloader.from_huggingface()
-        else:
-            downloader.from_modelscope()
-
-        # after check
-        times = 5
-        for i in range(times):
-            if downloader.check_exist():
-                break
-            time.sleep(5)
-            if i == times - 1:
-                raise TimeoutError("Download timeout")
-
-        downloader.extra_data_prepare()
-
-        downloader.gc()
+        downloader.download(down_source=down_source)
 
         logger.info(f"✅ Model [{downloader.model_name}] downloaded.")
