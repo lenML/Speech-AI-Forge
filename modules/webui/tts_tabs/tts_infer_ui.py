@@ -438,7 +438,14 @@ class TTSInterface:
         """
         首先检查模型是否已经下载可用，没有的话会显示施工提示
         """
-        if not ModelZoo.model_zoo.get_model(self.model_id).is_downloaded():
+
+        model = ModelZoo.model_zoo.get_model(self.model_id)
+        is_download = model.is_downloaded()
+        can_auto_download = model.can_auto_download()
+        # 如果模型没下载、并且无法自动下载，将会阻止 UI 使用
+        not_available = not is_download and not can_auto_download
+
+        if not_available:
             gr.HTML(
                 f"<p style='color:red'>🚧Model [{self.model_id}] is not available in the Model Zoo. Please contact the server owner to get it. Thank you!</p>"
             )

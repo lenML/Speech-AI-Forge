@@ -50,3 +50,10 @@ class BaseZooModel:
         """
         dl = self.get_downloader()
         return dl.check_exist()
+
+    def can_auto_download(self) -> bool:
+        """
+        检查是否可以自动下载，此状态和是否已经下载无关
+        """
+        adl = AutoModelDownloader()
+        return adl.can_auto_download(model_name=self.model_name)
