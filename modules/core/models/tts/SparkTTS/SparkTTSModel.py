@@ -21,36 +21,25 @@ class SparkTTSModel(TTSModel):
 
     def __init__(self):
         model_id = "spark-tts"
-        super().__init__(model_id)
+        super().__init__(model_id, "Spark-TTS-0.5B")
 
         self.model: SparkTTS = None
 
         self.model_path = Path("./models/Spark-TTS-0.5B")
 
-    def is_downloaded(self) -> bool:
-        return self.model_path.exists()
-
     def is_loaded(self):
         return self.model is not None
-
-    def check_files(self) -> None:
-        if not self.model_path.exists():
-            raise FileNotFoundError(f"Model file not found: {self.model_path}")
-
-    def is_downloaded(self) -> bool:
-        return self.model_path.exists()
 
     def get_dtype(self):
         dtype = super().get_dtype()
         if dtype == torch.float16:
-            # NOTE: SparkTTS 模型对于 float16 精度很糟糕，几乎破坏了模型，无法运行
-            # NOTE: 你可以使用 `--bf16` 启动项开启 bfloat16 模式，虽然可以运行，但是还是容易生成大量空白
-            # NOTE: 所以，如果没有使用 bf16 又开启了 half ，那么将切换为 f32
-            logger.warning(
-                "检测到 dtype 为 float16，但 SparkTTS 对 float16 支持很差，已强制切换为 float32。"
-                "如需 f16 减少显存占用，请使用 --bf16 开启 bfloat16 模式以获得更好兼容性。"
-            )
-            return torch.float32
+            # NOTE: 实测用不了，会导致数值溢出 切换为 bf16
+            if torch.cuda.is_bf16_supported():
+                logger.warning("qwen3-tts: bf16 is used instead of fp16")
+                dtype = torch.bfloat16
+            else:
+                logger.warning("qwen3-tts: fp16 无法在此模型上使用，自动切换为 fp32")
+                dtype = torch.float32
         return dtype
 
     def load(self):

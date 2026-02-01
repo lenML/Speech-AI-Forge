@@ -2,8 +2,11 @@ from .chattts import ChatTTSDownloader
 from .cosyvoice1_base import CosyVoiceInstructDownloader
 from .cosyvoice1_instruct import CosyVoiceInstructDownloader
 from .cosyvoice2 import CosyVoice2Downloader
-from .f5_tts import F5TTSDownloader
+
+# NOTE: 这个是老版本的 f5 tts 没必要支持
+# from .f5_tts import F5TTSDownloader
 from .f5_tts_v1 import F5TTSV1Downloader
+
 from .facebook_w2v_bert_2 import W2vBert2Downloader
 from .faster_whisper_v3_turbo import FasterWhisperV3TDownloader
 from .faster_whisper import FasterWhisperDownloader

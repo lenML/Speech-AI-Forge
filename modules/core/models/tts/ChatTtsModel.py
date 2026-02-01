@@ -36,12 +36,9 @@ class ChatTTSModel(TTSModel):
             return spk
 
     def __init__(self) -> None:
-        super().__init__("chat-tts")
+        super().__init__("chat-tts", model_name="ChatTTS")
         self.chat: ChatTTS.Chat = None
         self.current_infer: ChatTTSInfer = None
-
-    def is_downloaded(self) -> bool:
-        return Path("./models/ChatTTS").exists()
 
     def get_sample_rate(self) -> int:
         return 24000

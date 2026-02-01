@@ -137,7 +137,6 @@ apt-get install sox
 ├── ffmpeg.exe
 ├── ffprobe.exe
 ├── ffplay.exe
-├── ffplay.exe
 ├── rubberband.exe
 ├── rubberband-r3.exe
 ├── sndfile.dll

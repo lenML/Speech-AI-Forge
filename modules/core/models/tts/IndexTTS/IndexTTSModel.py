@@ -24,23 +24,11 @@ logger = logging.getLogger(__name__)
 class IndexTTSModel(TTSModel):
     model_id = "index-tts"
 
-    def __init__(self):
-        super().__init__("index-tts")
+    def __init__(self, model_name="Index-TTS"):
+        super().__init__("index-tts", model_name=model_name)
         self.tts: IndexTTS = None
-        model_v1_dir = Path("./models/Index-TTS")
-        model_v1_5_dir = Path("./models/Index-TTS-1.5")
-        self.model_dir = model_v1_dir
-
-        if model_v1_5_dir.exists():
-            self.model_dir = model_v1_5_dir
-
+        self.model_dir = Path(f"./models/${model_name}")
         self.tokenizer: TextTokenizer = None
-
-        # 如果没有下载 v1.5 模型就提醒
-        if self.model_dir is not model_v1_5_dir:
-            logger.warning(
-                "Index-TTS 模型已经更新，建议使用 Index-TTS-1.5 模型，使用 v1.5 下载脚本下载最新模型即可使用。"
-            )
 
     def is_downloaded(self):
         return self.model_dir.exists()

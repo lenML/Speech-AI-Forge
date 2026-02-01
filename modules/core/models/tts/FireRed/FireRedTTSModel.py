@@ -23,12 +23,9 @@ class FireRedTTSModel(TTSModel):
     model_id = "fire-red-tts"
 
     def __init__(self) -> None:
-        super().__init__(FireRedTTSModel.model_id)
+        super().__init__(FireRedTTSModel.model_id, "FireRedTTS")
 
         self.fire_red: FireRedTTSInfer = None
-
-    def is_downloaded(self) -> bool:
-        return Path("models/FireRedTTS").exists()
 
     def load(self):
         if self.fire_red:

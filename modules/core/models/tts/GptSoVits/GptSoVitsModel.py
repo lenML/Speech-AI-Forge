@@ -24,14 +24,12 @@ class GptSoVitsModel(TTSModel):
 
     def __init__(self, version: Literal["v1", "v2", "v3", "v4"] = "v4"):
         model_id = f"gpt-so-vits-{version}"
-        super().__init__(model_id)
+        model_name = f"gpt_sovits_{version}"
+        super().__init__(model_id,model_name=model_name)
 
         self.version = version
 
         self.model: GptSoVitsTTS = None
-
-    def is_downloaded(self):
-        return Path(f"models/gpt_sovits_{self.version}").exists()
 
     def get_device(self):
         return devices.get_device_for("gpt-so-vits")

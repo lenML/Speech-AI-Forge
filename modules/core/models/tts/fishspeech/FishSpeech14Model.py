@@ -46,12 +46,9 @@ class FishSpeech14Model(TTSModel):
 
     def __init__(self) -> None:
         model_id = "fish-speech"
-        super().__init__(model_id)
+        super().__init__(model_id, "fish-speech-1_4")
 
         self.model: Optional[FF14_infer] = None
-
-    def is_downloaded(self):
-        return FF14_llama.MODEL_PATH.exists() and FF14_vqgan.MODEL_PATH.exists()
 
     def load(self) -> None:
         with self.lock:

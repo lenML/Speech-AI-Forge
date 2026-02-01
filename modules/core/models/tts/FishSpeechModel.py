@@ -34,16 +34,15 @@ FISH_SPEECH_LLAMA = Union[NaiveTransformer, DualARTransformer]
 logger = logging.getLogger(__name__)
 
 
+# NOTE: 这里是 1.4 版本，最新是 1.5 版本，但是因为效果没有特别的提升，所以没支持，这里也只支持 1.4 版本
 class FishSpeechModel(TTSModel):
     lock = threading.Lock()
-
-    MODEL_PATH = Path("./models/fish-speech-1_4")
 
     model: FISH_SPEECH_LLAMA = None
     vqgan: FireflyArchitecture = None
 
     def __init__(self) -> None:
-        super().__init__("fish-speech")
+        super().__init__("fish-speech", "fish-speech-1_4")
 
         self.model: FISH_SPEECH_LLAMA = FishSpeechModel.model
         self.vqgan: FireflyArchitecture = FishSpeechModel.vqgan
@@ -53,9 +52,6 @@ class FishSpeechModel(TTSModel):
         self.dtype = devices.dtype
 
         self.encoded_prefix = []
-
-    def is_downloaded(self) -> bool:
-        return self.MODEL_PATH.exists()
 
     def is_loaded(self) -> bool:
         return FishSpeechModel.model is not None

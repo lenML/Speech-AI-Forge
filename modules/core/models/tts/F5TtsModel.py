@@ -20,69 +20,22 @@ class F5TtsModel(TTSModel):
     load_lock = threading.Lock()
 
     def __init__(self) -> None:
-        super().__init__("f5-tts")
+        super().__init__("f5-tts", "F5-TTS-V1")
 
-        v0_6_model_path = Path("./models/F5-TTS/F5TTS_Base/model_1200000.safetensors")
-        v1_120_model_path = Path(
-            "./models/F5-TTS/F5TTS_v1_Base/model_1200000.safetensors"
-        )
-        # NOTE: F5TTS 在 2025三月份发布的新 v1_base 模型
-        v1_125_model_path = Path(
+        self.model_path = Path(
             "./models/F5-TTS/F5TTS_v1_Base/model_1250000.safetensors"
         )
-        v1_model_path = (
-            v1_125_model_path if v1_125_model_path.exists() else v1_120_model_path
-        )
-
-        self.model_path = v1_model_path
         self.model_version = "F5TTS_v1_Base"
         self.vocos_path = Path("./models/vocos-mel-24khz")
-
-        if not v1_model_path.exists() and v0_6_model_path.exists():
-            logger.warning(
-                "F5-TTS v1 model not found, using v0.6.2 model instead. Please update your model."
-            )
-            self.model_path = v0_6_model_path
-            self.model_version = "F5TTS_Base"
 
         self.model: Optional[F5TTS] = None
 
         self.annotation = F5Annotation()
 
-    def is_downloaded(self):
-        return self.model_path.exists() and self.vocos_path.exists()
-
     def is_loaded(self):
         return self.model is not None
 
-    def check_files(self) -> None:
-        if not self.model_path.exists():
-            raise FileNotFoundError(f"Model file not found: {self.model_path}")
-        if not self.vocos_path.exists():
-            raise FileNotFoundError(f"Vocos model file not found: {self.vocos_path}")
-
-    def is_downloaded(self) -> bool:
-        return self.model_path.exists() and self.vocos_path.exists()
-
-    def _alert_ckpt_files(self):
-        """
-        提醒下载模型
-        """
-        if not self.model_path.exists():
-            # NOTE: 不存在，提示使用脚本下载 `python -m scripts.downloader.f5_tts_v1 --source huggingface`
-            if self.model_version == "F5TTS_Base":
-                raise ValueError(
-                    f"F5TTS model {self.model_version} not found, please download it manually using `python -m scripts.downloader.f5_tts --source huggingface`"
-                )
-            else:
-                raise ValueError(
-                    f"F5TTS model {self.model_version} not found, please download it manually using `python -m scripts.downloader.f5_tts_v1 --source huggingface`"
-                )
-
     def load(self) -> F5TTS:
-        self._alert_ckpt_files()
-        self.check_files()
-
         with self.load_lock:
             if self.model is None:
                 self.model = F5TTS(

@@ -61,6 +61,12 @@ class AutoModelDownloader:
                 return True
         return False
 
+    def is_downloaded(self, model_name: str):
+        downloader = self.registry.get_downloader(model_name=model_name)
+        if downloader is None:
+            return False
+        return downloader.check_exist()
+
     def download(self, model_name: str, force=False):
         downloader = self.registry.get_downloader(model_name=model_name)
         if downloader is None:

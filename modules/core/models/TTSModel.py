@@ -13,8 +13,8 @@ import numpy.typing as npt
 
 class TTSModel(BaseZooModel):
 
-    def __init__(self, model_id: str) -> None:
-        super().__init__(model_id=model_id)
+    def __init__(self, model_id: str, model_name: str = None) -> None:
+        super().__init__(model_id=model_id, model_name=model_name)
 
     def encode(self, text: str) -> list[int]:
         return [ord(char) for char in text]

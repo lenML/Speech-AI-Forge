@@ -59,7 +59,10 @@ for spk in custom_spks:
 class Qwen3TTSModel(TTSModel):
 
     def __init__(self, model_version="1.7B-Base", tokenizer_sr="12Hz"):
-        super().__init__("qwen3-tts")
+        model_name = f"Qwen3-TTS-{tokenizer_sr}-{model_version}"
+
+        super().__init__("qwen3-tts", model_name=model_name)
+
         self.model_version = model_version
         self.tokenizer_sr = tokenizer_sr
         if model_version not in model_versions:
@@ -67,10 +70,14 @@ class Qwen3TTSModel(TTSModel):
                 f"Invalid model version: {model_version}. Available versions: {model_versions}"
             )
 
-        self.model_name = f"Qwen3-TTS-{tokenizer_sr}-{model_version}"
+        self.model_name = model_name
 
         self.model: "None | Qwen3TTS" = None
         self.tokenizer: "None | Qwen3TTSTokenizer" = None
+
+    def is_downloaded(self):
+        downloader = AutoModelDownloader()
+        return downloader.is_downloaded(model_name=self.model_name)
 
     def get_sample_rate(self):
         # 来自 models/Qwen3-TTS-12Hz-0.6B-CustomVoice/speech_tokenizer/config.json

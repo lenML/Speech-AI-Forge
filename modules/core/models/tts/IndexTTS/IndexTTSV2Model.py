@@ -29,7 +29,7 @@ class IndexTTSV2Model(TTSModel):
     model_id = "index-tts-v2"
 
     def __init__(self):
-        super().__init__("index-tts-v2")
+        super().__init__("index-tts-v2", "Index-TTS-2")
         self.tts: IndexTTS2 = None
         self.model_dir = Path("./models/Index-TTS-2")
         self.semantic_code_ckpt_path = Path(
@@ -41,9 +41,6 @@ class IndexTTSV2Model(TTSModel):
         self.bigvgan_path = Path("./models/nvidia/bigvgan_v2_22khz_80band_256x")
         self.extract_features_model_path = Path("./models/facebook/w2v-bert-2.0")
         self.tokenizer: TextTokenizer = None
-
-    def is_downloaded(self):
-        return self.model_dir.exists()
 
     def is_loaded(self):
         return self.tts is not None
