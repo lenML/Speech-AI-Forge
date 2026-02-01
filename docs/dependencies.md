@@ -148,40 +148,44 @@ apt-get install sox
 
 ### pytorch
 
-建议版本: `torch==2.3.1+cu121`
+建议版本: `torch==2.6.0+cu126`
 
 由于 pytroch 安装与你的本机环境有关，请自行安装对应版本，下面是一个简单的安装脚本
 
 > （如果直接运行某些情况可能会安装 cpu 版本，具体应该指定什么版本请自行确定）
 
 ```bash
-pip3 install torch==2.3.1 torchvision torchaudio --index-url https://mirror.sjtu.edu.cn/pytorch-wheels/cu121
+pip3 install torch==2.6.0 torchvision torchaudio --index-url https://mirror.sjtu.edu.cn/pytorch-wheels/cu126
 ```
 
 如果上面无法安装 cuda 版本，可以参考下面的指令安装指定版本 torch (linux)
 
 ```bash
-pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torch-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl
-pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchaudio-2.3.1%2Bcu121-cp310-cp310-linux_x86_64.whl
-pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%2Bcu121-cp310-cp310-linux_x86_64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torch-2.6.0%2Bcu126-cp310-cp310-linux_x86_64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torchaudio-2.6.0%2Bcu126-cp310-cp310-linux_x86_64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torchvision-0.21.0%2Bcu126-cp310-cp310-linux_x86_64.whl
 ```
 
 windows
 ```bash
-pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torch-2.3.1%2Bcu121-cp310-cp310-win_amd64.whl
-pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchaudio-2.3.1%2Bcu121-cp310-cp310-win_amd64.whl
-pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu121/torchvision-0.18.1%2Bcu121-cp310-cp310-win_amd64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torch-2.6.0%2Bcu126-cp310-cp310-win_amd64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torchaudio-2.6.0%2Bcu126-cp310-cp310-win_amd64.whl
+pip3 install https://mirror.sjtu.edu.cn/pytorch-wheels/cu126/torchvision-0.21.0%2Bcu126-cp310-cp310-win_amd64.whl
 ```
 
 ### flash attn (可选)
 
+```
+pip install flash-attn --no-build-isolation
+```
+
 详见: https://github.com/Dao-AILab/flash-attention
 
 ### xformers （可选）
-几乎没用，因为tts模型不是所有模块都能支持，这里提供一个和 `torch==2.3.1+cu121` 兼容的版本，方便配置
+几乎没用，因为tts模型不是所有模块都能支持，这里提供一个和 `torch==2.6.0+cu126` 兼容的版本，方便配置
 
 ```bash
-pip3 install -U xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu121  --no-deps
+pip3 install -U xformers==0.0.27 --index-url https://download.pytorch.org/whl/cu126  --no-deps
 ```
 
 ### 其余依赖
