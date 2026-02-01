@@ -53,7 +53,7 @@ def init_distributed(args):
 def init_dataset_and_dataloader(args, configs, gan, dpo):
     data_pipeline = configs['data_pipeline_gan'] if gan is True else configs['data_pipeline']
     train_dataset = Dataset(args.train_data, data_pipeline=data_pipeline, mode='train', gan=gan, dpo=dpo, shuffle=True, partition=True)
-    cv_dataset = Dataset(args.cv_data, data_pipeline=data_pipeline, mode='train', gan=gan, dpo=dpo, shuffle=False, partition=False)
+    cv_dataset = Dataset(args.cv_data, data_pipeline=data_pipeline, mode='dev', gan=gan, dpo=dpo, shuffle=False, partition=False)
 
     # do not use persistent_workers=True, as whisper tokenizer opens tiktoken file each time when the for loop starts
     train_data_loader = DataLoader(train_dataset,
@@ -71,7 +71,7 @@ def init_dataset_and_dataloader(args, configs, gan, dpo):
 
 def check_modify_and_save_config(args, configs):
     if args.train_engine == "torch_ddp":
-        configs['train_conf']["dtype"] = 'fp32'
+        configs['train_conf']["dtype"] = 'bf16' if args.use_amp is True else 'fp32'
     else:
         with open(args.deepspeed_config, 'r') as fin:
             ds_configs = json.load(fin)
@@ -164,18 +164,18 @@ def init_optimizer_and_scheduler(args, configs, model, gan):
             raise ValueError("unknown scheduler: " + configs['train_conf'])
 
         if configs['train_conf']['optim_d'] == 'adam':
-            optimizer_d = optim.Adam(model.module.discriminator.parameters(), **configs['train_conf']['optim_conf'])
+            optimizer_d = optim.Adam(model.module.discriminator.parameters(), **configs['train_conf']['optim_conf_d'])
         elif configs['train_conf']['optim_d'] == 'adamw':
-            optimizer_d = optim.AdamW(model.module.discriminator.parameters(), **configs['train_conf']['optim_conf'])
+            optimizer_d = optim.AdamW(model.module.discriminator.parameters(), **configs['train_conf']['optim_conf_d'])
         else:
             raise ValueError("unknown optimizer: " + configs['train_conf'])
 
         if configs['train_conf']['scheduler_d'] == 'warmuplr':
             scheduler_type = WarmupLR
-            scheduler_d = WarmupLR(optimizer_d, **configs['train_conf']['scheduler_conf'])
+            scheduler_d = WarmupLR(optimizer_d, **configs['train_conf']['scheduler_d'])
         elif configs['train_conf']['scheduler_d'] == 'NoamHoldAnnealing':
             scheduler_type = NoamHoldAnnealing
-            scheduler_d = NoamHoldAnnealing(optimizer_d, **configs['train_conf']['scheduler_conf'])
+            scheduler_d = NoamHoldAnnealing(optimizer_d, **configs['train_conf']['scheduler_d'])
         elif configs['train_conf']['scheduler'] == 'constantlr':
             scheduler_type = ConstantLR
             scheduler_d = ConstantLR(optimizer_d)
@@ -247,7 +247,7 @@ def batch_forward(model, batch, scaler, info_dict, ref_model=None, dpo_loss=None
         dtype = torch.float32
 
     if info_dict['train_engine'] == 'torch_ddp':
-        autocast = torch.cuda.amp.autocast(enabled=scaler is not None)
+        autocast = torch.cuda.amp.autocast(enabled=scaler is not None, dtype=dtype)
     else:
         autocast = torch.cuda.amp.autocast(enabled=True, dtype=dtype, cache_enabled=False)
 
