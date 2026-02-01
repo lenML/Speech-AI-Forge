@@ -370,6 +370,7 @@ xxhash==3.4.1
 yarl==1.9.4
 zhon==2.0.2
 zipp==3.19.2
+json5==0.13.0
 
 ### matcha tts
 conformer==0.3.2
