@@ -162,7 +162,6 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 | **TTS**        | `ChatTTS`                              |
 |                | `CosyVoice2-0.5B`                      |
 |                | `CosyVoice_300M_Instruct`              |
-|                | `F5-TTS`                               |
 |                | `F5-TTS-V1`                            |
 |                | `FireRedTTS`                           |
 |                | `fish-speech-1_4`                      |
