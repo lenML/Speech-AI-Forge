@@ -13,6 +13,7 @@ from modules.repos_static.Qwen3_TTS.qwen_tts import (
     Qwen3TTSTokenizer,
 )
 from modules.utils.SeedContext import SeedContext
+from transformers.utils import is_flash_attn_2_available
 
 logger = logging.getLogger(__name__)
 
@@ -81,8 +82,12 @@ class Qwen3TTSModel(TTSModel):
         dtype = super().get_dtype()
         if dtype == torch.float16:
             # NOTE: 实测用不了，会导致数值溢出 切换为 bf16
-            logger.warning("qwen3-tts: bf16 is used instead of fp16")
-            dtype = torch.bfloat16
+            if torch.cuda.is_bf16_supported():
+                logger.warning("qwen3-tts: bf16 is used instead of fp16")
+                dtype = torch.bfloat16
+            else:
+                logger.warning("qwen3-tts: fp16 无法在此模型上使用，自动切换为 fp32")
+                dtype = torch.float32
         return dtype
 
     def load(self):
@@ -96,12 +101,13 @@ class Qwen3TTSModel(TTSModel):
         device = self.get_device()
         dtype = self.get_dtype()
 
+        attn_impl = "flash_attention_2" if is_flash_attn_2_available() else "sdpa"
+
         self.model = Qwen3TTS.from_pretrained(
             str(model_path.absolute()),
             device_map=device,
             dtype=dtype,
-            # TODO: 支持 flash atten
-            # attn_implementation="flash_attention_2",
+            attn_implementation=attn_impl,
         )
         self.tokenizer = Qwen3TTSTokenizer.from_pretrained(
             str(model_path.absolute() / "speech_tokenizer"),
