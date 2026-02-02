@@ -30,9 +30,6 @@ class IndexTTSModel(TTSModel):
         self.model_dir = Path(f"./models/${model_name}")
         self.tokenizer: TextTokenizer = None
 
-    def is_downloaded(self):
-        return self.model_dir.exists()
-
     def is_loaded(self):
         return self.tts is not None
 
