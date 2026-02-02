@@ -236,19 +236,23 @@ class Qwen2Encoder(torch.nn.Module):
     def forward(self, xs: torch.Tensor, xs_lens: torch.Tensor):
         T = xs.size(1)
         masks = ~make_pad_mask(xs_lens, T)
+        # Change: Cast to proper dtype and ensure 4D shape if needed
+        masks = masks.to(xs.dtype)
+
         outs = self.model(
             inputs_embeds=xs,
-            attention_mask=masks,
+            attention_mask=masks,  # Should be 2D [batch, seq_len]
             output_hidden_states=True,
             return_dict=True,
         )
         return outs.hidden_states[-1], masks.unsqueeze(1)
 
     def forward_one_step(self, xs, masks, cache=None):
-        input_masks = masks[:, -1, :]
+        # Change: Use the full sequence length mask, not just the last position
+        # masks shape should be [batch, full_seq_len] where full_seq_len includes cache
         outs = self.model(
             inputs_embeds=xs,
-            attention_mask=input_masks,
+            attention_mask=masks,  # Use full mask, not masks[:, -1, :]
             output_hidden_states=True,
             return_dict=True,
             use_cache=True,
@@ -487,10 +491,12 @@ class Qwen2LM(TransformerLM):
     def inference_wrapper(self, lm_input, sampling, min_len, max_len, uuid):
         if hasattr(self, 'vllm'):
             from vllm import SamplingParams, RequestOutput
-            sampling_params = SamplingParams(top_k=sampling,
-                                             stop_token_ids=self.stop_token_ids,
-                                             min_tokens=min_len,
-                                             max_tokens=max_len)
+            sampling_params = SamplingParams(
+                top_k=sampling,
+                stop_token_ids=self.stop_token_ids,
+                min_tokens=min_len,
+                max_tokens=max_len,
+            )
             with self.lock:
                 self.vllm.add_request(uuid, {"prompt_embeds": lm_input.squeeze(0).to(torch.bfloat16).to(lm_input.device)}, sampling_params)
                 self.vllm_output_queue[uuid] = queue.Queue()
@@ -517,10 +523,16 @@ class Qwen2LM(TransformerLM):
         else:
             out_tokens = []
             cache = None
+            seq_len = 0
             for i in range(max_len):
-                y_pred, cache = self.llm.forward_one_step(lm_input,
-                                                          masks=torch.tril(torch.ones((1, lm_input.shape[1], lm_input.shape[1]), device=lm_input.device)).to(torch.bool),
-                                                          cache=cache)
+                seq_len += lm_input.shape[1]
+                # Create proper 2D mask [batch, seq_len]
+                masks = torch.ones(
+                    (1, seq_len), device=lm_input.device, dtype=torch.bool
+                )
+                y_pred, cache = self.llm.forward_one_step(
+                    lm_input, masks=masks, cache=cache
+                )
                 logp = self.llm_decoder(y_pred[:, -1]).log_softmax(dim=-1)
                 top_ids = self.sampling_ids(logp.squeeze(dim=0), out_tokens, sampling, ignore_eos=True if i < min_len else False)
                 if top_ids in self.stop_token_ids:
