@@ -12,10 +12,10 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 | -            | 描述                     | 链接                                                                                                                                                               |
 | ------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **一键启动** | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb) |
-| **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                  |
+| **整合包** | Windows整合包解压即用         | [Releases](https://github.com/lenML/Speech-AI-Forge/releases) |
+| **Colab体验** | 点击按钮，一键启动 Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/lenML/Speech-AI-Forge/blob/main/colab.ipynb) |
 | **本地部署** | 查看环境准备部分         | [本地部署](#InstallationandRunning)                                                                                                                                |
-| **一键整合** | Windows一键整合包         | WIP 开发中 |
+| **容器部署** | 查看 docker 部分         | [Docker](#docker)                                                                                                                                                  |
 
 ## Breaking change logs
 
@@ -44,8 +44,8 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 ```
 python webui.py
 ```
-
-### webui features
+<details>
+<summary>WebUI 功能</summary>
 
 [点我看详细图文介绍](./docs/webui_features.md)
 
@@ -89,6 +89,8 @@ python webui.py
 - **工具 (Tools)**:
   - **后处理工具 (Post Process)**: 提供音频剪辑、调整和增强等功能，优化生成的语音质量
 
+</details>
+
 ### `launch.py`: API Server
 
 某些情况，你并不需要 webui 或者需要更高的 api 吞吐，那么可以使用这个脚本启动单纯的 api 服务。
@@ -108,15 +110,7 @@ python launch.py
 
 ## Docker
 
-### 镜像
-
-WIP 开发中
-
 ### 手动 build
-
-下载模型: `python -m scripts.download_models --source modelscope`
-
-> 此脚本将下载 `chat-tts` 和 `enhancer` 模型，如需下载其他模型，请看后续的 `模型下载` 介绍
 
 - webui: `docker-compose -f ./docker-compose.webui.yml up -d`
 - api: `docker-compose -f ./docker-compose.api.yml up -d`
@@ -130,16 +124,18 @@ WIP 开发中
 
 | 模型类别        | 模型名称                                                           | 支持多语言          | 实现情况    |
 |-----------------|--------------------------------------------------------------------|---------------------|-------------|
-| **TTS**         | [ChatTTS](https://github.com/2noise/ChatTTS)                       | en, zh              | ✅           |
+| **TTS**         |                        |               |            |
+|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | en, zh              | ✅ (v1/v1.5) |
+|                 | [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)                   | en, zh              | ✅ |
 |                 | [FishSpeech](https://github.com/fishaudio/fish-speech)             | en, zh, jp, ko      | ✅ (1.4)     |
 |                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | en, zh, jp, yue, ko | ✅ (v2)      |
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)            | en, zh              | ✅           |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                         | en, zh              | ✅ (v0.6/v1) |
-|                 | [Index-TTS](https://github.com/index-tts/index-tts)                | en, zh              | ✅ (v1/v1.5) |
 |                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | en, zh              | ✅           |
 |                 | [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS/tree/main)     | en, zh, ja, ko, yue | ✅           |
-|                 | [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)                   | en, zh              | ✅ |
-| **ASR**         | [Whisper](https://github.com/openai/whisper)                       | ✅                  | ✅           |
+|          | [ChatTTS](https://github.com/2noise/ChatTTS)                       | en, zh              | ✅           |
+| **ASR**         |                        |                   |            |
+|          | [Whisper](https://github.com/openai/whisper)                       | ✅                  | ✅           |
 |                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)            | ✅                  | ✅           |
 | **Voice Clone** | [OpenVoice](https://github.com/myshell-ai/OpenVoice)               | —                   | ✅           |
 | **Enhancer**    | [ResembleEnhance](https://github.com/resemble-ai/resemble-enhance) | —                   | ✅           |
@@ -151,11 +147,12 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 ```
 
 > 🔍 **说明**：
-> - 支持 `--source=huggingface` 或 `--source=modelscope`
+> - 支持 `--source=huggingface` 或 `--source=modelscope` 或 `--source=auto` （自动根据网络环境选择hf或者ms）
 > - 模型 ID 大小写不敏感，可忽略 `-`, `_`, `/` 等符号
 > - 例如：`Qwen3-TTS-12Hz-0.6B-Base` 可写作 `qwen3tts12hz06bbase` 或 `qwen3-tts-0.6b-base`
 
-### 📌 模型 ID 列表
+<details>
+<summary>📌 模型ID列表</summary>
 
 | 模型类别       | 内部模型 ID（可直接用于 `--models`） |
 |----------------|----------------------------------------|
@@ -187,6 +184,7 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 |                                 | `funasr/campplus`                      |
 |                                 | `facebook/w2v-bert-2.0`               |
 |                                 | `vocos-mel-24khz`                      |
+</details>
 
 ## 自动下载
 
@@ -199,14 +197,6 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 ## FAQ
 
 [Goto Discussion Page](https://github.com/lenML/Speech-AI-Forge/discussions/242)
-
-## 离线整合包
-
-感谢 @Phrixus2023 提供的整合包：
-https://pan.baidu.com/s/1Q1vQV5Gs0VhU5J76dZBK4Q?pwd=d7xu
-
-相关讨论：
-https://github.com/lenML/Speech-AI-Forge/discussions/65
 
 # Documents
 

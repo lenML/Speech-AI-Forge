@@ -216,6 +216,8 @@ test*.json
 test*.vtt
 test*.srt
 test*.tsv
+test*.mp3
+test*.wav
 
 .DS_Store
 
