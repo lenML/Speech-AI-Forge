@@ -440,7 +440,7 @@ class TTSInterface:
         """
 
         model = ModelZoo.model_zoo.get_model(self.model_id)
-        is_download = model.is_downloaded()
+        is_download = model.is_downloaded(verbose=False)
         can_auto_download = model.can_auto_download()
         # 如果模型没下载、并且无法自动下载，将会阻止 UI 使用
         not_available = not is_download and not can_auto_download

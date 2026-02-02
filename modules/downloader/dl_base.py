@@ -213,7 +213,7 @@ class RemoteModelDownloader(TModelDownloader):
         except Exception as e:
             self.logger.error(f"Failed to delete cache directory {self.cache_dir}: {e}")
 
-    def check_exist(self) -> bool:
+    def check_exist(self, verbose=True) -> bool:
         if not self.model_dir.exists():
             return False
         # 如果是空文件夹返回 False
@@ -221,7 +221,8 @@ class RemoteModelDownloader(TModelDownloader):
             return False
         for file in self.required_files:
             if not (self.model_dir / file).exists():
-                self.logger.info(f"Missing file: {file}")
+                if verbose:
+                    self.logger.info(f"Missing file: {file}")
                 return False
         return True
 

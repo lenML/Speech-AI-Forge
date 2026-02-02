@@ -104,7 +104,7 @@ class ModelZoo:
     def get_available_tts_model(self) -> list[TTSModel]:
         models = []
         for id, model in self.models.items():
-            if isinstance(model, TTSModel) and model.is_downloaded():
+            if isinstance(model, TTSModel) and model.is_downloaded(verbose=False):
                 models.append(model)
         return models
 
@@ -118,7 +118,7 @@ class ModelZoo:
     def get_available_stt_model(self) -> list[STTModel]:
         models = []
         for id, model in self.models.items():
-            if isinstance(model, STTModel) and model.is_downloaded():
+            if isinstance(model, STTModel) and model.is_downloaded(verbose=False):
                 models.append(model)
         return models
 

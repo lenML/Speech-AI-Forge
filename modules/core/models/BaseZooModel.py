@@ -53,12 +53,12 @@ class BaseZooModel:
     def interrupt(self) -> None:
         pass
 
-    def is_downloaded(self) -> bool:
+    def is_downloaded(self, verbose=True) -> bool:
         """
         检查模型是否已经安装 比如在 webui 页面是否显示
         """
         dl = self.get_downloader()
-        return dl.check_exist()
+        return dl.check_exist(verbose=verbose)
 
     def can_auto_download(self) -> bool:
         """
