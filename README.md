@@ -19,6 +19,7 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 ## Breaking change logs
 
+- 260202: Support CosyVoice3 [#264](https://github.com/lenML/Speech-AI-Forge/issues/264)
 - 260129: Support Qwen3-TTS [#282](https://github.com/lenML/Speech-AI-Forge/issues/282)
 - 250912: Support Index-TTS-2 [#265](https://github.com/lenML/Speech-AI-Forge/issues/265)
 - 250702: Support Index-TTS-1.5 [#250](https://github.com/lenML/Speech-AI-Forge/issues/250)
@@ -128,7 +129,7 @@ python launch.py
 |                 | [Index-TTS](https://github.com/index-tts/index-tts)                | en, zh              | ✅ (v1/v1.5) |
 |                 | [Qwen3-TTS](https://github.com/QwenLM/Qwen3-TTS)                   | en, zh              | ✅ |
 |                 | [FishSpeech](https://github.com/fishaudio/fish-speech)             | en, zh, jp, ko      | ✅ (1.4)     |
-|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | en, zh, jp, yue, ko | ✅ (v2)      |
+|                 | [CosyVoice](https://github.com/FunAudioLLM/CosyVoice)              | en, zh, jp, yue, ko | ✅ (v2/v3)      |
 |                 | [FireRedTTS](https://github.com/FireRedTeam/FireRedTTS)            | en, zh              | ✅           |
 |                 | [F5-TTS](https://github.com/SWivid/F5-TTS)                         | en, zh              | ✅ (v0.6/v1) |
 |                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | en, zh              | ✅           |
@@ -159,6 +160,7 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 | **TTS**        | `ChatTTS`                              |
 |                | `CosyVoice2-0.5B`                      |
 |                | `CosyVoice_300M_Instruct`              |
+|                | `Fun-CosyVoice3-0.5B-2512`              |
 |                | `F5-TTS-V1`                            |
 |                | `FireRedTTS`                           |
 |                | `fish-speech-1_4`                      |

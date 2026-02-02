@@ -23,7 +23,11 @@ from modules.core.pipeline.dcls import TTSPipelineContext, TTSSegment
 from modules.core.pipeline.processor import NP_AUDIO
 from modules.core.spk import TTSSpeaker
 from modules.devices import devices
-from modules.repos_static.cosyvoice.cosyvoice.cli.model import CosyVoice2Model
+from modules.repos_static.cosyvoice.cosyvoice.cli.model import (
+    CosyVoiceModel,
+    CosyVoice2Model,
+    CosyVoice3Model,
+)
 from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
 
@@ -35,24 +39,19 @@ class CosyVoiceTTSModel(TTSModel):
     model: Optional[CosyVoice2Model] = None
     frontend: Optional[CosyVoiceFrontEnd] = None
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        model_name="CosyVoice2-0.5B",
+        config_filenmae="cosyvoice2.yaml",
+        tokenizer_filename="speech_tokenizer_v2.onnx",
+        model_version: str = "2",
+    ) -> None:
         super().__init__("cosy-voice")
 
-        paths = [
-            Path("./models/CosyVoice2-0.5B"),
-            # NOTE: 不再支持老版本，只是为了方便检索留下关键词
-            # Path("./models/CosyVoice_300M"),
-            # Path("./models/CosyVoice_300M_Instruct"),
-            # Path("./models/CosyVoice_300M_SFT"),
-        ]
-        paths = [p for p in paths if p.exists()]
-        if len(paths) == 0:
-            paths = [Path("./models/CosyVoice2-0.5B")]
-            self.logger.info("No CosyVoice model found")
-        else:
-            self.logger.info(f"Found CosyVoice model: {paths}")
-
-        self.model_dir = paths[0]
+        self.model_dir = Path(f"./models/{model_name}")
+        self.config_filename = config_filenmae
+        self.tokenizer_filename = tokenizer_filename
+        self.model_version = model_version
 
         self.model = CosyVoiceTTSModel.model
         self.frontend = CosyVoiceTTSModel.frontend
@@ -85,14 +84,9 @@ class CosyVoiceTTSModel(TTSModel):
 
             device = self.get_device()
             dtype = self.get_dtype()
-            model_dir = self.model_dir
 
-            # 具体看 #268 ，因为 cosyvoice 改动配置文件名，所以兼容两种情况
-            configure_path_1 = model_dir / "cosyvoice.yaml"
-            configure_path_2 = model_dir / "cosyvoice2.yaml"
-            configure_path = (
-                configure_path_1 if configure_path_1.exists() else configure_path_2
-            )
+            model_dir = self.model_dir
+            configure_path = model_dir / self.config_filename
 
             with open(configure_path, "r") as f:
                 configs = load_hyperpyyaml(f, overrides=self.hp_overrides)
@@ -101,7 +95,7 @@ class CosyVoiceTTSModel(TTSModel):
                 get_tokenizer=configs["get_tokenizer"],
                 feat_extractor=configs["feat_extractor"],
                 campplus_model=model_dir / "campplus.onnx",
-                speech_tokenizer_model=model_dir / "speech_tokenizer_v2.onnx",
+                speech_tokenizer_model=model_dir / self.tokenizer_filename,
                 spk2info=model_dir / "spk2info.pt",
                 allowed_special=configs["allowed_special"],
                 device=device,
@@ -113,12 +107,30 @@ class CosyVoiceTTSModel(TTSModel):
             # NOTE: 好像 voice 采样率和这个采样率不一样？
             self.sample_rate = configs["sample_rate"]
 
-            model = CosyVoice2Model(
-                llm=configs["llm"],
-                flow=configs["flow"],
-                hift=configs["hift"],
-                fp16=dtype == torch.float16,
-            )
+            if self.model_version == "1":
+                model = CosyVoiceModel(
+                    llm=configs["llm"],
+                    flow=configs["flow"],
+                    hift=configs["hift"],
+                    fp16=dtype != torch.float32,
+                )
+            elif self.model_version == "2":
+                model = CosyVoice2Model(
+                    llm=configs["llm"],
+                    flow=configs["flow"],
+                    hift=configs["hift"],
+                    fp16=dtype != torch.float32,
+                )
+            elif self.model_version == "3":
+                model = CosyVoice3Model(
+                    llm=configs["llm"],
+                    flow=configs["flow"],
+                    hift=configs["hift"],
+                    # fp16=dtype != torch.float32,
+                )
+            else:
+                raise ValueError(f"Unsupported model version: {self.model_version}")
+
             model.device = device
             model.load(
                 llm_model=model_dir / "llm.pt",
@@ -280,8 +292,6 @@ class CosyVoiceTTSModel(TTSModel):
 
         instruct_text = emotion or prompt2 or ""
 
-        # NOTE: v2 版本不需要 token 可以直接用 prompt speech
-        # spk_embedding = self.spk_to_embedding(spk) if spk else None
         ref_wav, ref_text = (
             self.spk_to_ref_wav(spk, emotion=emotion) if spk else (None, None)
         )
@@ -297,7 +307,14 @@ class CosyVoiceTTSModel(TTSModel):
         os.close(fd)
 
         infer_func: callable = None
-        if instruct_text is not None:
+        if instruct_text is not None and instruct_text != "":
+            if self.model_version == "3":
+                # v3 的 instruct 模式需要依赖分隔token和预设模板
+                if not instruct_text.endswith("。"):
+                    instruct_text += "。"
+                instruct_text = (
+                    f"You are a helpful assistant. {instruct_text}<|endofprompt|>"
+                )
             infer_func = partial(
                 self.inference_instruct,
                 instruct_text=instruct_text,
@@ -310,7 +327,9 @@ class CosyVoiceTTSModel(TTSModel):
                 prompt_wav=tmp_wav,
             )
         else:
-            raise ValueError("ref_wav or ref_text is None")
+            raise ValueError(
+                "Cosyvoice must be generated using reference audio. If an error occurs, please change the speaker/timbre."
+            )
 
         try:
             sf.write(tmp_wav, ref_wav, sr, format="WAV")
@@ -342,7 +361,18 @@ if __name__ == "__main__":
     from modules.core.pipeline.dcls import TTSSegment
     from modules.core.spk import spk_mgr
 
-    model = CosyVoiceTTSModel()
+    # model = CosyVoiceTTSModel(
+    #     model_name="CosyVoice2-0.5B",
+    #     config_filenmae="cosyvoice2.yaml",
+    #     tokenizer_filename="speech_tokenizer_v2.onnx",
+    #     model_version="2",
+    # )
+    model = CosyVoiceTTSModel(
+        model_name="Fun-CosyVoice3-0.5B-2512",
+        config_filenmae="cosyvoice3.yaml",
+        tokenizer_filename="speech_tokenizer_v3.onnx",
+        model_version="3",
+    )
     model.logger.setLevel(logging.DEBUG)
     model.load()
 
@@ -361,7 +391,12 @@ if __name__ == "__main__":
             context=TTSPipelineContext(),
         )
         # audio_data = (audio_data * (2**15)).astype(np.int16)
-        sf.write(f"test_cosyvoice{spk_name}.wav", audio_data, sr, format="WAV")
+        sf.write(
+            f"test_cosyvoice_{model.model_version}_{spk_name}.wav",
+            audio_data,
+            sr,
+            format="WAV",
+        )
 
     spk_names = ["mona"]
 

@@ -118,8 +118,13 @@ class PipelineFactory:
             return cls.create_chattts_pipeline(ctx)
         elif model_id == "fishspeech":
             return cls.create_fishspeech_pipeline(ctx)
-        elif model_id == "cosyvoice":
-            return cls.create_cosyvoice_pipeline(ctx)
+        elif model_id.startswith("cosyvoice"):
+            version = (
+                "2"
+                if model_id.endswith("2")
+                else "3" if model_id.endswith("3") else "1"
+            )
+            return cls.create_cosyvoice_pipeline(ctx, version)
         elif model_id == "firered" or model_id == "fireredtts":
             return cls.create_fire_red_tts_pipeline(ctx)
         elif model_id == "f5" or model_id == "f5tts":
@@ -174,11 +179,17 @@ class PipelineFactory:
         return pipeline
 
     @classmethod
-    def create_cosyvoice_pipeline(cls, ctx: TTSPipelineContext):
+    def create_cosyvoice_pipeline(cls, ctx: TTSPipelineContext, version="2"):
         pipeline = TTSPipeline(ctx)
         cls.setup_base_modules(pipeline=pipeline)
         pipeline.add_module(TNProcess(tn_pipeline=CosyVoiceTN))
-        model = model_zoo.get_cosy_voice()
+        if version == "2":
+            model = model_zoo.get_cosy_voice_v2()
+        elif version == "3":
+            model = model_zoo.get_cosy_voice_v3()
+        else:
+            # 不支持
+            raise Exception("Unsupported CosyVoice version: {}".format(version))
         pipeline.set_model(model)
 
         pipeline.audio_sr = model.get_sample_rate()

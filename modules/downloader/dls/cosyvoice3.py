@@ -1,0 +1,42 @@
+import logging
+
+from modules.downloader.dl_base import RemoteModelDownloader
+
+logger = logging.getLogger(__name__)
+
+
+class CosyVoice3Downloader(RemoteModelDownloader):
+    def __init__(self):
+        required_files = [
+            "campplus.onnx",
+            "configuration.json",
+            "cosyvoice3.yaml",
+            "flow.pt",
+            "hift.pt",
+            "llm.pt",
+            "speech_tokenizer_v3.onnx",
+            "CosyVoice-BlankEN/model.safetensors",
+            "CosyVoice-BlankEN/config.json",
+            "CosyVoice-BlankEN/generation_config.json",
+            "CosyVoice-BlankEN/merges.txt",
+            "CosyVoice-BlankEN/tokenizer_config.json",
+            "CosyVoice-BlankEN/vocab.json",
+        ]
+        super().__init__(
+            model_name="Fun-CosyVoice3-0.5B-2512",
+            modelscope_repo="FunAudioLLM/Fun-CosyVoice3-0.5B-2512",
+            huggingface_repo="FunAudioLLM/Fun-CosyVoice3-0.5B-2512",
+            required_files=required_files,
+            just_download_required_files=True,
+        )
+        self.logger = logger
+
+        self.blank_dir = self.model_dir / "CosyVoice-BlankEN"
+        self.blank_dir.mkdir(parents=True, exist_ok=True)
+
+
+if __name__ == "__main__":
+    from modules.downloader.dl_args import parser_args
+
+    args = parser_args()
+    CosyVoice3Downloader()(source=args.source)

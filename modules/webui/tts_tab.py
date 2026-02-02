@@ -24,8 +24,8 @@ class NotSeedTTSInterface(TTSInterface):
 
 class CosyVoiceInterface(NotSeedTTSInterface):
 
-    def __init__(self):
-        super().__init__("cosy-voice")
+    def __init__(self, model_id="cosy-voice-2"):
+        super().__init__(model_id)
         self.refine_visible = False
         self.contorl_tokens = []
         self.spliter_eos = " 。 "
@@ -269,7 +269,8 @@ def create_tts_interface():
         Qwen3TTSInterface("qwen3-tts-06cv"),
         Qwen3TTSInterface("qwen3-tts-17cv"),
         Qwen3TTSVoiceDesignInterface(),
-        CosyVoiceInterface(),
+        CosyVoiceInterface("cosy-voice-2"),
+        CosyVoiceInterface("cosy-voice-3"),
         IndexTTSInterface(),
         F5TtsInterface(),
         GptSoVitsInterface(),

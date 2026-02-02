@@ -38,7 +38,19 @@ class ModelZoo:
         # === tts ===
         "chat-tts": ChatTTSModel(),
         "fish-speech": FishSpeech14Model(),
-        "cosy-voice": CosyVoiceTTSModel(),
+        # NOTE: 这里没有支持v1版本
+        "cosy-voice-2": CosyVoiceTTSModel(
+            model_name="CosyVoice2-0.5B",
+            config_filenmae="cosyvoice2.yaml",
+            tokenizer_filename="speech_tokenizer_v2.onnx",
+            model_version="2",
+        ),
+        "cosy-voice-3": CosyVoiceTTSModel(
+            model_name="Fun-CosyVoice3-0.5B-2512",
+            config_filenmae="cosyvoice3.yaml",
+            tokenizer_filename="speech_tokenizer_v3.onnx",
+            model_version="3",
+        ),
         "fire-red-tts": FireRedTTSModel(),
         "f5-tts": F5TtsModel(),
         "index-tts": IndexTTSModel("Index-TTS"),
@@ -163,8 +175,11 @@ class ModelZoo:
     def get_chat_tts(self) -> ChatTTSModel:
         return self.get_model("chat-tts")
 
-    def get_cosy_voice(self) -> CosyVoiceTTSModel:
-        return self.get_model("cosy-voice")
+    def get_cosy_voice_v2(self) -> CosyVoiceTTSModel:
+        return self.get_model("cosy-voice-2")
+
+    def get_cosy_voice_v3(self) -> CosyVoiceTTSModel:
+        return self.get_model("cosy-voice-3")
 
     def get_fish_speech(self) -> FishSpeech14Model:
         return self.get_model("fish-speech")

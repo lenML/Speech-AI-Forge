@@ -1,7 +1,9 @@
 from .chattts import ChatTTSDownloader
+
 from .cosyvoice1_base import CosyVoiceInstructDownloader
 from .cosyvoice1_instruct import CosyVoiceInstructDownloader
 from .cosyvoice2 import CosyVoice2Downloader
+from .cosyvoice3 import CosyVoice3Downloader
 
 # NOTE: 这个是老版本的 f5 tts 没必要支持
 # from .f5_tts import F5TTSDownloader
