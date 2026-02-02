@@ -4,10 +4,12 @@ if __name__ == "__main__":
     setup_repos_paths()
 
 import logging
+import os
+import tempfile
 import threading
 from functools import partial
 from pathlib import Path
-from typing import Generator, Optional
+from typing import BinaryIO, Generator, Optional
 
 import librosa
 import numpy as np
@@ -24,20 +26,6 @@ from modules.devices import devices
 from modules.repos_static.cosyvoice.cosyvoice.cli.model import CosyVoice2Model
 from modules.utils import audio_utils
 from modules.utils.SeedContext import SeedContext
-
-max_val = 0.8
-prompt_sr, target_sr = 16000, 16000
-
-
-def postprocess(speech: np.ndarray, top_db=60, hop_length=220, win_length=440):
-    speech, _ = librosa.effects.trim(
-        speech, top_db=top_db, frame_length=win_length, hop_length=hop_length
-    )
-    if speech.abs().max() > max_val:
-        speech = speech / speech.abs().max() * max_val
-    speech = torch.concat([speech, torch.zeros(1, int(target_sr * 0.2))], dim=1)
-    return speech
-
 
 class CosyVoiceTTSModel(TTSModel):
     logger = logging.getLogger(__name__)
@@ -75,6 +63,9 @@ class CosyVoiceTTSModel(TTSModel):
 
         self.sample_rate = 24000
 
+    def get_sample_rate(self) -> int:
+        return self.sample_rate
+
     def is_downloaded(self) -> bool:
         return self.model_dir.exists()
 
@@ -96,10 +87,6 @@ class CosyVoiceTTSModel(TTSModel):
             dtype = self.get_dtype()
             model_dir = self.model_dir
 
-            # V2 完全支持 instruct 不需要区分模型
-            # instruct = True if "-Instruct" in str(model_dir) else False
-            instruct = True
-
             # 具体看 #268 ，因为 cosyvoice 改动配置文件名，所以兼容两种情况
             configure_path_1 = model_dir / "cosyvoice.yaml"
             configure_path_2 = model_dir / "cosyvoice2.yaml"
@@ -116,7 +103,6 @@ class CosyVoiceTTSModel(TTSModel):
                 campplus_model=model_dir / "campplus.onnx",
                 speech_tokenizer_model=model_dir / "speech_tokenizer_v2.onnx",
                 spk2info=model_dir / "spk2info.pt",
-                instruct=instruct,
                 allowed_special=configs["allowed_special"],
                 device=device,
                 dtype=dtype,
@@ -190,47 +176,45 @@ class CosyVoiceTTSModel(TTSModel):
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def inference_zero_shot(
-        self, tts_texts: list[str], prompt_text: str, prompt_speech_16k: torch.Tensor
+        self, tts_texts: list[str], prompt_text: str, prompt_wav: BinaryIO
     ):
         tts_speeches = []
         for text in tts_texts:
             model_input = self.frontend.frontend_zero_shot(
-                text, prompt_text, prompt_speech_16k, resample_rate=self.sample_rate
+                text,
+                prompt_text,
+                prompt_wav=prompt_wav,
+                resample_rate=self.sample_rate,
+                zero_shot_spk_id="",
             )
             for model_output in self.model.tts(**model_input):
                 tts_speeches.append(model_output["tts_speech"])
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
-    def inference_cross_lingual(
-        self, tts_texts: list[str], prompt_speech_16k: torch.Tensor
-    ):
-        if self.frontend.instruct is True:
-            raise ValueError(
-                "{} do not support cross_lingual inference".format(self.model_dir)
-            )
+    def inference_cross_lingual(self, tts_texts: list[str], prompt_wav: BinaryIO):
         tts_speeches = []
         for text in tts_texts:
             model_input = self.frontend.frontend_cross_lingual(
-                text, prompt_speech_16k, resample_rate=self.sample_rate
+                text,
+                prompt_wav=prompt_wav,
+                resample_rate=self.sample_rate,
+                zero_shot_spk_id="",
             )
             for model_output in self.model.tts(**model_input):
                 tts_speeches.append(model_output["tts_speech"])
         return {"tts_speech": torch.concat(tts_speeches, dim=1)}
 
     def inference_instruct(
-        self, tts_texts: list[str], prompt_speech_16k: torch.Tensor, instruct_text: str
+        self, tts_texts: list[str], prompt_wav: BinaryIO, instruct_text: str
     ):
-        if self.frontend.instruct is False:
-            raise ValueError(
-                "{} do not support instruct inference".format(self.model_dir)
-            )
         tts_speeches = []
         for text in tts_texts:
             model_input = self.frontend.frontend_instruct2(
                 tts_text=text,
                 instruct_text=instruct_text,
-                prompt_speech_16k=prompt_speech_16k,
+                prompt_wav=prompt_wav,
                 resample_rate=self.sample_rate,
+                zero_shot_spk_id="",
             )
             for model_output in self.model.tts(**model_input):
                 tts_speeches.append(model_output["tts_speech"])
@@ -256,12 +240,9 @@ class CosyVoiceTTSModel(TTSModel):
             audio_bytes=ref_data.wav, sample_rate=ref_data.wav_sr
         )
         _, wav = AudioReshaper.normalize_audio(
-            audio=(ref_data.wav_sr, wav), target_sr=target_sr
+            audio=(ref_data.wav_sr, wav), target_sr=self.get_sample_rate()
         )
         return wav, ref_data.text
-
-    def get_sample_rate(self) -> int:
-        return self.sample_rate
 
     def generate_batch(
         self, segments: list[TTSSegment], context: TTSPipelineContext
@@ -279,6 +260,7 @@ class CosyVoiceTTSModel(TTSModel):
         # NOTE: 因为不支持流式，所以是同步的
 
         self.load()
+        sr = self.get_sample_rate()
 
         seg0 = segments[0]
         spk = seg0.spk
@@ -310,38 +292,46 @@ class CosyVoiceTTSModel(TTSModel):
                 "Cosyvoice must be generated using reference audio. If an error occurs, please change the speaker/timbre."
             )
 
+        # NOTE: 需要用 mkstemp 而不是 NamedTemporaryFile ，不然windows有兼容问题
+        fd, tmp_wav = tempfile.mkstemp(suffix=".wav")
+        os.close(fd)
+
         infer_func: callable = None
         if instruct_text is not None:
             infer_func = partial(
                 self.inference_instruct,
                 instruct_text=instruct_text,
-                prompt_speech_16k=torch.from_numpy(ref_wav).unsqueeze(0),
+                prompt_wav=tmp_wav,
             )
         elif ref_wav is not None and ref_text:
             infer_func = partial(
                 self.inference_zero_shot,
                 prompt_text=ref_text,
-                prompt_speech_16k=torch.from_numpy(ref_wav).unsqueeze(0),
+                prompt_wav=tmp_wav,
             )
         else:
             raise ValueError("ref_wav or ref_text is None")
 
-        # NOTE: 迷，不是很清楚为什么输入要 16k 输出却是 22050 ...
-        sr = 22050
+        try:
+            sf.write(tmp_wav, ref_wav, sr, format="WAV")
+            results: list[NP_AUDIO] = []
+            for seg in segments:
+                if context.stop:
+                    break
 
-        results: list[NP_AUDIO] = []
-        for seg in segments:
-            if context.stop:
-                break
+                with SeedContext(infer_seed):
+                    result = infer_func(tts_texts=[seg.text])
+                wav = result["tts_speech"].float().cpu().numpy().squeeze()
+                results.append((sr, wav))
 
-            with SeedContext(infer_seed):
-                result = infer_func(tts_texts=[seg.text])
-            wav = result["tts_speech"].float().cpu().numpy().squeeze()
-            results.append((sr, wav))
-
-        if not context.stop:
-            self.set_cache(segments=segments, context=context, value=results)
-        yield results
+            if not context.stop:
+                self.set_cache(segments=segments, context=context, value=results)
+            yield results
+        finally:
+            try:
+                os.remove(tmp_wav)
+            except Exception as e:
+                self.logger.warning(f"Failed to remove temp file {tmp_wav}: {e}")
 
 
 if __name__ == "__main__":
@@ -368,12 +358,12 @@ if __name__ == "__main__":
 
         sr, audio_data = model.generate(
             segment=TTSSegment(_type="text", text=text, spk=spk, emotion=emotion),
-            context=None,
+            context=TTSPipelineContext(),
         )
         # audio_data = (audio_data * (2**15)).astype(np.int16)
         sf.write(f"test_cosyvoice{spk_name}.wav", audio_data, sr, format="WAV")
 
-    spk_names = ["中文女", "中文男", "英文女", "粤语女", "韩语女"]
+    spk_names = ["mona"]
 
     for name in tqdm.tqdm(spk_names):
         gen_audio(name)
