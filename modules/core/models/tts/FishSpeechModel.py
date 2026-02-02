@@ -159,6 +159,7 @@ class FishSpeechModel(TTSModel):
             yield cached
             return
 
+        self.download()
         self.load()
 
         infer = FishSpeechInfer(

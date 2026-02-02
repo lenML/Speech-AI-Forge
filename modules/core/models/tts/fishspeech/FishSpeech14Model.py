@@ -88,6 +88,7 @@ class FishSpeech14Model(TTSModel):
             yield cached
             return
 
+        self.download()
         self.load()
         model = self.model
 

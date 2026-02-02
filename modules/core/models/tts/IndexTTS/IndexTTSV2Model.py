@@ -126,6 +126,7 @@ class IndexTTSV2Model(TTSModel):
             yield cached
             return
 
+        self.download()
         self.load()
 
         seg0 = segments[0]

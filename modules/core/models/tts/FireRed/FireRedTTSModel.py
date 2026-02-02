@@ -57,6 +57,7 @@ class FireRedTTSModel(TTSModel):
     def generate(
         self, segment: TTSSegment, context: TTSPipelineContext
     ) -> Tuple[NP_AUDIO]:
+        self.download()
         model = self.load()
 
         seg0 = segment

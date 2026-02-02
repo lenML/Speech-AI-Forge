@@ -1,3 +1,4 @@
+from pathlib import Path
 from modules.devices import devices
 from modules.downloader.AutoModelDownloader import AutoModelDownloader
 
@@ -38,8 +39,16 @@ class BaseZooModel:
     def unload(self) -> None:
         pass
 
-    def download(self) -> None:
-        pass
+    def download(self, force=False) -> Path:
+        """
+        下载模型
+        - 如果已经下载过则不会重新下载
+        - 如果未下载过则会下载
+        - 如果未包含在自动下载列表中，则不会下载，并报错
+        - 开启 force 参数则会强制下载
+        """
+        adl = AutoModelDownloader()
+        return adl.download(model_name=self.model_name, force=force)
 
     def interrupt(self) -> None:
         pass

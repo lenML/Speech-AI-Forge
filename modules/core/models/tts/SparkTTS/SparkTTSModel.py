@@ -97,6 +97,7 @@ class SparkTTSModel(TTSModel):
         if cached is not None:
             return cached[0]
 
+        self.download()
         self.load()
 
         sr = self.get_sample_rate()

@@ -46,7 +46,7 @@ class CosyVoiceTTSModel(TTSModel):
         tokenizer_filename="speech_tokenizer_v2.onnx",
         model_version: str = "2",
     ) -> None:
-        super().__init__("cosy-voice")
+        super().__init__("cosy-voice", model_name=model_name)
 
         self.model_dir = Path(f"./models/{model_name}")
         self.config_filename = config_filenmae
@@ -64,9 +64,6 @@ class CosyVoiceTTSModel(TTSModel):
 
     def get_sample_rate(self) -> int:
         return self.sample_rate
-
-    def is_downloaded(self) -> bool:
-        return self.model_dir.exists()
 
     def is_loaded(self) -> bool:
         return CosyVoiceTTSModel.model is not None
@@ -261,6 +258,7 @@ class CosyVoiceTTSModel(TTSModel):
     ) -> list[NP_AUDIO]:
         return next(self.generate_batch_stream(segments, context))
 
+    # TODO: 内部推理已经支持stream了，这里还没写，还是同步的
     def generate_batch_stream(
         self, segments: list[TTSSegment], context: TTSPipelineContext
     ) -> Generator[list[NP_AUDIO], None, None]:
@@ -269,8 +267,7 @@ class CosyVoiceTTSModel(TTSModel):
             yield cached
             return
 
-        # NOTE: 因为不支持流式，所以是同步的
-
+        self.download()
         self.load()
         sr = self.get_sample_rate()
 

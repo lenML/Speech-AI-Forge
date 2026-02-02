@@ -75,10 +75,6 @@ class Qwen3TTSModel(TTSModel):
         self.model: "None | Qwen3TTS" = None
         self.tokenizer: "None | Qwen3TTSTokenizer" = None
 
-    def is_downloaded(self):
-        downloader = AutoModelDownloader()
-        return downloader.is_downloaded(model_name=self.model_name)
-
     def get_sample_rate(self):
         # 来自 models/Qwen3-TTS-12Hz-0.6B-CustomVoice/speech_tokenizer/config.json
         # input_sample_rate=24000
@@ -100,10 +96,8 @@ class Qwen3TTSModel(TTSModel):
     def load(self):
         if self.model is not None:
             return self.model, self.tokenizer
-
-        downloader = AutoModelDownloader()
-
-        model_path = downloader.download(model_name=self.model_name)
+        # NOTE download 的语义其实写在 generate 里面好一点，但是...写在这里应该也没什么问题
+        model_path = self.download()
 
         device = self.get_device()
         dtype = self.get_dtype()

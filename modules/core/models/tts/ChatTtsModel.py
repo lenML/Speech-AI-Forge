@@ -97,6 +97,7 @@ class ChatTTSModel(TTSModel):
 
             return _gen()
 
+        self.download()
         infer = self.get_infer(context)
         self.current_infer = infer
 

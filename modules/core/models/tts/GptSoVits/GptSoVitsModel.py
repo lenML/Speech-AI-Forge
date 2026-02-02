@@ -72,6 +72,7 @@ class GptSoVitsModel(TTSModel):
         if cached is not None:
             return cached
 
+        self.download()
         model = self.load()
 
         seg0 = segment
