@@ -6,12 +6,12 @@ fastapi==0.111.0
 soundfile==0.13.1
 omegaconf==2.3.0
 pypinyin==0.51.0
-vocos==0.1.0
+vocos
 pandas==2.1.3
 vector_quantize_pytorch==1.14.24
 einops==0.8.0
 transformers==4.57.3
-tqdm==4.66.3
+tqdm
 python-ms==1.1.0
 
 huggingface-hub==0.34.4
@@ -57,9 +57,9 @@ loralib==0.1.2
 wandb==0.17.4
 
 ### cosyvoice
-hyperpyyaml==1.2.2
-openai-whisper==20231117
-onnxruntime==1.18.1
+hyperpyyaml==1.2.3
+openai-whisper
+onnxruntime
 inflect==7.3.1
 unidecode==1.3.8
 pyworld==0.3.5
@@ -91,7 +91,7 @@ lingua-language-detector==2.0.2
 torchdiffeq==0.2.4
 x-transformers==1.39.1
 ema-pytorch==0.7.0
-funasr==1.1.12
+funasr
 jiwer==3.0.4
 zhconv==1.4.3
 tomli==2.2.1
@@ -103,14 +103,14 @@ ffmpeg-python==0.2.0
 wordsegment==1.3.1
 g2p_en==2.1.0
 nltk==3.9.1
-g2pk2==0.0.3
+g2pk2==0.0.3 
 ko_pron==1.3
 
 ### webui tools
 moviepy==1.0.3
 
 ### downloader script
-modelscope==1.20.0
+modelscope
 
 ### Index-TTS v2
 munch==4.0.0
@@ -118,3 +118,9 @@ descript-audiotools==0.7.2
 
 ### Qwen3-TTS
 sox==1.5.0
+
+### PyTorch Dependencies (using custom source for CUDA)
+--extra-index-url https://download.pytorch.org/whl/cu126
+torch==2.6.0+cu126
+torchvision==0.21.0+cu126
+torchaudio==2.6.0+cu126
