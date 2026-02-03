@@ -263,12 +263,12 @@ class ChatTTSInterface(TTSInterface):
 def create_tts_interface():
     # ---- 1. 模型注册表（顺序 = 默认顺序）----
     MODELS: list[TTSInterface] = [
-        IndexTTSV2Interface(),
-        Qwen3TTSInterface("qwen3-tts-06base"),
         Qwen3TTSInterface("qwen3-tts-17base"),
-        Qwen3TTSInterface("qwen3-tts-06cv"),
-        Qwen3TTSInterface("qwen3-tts-17cv"),
         Qwen3TTSVoiceDesignInterface(),
+        Qwen3TTSInterface("qwen3-tts-17cv"),
+        Qwen3TTSInterface("qwen3-tts-06base"),
+        Qwen3TTSInterface("qwen3-tts-06cv"),
+        IndexTTSV2Interface(),
         CosyVoiceInterface("cosy-voice-2"),
         CosyVoiceInterface("cosy-voice-3"),
         IndexTTSInterface(),
