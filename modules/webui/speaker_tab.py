@@ -12,6 +12,8 @@ def create_speaker_panel():
 
     with gr.Tabs():
 
+        with gr.Tab("Hub"):
+            create_spk_hub_ui()
         with gr.Tab("Builder"):
             speaker_editor_ui_v2()
         with gr.Tab("Test Voice"):
@@ -21,5 +23,3 @@ def create_speaker_panel():
                 speaker_creator_ui()
             with gr.Tab("Merger"):
                 create_speaker_merger()
-        with gr.Tab("Hub"):
-            create_spk_hub_ui()
