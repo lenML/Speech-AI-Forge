@@ -261,7 +261,7 @@ pyperclip==1.9.0
 pypinyin==0.51.0
 pyproject_hooks==1.2.0
 pyrootutils==1.0.4
-pyrubberband==0.3.0
+pyrubberband==0.4.0
 PySocks==1.7.1
 PySoundFile==0.9.0.post1
 pysubs2==1.7.3

@@ -41,7 +41,7 @@ pydantic-core==2.20.1
 python-box==7.1.1
 ftfy==6.2.0
 librosa==0.10.1
-pyrubberband==0.3.0
+pyrubberband==0.4.0
 pybase16384==0.3.8
 cachetools==5.3.3
 langdetect==1.0.9

@@ -158,7 +158,7 @@ websockets==11.0.3
 Werkzeug==3.0.3
 zhon==2.0.2
 ftfy==6.2.0
-pyrubberband==0.3.0
+pyrubberband==0.4.0
 pybase16384==0.3.7
 cachetools==5.3.3
 langdetect==1.0.9
