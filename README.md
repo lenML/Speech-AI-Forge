@@ -178,7 +178,6 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 | **ASR**        | `faster-whisper-large-v3`              |
 |                | `faster-whisper-large-v3-turbo-ct2`    |
 |                | `SenseVoiceSmall`                      |
-|                | `fsmn-vad`                             |
 | **CV / Voice Clone** | `OpenVoiceV2`                     |
 | **Enhancer**   | `resemble-enhance`                     |
 | **依赖模型（Index-TTS-2 所需）** | `amphion/MaskGCT`       |
@@ -186,6 +185,7 @@ python -m scripts.download_models --source=modelscope --models="model1,model2,..
 |                                 | `funasr/campplus`                      |
 |                                 | `facebook/w2v-bert-2.0`               |
 |                                 | `vocos-mel-24khz`                      |
+|    (sense_voice依赖)            | `fsmn-vad`                             |
 </details>
 
 ## 自动下载
