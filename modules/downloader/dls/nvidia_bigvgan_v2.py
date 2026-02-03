@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 class NvidiaBigvganV2Downloader(RemoteModelDownloader):
     def __init__(self):
         required_files = [
-            "configuration.json",
+            # hugginface 上面没有这个文件，不知道为什么...应该没有也可以？只是几个默认配置
+            # "configuration.json",
             "config.json",
             "bigvgan_generator.pt",
         ]
