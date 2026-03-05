@@ -45,6 +45,8 @@ pyrubberband==0.4.0
 pybase16384==0.3.8
 cachetools==5.3.3
 langdetect==1.0.9
+
+wetext; platform_system != "Linux"
 WeTextProcessing; sys_platform=="linux"
 
 #### fish-speech
