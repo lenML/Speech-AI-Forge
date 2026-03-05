@@ -44,7 +44,7 @@ class AudioSpeechParams(BaseModel):
         100, ge=10, le=1024, description="Threshold for sentence spliter"
     )
     # end of sentence
-    eos: str = "[uv_break]"
+    eos: str = " "
 
     enhance: bool = False
     denoise: bool = False

@@ -125,7 +125,7 @@ async def synthesize_ssml(
     batch_size=4,
     enable_enhance=False,
     enable_denoise=False,
-    eos: str = "[uv_break]",
+    eos: str = " ",
     spliter_thr: int = 100,
     pitch: float = 0,
     speed_rate: float = 1,
@@ -254,7 +254,7 @@ async def tts_generate(
     enable_denoise=False,
     spk_file=None,
     spliter_thr: int = 100,
-    eos: str = "[uv_break]",
+    eos: str = " ",
     pitch: float = 0,
     speed_rate: float = 1,
     volume_gain_db: float = 0,
@@ -391,22 +391,22 @@ async def tts_generate(
 # @torch.inference_mode()
 @spaces.GPU(duration=120)
 def dit_tts_generate(
-    text:str,
-    spk:Optional[TTSSpeaker] = None,
+    text: str,
+    spk: Optional[TTSSpeaker] = None,
     infer_seed=-1,
     disable_normalize=False,
     batch_size=4,
     # dit configs
-    nfe_step = 32,
-    cfg_strength = 2.0,
-    sway_sampling_coef = -1.0,
-    speed_scale = 1.0,
+    nfe_step=32,
+    cfg_strength=2.0,
+    sway_sampling_coef=-1.0,
+    speed_scale=1.0,
     # enhancer
     enable_enhance=False,
     enable_denoise=False,
     # spliter
     spliter_thr: int = 100,
-    eos: str = "[uv_break]",
+    eos: str = " ",
     # adjuster
     pitch: float = 0,
     speed_rate: float = 1,

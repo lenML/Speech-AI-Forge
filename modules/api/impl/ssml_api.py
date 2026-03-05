@@ -21,7 +21,7 @@ class SSMLParams(BaseModel):
     batch_size: int = 4
 
     # end of sentence
-    eos: str = "[uv_break]"
+    eos: str = " "
 
     model: str = "chat-tts"
 

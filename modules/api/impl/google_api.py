@@ -35,7 +35,7 @@ class VoiceSelectionParams(BaseModel):
     seed: int = 42
 
     # end_of_sentence
-    eos: str = "[uv_break]"
+    eos: str = " "
 
     model: str = "chat-tts"
 
