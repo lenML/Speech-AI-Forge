@@ -19,6 +19,7 @@ from modules.core.models.tts.F5TtsModel import F5TtsModel
 from modules.core.models.tts.FireRed.FireRedTTSModel import FireRedTTSModel
 from modules.core.models.tts.GptSoVits.GptSoVitsModel import GptSoVitsModel
 from modules.core.models.tts.IndexTTS.IndexTTSV2Model import IndexTTSV2Model
+from modules.core.models.tts.MiniMaxCloudTTSModel import MiniMaxCloudTTSModel
 from modules.core.models.tts.Qwen.Qwen3TTS import Qwen3TTSModel
 from modules.core.models.tts.fishspeech.FishSpeech14Model import FishSpeech14Model
 from modules.core.models.tts.IndexTTS.IndexTTSModel import IndexTTSModel
@@ -67,6 +68,9 @@ class ModelZoo:
         "qwen3-tts-17cv": Qwen3TTSModel("1.7B-CustomVoice"),
         "qwen3-tts-17base": Qwen3TTSModel("1.7B-Base"),
         "qwen3-tts-17vd": Qwen3TTSModel("1.7B-VoiceDesign"),
+        # === cloud tts ===
+        "minimax-hd": MiniMaxCloudTTSModel("speech-2.8-hd"),
+        "minimax-turbo": MiniMaxCloudTTSModel("speech-2.8-turbo"),
         # === enhancer ===
         "resemble-enhance": ResembleEnhanceModel(),
         # === whisper ===
@@ -240,6 +244,12 @@ class ModelZoo:
 
     def get_qwen3_tts_17vd(self) -> Qwen3TTSModel:
         return self.get_model("qwen3-tts-17vd")
+
+    def get_minimax_hd(self) -> MiniMaxCloudTTSModel:
+        return self.get_model("minimax-hd")
+
+    def get_minimax_turbo(self) -> MiniMaxCloudTTSModel:
+        return self.get_model("minimax-turbo")
 
 
 model_zoo = ModelZoo()

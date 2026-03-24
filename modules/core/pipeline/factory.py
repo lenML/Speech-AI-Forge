@@ -139,6 +139,8 @@ class PipelineFactory:
             return cls.create_gpt_sovits_v4(ctx)
         elif model_id.startswith("qwen3tts"):
             return cls.create_qwen3_tts_pipeline(ctx)
+        elif model_id.startswith("minimax"):
+            return cls.create_minimax_cloud_pipeline(ctx)
         else:
             raise Exception(f"Unknown model id: {model_id}")
 
@@ -283,6 +285,23 @@ class PipelineFactory:
         else:
             # 不支持
             raise ValueError(f"Unsupported model_id: {model_id}")
+        pipeline.set_model(model)
+
+        pipeline.audio_sr = model.get_sample_rate()
+        return pipeline
+
+    @classmethod
+    def create_minimax_cloud_pipeline(cls, ctx: TTSPipelineContext):
+        model_id = ctx.tts_config.mid.lower().replace(" ", "-").replace("-", "")
+
+        pipeline = TTSPipeline(ctx)
+        cls.setup_base_modules(pipeline=pipeline)
+        # Cloud TTS handles text directly, use base TN for minimal preprocessing
+        pipeline.add_module(TNProcess(tn_pipeline=BaseTN))
+        if model_id == "minimaxturbo":
+            model = model_zoo.get_minimax_turbo()
+        else:
+            model = model_zoo.get_minimax_hd()
         pipeline.set_model(model)
 
         pipeline.audio_sr = model.get_sample_rate()
