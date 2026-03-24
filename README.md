@@ -135,6 +135,8 @@ python launch.py
 |                 | [Spark-TTS](https://github.com/SparkAudio/Spark-TTS)               | en, zh              | ✅           |
 |                 | [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS/tree/main)     | en, zh, ja, ko, yue | ✅           |
 |          | [ChatTTS](https://github.com/2noise/ChatTTS)                       | en, zh              | ✅           |
+| **Cloud TTS**   |                        |                   |            |
+|                 | [MiniMax Cloud TTS](https://platform.minimaxi.com/)                | en, zh, jp, ko + more | ✅ (speech-2.8-hd/turbo) |
 | **ASR**         |                        |                   |            |
 |          | [Whisper](https://github.com/openai/whisper)                       | ✅                  | ✅           |
 |                 | [SenseVoice](https://github.com/FunAudioLLM/SenseVoice)            | ✅                  | ✅           |
