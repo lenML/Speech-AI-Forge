@@ -279,7 +279,7 @@ PyYAML==6.0.1
 pyzmq==26.0.3
 quantile-python==1.1
 RapidFuzz==3.10.0
-ray==2.31.0
+ray==2.54.0
 rdflib==7.0.0
 referencing==0.35.1
 regex==2024.5.15
