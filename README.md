@@ -19,6 +19,7 @@ Speech-AI-Forge 是一个围绕 TTS 生成模型开发的项目，实现了 API 
 
 ## Breaking change logs
 
+- 260402: Support Cloud TTS (minimax tts) [#293](https://github.com/lenML/Speech-AI-Forge/pull/293)
 - 260202: Support CosyVoice3 [#264](https://github.com/lenML/Speech-AI-Forge/issues/264)
 - 260129: Support Qwen3-TTS [#282](https://github.com/lenML/Speech-AI-Forge/issues/282)
 - 250912: Support Index-TTS-2 [#265](https://github.com/lenML/Speech-AI-Forge/issues/265)
